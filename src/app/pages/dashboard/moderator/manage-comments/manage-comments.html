@@ -1,1 +1,91 @@
-<p>manage-comments works!</p>
+<section class="dashboard-content">
+  <div class="card table-card border-0 shadow-sm">
+    <table class="table align-middle mb-0 table-hover">
+      <thead>
+        <tr>
+          <th>Bình luận</th>
+          <th class="col-w-md text-nowrap">Người dùng</th>
+          <th class="col-w-lg text-nowrap">Bài viết</th>
+          <th class="col-w-actions text-nowrap text-center">Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (comment of paginatedComments; track comment.id) {
+          <tr>
+            <td class="fw-medium">{{ comment.text }}</td>
+            <td class="text-nowrap">{{ comment.user }}</td>
+            <td>
+              <a href="#" (click)="$event.preventDefault(); setPreviewComment(comment)" class="text-decoration-none text-dark" data-bs-toggle="modal" data-bs-target="#previewBlogModal">
+                {{ comment.postTitle }}
+              </a>
+            </td>
+            <td class="text-nowrap text-center">
+              <button (click)="deleteComment(comment)" class="btn btn-sm btn-outline-danger border-0" title="Xóa">
+                <i class="bi bi-trash3-fill"></i>
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-4">
+    <nav>
+      <ul class="pagination justify-content-center">
+        <li class="page-item" [class.disabled]="currentPage() === 1">
+          <a class="page-link" href="#" (click)="$event.preventDefault(); setPage(currentPage() - 1)">Previous</a>
+        </li>
+        @for (p of pageNumbers; track p) {
+          <li class="page-item" [class.active]="currentPage() === p">
+            <a class="page-link" href="#" (click)="$event.preventDefault(); setPage(p)">{{ p }}</a>
+          </li>
+        }
+        <li class="page-item" [class.disabled]="currentPage() === totalPages()">
+          <a class="page-link" href="#" (click)="$event.preventDefault(); setPage(currentPage() + 1)">Next</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</section>
+
+<!-- Modal Xem trước bài viết ngữ cảnh -->
+@if (activePreviewComment()) {
+  <div class="modal fade" id="previewBlogModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">Xem trước: {{ activePreviewComment()?.postTitle }}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-warning border-warning-subtle shadow-sm mb-4">
+            <div class="d-flex align-items-center mb-2">
+              <i class="bi bi-chat-quote-fill text-warning fs-5 me-2"></i>
+              <h6 class="fw-bold mb-0">Nội dung bình luận bị báo cáo:</h6>
+            </div>
+            <p class="mb-0 text-dark">{{ activePreviewComment()?.text }}</p>
+          </div>
+
+          <hr class="mb-4">
+
+          <h5 class="fw-bold mb-3 text-primary"><i class="bi bi-file-earmark-text me-2"></i>Ngữ cảnh bài viết:</h5>
+          <div class="mb-3">
+            <span class="badge bg-secondary-subtle text-secondary-emphasis me-2">Frontend</span>
+            <span class="text-muted small">Ngôn ngữ gốc: VI | Đã xuất bản</span>
+          </div>
+          <h2 class="mb-4 fw-bold">{{ activePreviewComment()?.postTitle }}</h2>
+          <div class="text-muted mb-4">Tác giả: <span class="fw-medium text-dark">Author</span></div>
+          <div class="blog-content text-dark" style="line-height: 1.8;">
+            <p>Đây là nội dung mô phỏng của bài viết liên kết với bình luận này. Moderator có thể đọc nhanh nội dung bài viết ngay tại đây để có ngữ cảnh tốt hơn khi xử lý bình luận.</p>
+            <p>Ví dụ: một bình luận có thể trông không rõ ràng, nhưng khi đặt vào ngữ cảnh của bài viết thì lại hoàn toàn hợp lệ.</p>
+            <pre class="bg-light p-3 rounded border text-dark mt-2 mb-4"><code>console.log("Context is key!");</code></pre>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

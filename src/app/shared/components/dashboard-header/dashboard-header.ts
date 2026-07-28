@@ -1,9 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-dashboard-header',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './dashboard-header.html',
   styleUrl: './dashboard-header.css',
 })
-export class DashboardHeader {}
+export class DashboardHeader {
+  auth = inject(AuthService);
+}

@@ -1,1 +1,21 @@
-<p>hashtag works!</p>
+<main class="container-xl py-4">
+  <div class="card soft-card mb-4">
+    <div class="card-body">
+      <h3 class="fw-bold mb-2">#Hashtag bài viết</h3>
+      <p class="text-muted mb-0">Tìm kiếm các bài viết nổi bật được đánh tag tương ứng.</p>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <app-public-sidebar-left class="col-lg-2 d-none d-lg-block"></app-public-sidebar-left>
+    
+    <section class="col-lg-7">
+      @for (post of mockPosts; track post.id) {
+        <app-post-card [post]="post"></app-post-card>
+      }
+      <app-pagination></app-pagination>
+    </section>
+
+    <app-public-sidebar-right class="col-lg-3"></app-public-sidebar-right>
+  </div>
+</main>

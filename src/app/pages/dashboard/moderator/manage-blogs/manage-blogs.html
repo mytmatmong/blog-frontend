@@ -1,1 +1,119 @@
-<p>manage-blogs works!</p>
+<section class="dashboard-content">
+  <div class="card table-card border-0 shadow-sm">
+    <table class="table align-middle mb-0 table-hover">
+      <thead>
+        <tr>
+          <th>Tiêu đề</th>
+          <th class="col-w-md text-nowrap">Tác giả</th>
+          <th class="col-w-md text-nowrap text-center">Trạng thái</th>
+          <th class="col-w-lg text-nowrap text-center">Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (blog of paginatedBlogs; track blog.id) {
+          <tr>
+            <td class="fw-medium">
+              <a href="#" (click)="$event.preventDefault(); setPreviewBlog(blog)" class="text-decoration-none text-dark" data-bs-toggle="modal" data-bs-target="#previewBlogModal">
+                {{ blog.title }}
+              </a>
+            </td>
+            <td class="text-nowrap">{{ blog.author }}</td>
+            <td class="text-nowrap text-center">
+              <span class="badge bg-warning-subtle text-warning-emphasis">Chờ duyệt</span>
+            </td>
+            <td class="text-nowrap text-center">
+              <button (click)="approveBlog(blog)" class="btn btn-sm btn-outline-success border-0 me-1" title="Duyệt bài">
+                <i class="bi bi-check-circle-fill"></i>
+              </button>
+              <button (click)="setRejectBlog(blog)" class="btn btn-sm btn-outline-danger border-0 me-1" title="Từ chối" data-bs-toggle="modal" data-bs-target="#rejectModal">
+                <i class="bi bi-x-circle-fill"></i>
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-4">
+    <nav>
+      <ul class="pagination justify-content-center">
+        <li class="page-item" [class.disabled]="currentPage() === 1">
+          <a class="page-link" href="#" (click)="$event.preventDefault(); setPage(currentPage() - 1)">Previous</a>
+        </li>
+        @for (p of pageNumbers; track p) {
+          <li class="page-item" [class.active]="currentPage() === p">
+            <a class="page-link" href="#" (click)="$event.preventDefault(); setPage(p)">{{ p }}</a>
+          </li>
+        }
+        <li class="page-item" [class.disabled]="currentPage() === totalPages()">
+          <a class="page-link" href="#" (click)="$event.preventDefault(); setPage(currentPage() + 1)">Next</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</section>
+
+<!-- Modal Xem trước bài viết -->
+@if (activePreviewBlog()) {
+  <div class="modal fade" id="previewBlogModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">Xem trước: {{ activePreviewBlog()?.title }}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <span class="badge bg-secondary-subtle text-secondary-emphasis me-2">{{ activePreviewBlog()?.category }}</span>
+            <span class="text-muted small">Ngôn ngữ gốc: {{ activePreviewBlog()?.lang }} | Chờ duyệt</span>
+          </div>
+          <h2 class="mb-4 fw-bold">{{ activePreviewBlog()?.title }}</h2>
+          <div class="text-muted mb-4">Tác giả: <span class="fw-medium text-dark">{{ activePreviewBlog()?.author }}</span></div>
+          <div class="blog-content text-dark" style="line-height: 1.8;">
+            <p>Đây là nội dung mô phỏng của bài viết để Moderator có thể đọc và đánh giá trước khi duyệt. Trong thực tế, nội dung này sẽ được load từ database dựa vào ID của bài viết.</p>
+            <p>Dưới đây là một ví dụ về nội dung bài viết dài hơn để kiểm tra khả năng cuộn trang (scroll) của Modal. Khi một bài viết có nhiều chi tiết, hình ảnh hoặc các đoạn mã nguồn, Moderator cần phải kiểm tra kỹ lưỡng trước khi quyết định duyệt (Approve) hoặc từ chối (Reject).</p>
+            
+            <h4 class="fw-bold mt-4">1. Tại sao tính năng này quan trọng?</h4>
+            <p>Việc kiểm duyệt bài viết giúp đảm bảo nền tảng DevBlog luôn giữ được chất lượng nội dung tốt nhất. Các bài viết rác (spam) hoặc copy từ nguồn khác mà không ghi nguồn sẽ bị loại bỏ.</p>
+            
+            <h4 class="fw-bold mt-4">2. Yêu cầu định dạng bài viết</h4>
+            <ul>
+              <li>Tiêu đề phải rõ ràng, không giật tít câu view (clickbait).</li>
+              <li>Nội dung không chứa ngôn từ kích động, thù địch hoặc spam.</li>
+              <li>Các đoạn code cần được đặt trong thẻ Code block (pre/code) một cách hợp lệ.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal Từ chối bài viết -->
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold">Từ chối bài viết</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form (submit)="$event.preventDefault(); submitReject()">
+          <div class="mb-3">
+            <label for="rejectReason" class="form-label">Lý do từ chối</label>
+            <textarea class="form-control" id="rejectReason" name="reason" [(ngModel)]="rejectReason" rows="3" placeholder="Ví dụ: Bài viết vi phạm chính sách nội dung, hoặc cần chỉnh sửa lại phần mở đầu..." required></textarea>
+            <div class="form-text">Tác giả sẽ nhận được thông báo kèm lý do này để chỉnh sửa và gửi lại.</div>
+          </div>
+          <div class="modal-footer border-top-0 px-0 pb-0">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+            <button type="submit" class="btn btn-danger" data-bs-dismiss="modal" [disabled]="!rejectReason.trim()">Xác nhận Từ chối</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

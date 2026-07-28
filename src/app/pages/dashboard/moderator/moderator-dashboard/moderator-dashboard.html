@@ -1,1 +1,88 @@
-<p>moderator-dashboard works!</p>
+<section class="dashboard-content">
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="card stat-card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="text-muted small">Blogs chờ xử lý</div>
+          <h3 class="fw-bold mb-0 text-primary">6</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card stat-card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="text-muted small">Comments bị report</div>
+          <h3 class="fw-bold mb-0 text-warning">14</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card stat-card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="text-muted small">Categories</div>
+          <h3 class="fw-bold mb-0">8</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card stat-card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="text-muted small">Đã xóa hôm nay</div>
+          <h3 class="fw-bold mb-0 text-danger">3</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white fw-bold border-bottom-0 pt-3 pb-0">
+          Lượng báo cáo vi phạm (7 ngày qua)
+        </div>
+        <div class="card-body">
+          <canvas id="reportsChart" height="100"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white fw-bold border-bottom-0 pt-3 pb-0">
+          Thao tác nhanh
+        </div>
+        <div class="card-body">
+          <div class="d-grid gap-2">
+            <a routerLink="/dashboard/moderator/manage-blogs" class="btn btn-primary text-start">
+              <i class="bi bi-journal-check me-2"></i>Duyệt Blogs (6)
+            </a>
+            <a routerLink="/dashboard/moderator/manage-comments" class="btn btn-primary text-start">
+              <i class="bi bi-chat-right-dots me-2"></i>Xử lý Comments (14)
+            </a>
+            <a routerLink="/dashboard/moderator/manage-categories" class="btn btn-outline-secondary text-start">
+              <i class="bi bi-folder-plus me-2"></i>Thêm Category
+            </a>
+            <a href="#" class="btn btn-outline-danger text-start">
+              <i class="bi bi-trash3 me-2"></i>Xem lịch sử xóa
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white fw-bold border-bottom-0 pt-3 pb-0">
+          Tỷ lệ xử lý vi phạm
+        </div>
+        <div class="card-body">
+          <canvas id="moderationPieChart"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-8">
+    </div>
+  </div>
+</section>

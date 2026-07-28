@@ -1,1 +1,98 @@
-<p>create-post works!</p>
+<section class="dashboard-content">
+  <div class="card soft-card">
+    <div class="card-body p-4">
+      <h3 class="fw-bold mb-4">Tạo bài viết</h3>
+      
+      <form (submit)="$event.preventDefault()">
+        <div class="row g-3">
+          <div class="col-12 d-flex justify-content-between align-items-center mb-1">
+            <div class="btn-group" role="group">
+              <input type="radio" class="btn-check" name="editLang" id="editLangVi" [checked]="currentEditLang() === 'VI'" (change)="changeEditLang('VI')" autocomplete="off">
+              <label class="btn btn-outline-primary" for="editLangVi">
+                <img src="https://flagcdn.com/w20/vn.png" alt="VN" style="width: 16px; margin-right: 4px;"> Tiếng Việt 
+                <span class="badge ms-1" [class.bg-primary]="originalLanguage() === 'VI'" [class.bg-secondary]="originalLanguage() !== 'VI'">
+                  {{ originalLanguage() === 'VI' ? 'Gốc' : 'Dịch' }}
+                </span>
+              </label>
+
+              <input type="radio" class="btn-check" name="editLang" id="editLangEn" [checked]="currentEditLang() === 'EN'" (change)="changeEditLang('EN')" autocomplete="off">
+              <label class="btn btn-outline-primary" for="editLangEn">
+                <img src="https://flagcdn.com/w20/gb.png" alt="EN" style="width: 16px; margin-right: 4px;"> Tiếng Anh 
+                <span class="badge ms-1" [class.bg-primary]="originalLanguage() === 'EN'" [class.bg-secondary]="originalLanguage() !== 'EN'">
+                  {{ originalLanguage() === 'EN' ? 'Gốc' : 'Dịch' }}
+                </span>
+              </label>
+            </div>
+            <div>
+              <label class="form-label me-2 mb-0 small text-muted">Ngôn ngữ gốc:</label>
+              <select [value]="originalLanguage()" (change)="changeOriginalLanguage($any($event.target).value)" class="form-select form-select-sm d-inline-block w-auto">
+                <option value="VI">Tiếng Việt</option>
+                <option value="EN">Tiếng Anh</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Tiêu đề (<span>{{ currentEditLang() }}</span>) <span class="text-danger">*</span></label>
+            <input type="text" [(ngModel)]="titleModel" name="title" class="form-control" placeholder="Nhập tiêu đề..." required>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Danh mục</label>
+            <div class="form-control p-2" style="height: 100px; overflow-y: auto;">
+              @for (cat of categories; track cat.id) {
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" [(ngModel)]="cat.checked" [name]="cat.id" [id]="cat.id">
+                  <label class="form-check-label" [for]="cat.id">{{ cat.label }}</label>
+                </div>
+              }
+            </div>
+            <small class="text-muted">Tích chọn các danh mục phù hợp</small>
+          </div>
+          
+          <div class="col-md-6">
+            <label class="form-label">Hashtags</label>
+            <input type="text" [(ngModel)]="hashtags" name="hashtags" class="form-control" placeholder="#tag1 #tag2">
+          </div>
+          
+          <div class="col-md-6">
+            <label class="form-label">Ảnh bìa (Thumbnail)</label>
+            <input type="file" class="form-control" accept="image/*">
+            <small class="text-muted">Hỗ trợ JPG, PNG, GIF...</small>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Video đính kèm (Tùy chọn)</label>
+            <input type="file" class="form-control" accept="video/mp4,video/webm,video/ogg">
+            <small class="text-muted">Hỗ trợ MP4, WebM (Tối đa 50MB)</small>
+          </div>
+          
+          <div class="col-12">
+            <label class="form-label">Content <span class="text-danger">*</span></label>
+            <div>
+              <div id="editor-container" style="height: 350px;"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-4 d-flex gap-2">
+          <button type="button" (click)="handleSave('PUBLISHED')" class="btn btn-primary px-4"><i class="bi bi-send me-1"></i> Xuất bản</button>
+          <button type="button" (click)="handleSave('DRAFT')" class="btn btn-outline-secondary px-4"><i class="bi bi-save me-1"></i> Lưu nháp</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</section>
+
+<!-- Toast Container -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100;">
+  <div class="toast align-items-center text-white border-0 show" [class.d-none]="!showToast()" [class.bg-success]="toastType() === 'success'" [class.bg-danger]="toastType() === 'danger'" [class.bg-secondary]="toastType() === 'secondary'" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">
+        {{ toastMsg() }}
+      </div>
+      <button type="button" (click)="showToast.set(false)" class="btn-close btn-close-white me-2 m-auto" aria-label="Close"></button>
+    </div>
+  </div>
+</div>

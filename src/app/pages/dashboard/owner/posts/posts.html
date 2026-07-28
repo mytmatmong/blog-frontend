@@ -1,1 +1,85 @@
-<p>posts works!</p>
+<section class="dashboard-content">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="fw-bold mb-0">Bài viết của tôi</h3>
+    <a routerLink="/dashboard/owner/create-post" class="btn btn-primary shadow-sm">
+      <i class="bi bi-plus-lg me-1"></i> Tạo bài viết
+    </a>
+  </div>
+  
+  <div class="card table-card border-0 shadow-sm">
+    <table class="table align-middle mb-0 table-hover">
+      <thead>
+        <tr>
+          <th>Tiêu đề</th>
+          <th class="col-w-md text-nowrap">Danh mục</th>
+          <th class="col-w-sm text-nowrap text-center">Ngôn ngữ</th>
+          <th class="col-w-md text-nowrap text-center">Trạng thái</th>
+          <th class="col-w-actions text-nowrap text-center">Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (post of paginatedPosts; track post.id) {
+          <tr>
+            <td class="fw-medium">{{ post.title }}</td>
+            <td class="text-nowrap">{{ post.category }}</td>
+            <td class="text-nowrap text-center">
+              <span class="badge bg-secondary-subtle text-secondary-emphasis border">{{ post.lang }}</span>
+            </td>
+            <td class="text-nowrap text-center">
+              <span class="badge {{ post.statusClass }} rounded-pill px-3 py-1">{{ post.status }}</span>
+            </td>
+            <td class="text-nowrap text-center">
+              <button (click)="setPreviewPost(post)" class="btn btn-sm btn-outline-info border-0 me-1" title="Xem" data-bs-toggle="modal" data-bs-target="#previewModal">
+                <i class="bi bi-eye"></i>
+              </button>
+              <a routerLink="/dashboard/owner/edit-post" class="btn btn-sm btn-outline-primary border-0 me-1" title="Chỉnh sửa">
+                <i class="bi bi-pencil-square"></i>
+              </a>
+              <button (click)="deletePost(post)" class="btn btn-sm btn-outline-danger border-0" title="Xóa">
+                <i class="bi bi-trash3-fill"></i>
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  
+  <div class="mt-4">
+    <nav>
+      <ul class="pagination justify-content-center">
+        <li class="page-item" [class.disabled]="currentPage() === 1">
+          <a class="page-link" href="#" (click)="$event.preventDefault(); setPage(currentPage() - 1)">Previous</a>
+        </li>
+        @for (p of pageNumbers; track p) {
+          <li class="page-item" [class.active]="currentPage() === p">
+            <a class="page-link" href="#" (click)="$event.preventDefault(); setPage(p)">{{ p }}</a>
+          </li>
+        }
+        <li class="page-item" [class.disabled]="currentPage() === totalPages()">
+          <a class="page-link" href="#" (click)="$event.preventDefault(); setPage(currentPage() + 1)">Next</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</section>
+
+<!-- Preview Modal -->
+@if (activePreviewPost()) {
+  <div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">Xem trước: {{ activePreviewPost()?.title }}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div [innerHTML]="activePreviewPost()?.content"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

@@ -1,1 +1,41 @@
-<p>home works!</p>
+<main class="container-xl py-4">
+  <section class="category-bar soft-card mb-4">
+    <div class="d-flex flex-wrap align-items-center gap-2">
+      <a routerLink="/" class="category-pill active">Tất cả</a>
+      <a routerLink="/category" class="category-pill">Backend</a>
+      <a routerLink="/category" class="category-pill">Frontend</a>
+      <a routerLink="/category" class="category-pill">Angular</a>
+      <a routerLink="/category" class="category-pill">NodeJS</a>
+      <a routerLink="/category" class="category-pill">Database</a>
+      <a routerLink="/category" class="category-pill">DevOps</a>
+      <a routerLink="/category" class="category-pill">AI</a>
+    </div>
+  </section>
+
+  <div class="row g-4">
+    <app-public-sidebar-left class="col-lg-2 d-none d-lg-block"></app-public-sidebar-left>
+
+    <section class="col-lg-7">
+      <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+        <div>
+          <h4 class="fw-bold mb-1">Bài viết mới nhất</h4>
+          <small class="text-muted">Cập nhật kiến thức lập trình mỗi ngày</small>
+        </div>
+
+        <select class="form-select form-select-sm w-auto">
+          <option>Mới nhất</option>
+          <option>Nhiều lượt xem</option>
+          <option>Nhiều lượt thích</option>
+          <option>Nhiều bình luận</option>
+        </select>
+      </div>
+
+      @for (post of mockPosts; track post.id) {
+        <app-post-card [post]="post"></app-post-card>
+      }
+      <app-pagination></app-pagination>
+    </section>
+
+    <app-public-sidebar-right class="col-lg-3"></app-public-sidebar-right>
+  </div>
+</main>

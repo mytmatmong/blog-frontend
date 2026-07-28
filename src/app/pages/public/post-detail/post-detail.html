@@ -1,1 +1,47 @@
-<p>post-detail works!</p>
+<main class="container-xl py-4">
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <article class="card soft-card">
+        <div class="card-body p-lg-5">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <span class="avatar-sm">S</span>
+            <div>
+              <div class="fw-semibold">Sơn Dev</div>
+              <small class="text-muted">06/07/2026 • 8 phút đọc</small>
+            </div>
+          </div>
+          <h1 class="fw-bold mb-3">Phân tích và so sánh ưu và nhược điểm của RBAC và ABAC trong phân quyền</h1>
+          <div class="d-flex gap-2 mb-4">
+            <a class="tag" routerLink="/hashtag">#expressjs</a>
+            <a class="tag" routerLink="/hashtag">#angular</a>
+            <a class="tag" routerLink="/hashtag">#mysql</a>
+          </div>
+          <p class="lead">Cả RBAC (Role-Based Access Control) và ABAC (Attribute-Based Access Control) đều là những tiêu chuẩn phổ biến, nhưng chúng tiếp cận bài toán theo hai hướng hoàn toàn khác nhau.</p>
+          <p>Dưới đây là phân tích chi tiết, đánh giá ưu nhược điểm và bảng so sánh để giúp hiểu rõ bản chất của từng mô hình.</p>
+          <h3>1. RBAC</h3>
+          <p>Trong RBAC, quyền truy cập không được cấp trực tiếp cho người dùng mà được gán cho các Vai trò (Roles).</p>
+          <h3>2. ABAC</h3>
+          <p>ABAC đánh giá quyền truy cập dựa trên một tập hợp các Thuộc tính (Attributes) và các Chính sách logic (Policies).</p>
+          
+          <div class="border-top pt-4 mt-4 d-flex gap-2">
+            <button class="btn btn-primary like-btn"><i class="bi bi-hand-thumbs-up"></i> Like</button>
+            <button class="btn btn-outline-secondary"><i class="bi bi-bookmark"></i> Save</button>
+          </div>
+        </div>
+      </article>
+
+      <section class="card soft-card mt-4">
+        <div class="card-body">
+          <h5 class="fw-bold mb-3">Bình luận</h5>
+          <div class="mb-4">
+            <textarea class="form-control mb-2" rows="3" placeholder="Viết bình luận..."></textarea>
+            <button class="btn btn-primary">Gửi bình luận</button>
+          </div>
+          <app-comment-item></app-comment-item>
+        </div>
+      </section>
+    </div>
+
+    <app-public-sidebar-right class="col-lg-3"></app-public-sidebar-right>
+  </div>
+</main>

@@ -1,1 +1,193 @@
-<p>manage-languages works!</p>
+<section class="dashboard-content">
+  <div class="d-flex justify-content-between mb-3">
+    <h3 class="fw-bold">Languages</h3>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addLanguageModal">
+      <i class="bi bi-plus-circle me-2"></i>Thêm language
+    </button>
+  </div>
+
+  <div class="card table-card border-0 shadow-sm">
+    <table class="table align-middle mb-0 table-hover">
+      <thead>
+        <tr>
+          <th class="col-w-sm text-nowrap">Code</th>
+          <th>Tên ngôn ngữ</th>
+          <th class="col-w-md text-nowrap text-center">Default</th>
+          <th class="col-w-md text-nowrap text-center">Trạng thái</th>
+          <th class="col-w-actions text-nowrap text-center">Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (lang of paginatedLanguages; track lang.id) {
+          <tr>
+            <td class="fw-bold text-uppercase text-nowrap">{{ lang.code }}</td>
+            <td class="text-nowrap">
+              <img [src]="'https://flagcdn.com/w20/' + lang.flag + '.png'" [alt]="lang.flag" style="width: 20px; border-radius: 2px;" class="me-2">
+              {{ lang.name }}
+            </td>
+            <td class="text-nowrap text-center">
+              @if (lang.isDefault) {
+                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle px-2 py-1">
+                  <i class="bi bi-star-fill me-1"></i> Default
+                </span>
+              } @else {
+                <span class="text-muted">-</span>
+              }
+            </td>
+            <td class="text-nowrap text-center">
+              @if (lang.status === 'ACTIVE') {
+                <span class="badge bg-success rounded-pill px-3 py-2">ACTIVE</span>
+              } @else {
+                <span class="badge bg-secondary rounded-pill px-3 py-2">INACTIVE</span>
+              }
+            </td>
+            <td class="text-nowrap text-center">
+              <button (click)="setEditLanguage(lang)" class="btn btn-sm btn-outline-warning border-0 me-1" title="Chỉnh sửa" data-bs-toggle="modal" data-bs-target="#editLanguageModal">
+                <i class="bi bi-pencil-square"></i>
+              </button>
+              <button (click)="deleteLanguage(lang)" class="btn btn-sm btn-outline-danger border-0" title="Xóa">
+                <i class="bi bi-trash3-fill"></i>
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-4">
+    <nav>
+      <ul class="pagination justify-content-center">
+        <li class="page-item" [class.disabled]="currentPage() === 1">
+          <a class="page-link" href="#" (click)="$event.preventDefault(); setPage(currentPage() - 1)">Previous</a>
+        </li>
+        @for (p of pageNumbers; track p) {
+          <li class="page-item" [class.active]="currentPage() === p">
+            <a class="page-link" href="#" (click)="$event.preventDefault(); setPage(p)">{{ p }}</a>
+          </li>
+        }
+        <li class="page-item" [class.disabled]="currentPage() === totalPages()">
+          <a class="page-link" href="#" (click)="$event.preventDefault(); setPage(currentPage() + 1)">Next</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</section>
+
+<!-- Modal Thêm Ngôn ngữ mới -->
+<div class="modal fade" id="addLanguageModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold">Thêm Ngôn ngữ mới</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form (submit)="$event.preventDefault(); submitAddLanguage()">
+          <div class="mb-3">
+            <label class="form-label">Quốc gia (Cờ)</label>
+            <div class="dropdown">
+              <button class="btn btn-outline-secondary w-100 text-start d-flex align-items-center justify-content-between" type="button" data-bs-toggle="dropdown" id="addFlagBtn">
+                <span class="d-flex align-items-center gap-2">
+                  <img [src]="'https://flagcdn.com/w20/' + selectedAddFlag + '.png'" style="width: 20px; border-radius: 2px;"> 
+                  {{ selectedAddFlagName }}
+                </span>
+                <i class="bi bi-chevron-down"></i>
+              </button>
+              <ul class="dropdown-menu w-100 shadow" style="max-height: 250px; overflow-y: auto;">
+                @for (opt of flagOptions; track opt.code) {
+                  <li>
+                    <a class="dropdown-item d-flex align-items-center gap-2" href="#" (click)="$event.preventDefault(); selectAddFlag(opt.code, opt.name)">
+                      <img [src]="'https://flagcdn.com/w20/' + opt.code + '.png'" style="width: 20px;"> 
+                      {{ opt.name }}
+                    </a>
+                  </li>
+                }
+              </ul>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="langCode" class="form-label">Mã ngôn ngữ (Code)</label>
+            <input type="text" class="form-control" id="langCode" name="code" [(ngModel)]="addCode" placeholder="VD: vi, en, fr..." required>
+          </div>
+          <div class="mb-3">
+            <label for="langName" class="form-label">Tên hiển thị</label>
+            <input type="text" class="form-control" id="langName" name="name" [(ngModel)]="addName" placeholder="VD: Tiếng Việt" required>
+          </div>
+          <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" role="switch" id="isDefaultLang" name="isDefault" [(ngModel)]="addIsDefault">
+            <label class="form-check-label" for="isDefaultLang">Đặt làm ngôn ngữ mặc định (Default)</label>
+          </div>
+          <div class="form-check form-switch mb-2">
+            <input class="form-check-input" type="checkbox" role="switch" id="isActiveLang" name="isActive" [(ngModel)]="addIsActive">
+            <label class="form-check-label" for="isActiveLang">Kích hoạt ngay (Active)</label>
+          </div>
+          <div class="modal-footer px-0 pb-0 border-top-0">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+            <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" [disabled]="!addCode.trim() || !addName.trim()">Lưu ngôn ngữ</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Chỉnh sửa Ngôn ngữ -->
+<div class="modal fade" id="editLanguageModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold">Chỉnh sửa Ngôn ngữ</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form (submit)="$event.preventDefault(); submitEditLanguage()">
+          <div class="mb-3">
+            <label class="form-label">Quốc gia (Cờ)</label>
+            <div class="dropdown">
+              <button class="btn btn-outline-secondary w-100 text-start d-flex align-items-center justify-content-between" type="button" data-bs-toggle="dropdown" id="editFlagBtn">
+                <span class="d-flex align-items-center gap-2">
+                  <img [src]="'https://flagcdn.com/w20/' + selectedEditFlag + '.png'" style="width: 20px; border-radius: 2px;"> 
+                  {{ selectedEditFlagName }}
+                </span>
+                <i class="bi bi-chevron-down"></i>
+              </button>
+              <ul class="dropdown-menu w-100 shadow" style="max-height: 250px; overflow-y: auto;">
+                @for (opt of flagOptions; track opt.code) {
+                  <li>
+                    <a class="dropdown-item d-flex align-items-center gap-2" href="#" (click)="$event.preventDefault(); selectEditFlag(opt.code, opt.name)">
+                      <img [src]="'https://flagcdn.com/w20/' + opt.code + '.png'" style="width: 20px;"> 
+                      {{ opt.name }}
+                    </a>
+                  </li>
+                }
+              </ul>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="editLangCode" class="form-label">Mã ngôn ngữ (Code)</label>
+            <input type="text" class="form-control" id="editLangCode" name="editCode" [(ngModel)]="editCode" required>
+          </div>
+          <div class="mb-3">
+            <label for="editLangName" class="form-label">Tên hiển thị</label>
+            <input type="text" class="form-control" id="editLangName" name="editName" [(ngModel)]="editName" required>
+          </div>
+          <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" role="switch" id="editIsDefaultLang" name="editIsDefault" [(ngModel)]="editIsDefault">
+            <label class="form-check-label" for="editIsDefaultLang">Đặt làm ngôn ngữ mặc định (Default)</label>
+          </div>
+          <div class="form-check form-switch mb-2">
+            <input class="form-check-input" type="checkbox" role="switch" id="editIsActiveLang" name="editIsActive" [(ngModel)]="editIsActive">
+            <label class="form-check-label" for="editIsActiveLang">Kích hoạt ngay (Active)</label>
+          </div>
+          <div class="modal-footer px-0 pb-0 border-top-0">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+            <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" [disabled]="!editCode.trim() || !editName.trim()">Cập nhật</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

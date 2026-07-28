@@ -1,1 +1,40 @@
-<p>public-sidebar-left works!</p>
+<div class="card soft-card mb-3">
+  <div class="card-body">
+    <h6 class="fw-bold mb-3">Khám phá</h6>
+    <ul class="sidebar-menu">
+      <li>
+        <a routerLink="/">
+          <i class="bi bi-house"></i> Trang chủ
+        </a>
+      </li>
+      <li>
+        <a routerLink="/hashtag">
+          <i class="bi bi-fire"></i> Trending
+        </a>
+      </li>
+      <li>
+        <a routerLink="/category">
+          <i class="bi bi-folder"></i> Danh mục
+        </a>
+      </li>
+      <li>
+        <a routerLink="/hashtag">
+          <i class="bi bi-hash"></i> Hashtag
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="card soft-card">
+  <div class="card-body">
+    <h6 class="fw-bold mb-3">Tags nổi bật</h6>
+    <div class="d-flex flex-column gap-2">
+      <a routerLink="/hashtag" class="left-tag">#angular</a>
+      <a routerLink="/hashtag" class="left-tag">#nodejs</a>
+      <a routerLink="/hashtag" class="left-tag">#mysql</a>
+      <a routerLink="/hashtag" class="left-tag">#sequelize</a>
+      <a routerLink="/hashtag" class="left-tag">#jwt</a>
+    </div>
+  </div>
+</div>

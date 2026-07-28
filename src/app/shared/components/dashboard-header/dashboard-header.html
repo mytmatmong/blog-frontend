@@ -1,1 +1,19 @@
-<p>dashboard-header works!</p>
+<header class="dashboard-header">
+  <div>
+    <strong>Dashboard</strong>
+    <div class="small text-muted">Bảng điều khiển & Thống kê hệ thống</div>
+  </div>
+  <div class="d-flex align-items-center gap-2">
+    <button type="button" class="btn btn-sm btn-outline-secondary theme-toggle-btn" (click)="auth.toggleTheme()" title="Chuyển chế độ Sáng/Tối">
+      @if (auth.isDarkMode()) {
+        <i class="bi bi-sun-fill text-warning"></i>
+      } @else {
+        <i class="bi bi-moon-stars-fill text-primary"></i>
+      }
+    </button>
+    <span class="avatar-sm">S</span>
+    <button type="button" class="btn btn-sm btn-outline-danger ms-1" title="Đăng xuất" (click)="auth.setRole('guest')" routerLink="/auth">
+      <i class="bi bi-box-arrow-right"></i>
+    </button>
+  </div>
+</header>

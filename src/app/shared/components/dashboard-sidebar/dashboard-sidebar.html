@@ -1,1 +1,31 @@
-<p>dashboard-sidebar works!</p>
+<aside class="dashboard-sidebar">
+  <h4 class="text-white fw-bold mb-4"><i class="bi bi-braces-asterisk me-2"></i>DevBlog</h4>
+  
+  @if (activeSection === 'owner') {
+    <div class="small text-muted mb-2 px-2 text-uppercase font-weight-bold">Owner</div>
+    <a routerLink="/dashboard/owner" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"><i class="bi bi-speedometer2"></i>Owner Dashboard</a>
+    <a routerLink="/dashboard/owner/posts" routerLinkActive="active"><i class="bi bi-file-earmark-text"></i>Bài viết của tôi</a>
+    <a routerLink="/dashboard/owner/create-post" routerLinkActive="active"><i class="bi bi-plus-circle"></i>Tạo bài viết</a>
+  }
+
+  @if (activeSection === 'moderator') {
+    <div class="small text-muted my-2 px-2 text-uppercase font-weight-bold">Moderator</div>
+    <a routerLink="/dashboard/moderator" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"><i class="bi bi-shield-check"></i>Mod Dashboard</a>
+    <a routerLink="/dashboard/moderator/manage-blogs" routerLinkActive="active"><i class="bi bi-journals"></i>Duyệt bài viết</a>
+    <a routerLink="/dashboard/moderator/manage-categories" routerLinkActive="active"><i class="bi bi-folder-check"></i>Danh mục</a>
+    <a routerLink="/dashboard/moderator/manage-comments" routerLinkActive="active"><i class="bi bi-chat-dots"></i>Bình luận</a>
+  }
+
+  @if (activeSection === 'admin') {
+    <div class="small text-muted my-2 px-2 text-uppercase font-weight-bold">Admin</div>
+    <a routerLink="/dashboard/admin" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"><i class="bi bi-gear"></i>Admin Dashboard</a>
+    <a routerLink="/dashboard/admin/manage-users" routerLinkActive="active"><i class="bi bi-people"></i>Quản lý người dùng</a>
+    <a routerLink="/dashboard/admin/manage-languages" routerLinkActive="active"><i class="bi bi-translate"></i>Quản lý ngôn ngữ</a>
+  }
+
+  <hr class="border-secondary my-3">
+  <a routerLink="/"><i class="bi bi-house"></i>Về trang public</a>
+  <a routerLink="/auth" class="text-danger" (click)="auth.setRole('guest')">
+    <i class="bi bi-box-arrow-right"></i>Đăng xuất
+  </a>
+</aside>
