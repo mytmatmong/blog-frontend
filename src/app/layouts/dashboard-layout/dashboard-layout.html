@@ -1,7 +1,9 @@
-<div class="dashboard-shell">
+<div class="flex flex-col lg:flex-row min-h-screen bg-aquamarine-50/50 dark:bg-aquamarine-950">
   <app-dashboard-sidebar></app-dashboard-sidebar>
-  <main class="dashboard-main">
+  <main class="flex-grow lg:ml-64 min-h-screen flex flex-col">
     <app-dashboard-header></app-dashboard-header>
-    <router-outlet></router-outlet>
+    <div class="p-6 flex-grow">
+      <router-outlet></router-outlet>
+    </div>
   </main>
 </div>

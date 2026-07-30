@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal, computed } from '@angular/core';
 import { PublicSidebarLeft } from '../../../shared/components/public-sidebar-left/public-sidebar-left';
 import { PublicSidebarRight } from '../../../shared/components/public-sidebar-right/public-sidebar-right';
 import { PostCard, PostItem } from '../../../shared/components/post-card/post-card';
@@ -12,6 +12,33 @@ import { Pagination } from '../../../shared/components/pagination/pagination';
 })
 export class Category {
   mockPosts: PostItem[] = [];
+  currentPage = signal(1);
+  itemsPerPage = 10;
+  searchTerm = signal('');
+
+  filteredPosts = computed(() => {
+    const term = this.searchTerm().toLowerCase().trim();
+    if (!term) return this.mockPosts;
+    return this.mockPosts.filter(post => 
+      post.categories.some(cat => cat.toLowerCase().includes(term))
+    );
+  });
+
+  visiblePosts = computed(() => {
+    const startIndex = (this.currentPage() - 1) * this.itemsPerPage;
+    return this.filteredPosts().slice(startIndex, startIndex + this.itemsPerPage);
+  });
+
+  onSearchChange(event: Event) {
+    const input = event.target as HTMLInputElement;
+    this.searchTerm.set(input.value);
+    this.currentPage.set(1);
+  }
+
+  clearSearch() {
+    this.searchTerm.set('');
+    this.currentPage.set(1);
+  }
 
   constructor() {
     const basePosts: Omit<PostItem, 'id'>[] = [

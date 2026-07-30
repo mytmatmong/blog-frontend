@@ -32,19 +32,19 @@ export class Posts {
         category: 'Backend',
         lang: 'VI', 
         status: 'PUBLISHED', 
-        statusClass: 'bg-success',
+        statusClass: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300',
         modalId: 'previewModal1',
         content: `
           <div class="mb-3">
-            <span class="badge bg-secondary-subtle text-secondary-emphasis me-2">Backend</span>
-            <span class="text-muted small">Ngôn ngữ gốc: VI | Đã xuất bản</span>
+            <span class="inline-block px-2.5 py-1 text-xs font-semibold rounded-md bg-aquamarine-100 text-aquamarine-800 dark:bg-aquamarine-800 dark:text-aquamarine-100 me-2">Backend</span>
+            <span class="text-aquamarine-600 dark:text-aquamarine-400 text-xs">Ngôn ngữ gốc: VI | Đã xuất bản</span>
           </div>
-          <h2 class="mb-4 fw-bold">Cách xây dựng hệ thống đa ngôn ngữ hiệu quả cho Blog cá nhân</h2>
-          <div class="blog-content text-dark" style="line-height: 1.8;">
+          <h2 class="mb-4 font-bold text-xl text-aquamarine-950 dark:text-aquamarine-50">Cách xây dựng hệ thống đa ngôn ngữ hiệu quả cho Blog cá nhân</h2>
+          <div class="space-y-3 text-aquamarine-800 dark:text-aquamarine-200 text-sm">
             <p>Xin chào mọi người! Hôm nay mình sẽ chia sẻ cách thiết kế kiến trúc đa ngôn ngữ cho hệ thống CMS. Điều quan trọng nhất khi làm đa ngôn ngữ là cấu trúc Database.</p>
             <p><strong>1. Cấu trúc Database:</strong></p>
             <p>Thay vì tạo thêm các cột như <code>title_en</code>, <code>content_en</code> trực tiếp vào bảng <code>posts</code> (cách này rất khó mở rộng sau này), chúng ta nên tách ra một bảng riêng gọi là <code>post_translations</code>.</p>
-            <pre class="bg-light p-3 rounded my-3 border text-dark"><code>
+            <pre class="bg-aquamarine-950 text-aquamarine-100 p-4 rounded-xl my-3 text-xs overflow-x-auto"><code>
 CREATE TABLE post_translations (
     id INT PRIMARY KEY,
     post_id INT,
@@ -65,18 +65,18 @@ CREATE TABLE post_translations (
         category: 'Frontend',
         lang: 'EN', 
         status: 'DRAFT', 
-        statusClass: 'bg-secondary',
+        statusClass: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300',
         modalId: 'previewModal2',
         content: `
           <div class="mb-3">
-            <span class="badge bg-secondary-subtle text-secondary-emphasis me-2">Frontend</span>
-            <span class="text-muted small">Ngôn ngữ gốc: EN | Bản nháp</span>
+            <span class="inline-block px-2.5 py-1 text-xs font-semibold rounded-md bg-aquamarine-100 text-aquamarine-800 dark:bg-aquamarine-800 dark:text-aquamarine-100 me-2">Frontend</span>
+            <span class="text-aquamarine-600 dark:text-aquamarine-400 text-xs">Ngôn ngữ gốc: EN | Bản nháp</span>
           </div>
-          <h2 class="mb-4 fw-bold">Mastering Angular HttpInterceptor for Authentication</h2>
-          <div class="blog-content text-dark" style="line-height: 1.8;">
+          <h2 class="mb-4 font-bold text-xl text-aquamarine-950 dark:text-aquamarine-50">Mastering Angular HttpInterceptor for Authentication</h2>
+          <div class="space-y-3 text-aquamarine-800 dark:text-aquamarine-200 text-sm">
             <p>An <strong>HttpInterceptor</strong> is a fantastic tool in Angular for transforming HTTP requests and responses globally. We often use it for attaching JWT tokens to API calls.</p>
             <p>Here is a simple implementation of an Auth Interceptor:</p>
-            <pre class="bg-light p-3 rounded my-3 border text-dark"><code>
+            <pre class="bg-aquamarine-950 text-aquamarine-100 p-4 rounded-xl my-3 text-xs overflow-x-auto"><code>
 import { Injectable } from '@angular/core';
 import { HttpInterceptor, HttpRequest, HttpHandler } from '@angular/common/http';
 
@@ -102,7 +102,10 @@ export class AuthInterceptor implements HttpInterceptor {
 
     const categoriesList = ['Backend', 'Frontend', 'Database', 'DevOps', 'AI', 'NodeJS', 'Angular'];
     const langList = ['VI', 'EN'];
-    const statusList = [{ label: 'PUBLISHED', class: 'bg-success' }, { label: 'DRAFT', class: 'bg-secondary' }];
+    const statusList = [
+      { label: 'PUBLISHED', class: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' }, 
+      { label: 'DRAFT', class: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300' }
+    ];
 
     for (let i = 0; i < 25; i++) {
       const post = { ...basePosts[i % 2] };
@@ -116,10 +119,8 @@ export class AuthInterceptor implements HttpInterceptor {
     }
   }
 
-  // Reactive computed total pages
   totalPages = computed(() => Math.ceil(this.postsMockData.length / this.itemsPerPage));
 
-  // Reactive page array
   get pageNumbers(): number[] {
     const pages = [];
     for (let i = 1; i <= this.totalPages(); i++) {
@@ -128,7 +129,6 @@ export class AuthInterceptor implements HttpInterceptor {
     return pages;
   }
 
-  // Paginated posts
   get paginatedPosts(): PostItem[] {
     const startIndex = (this.currentPage() - 1) * this.itemsPerPage;
     return this.postsMockData.slice(startIndex, startIndex + this.itemsPerPage);
@@ -142,6 +142,10 @@ export class AuthInterceptor implements HttpInterceptor {
 
   setPreviewPost(post: PostItem) {
     this.activePreviewPost.set(post);
+  }
+
+  closePreviewModal() {
+    this.activePreviewPost.set(null);
   }
 
   deletePost(post: PostItem) {

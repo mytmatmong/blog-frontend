@@ -1,47 +1,49 @@
-<main class="container-xl py-4">
-  <div class="row g-4">
-    <div class="col-lg-8">
-      <article class="card soft-card">
-        <div class="card-body p-lg-5">
-          <div class="d-flex align-items-center gap-2 mb-3">
-            <span class="avatar-sm">S</span>
-            <div>
-              <div class="fw-semibold">Sơn Dev</div>
-              <small class="text-muted">06/07/2026 • 8 phút đọc</small>
-            </div>
+<main class="container mx-auto px-4 max-w-7xl py-6">
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div class="lg:col-span-9">
+      <article class="p-6 lg:p-8 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="avatar-sm">S</span>
+          <div>
+            <div class="font-semibold text-sm text-aquamarine-950 dark:text-aquamarine-50">Sơn Dev</div>
+            <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400">06/07/2026 • 8 phút đọc</small>
           </div>
-          <h1 class="fw-bold mb-3">Phân tích và so sánh ưu và nhược điểm của RBAC và ABAC trong phân quyền</h1>
-          <div class="d-flex gap-2 mb-4">
-            <a class="tag" routerLink="/hashtag">#expressjs</a>
-            <a class="tag" routerLink="/hashtag">#angular</a>
-            <a class="tag" routerLink="/hashtag">#mysql</a>
-          </div>
-          <p class="lead">Cả RBAC (Role-Based Access Control) và ABAC (Attribute-Based Access Control) đều là những tiêu chuẩn phổ biến, nhưng chúng tiếp cận bài toán theo hai hướng hoàn toàn khác nhau.</p>
+        </div>
+        <h1 class="font-bold text-2xl lg:text-3xl text-aquamarine-950 dark:text-aquamarine-50 mb-4">Phân tích và so sánh ưu và nhược điểm của RBAC và ABAC trong phân quyền</h1>
+        <div class="flex flex-wrap gap-2 mb-6">
+          <a class="tag" routerLink="/hashtag">#expressjs</a>
+          <a class="tag" routerLink="/hashtag">#angular</a>
+          <a class="tag" routerLink="/hashtag">#mysql</a>
+        </div>
+        <div class="prose dark:prose-invert max-w-none text-aquamarine-800 dark:text-aquamarine-200 space-y-4">
+          <p class="text-lg font-medium text-aquamarine-900 dark:text-aquamarine-100">Cả RBAC (Role-Based Access Control) và ABAC (Attribute-Based Access Control) đều là những tiêu chuẩn phổ biến, nhưng chúng tiếp cận bài toán theo hai hướng hoàn toàn khác nhau.</p>
           <p>Dưới đây là phân tích chi tiết, đánh giá ưu nhược điểm và bảng so sánh để giúp hiểu rõ bản chất của từng mô hình.</p>
-          <h3>1. RBAC</h3>
+          <h3 class="text-xl font-bold text-aquamarine-950 dark:text-aquamarine-50 pt-2">1. RBAC</h3>
           <p>Trong RBAC, quyền truy cập không được cấp trực tiếp cho người dùng mà được gán cho các Vai trò (Roles).</p>
-          <h3>2. ABAC</h3>
+          <h3 class="text-xl font-bold text-aquamarine-950 dark:text-aquamarine-50 pt-2">2. ABAC</h3>
           <p>ABAC đánh giá quyền truy cập dựa trên một tập hợp các Thuộc tính (Attributes) và các Chính sách logic (Policies).</p>
-          
-          <div class="border-top pt-4 mt-4 d-flex gap-2">
-            <button class="btn btn-primary like-btn"><i class="bi bi-hand-thumbs-up"></i> Like</button>
-            <button class="btn btn-outline-secondary"><i class="bi bi-bookmark"></i> Save</button>
-          </div>
+        </div>
+        
+        <div class="border-t border-aquamarine-200 dark:border-aquamarine-800 pt-6 mt-8 flex gap-3">
+          <button class="px-4 py-2 rounded-lg font-medium text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 transition-colors flex items-center gap-2">
+            <i class="bi bi-hand-thumbs-up"></i> Like
+          </button>
+          <button class="px-4 py-2 rounded-lg font-medium text-sm text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors flex items-center gap-2">
+            <i class="bi bi-bookmark"></i> Save
+          </button>
         </div>
       </article>
 
-      <section class="card soft-card mt-4">
-        <div class="card-body">
-          <h5 class="fw-bold mb-3">Bình luận</h5>
-          <div class="mb-4">
-            <textarea class="form-control mb-2" rows="3" placeholder="Viết bình luận..."></textarea>
-            <button class="btn btn-primary">Gửi bình luận</button>
-          </div>
-          <app-comment-item></app-comment-item>
+      <section class="p-6 mt-6 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
+        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50 mb-4">Bình luận</h5>
+        <div class="mb-6">
+          <textarea class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 p-3 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500 mb-3" rows="3" placeholder="Viết bình luận..."></textarea>
+          <button class="px-5 py-2 rounded-lg font-semibold text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 transition-colors">Gửi bình luận</button>
         </div>
+        <app-comment-item></app-comment-item>
       </section>
     </div>
 
-    <app-public-sidebar-right class="col-lg-3"></app-public-sidebar-right>
+    <app-public-sidebar-right class="lg:col-span-3"></app-public-sidebar-right>
   </div>
 </main>

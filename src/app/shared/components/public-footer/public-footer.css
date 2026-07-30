@@ -1,0 +1,5 @@
+:host-context(.dark-mode) footer {
+    background: var(--card) !important;
+    color: var(--text) !important;
+    border-color: var(--border) !important;
+}

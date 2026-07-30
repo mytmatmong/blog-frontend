@@ -21,6 +21,7 @@ export class ManageCategories {
   itemsPerPage = 8;
 
   activeCategoryPosts = signal<string | null>(null);
+  isAddModalOpen = signal<boolean>(false);
   
   // Add Category fields
   newCatName = '';
@@ -72,10 +73,26 @@ export class ManageCategories {
     this.activeCategoryPosts.set(catName);
   }
 
+  closeCategoryPostsModal() {
+    this.activeCategoryPosts.set(null);
+  }
+
   setEditCategory(cat: CategoryItem) {
     this.activeEditCategory.set(cat);
     this.editCatName = cat.name;
     this.editCatLang = cat.lang;
+  }
+
+  closeEditCategoryModal() {
+    this.activeEditCategory.set(null);
+  }
+
+  openAddCategoryModal() {
+    this.isAddModalOpen.set(true);
+  }
+
+  closeAddCategoryModal() {
+    this.isAddModalOpen.set(false);
   }
 
   submitAddCategory() {
@@ -91,6 +108,7 @@ export class ManageCategories {
     this.categoriesMockData.unshift(newCat);
     this.newCatName = '';
     this.newCatLang = 'VI';
+    this.closeAddCategoryModal();
   }
 
   submitEditCategory() {
@@ -104,7 +122,7 @@ export class ManageCategories {
         this.categoriesMockData[index].lang = this.editCatLang;
         this.categoriesMockData[index].langFlag = this.editCatLang === 'VI' ? 'vn' : 'gb';
       }
-      this.activeEditCategory.set(null);
+      this.closeEditCategoryModal();
     }
   }
 

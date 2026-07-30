@@ -1,43 +1,45 @@
-<section class="dashboard-content">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h3 class="fw-bold mb-0">Bài viết của tôi</h3>
-    <a routerLink="/dashboard/owner/create-post" class="btn btn-primary shadow-sm">
-      <i class="bi bi-plus-lg me-1"></i> Tạo bài viết
+<section class="space-y-6">
+  <div class="flex justify-between items-center">
+    <h3 class="font-bold text-xl text-aquamarine-950 dark:text-aquamarine-50">Bài viết của tôi</h3>
+    <a routerLink="/dashboard/owner/create-post" class="px-4 py-2.5 rounded-xl font-semibold text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 transition-colors shadow-sm flex items-center gap-2">
+      <i class="bi bi-plus-lg"></i> Tạo bài viết
     </a>
   </div>
   
-  <div class="card table-card border-0 shadow-sm">
-    <table class="table align-middle mb-0 table-hover">
+  <div class="rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm overflow-x-auto">
+    <table class="w-full text-left border-collapse text-sm">
       <thead>
-        <tr>
-          <th>Tiêu đề</th>
-          <th class="col-w-md text-nowrap">Danh mục</th>
-          <th class="col-w-sm text-nowrap text-center">Ngôn ngữ</th>
-          <th class="col-w-md text-nowrap text-center">Trạng thái</th>
-          <th class="col-w-actions text-nowrap text-center">Thao tác</th>
+        <tr class="border-b border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950/50">
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">Tiêu đề</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">Danh mục</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">Ngôn ngữ</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">Trạng thái</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">Thao tác</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody class="divide-y divide-aquamarine-100 dark:divide-aquamarine-800">
         @for (post of paginatedPosts; track post.id) {
-          <tr>
-            <td class="fw-medium">{{ post.title }}</td>
-            <td class="text-nowrap">{{ post.category }}</td>
-            <td class="text-nowrap text-center">
-              <span class="badge bg-secondary-subtle text-secondary-emphasis border">{{ post.lang }}</span>
+          <tr class="hover:bg-aquamarine-50/30 dark:hover:bg-aquamarine-950/30 transition-colors">
+            <td class="p-4 font-medium text-aquamarine-950 dark:text-aquamarine-50">{{ post.title }}</td>
+            <td class="p-4 text-aquamarine-800 dark:text-aquamarine-200">{{ post.category }}</td>
+            <td class="p-4 text-center">
+              <span class="inline-block px-2.5 py-0.5 text-xs font-semibold rounded-md border border-aquamarine-200 dark:border-aquamarine-700 bg-aquamarine-50 dark:bg-aquamarine-950 text-aquamarine-800 dark:text-aquamarine-200">{{ post.lang }}</span>
             </td>
-            <td class="text-nowrap text-center">
-              <span class="badge {{ post.statusClass }} rounded-pill px-3 py-1">{{ post.status }}</span>
+            <td class="p-4 text-center">
+              <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full {{ post.statusClass }}">{{ post.status }}</span>
             </td>
-            <td class="text-nowrap text-center">
-              <button (click)="setPreviewPost(post)" class="btn btn-sm btn-outline-info border-0 me-1" title="Xem" data-bs-toggle="modal" data-bs-target="#previewModal">
-                <i class="bi bi-eye"></i>
-              </button>
-              <a routerLink="/dashboard/owner/edit-post" class="btn btn-sm btn-outline-primary border-0 me-1" title="Chỉnh sửa">
-                <i class="bi bi-pencil-square"></i>
-              </a>
-              <button (click)="deletePost(post)" class="btn btn-sm btn-outline-danger border-0" title="Xóa">
-                <i class="bi bi-trash3-fill"></i>
-              </button>
+            <td class="p-4 text-center">
+              <div class="flex items-center justify-center gap-1">
+                <button (click)="setPreviewPost(post)" class="p-1.5 text-cyan-600 hover:bg-cyan-50 dark:hover:bg-cyan-950/30 rounded-lg transition-colors" title="Xem">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <a routerLink="/dashboard/owner/edit-post" class="p-1.5 text-aquamarine-600 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 rounded-lg transition-colors" title="Chỉnh sửa">
+                  <i class="bi bi-pencil-square"></i>
+                </a>
+                <button (click)="deletePost(post)" class="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors" title="Xóa">
+                  <i class="bi bi-trash3-fill"></i>
+                </button>
+              </div>
             </td>
           </tr>
         }
@@ -45,40 +47,36 @@
     </table>
   </div>
   
-  <div class="mt-4">
-    <nav>
-      <ul class="pagination justify-content-center">
-        <li class="page-item" [class.disabled]="currentPage() === 1">
-          <a class="page-link" href="#" (click)="$event.preventDefault(); setPage(currentPage() - 1)">Previous</a>
+  <div class="mt-6 flex justify-center">
+    <ul class="inline-flex items-center space-x-1 text-sm">
+      <li>
+        <button [disabled]="currentPage() === 1" [class.opacity-50]="currentPage() === 1" class="px-3 py-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="setPage(currentPage() - 1)">Previous</button>
+      </li>
+      @for (p of pageNumbers; track p) {
+        <li>
+          <button class="px-3.5 py-2 rounded-lg font-semibold transition-colors" [class.bg-aquamarine-600]="currentPage() === p" [class.text-white]="currentPage() === p" [class.border]="currentPage() !== p" [class.border-aquamarine-200]="currentPage() !== p" [class.dark:border-aquamarine-800]="currentPage() !== p" [class.bg-white]="currentPage() !== p" [class.dark:bg-aquamarine-900]="currentPage() !== p" [class.text-aquamarine-800]="currentPage() !== p" [class.dark:text-aquamarine-200]="currentPage() !== p" (click)="setPage(p)">{{ p }}</button>
         </li>
-        @for (p of pageNumbers; track p) {
-          <li class="page-item" [class.active]="currentPage() === p">
-            <a class="page-link" href="#" (click)="$event.preventDefault(); setPage(p)">{{ p }}</a>
-          </li>
-        }
-        <li class="page-item" [class.disabled]="currentPage() === totalPages()">
-          <a class="page-link" href="#" (click)="$event.preventDefault(); setPage(currentPage() + 1)">Next</a>
-        </li>
-      </ul>
-    </nav>
+      }
+      <li>
+        <button [disabled]="currentPage() === totalPages()" [class.opacity-50]="currentPage() === totalPages()" class="px-3 py-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="setPage(currentPage() + 1)">Next</button>
+      </li>
+    </ul>
   </div>
 </section>
 
 <!-- Preview Modal -->
 @if (activePreviewPost()) {
-  <div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title fw-bold">Xem trước: {{ activePreviewPost()?.title }}</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div [innerHTML]="activePreviewPost()?.content"></div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-        </div>
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-3xl max-h-[85vh] flex flex-col">
+      <div class="flex justify-between items-center p-5 border-b border-aquamarine-200 dark:border-aquamarine-800">
+        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">Xem trước: {{ activePreviewPost()?.title }}</h5>
+        <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" (click)="closePreviewModal()">
+          <i class="bi bi-x-lg text-lg"></i>
+        </button>
+      </div>
+      <div class="p-6 overflow-y-auto" [innerHTML]="activePreviewPost()?.content"></div>
+      <div class="p-4 border-t border-aquamarine-200 dark:border-aquamarine-800 flex justify-end">
+        <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="closePreviewModal()">Đóng</button>
       </div>
     </div>
   </div>

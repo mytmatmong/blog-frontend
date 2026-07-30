@@ -1,45 +1,42 @@
-<main class="container-xl py-5 flex-grow-1">
-  <div class="auth-card card soft-card">
-    <div class="card-body p-4">
-      <ul class="nav nav-pills nav-fill mb-4" role="tablist">
-        <li class="nav-item">
-          <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#login">Login</button>
-        </li>
-        <li class="nav-item">
-          <button class="nav-link" data-bs-toggle="pill" data-bs-target="#register">Register</button>
-        </li>
-        <li class="nav-item">
-          <button class="nav-link" data-bs-toggle="pill" data-bs-target="#forgot">Forgot</button>
-        </li>
-      </ul>
-      <div class="tab-content">
-        <div class="tab-pane fade show active" id="login">
-          <h4 class="fw-bold mb-3 text-center">Đăng nhập</h4>
-          <form id="loginForm">
-            <input class="form-control mb-3" type="email" placeholder="Email" required>
-            <input class="form-control mb-3" type="password" placeholder="Mật khẩu" required>
-            <button type="submit" class="btn btn-primary w-100">Đăng nhập demo</button>
-          </form>
-        </div>
-        
-        <div class="tab-pane fade" id="register">
-          <h4 class="fw-bold mb-3 text-center">Đăng ký</h4>
-          <form id="registerForm">
-            <input class="form-control mb-3" type="text" placeholder="Username" required>
-            <input class="form-control mb-3" type="email" placeholder="Email" required>
-            <input class="form-control mb-3" type="password" placeholder="Mật khẩu" required>
-            <button type="submit" class="btn btn-primary w-100">Tạo tài khoản</button>
-          </form>
-        </div>
-
-        <div class="tab-pane fade" id="forgot">
-          <h4 class="fw-bold mb-3 text-center">Khôi phục mật khẩu</h4>
-          <form id="forgotForm">
-            <input class="form-control mb-3" type="email" placeholder="Email" required>
-            <button type="submit" class="btn btn-primary w-100">Gửi link khôi phục</button>
-          </form>
-        </div>
-      </div>
+<main class="container mx-auto px-4 py-12 flex-grow flex items-center justify-center">
+  <div class="w-full max-w-md p-6 lg:p-8 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
+    <div class="flex rounded-xl bg-aquamarine-50 dark:bg-aquamarine-950 p-1 mb-6">
+      <button class="flex-1 py-2 text-sm font-semibold rounded-lg transition-all" [class.bg-aquamarine-600]="activeTab() === 'login'" [class.text-white]="activeTab() === 'login'" [class.text-aquamarine-700]="activeTab() !== 'login'" [class.dark:text-aquamarine-300]="activeTab() !== 'login'" (click)="setTab('login')">Login</button>
+      <button class="flex-1 py-2 text-sm font-semibold rounded-lg transition-all" [class.bg-aquamarine-600]="activeTab() === 'register'" [class.text-white]="activeTab() === 'register'" [class.text-aquamarine-700]="activeTab() !== 'register'" [class.dark:text-aquamarine-300]="activeTab() !== 'register'" (click)="setTab('register')">Register</button>
+      <button class="flex-1 py-2 text-sm font-semibold rounded-lg transition-all" [class.bg-aquamarine-600]="activeTab() === 'forgot'" [class.text-white]="activeTab() === 'forgot'" [class.text-aquamarine-700]="activeTab() !== 'forgot'" [class.dark:text-aquamarine-300]="activeTab() !== 'forgot'" (click)="setTab('forgot')">Forgot</button>
     </div>
+
+    @if (activeTab() === 'login') {
+      <div>
+        <h4 class="font-bold text-xl text-center text-aquamarine-950 dark:text-aquamarine-50 mb-4">Đăng nhập</h4>
+        <form class="space-y-3">
+          <input class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" type="email" placeholder="Email" required>
+          <input class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" type="password" placeholder="Mật khẩu" required>
+          <button type="submit" class="w-full py-2.5 font-semibold text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 rounded-xl transition-colors">Đăng nhập demo</button>
+        </form>
+      </div>
+    }
+
+    @if (activeTab() === 'register') {
+      <div>
+        <h4 class="font-bold text-xl text-center text-aquamarine-950 dark:text-aquamarine-50 mb-4">Đăng ký</h4>
+        <form class="space-y-3">
+          <input class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" type="text" placeholder="Username" required>
+          <input class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" type="email" placeholder="Email" required>
+          <input class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" type="password" placeholder="Mật khẩu" required>
+          <button type="submit" class="w-full py-2.5 font-semibold text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 rounded-xl transition-colors">Tạo tài khoản</button>
+        </form>
+      </div>
+    }
+
+    @if (activeTab() === 'forgot') {
+      <div>
+        <h4 class="font-bold text-xl text-center text-aquamarine-950 dark:text-aquamarine-50 mb-4">Khôi phục mật khẩu</h4>
+        <form class="space-y-3">
+          <input class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" type="email" placeholder="Email" required>
+          <button type="submit" class="w-full py-2.5 font-semibold text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 rounded-xl transition-colors">Gửi link khôi phục</button>
+        </form>
+      </div>
+    }
   </div>
 </main>

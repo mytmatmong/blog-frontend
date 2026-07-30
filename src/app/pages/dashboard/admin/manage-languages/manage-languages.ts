@@ -21,6 +21,10 @@ export class ManageLanguages {
   currentPage = signal<number>(1);
   itemsPerPage = 6;
 
+  isAddModalOpen = signal<boolean>(false);
+  isAddFlagDropdownOpen = signal<boolean>(false);
+  isEditFlagDropdownOpen = signal<boolean>(false);
+
   // Add Language Form Fields
   selectedAddFlag = 'vn';
   selectedAddFlagName = 'Vietnam (VN)';
@@ -91,14 +95,30 @@ export class ManageLanguages {
     }
   }
 
+  openAddModal() {
+    this.isAddModalOpen.set(true);
+  }
+
+  closeAddModal() {
+    this.isAddModalOpen.set(false);
+    this.isAddFlagDropdownOpen.set(false);
+  }
+
+  closeEditModal() {
+    this.activeEditLanguage.set(null);
+    this.isEditFlagDropdownOpen.set(false);
+  }
+
   selectAddFlag(flagCode: string, flagName: string) {
     this.selectedAddFlag = flagCode;
     this.selectedAddFlagName = flagName;
+    this.isAddFlagDropdownOpen.set(false);
   }
 
   selectEditFlag(flagCode: string, flagName: string) {
     this.selectedEditFlag = flagCode;
     this.selectedEditFlagName = flagName;
+    this.isEditFlagDropdownOpen.set(false);
   }
 
   setEditLanguage(lang: LanguageItem) {
@@ -131,6 +151,7 @@ export class ManageLanguages {
 
     this.languagesMockData.unshift(newLang);
     this.resetAddForm();
+    this.closeAddModal();
   }
 
   submitEditLanguage() {
@@ -151,7 +172,7 @@ export class ManageLanguages {
         this.languagesMockData[idx].isDefault = this.editIsDefault;
         this.languagesMockData[idx].status = this.editIsActive ? 'ACTIVE' : 'INACTIVE';
       }
-      this.activeEditLanguage.set(null);
+      this.closeEditModal();
     }
   }
 

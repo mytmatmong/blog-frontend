@@ -60,6 +60,10 @@ export class ManageComments {
     this.activePreviewComment.set(comment);
   }
 
+  closePreviewComment() {
+    this.activePreviewComment.set(null);
+  }
+
   deleteComment(comment: CommentItem) {
     if (confirm('Bạn có chắc chắn muốn xóa bình luận này không?')) {
       alert('Đã xóa bình luận thành công!');

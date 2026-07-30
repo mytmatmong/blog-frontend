@@ -1,27 +1,27 @@
-<section class="dashboard-content">
-  <div class="card table-card border-0 shadow-sm">
-    <table class="table align-middle mb-0 table-hover">
+<section class="space-y-6">
+  <div class="rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm overflow-x-auto">
+    <table class="w-full text-left border-collapse text-sm">
       <thead>
-        <tr>
-          <th>Bình luận</th>
-          <th class="col-w-md text-nowrap">Người dùng</th>
-          <th class="col-w-lg text-nowrap">Bài viết</th>
-          <th class="col-w-actions text-nowrap text-center">Thao tác</th>
+        <tr class="border-b border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950/50">
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">Bình luận</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">Người dùng</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">Bài viết</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">Thao tác</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody class="divide-y divide-aquamarine-100 dark:divide-aquamarine-800">
         @for (comment of paginatedComments; track comment.id) {
-          <tr>
-            <td class="fw-medium">{{ comment.text }}</td>
-            <td class="text-nowrap">{{ comment.user }}</td>
-            <td>
-              <a href="#" (click)="$event.preventDefault(); setPreviewComment(comment)" class="text-decoration-none text-dark" data-bs-toggle="modal" data-bs-target="#previewBlogModal">
+          <tr class="hover:bg-aquamarine-50/30 dark:hover:bg-aquamarine-950/30 transition-colors">
+            <td class="p-4 font-medium text-aquamarine-950 dark:text-aquamarine-50">{{ comment.text }}</td>
+            <td class="p-4 text-aquamarine-800 dark:text-aquamarine-200">{{ comment.user }}</td>
+            <td class="p-4">
+              <a href="#" (click)="$event.preventDefault(); setPreviewComment(comment)" class="text-aquamarine-950 dark:text-aquamarine-50 hover:text-aquamarine-600 dark:hover:text-aquamarine-400 transition-colors">
                 {{ comment.postTitle }}
               </a>
             </td>
-            <td class="text-nowrap text-center">
-              <button (click)="deleteComment(comment)" class="btn btn-sm btn-outline-danger border-0" title="Xóa">
-                <i class="bi bi-trash3-fill"></i>
+            <td class="p-4 text-center">
+              <button (click)="deleteComment(comment)" class="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors" title="Xóa">
+                <i class="bi bi-trash3-fill text-lg"></i>
               </button>
             </td>
           </tr>
@@ -30,61 +30,61 @@
     </table>
   </div>
 
-  <div class="mt-4">
-    <nav>
-      <ul class="pagination justify-content-center">
-        <li class="page-item" [class.disabled]="currentPage() === 1">
-          <a class="page-link" href="#" (click)="$event.preventDefault(); setPage(currentPage() - 1)">Previous</a>
+  <div class="mt-6 flex justify-center">
+    <ul class="inline-flex items-center space-x-1 text-sm">
+      <li>
+        <button [disabled]="currentPage() === 1" [class.opacity-50]="currentPage() === 1" class="px-3 py-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="setPage(currentPage() - 1)">Previous</button>
+      </li>
+      @for (p of pageNumbers; track p) {
+        <li>
+          <button class="px-3.5 py-2 rounded-lg font-semibold transition-colors" [class.bg-aquamarine-600]="currentPage() === p" [class.text-white]="currentPage() === p" [class.border]="currentPage() !== p" [class.border-aquamarine-200]="currentPage() !== p" [class.dark:border-aquamarine-800]="currentPage() !== p" [class.bg-white]="currentPage() !== p" [class.dark:bg-aquamarine-900]="currentPage() !== p" [class.text-aquamarine-800]="currentPage() !== p" [class.dark:text-aquamarine-200]="currentPage() !== p" (click)="setPage(p)">{{ p }}</button>
         </li>
-        @for (p of pageNumbers; track p) {
-          <li class="page-item" [class.active]="currentPage() === p">
-            <a class="page-link" href="#" (click)="$event.preventDefault(); setPage(p)">{{ p }}</a>
-          </li>
-        }
-        <li class="page-item" [class.disabled]="currentPage() === totalPages()">
-          <a class="page-link" href="#" (click)="$event.preventDefault(); setPage(currentPage() + 1)">Next</a>
-        </li>
-      </ul>
-    </nav>
+      }
+      <li>
+        <button [disabled]="currentPage() === totalPages()" [class.opacity-50]="currentPage() === totalPages()" class="px-3 py-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="setPage(currentPage() + 1)">Next</button>
+      </li>
+    </ul>
   </div>
 </section>
 
 <!-- Modal Xem trước bài viết ngữ cảnh -->
 @if (activePreviewComment()) {
-  <div class="modal fade" id="previewBlogModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title fw-bold">Xem trước: {{ activePreviewComment()?.postTitle }}</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div class="alert alert-warning border-warning-subtle shadow-sm mb-4">
-            <div class="d-flex align-items-center mb-2">
-              <i class="bi bi-chat-quote-fill text-warning fs-5 me-2"></i>
-              <h6 class="fw-bold mb-0">Nội dung bình luận bị báo cáo:</h6>
-            </div>
-            <p class="mb-0 text-dark">{{ activePreviewComment()?.text }}</p>
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-3xl max-h-[85vh] flex flex-col">
+      <div class="flex justify-between items-center p-5 border-b border-aquamarine-200 dark:border-aquamarine-800">
+        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">Xem trước: {{ activePreviewComment()?.postTitle }}</h5>
+        <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" (click)="closePreviewComment()">
+          <i class="bi bi-x-lg text-lg"></i>
+        </button>
+      </div>
+      <div class="p-6 overflow-y-auto space-y-4">
+        <div class="p-4 rounded-xl border border-yellow-200 dark:border-yellow-900 bg-yellow-50 dark:bg-yellow-950/30">
+          <div class="flex items-center gap-2 mb-1">
+            <i class="bi bi-chat-quote-fill text-yellow-600"></i>
+            <h6 class="font-bold text-sm text-yellow-900 dark:text-yellow-200">Nội dung bình luận bị báo cáo:</h6>
           </div>
+          <p class="text-sm text-yellow-950 dark:text-yellow-100">{{ activePreviewComment()?.text }}</p>
+        </div>
 
-          <hr class="mb-4">
+        <hr class="border-aquamarine-200 dark:border-aquamarine-800">
 
-          <h5 class="fw-bold mb-3 text-primary"><i class="bi bi-file-earmark-text me-2"></i>Ngữ cảnh bài viết:</h5>
-          <div class="mb-3">
-            <span class="badge bg-secondary-subtle text-secondary-emphasis me-2">Frontend</span>
-            <span class="text-muted small">Ngôn ngữ gốc: VI | Đã xuất bản</span>
-          </div>
-          <h2 class="mb-4 fw-bold">{{ activePreviewComment()?.postTitle }}</h2>
-          <div class="text-muted mb-4">Tác giả: <span class="fw-medium text-dark">Author</span></div>
-          <div class="blog-content text-dark" style="line-height: 1.8;">
-            <p>Đây là nội dung mô phỏng của bài viết liên kết với bình luận này. Moderator có thể đọc nhanh nội dung bài viết ngay tại đây để có ngữ cảnh tốt hơn khi xử lý bình luận.</p>
-            <p>Ví dụ: một bình luận có thể trông không rõ ràng, nhưng khi đặt vào ngữ cảnh của bài viết thì lại hoàn toàn hợp lệ.</p>
-            <pre class="bg-light p-3 rounded border text-dark mt-2 mb-4"><code>console.log("Context is key!");</code></pre>
-          </div>
+        <h5 class="font-bold text-base text-aquamarine-600 dark:text-aquamarine-400 flex items-center gap-2">
+          <i class="bi bi-file-earmark-text"></i>Ngữ cảnh bài viết:
+        </h5>
+        <div class="flex items-center gap-2">
+          <span class="inline-block px-2.5 py-1 text-xs font-semibold rounded-md bg-aquamarine-100 text-aquamarine-800 dark:bg-aquamarine-800 dark:text-aquamarine-100">Frontend</span>
+          <span class="text-xs text-aquamarine-600 dark:text-aquamarine-400">Ngôn ngữ gốc: VI | Đã xuất bản</span>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <h2 class="font-bold text-2xl text-aquamarine-950 dark:text-aquamarine-50">{{ activePreviewComment()?.postTitle }}</h2>
+        <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400">Tác giả: <span class="font-medium text-aquamarine-950 dark:text-aquamarine-50">Author</span></div>
+        <div class="space-y-3 text-aquamarine-800 dark:text-aquamarine-200 text-sm">
+          <p>Đây là nội dung mô phỏng của bài viết liên kết với bình luận này. Moderator có thể đọc nhanh nội dung bài viết ngay tại đây để có ngữ cảnh tốt hơn khi xử lý bình luận.</p>
+          <p>Ví dụ: một bình luận có thể trông không rõ ràng, nhưng khi đặt vào ngữ cảnh của bài viết thì lại hoàn toàn hợp lệ.</p>
+          <pre class="bg-aquamarine-950 text-aquamarine-100 p-4 rounded-xl text-xs overflow-x-auto"><code>console.log("Context is key!");</code></pre>
         </div>
+      </div>
+      <div class="p-4 border-t border-aquamarine-200 dark:border-aquamarine-800 flex justify-end">
+        <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="closePreviewComment()">Đóng</button>
       </div>
     </div>
   </div>

@@ -1,115 +1,99 @@
-<section class="dashboard-content">
-  <div class="row g-3 mb-4">
-    <div class="col-md-3">
-      <div class="card stat-card border-0 shadow-sm">
-        <div class="card-body">
-          <div class="text-muted small">Tổng bài viết</div>
-          <h3 class="fw-bold mb-0 text-primary">24</h3>
-        </div>
-      </div>
+<section class="space-y-6">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
+      <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400">Tổng bài viết</div>
+      <h3 class="font-bold text-2xl text-aquamarine-600 dark:text-aquamarine-400 mt-1">24</h3>
     </div>
-    <div class="col-md-3">
-      <div class="card stat-card border-0 shadow-sm">
-        <div class="card-body">
-          <div class="text-muted small">Lượt xem (Views)</div>
-          <h3 class="fw-bold mb-0 text-info">12.4k</h3>
-        </div>
-      </div>
+    <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
+      <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400">Lượt xem (Views)</div>
+      <h3 class="font-bold text-2xl text-cyan-500 mt-1">12.4k</h3>
     </div>
-    <div class="col-md-3">
-      <div class="card stat-card border-0 shadow-sm">
-        <div class="card-body">
-          <div class="text-muted small">Lượt thích (Likes)</div>
-          <h3 class="fw-bold mb-0 text-danger">3.2k</h3>
-        </div>
-      </div>
+    <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
+      <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400">Lượt thích (Likes)</div>
+      <h3 class="font-bold text-2xl text-red-500 mt-1">3.2k</h3>
     </div>
-    <div class="col-md-3">
-      <div class="card stat-card border-0 shadow-sm">
-        <div class="card-body">
-          <div class="text-muted small">Bản nháp (Draft)</div>
-          <h3 class="fw-bold mb-0 text-secondary">4</h3>
-        </div>
-      </div>
+    <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
+      <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400">Bản nháp (Draft)</div>
+      <h3 class="font-bold text-2xl text-gray-500 dark:text-gray-400 mt-1">4</h3>
     </div>
   </div>
 
-  <div class="row g-3 mb-4">
-    <div class="col-lg-8">
-      <div class="card border-0 shadow-sm h-100">
-        <div class="card-header bg-white fw-bold border-bottom-0 pt-3 pb-0">
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div class="lg:col-span-8">
+      <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm h-full flex flex-col justify-between">
+        <h6 class="font-bold text-base text-aquamarine-950 dark:text-aquamarine-50 mb-4">
           Tương tác bài viết (7 ngày qua)
-        </div>
-        <div class="card-body">
+        </h6>
+        <div>
           <canvas id="interactionChart" height="100"></canvas>
         </div>
       </div>
     </div>
-    <div class="col-lg-4">
-      <div class="card border-0 shadow-sm h-100">
-        <div class="card-header bg-white fw-bold border-bottom-0 pt-3 pb-0">
+    <div class="lg:col-span-4">
+      <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm h-full">
+        <h6 class="font-bold text-base text-aquamarine-950 dark:text-aquamarine-50 mb-4">
           Thao tác nhanh
-        </div>
-        <div class="card-body">
-          <div class="d-grid gap-2">
-            <a routerLink="/dashboard/owner/create-post" class="btn btn-primary text-start">
-              <i class="bi bi-pencil-square me-2"></i>Viết bài mới
-            </a>
-            <a routerLink="/dashboard/owner/posts" class="btn btn-outline-secondary text-start">
-              <i class="bi bi-list-task me-2"></i>Quản lý bài viết
-            </a>
-            <button class="btn btn-outline-info text-start" data-bs-toggle="modal" data-bs-target="#shareModal">
-              <i class="bi bi-share me-2"></i>Chia sẻ trang Blog
-            </button>
-          </div>
+        </h6>
+        <div class="flex flex-col gap-3">
+          <a routerLink="/dashboard/owner/create-post" class="flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 transition-colors">
+            <i class="bi bi-pencil-square"></i>Viết bài mới
+          </a>
+          <a routerLink="/dashboard/owner/posts" class="flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors">
+            <i class="bi bi-list-task"></i>Quản lý bài viết
+          </a>
+          <button class="flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm text-cyan-700 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-700 hover:bg-cyan-50 dark:hover:bg-cyan-950/30 transition-colors text-left" (click)="openShareModal()">
+            <i class="bi bi-share"></i>Chia sẻ trang Blog
+          </button>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <div class="d-flex align-items-center gap-3">
-      <h5 class="fw-bold mb-0">Bài viết nổi bật</h5>
-      <select [value]="sortCriteria()" (change)="onSortChange($event)" class="form-select form-select-sm" style="width: auto; cursor: pointer;">
+  <div class="flex justify-between items-center pt-2">
+    <div class="flex items-center gap-3">
+      <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">Bài viết nổi bật</h5>
+      <select [value]="sortCriteria()" (change)="onSortChange($event)" class="text-sm rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 px-3 py-1.5 text-aquamarine-900 dark:text-aquamarine-100 outline-none">
         <option value="views">Theo Lượt xem (View)</option>
         <option value="likes">Theo Lượt thích (Like)</option>
       </select>
     </div>
-    <a routerLink="/dashboard/owner/posts" class="text-decoration-none text-primary small">Xem tất cả</a>
+    <a routerLink="/dashboard/owner/posts" class="text-sm text-aquamarine-600 hover:text-aquamarine-700 font-medium">Xem tất cả</a>
   </div>
 
-  <div class="card table-card border-0 shadow-sm">
-    <table class="table align-middle mb-0 table-hover">
+  <div class="rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm overflow-x-auto">
+    <table class="w-full text-left border-collapse text-sm">
       <thead>
-        <tr>
-          <th>Bài viết</th>
-          <th class="col-w-md text-nowrap text-center">Trạng thái</th>
-          <th class="col-w-sm text-nowrap text-center">View</th>
-          <th class="col-w-sm text-nowrap text-center">Like</th>
-          <th class="col-w-actions text-nowrap text-center">Thao tác</th>
+        <tr class="border-b border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950/50">
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">Bài viết</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">Trạng thái</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">View</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">Like</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">Thao tác</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody class="divide-y divide-aquamarine-100 dark:divide-aquamarine-800">
         @for (post of sortedPosts; track post.id) {
-          <tr>
-            <td class="fw-medium">{{ post.title }}</td>
-            <td class="text-nowrap text-center">
-              <span class="badge {{ post.statusClass }} rounded-pill px-3 py-1">{{ post.status }}</span>
+          <tr class="hover:bg-aquamarine-50/30 dark:hover:bg-aquamarine-950/30 transition-colors">
+            <td class="p-4 font-medium text-aquamarine-950 dark:text-aquamarine-50">{{ post.title }}</td>
+            <td class="p-4 text-center">
+              <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full {{ post.statusClass }}">{{ post.status }}</span>
             </td>
-            <td class="text-nowrap text-center">{{ post.views | number }}</td>
-            <td class="text-nowrap text-center">
-              <span class="text-danger"><i class="bi bi-heart-fill me-1"></i>{{ post.likes | number }}</span>
+            <td class="p-4 text-center text-aquamarine-800 dark:text-aquamarine-200">{{ post.views | number }}</td>
+            <td class="p-4 text-center">
+              <span class="text-red-500 font-medium"><i class="bi bi-heart-fill me-1"></i>{{ post.likes | number }}</span>
             </td>
-            <td class="text-nowrap text-center">
-              <button (click)="setPreviewPost(post)" class="btn btn-sm btn-outline-info border-0 me-1" title="Xem" data-bs-toggle="modal" data-bs-target="#previewModal">
-                <i class="bi bi-eye"></i>
-              </button>
-              <a routerLink="/dashboard/owner/edit-post" class="btn btn-sm btn-outline-primary border-0 me-1" title="Sửa">
-                <i class="bi bi-pencil-square"></i>
-              </a>
-              <button (click)="deletePost(post)" class="btn btn-sm btn-outline-danger border-0" title="Xóa">
-                <i class="bi bi-trash3-fill"></i>
-              </button>
+            <td class="p-4 text-center">
+              <div class="flex items-center justify-center gap-1">
+                <button (click)="setPreviewPost(post)" class="p-1.5 text-cyan-600 hover:bg-cyan-50 dark:hover:bg-cyan-950/30 rounded-lg transition-colors" title="Xem">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <a routerLink="/dashboard/owner/edit-post" class="p-1.5 text-aquamarine-600 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 rounded-lg transition-colors" title="Sửa">
+                  <i class="bi bi-pencil-square"></i>
+                </a>
+                <button (click)="deletePost(post)" class="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors" title="Xóa">
+                  <i class="bi bi-trash3-fill"></i>
+                </button>
+              </div>
             </td>
           </tr>
         }
@@ -119,46 +103,46 @@
 </section>
 
 <!-- Share Modal -->
-<div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header border-bottom-0">
-        <h1 class="modal-title fs-5 fw-bold" id="shareModalLabel">Chia sẻ Blog của bạn</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+@if (isShareModalOpen()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-md p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">Chia sẻ Blog của bạn</h3>
+        <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" (click)="closeShareModal()">
+          <i class="bi bi-x-lg text-lg"></i>
+        </button>
       </div>
-      <div class="modal-body">
-        <p class="text-muted small mb-2">Sao chép đường dẫn bên dưới để chia sẻ trang Blog của bạn với mọi người:</p>
-        <div class="input-group mb-3">
-          <input type="text" id="blogLinkInput" class="form-control" value="https://devblog.com/@sondev" readonly>
-          <button (click)="copyBlogLink()" class="btn d-flex align-items-center gap-1" [class.btn-primary]="!copySuccess()" [class.btn-success]="copySuccess()" type="button" id="copyBtn">
-            <i class="bi" [class.bi-clipboard]="!copySuccess()" [class.bi-check2]="copySuccess()"></i> 
-            {{ copySuccess() ? 'Đã copy' : 'Copy' }}
-          </button>
-        </div>
+      <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400 mb-4">Sao chép đường dẫn bên dưới để chia sẻ trang Blog của bạn với mọi người:</p>
+      <div class="flex rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 overflow-hidden mb-2">
+        <input type="text" id="blogLinkInput" class="w-full px-3 py-2 text-sm bg-transparent outline-none text-aquamarine-950 dark:text-aquamarine-50" value="https://devblog.com/@sondev" readonly>
+        <button (click)="copyBlogLink()" class="px-4 py-2 text-xs font-semibold text-white transition-colors" [class.bg-aquamarine-600]="!copySuccess()" [class.bg-emerald-600]="copySuccess()" type="button">
+          <i class="bi me-1" [class.bi-clipboard]="!copySuccess()" [class.bi-check2]="copySuccess()"></i> 
+          {{ copySuccess() ? 'Đã copy' : 'Copy' }}
+        </button>
       </div>
     </div>
   </div>
-</div>
+}
 
 <!-- Preview Modal -->
 @if (activePreviewPost()) {
-  <div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title fw-bold">Xem trước: {{ activePreviewPost()?.title }}</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-3xl max-h-[85vh] flex flex-col">
+      <div class="flex justify-between items-center p-5 border-b border-aquamarine-200 dark:border-aquamarine-800">
+        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">Xem trước: {{ activePreviewPost()?.title }}</h5>
+        <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" (click)="closePreviewModal()">
+          <i class="bi bi-x-lg text-lg"></i>
+        </button>
+      </div>
+      <div class="p-6 overflow-y-auto space-y-4">
+        <div>
+          <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full {{ activePreviewPost()?.statusClass }}">{{ activePreviewPost()?.status }}</span>
         </div>
-        <div class="modal-body">
-          <div class="mb-3">
-            <span class="badge {{ activePreviewPost()?.statusClass }} me-2">{{ activePreviewPost()?.status }}</span>
-          </div>
-          <h2 class="mb-4 fw-bold">{{ activePreviewPost()?.title }}</h2>
-          <div class="blog-content text-dark" style="line-height: 1.8;" [innerHTML]="activePreviewPost()?.content"></div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-        </div>
+        <h2 class="font-bold text-2xl text-aquamarine-950 dark:text-aquamarine-50">{{ activePreviewPost()?.title }}</h2>
+        <div class="prose dark:prose-invert max-w-none text-aquamarine-800 dark:text-aquamarine-200" [innerHTML]="activePreviewPost()?.content"></div>
+      </div>
+      <div class="p-4 border-t border-aquamarine-200 dark:border-aquamarine-800 flex justify-end">
+        <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="closePreviewModal()">Đóng</button>
       </div>
     </div>
   </div>

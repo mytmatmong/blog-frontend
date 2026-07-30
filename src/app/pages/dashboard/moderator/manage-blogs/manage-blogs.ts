@@ -65,9 +65,17 @@ export class ManageBlogs {
     this.activePreviewBlog.set(blog);
   }
 
+  closePreviewBlog() {
+    this.activePreviewBlog.set(null);
+  }
+
   setRejectBlog(blog: BlogItem) {
     this.activeRejectBlog.set(blog);
     this.rejectReason = '';
+  }
+
+  closeRejectModal() {
+    this.activeRejectBlog.set(null);
   }
 
   approveBlog(blog: BlogItem) {

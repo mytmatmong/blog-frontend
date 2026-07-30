@@ -1,6 +1,29 @@
-<main class="container-xl py-4">
-  <section class="category-bar soft-card mb-4">
-    <div class="d-flex flex-wrap align-items-center gap-2">
+<main class="container mx-auto px-4 max-w-7xl py-6">
+  <!-- Search Bar Section -->
+  <section class="p-6 mb-6 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 card-box shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <h3 class="font-bold text-2xl text-aquamarine-950 dark:text-aquamarine-50 mb-2">Khám phá DevBlog</h3>
+      <p class="text-sm text-aquamarine-600 dark:text-aquamarine-400">Tìm kiếm các bài viết chia sẻ kinh nghiệm và kiến thức lập trình.</p>
+    </div>
+    <div class="relative w-full md:max-w-xs lg:max-w-sm flex-shrink-0">
+      <div class="flex items-center rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white/50 dark:bg-aquamarine-950/50 backdrop-blur-sm px-3.5 py-2.5 focus-within:ring-2 focus-within:ring-aquamarine-500 transition-all duration-300">
+        <i class="bi bi-search text-aquamarine-500 me-2.5"></i>
+        <input 
+          class="bg-transparent border-none outline-none w-full text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400/80" 
+          placeholder="Tìm bài viết..."
+          [value]="searchTerm()"
+          (input)="onSearchChange($event)">
+        @if (searchTerm()) {
+          <button (click)="clearSearch()" class="text-aquamarine-400 hover:text-aquamarine-600 dark:hover:text-aquamarine-200 transition-colors">
+            <i class="bi bi-x-circle-fill"></i>
+          </button>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="p-4 mb-6 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 card-box shadow-sm">
+    <div class="flex flex-wrap items-center gap-2">
       <a routerLink="/" class="category-pill active">Tất cả</a>
       <a routerLink="/category" class="category-pill">Backend</a>
       <a routerLink="/category" class="category-pill">Frontend</a>
@@ -11,31 +34,34 @@
       <a routerLink="/category" class="category-pill">AI</a>
     </div>
   </section>
-
-  <div class="row g-4">
-    <app-public-sidebar-left class="col-lg-2 d-none d-lg-block"></app-public-sidebar-left>
-
-    <section class="col-lg-7">
-      <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <app-public-sidebar-left class="hidden lg:block lg:col-span-2"></app-public-sidebar-left>
+ 
+    <section class="lg:col-span-7">
+      <div class="flex flex-wrap justify-between items-center mb-4 gap-2">
         <div>
-          <h4 class="fw-bold mb-1">Bài viết mới nhất</h4>
-          <small class="text-muted">Cập nhật kiến thức lập trình mỗi ngày</small>
+          <h4 class="font-bold text-xl text-aquamarine-950 dark:text-aquamarine-50 mb-1">Bài viết mới nhất</h4>
+          <small class="text-sm text-aquamarine-600 dark:text-aquamarine-400">Cập nhật kiến thức lập trình mỗi ngày</small>
         </div>
-
-        <select class="form-select form-select-sm w-auto">
+ 
+        <select class="text-sm rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 px-3 py-1.5 text-aquamarine-900 dark:text-aquamarine-100 outline-none">
           <option>Mới nhất</option>
           <option>Nhiều lượt xem</option>
           <option>Nhiều lượt thích</option>
           <option>Nhiều bình luận</option>
         </select>
       </div>
-
-      @for (post of mockPosts; track post.id) {
+ 
+      @for (post of visiblePosts(); track post.id) {
         <app-post-card [post]="post"></app-post-card>
       }
-      <app-pagination></app-pagination>
+      <app-pagination 
+        [totalItems]="filteredPosts().length" 
+        [itemsPerPage]="itemsPerPage" 
+        [(currentPage)]="currentPage">
+      </app-pagination>
     </section>
-
-    <app-public-sidebar-right class="col-lg-3"></app-public-sidebar-right>
+ 
+    <app-public-sidebar-right class="lg:col-span-3"></app-public-sidebar-right>
   </div>
 </main>

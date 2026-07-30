@@ -16,7 +16,8 @@ export class AuthService {
       const savedTheme = localStorage.getItem('demoTheme');
       if (savedTheme === 'dark') {
         this.isDarkMode.set(true);
-        document.body.classList.add('dark-mode');
+        document.documentElement.classList.add('dark', 'dark-mode');
+        document.body.classList.add('dark', 'dark-mode');
       }
 
       effect(() => {
@@ -27,9 +28,11 @@ export class AuthService {
         const dark = this.isDarkMode();
         localStorage.setItem('demoTheme', dark ? 'dark' : 'light');
         if (dark) {
-          document.body.classList.add('dark-mode');
+          document.documentElement.classList.add('dark', 'dark-mode');
+          document.body.classList.add('dark', 'dark-mode');
         } else {
-          document.body.classList.remove('dark-mode');
+          document.documentElement.classList.remove('dark', 'dark-mode');
+          document.body.classList.remove('dark', 'dark-mode');
         }
       });
     }

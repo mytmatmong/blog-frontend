@@ -25,14 +25,15 @@ export class ManageUsers {
   modPassword = '';
   modNote = '';
 
+  isCreateModModalOpen = signal<boolean>(false);
   activePreviewUser = signal<UserItem | null>(null);
 
   constructor() {
     const baseUsers: Omit<UserItem, 'id'>[] = [
-      { email: 'son@example.com', role: 'NORMAL_USER', roleClass: 'text-secondary', status: 'ACTIVE' },
-      { email: 'owner@example.com', role: 'BLOG_OWNER', roleClass: 'text-primary', status: 'ACTIVE' },
-      { email: 'mod@example.com', role: 'CONTENT_MODERATOR', roleClass: 'text-danger', status: 'ACTIVE' },
-      { email: 'spam@example.com', role: 'NORMAL_USER', roleClass: 'text-secondary', status: 'LOCKED' }
+      { email: 'son@example.com', role: 'NORMAL_USER', roleClass: 'text-gray-600 dark:text-gray-400', status: 'ACTIVE' },
+      { email: 'owner@example.com', role: 'BLOG_OWNER', roleClass: 'text-aquamarine-600 dark:text-aquamarine-400', status: 'ACTIVE' },
+      { email: 'mod@example.com', role: 'CONTENT_MODERATOR', roleClass: 'text-red-600 dark:text-red-400', status: 'ACTIVE' },
+      { email: 'spam@example.com', role: 'NORMAL_USER', roleClass: 'text-gray-600 dark:text-gray-400', status: 'LOCKED' }
     ];
 
     for (let i = 0; i < 30; i++) {
@@ -68,6 +69,18 @@ export class ManageUsers {
     this.activePreviewUser.set(user);
   }
 
+  closePreviewUserModal() {
+    this.activePreviewUser.set(null);
+  }
+
+  openCreateModModal() {
+    this.isCreateModModalOpen.set(true);
+  }
+
+  closeCreateModModal() {
+    this.isCreateModModalOpen.set(false);
+  }
+
   submitCreateMod() {
     if (!this.modEmail.trim() || !this.modPassword.trim()) return;
     alert('Mock: Đã tạo tài khoản Moderator thành công!');
@@ -75,13 +88,14 @@ export class ManageUsers {
       id: this.usersMockData.length + 1,
       email: this.modEmail,
       role: 'CONTENT_MODERATOR',
-      roleClass: 'text-danger',
+      roleClass: 'text-red-600 dark:text-red-400',
       status: 'ACTIVE'
     };
     this.usersMockData.unshift(newMod);
     this.modEmail = '';
     this.modPassword = '';
     this.modNote = '';
+    this.closeCreateModModal();
   }
 
   grantBlogOwner(user: UserItem) {
@@ -90,7 +104,7 @@ export class ManageUsers {
       const idx = this.usersMockData.findIndex(u => u.id === user.id);
       if (idx !== -1) {
         this.usersMockData[idx].role = 'BLOG_OWNER';
-        this.usersMockData[idx].roleClass = 'text-primary';
+        this.usersMockData[idx].roleClass = 'text-aquamarine-600 dark:text-aquamarine-400';
       }
     }
   }
@@ -101,7 +115,7 @@ export class ManageUsers {
       const idx = this.usersMockData.findIndex(u => u.id === user.id);
       if (idx !== -1) {
         this.usersMockData[idx].role = 'NORMAL_USER';
-        this.usersMockData[idx].roleClass = 'text-secondary';
+        this.usersMockData[idx].roleClass = 'text-gray-600 dark:text-gray-400';
       }
     }
   }
