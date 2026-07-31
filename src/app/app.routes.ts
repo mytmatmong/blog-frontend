@@ -8,6 +8,7 @@ import { Auth } from './pages/public/auth/auth';
 import { PostDetail } from './pages/public/post-detail/post-detail';
 import { Category } from './pages/public/category/category';
 import { Hashtag } from './pages/public/hashtag/hashtag';
+import { AuthorDetailComponent } from './pages/public/author-detail/author-detail';
 
 import { Profile } from './pages/account/profile/profile';
 import { RequestBlogOwner } from './pages/account/request-blog-owner/request-blog-owner';
@@ -39,6 +40,7 @@ export const routes: Routes = [
       { path: '', component: Home },
       { path: 'auth', component: Auth },
       { path: 'post/:id', component: PostDetail },
+      { path: 'author/:id', component: AuthorDetailComponent },
       { path: 'category', component: Category },
       { path: 'hashtag', component: Hashtag },
       { path: 'account/profile', component: Profile },

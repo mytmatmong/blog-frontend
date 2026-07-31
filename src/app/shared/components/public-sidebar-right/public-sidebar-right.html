@@ -1,53 +1,113 @@
+<!-- TOP AUTHORS -->
 <div class="p-4 mb-4 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
   <h6 class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-50 mb-3">{{ 'sidebar.top_authors' | translate }}</h6>
 
-  <div class="flex items-center mb-3 gap-2">
-    <span class="avatar-sm">S</span>
-    <div>
-      <div class="font-semibold text-sm text-aquamarine-900 dark:text-aquamarine-100">Sơn Dev</div>
-      <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400">120 {{ 'author.followers' | translate }}</small>
+  @if (isLoadingAuthors()) {
+    <div class="space-y-3 py-2">
+      <div class="animate-pulse flex items-center gap-2">
+        <div class="rounded-full bg-aquamarine-200 dark:bg-aquamarine-800 h-8 w-8"></div>
+        <div class="flex-1 space-y-1">
+          <div class="h-3 bg-aquamarine-200 dark:bg-aquamarine-800 rounded w-3/4"></div>
+          <div class="h-2 bg-aquamarine-200 dark:bg-aquamarine-800 rounded w-1/2"></div>
+        </div>
+      </div>
     </div>
-  </div>
-
-  <div class="flex items-center mb-3 gap-2">
-    <span class="avatar-sm">A</span>
-    <div>
-      <div class="font-semibold text-sm text-aquamarine-900 dark:text-aquamarine-100">Angular Master</div>
-      <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400">98 {{ 'author.followers' | translate }}</small>
+  } @else if (topAuthors().length > 0) {
+    <div class="space-y-3">
+      @for (author of topAuthors(); track author.id) {
+        <a [routerLink]="['/author', author.id]" class="flex items-center gap-2 group hover:opacity-80 transition-opacity">
+          @if (author.avatarUrl) {
+            <img [src]="author.avatarUrl" [alt]="author.username" class="w-8 h-8 rounded-full object-cover border border-aquamarine-300">
+          } @else {
+            <span class="w-8 h-8 rounded-full bg-aquamarine-600 text-white font-bold flex items-center justify-center text-xs">
+              {{ getAvatarInitial(author.username) }}
+            </span>
+          }
+          <div class="overflow-hidden">
+            <div class="font-semibold text-sm text-aquamarine-900 dark:text-aquamarine-100 group-hover:text-aquamarine-600 dark:group-hover:text-aquamarine-400 transition-colors truncate">
+              {{ author.username }}
+            </div>
+            <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400">
+              {{ author.followerCount }} {{ 'author.followers' | translate }}
+            </small>
+          </div>
+        </a>
+      }
     </div>
-  </div>
-
-  <div class="flex items-center gap-2">
-    <span class="avatar-sm">N</span>
-    <div>
-      <div class="font-semibold text-sm text-aquamarine-900 dark:text-aquamarine-100">NodeJS Lab</div>
-      <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400">86 {{ 'author.followers' | translate }}</small>
+  } @else {
+    <!-- Fallback data if DB has no top authors yet -->
+    <div class="space-y-3">
+      <a [routerLink]="['/author', 1]" class="flex items-center gap-2 group hover:opacity-80 transition-opacity">
+        <span class="w-8 h-8 rounded-full bg-aquamarine-600 text-white font-bold flex items-center justify-center text-xs">S</span>
+        <div>
+          <div class="font-semibold text-sm text-aquamarine-900 dark:text-aquamarine-100 group-hover:text-aquamarine-600 dark:group-hover:text-aquamarine-400 transition-colors">Sơn Dev</div>
+          <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400">120 {{ 'author.followers' | translate }}</small>
+        </div>
+      </a>
+      <a [routerLink]="['/author', 2]" class="flex items-center gap-2 group hover:opacity-80 transition-opacity">
+        <span class="w-8 h-8 rounded-full bg-aquamarine-600 text-white font-bold flex items-center justify-center text-xs">A</span>
+        <div>
+          <div class="font-semibold text-sm text-aquamarine-900 dark:text-aquamarine-100 group-hover:text-aquamarine-600 dark:group-hover:text-aquamarine-400 transition-colors">Angular Master</div>
+          <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400">98 {{ 'author.followers' | translate }}</small>
+        </div>
+      </a>
     </div>
-  </div>
+  }
 </div>
 
+<!-- TRENDING POSTS -->
 <div class="p-4 mb-4 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
   <h6 class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-50 mb-3">{{ 'sidebar.trending_posts' | translate }}</h6>
-  <ol class="list-decimal list-inside text-sm space-y-2.5">
-    <li>
-      <a routerLink="/post/1" class="card-text font-medium transition-colors">Thiết kế REST API chuẩn cho Blog</a>
-    </li>
-    <li>
-      <a routerLink="/post/2" class="card-text font-medium transition-colors">Angular Interceptor gắn JWT</a>
-    </li>
-    <li>
-      <a routerLink="/post/3" class="card-text font-medium transition-colors">Sequelize migration cơ bản</a>
-    </li>
-  </ol>
+
+  @if (isLoadingPosts()) {
+    <div class="space-y-2 py-2">
+      <div class="animate-pulse h-4 bg-aquamarine-200 dark:bg-aquamarine-800 rounded w-full"></div>
+      <div class="animate-pulse h-4 bg-aquamarine-200 dark:bg-aquamarine-800 rounded w-4/5"></div>
+    </div>
+  } @else if (topPosts().length > 0) {
+    <ol class="list-decimal list-inside text-sm space-y-2.5">
+      @for (post of topPosts(); track post.id) {
+        <li>
+          <a [routerLink]="['/post', post.id]" class="card-text font-medium transition-colors hover:text-aquamarine-600 dark:hover:text-aquamarine-400">
+            {{ post.title }}
+          </a>
+        </li>
+      }
+    </ol>
+  } @else {
+    <ol class="list-decimal list-inside text-sm space-y-2.5">
+      <li>
+        <a routerLink="/post/1" class="card-text font-medium transition-colors hover:text-aquamarine-600 dark:hover:text-aquamarine-400">Thiết kế REST API chuẩn cho Blog</a>
+      </li>
+      <li>
+        <a routerLink="/post/2" class="card-text font-medium transition-colors hover:text-aquamarine-600 dark:hover:text-aquamarine-400">Angular Interceptor gắn JWT</a>
+      </li>
+    </ol>
+  }
 </div>
 
+<!-- POPULAR TAGS -->
 <div class="p-4 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
   <h6 class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-50 mb-3">{{ 'sidebar.popular_tags' | translate }}</h6>
-  <div class="flex flex-wrap gap-2">
-    <a routerLink="/hashtag" class="tag">#nodejs</a>
-    <a routerLink="/hashtag" class="tag">#angular</a>
-    <a routerLink="/hashtag" class="tag">#mysql</a>
-    <a routerLink="/hashtag" class="tag">#sequelize</a>
-    <a routerLink="/hashtag" class="tag">#jwt</a>
-  </div>
+  @if (isLoadingTags()) {
+    <div class="flex flex-wrap gap-2 animate-pulse">
+      <div class="h-6 w-16 bg-aquamarine-200 dark:bg-aquamarine-800 rounded-full"></div>
+      <div class="h-6 w-20 bg-aquamarine-200 dark:bg-aquamarine-800 rounded-full"></div>
+      <div class="h-6 w-14 bg-aquamarine-200 dark:bg-aquamarine-800 rounded-full"></div>
+    </div>
+  } @else if (topTags().length > 0) {
+    <div class="flex flex-wrap gap-2">
+      @for (tag of topTags(); track tag.id) {
+        <a routerLink="/hashtag" class="tag">#{{ tag.name }}</a>
+      }
+    </div>
+  } @else {
+    <div class="flex flex-wrap gap-2">
+      <a routerLink="/hashtag" class="tag">#nodejs</a>
+      <a routerLink="/hashtag" class="tag">#angular</a>
+      <a routerLink="/hashtag" class="tag">#mysql</a>
+      <a routerLink="/hashtag" class="tag">#prisma</a>
+      <a routerLink="/hashtag" class="tag">#jwt</a>
+    </div>
+  }
 </div>

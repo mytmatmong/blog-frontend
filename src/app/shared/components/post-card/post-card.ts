@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 
 export interface PostItem {
   id: number;
+  authorId?: number;
   title: string;
   excerpt: string;
   authorName: string;

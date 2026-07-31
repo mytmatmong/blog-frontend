@@ -1,13 +1,54 @@
-<div class="mb-4 pb-4 border-b border-aquamarine-200 dark:border-aquamarine-800">
-  <div class="border-l-2 border-aquamarine-500 pl-4 space-y-1">
-    <div class="font-semibold text-sm text-aquamarine-950 dark:text-aquamarine-50">Nguyễn Văn A</div>
-    <p class="text-sm text-aquamarine-950 dark:text-aquamarine-50">Bài viết rất hay và bổ ích!</p>
-    <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400 space-x-2 pt-1">
-      <span class="hover:underline cursor-pointer">{{ 'comments.reply' | translate }}</span>
-      <span>•</span>
-      <span class="hover:underline cursor-pointer">{{ 'comments.edit' | translate }}</span>
-      <span>•</span>
-      <span class="hover:underline cursor-pointer text-red-500">{{ 'comments.delete' | translate }}</span>
+@if (comment) {
+  <div class="mb-4 pb-4 border-b border-aquamarine-200 dark:border-aquamarine-800">
+    <div class="border-l-2 border-aquamarine-500 pl-4 space-y-1">
+      <div class="flex items-center gap-2">
+        <span class="w-6 h-6 rounded-full bg-aquamarine-600 text-white font-bold flex items-center justify-center text-xs">
+          {{ getAvatarInitial(comment.user.username) }}
+        </span>
+        <div class="font-semibold text-sm text-aquamarine-950 dark:text-aquamarine-50">
+          {{ comment.user.username || 'Người dùng' }}
+        </div>
+        <span class="text-xs text-aquamarine-500">• {{ formatDate(comment.createdAt) }}</span>
+      </div>
+      <p class="text-sm text-aquamarine-950 dark:text-aquamarine-50 pt-1">
+        {{ comment.content }}
+      </p>
+      <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400 space-x-2 pt-1">
+        <span class="hover:underline cursor-pointer font-medium">{{ 'comments.reply' | translate }}</span>
+      </div>
+
+      <!-- Nested Replies -->
+      @if (comment.replies && comment.replies.length > 0) {
+        <div class="mt-3 space-y-3 pl-4 border-l border-aquamarine-200 dark:border-aquamarine-800">
+          @for (reply of comment.replies; track reply.id) {
+            <div class="space-y-1">
+              <div class="flex items-center gap-2">
+                <span class="w-5 h-5 rounded-full bg-aquamarine-700 text-white font-bold flex items-center justify-center text-[10px]">
+                  {{ getAvatarInitial(reply.user.username) }}
+                </span>
+                <div class="font-semibold text-xs text-aquamarine-950 dark:text-aquamarine-50">
+                  {{ reply.user.username || 'Người dùng' }}
+                </div>
+                <span class="text-[10px] text-aquamarine-500">• {{ formatDate(reply.createdAt) }}</span>
+              </div>
+              <p class="text-xs text-aquamarine-900 dark:text-aquamarine-100">
+                {{ reply.content }}
+              </p>
+            </div>
+          }
+        </div>
+      }
     </div>
   </div>
-</div>
+} @else {
+  <!-- Fallback Mock Comment -->
+  <div class="mb-4 pb-4 border-b border-aquamarine-200 dark:border-aquamarine-800">
+    <div class="border-l-2 border-aquamarine-500 pl-4 space-y-1">
+      <div class="font-semibold text-sm text-aquamarine-950 dark:text-aquamarine-50">Nguyễn Văn A</div>
+      <p class="text-sm text-aquamarine-950 dark:text-aquamarine-50">Bài viết rất hay và bổ ích!</p>
+      <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400 space-x-2 pt-1">
+        <span class="hover:underline cursor-pointer">{{ 'comments.reply' | translate }}</span>
+      </div>
+    </div>
+  </div>
+}

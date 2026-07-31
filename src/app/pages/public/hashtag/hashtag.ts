@@ -60,6 +60,7 @@ export class Hashtag {
       {
         title: 'Microservices vs Monolithic: Cuộc chiến kiến trúc',
         excerpt: 'Phân tích điểm mạnh, điểm yếu và khi nào nên chuyển đổi hệ thống sang Microservices.',
+        authorId: 1,
         authorName: 'Kiên Architect',
         authorAvatar: 'K',
         timeAgo: '5 giờ trước',
@@ -73,6 +74,7 @@ export class Hashtag {
       {
         title: 'Bảo mật dữ liệu nhạy cảm trong hệ thống phân tán',
         excerpt: 'Cách sử dụng Vault, mã hóa dữ liệu tại chỗ (at-rest) và trên đường truyền (in-transit).',
+        authorId: 2,
         authorName: 'Nam Security',
         authorAvatar: 'N',
         timeAgo: '1 ngày trước',

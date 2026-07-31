@@ -1,8 +1,37 @@
 <main class="container mx-auto px-4 max-w-7xl py-6">
-  <!-- Page Header -->
-  <section class="p-6 mb-6 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 card-box shadow-sm">
-    <h3 class="font-bold text-2xl text-aquamarine-950 dark:text-aquamarine-50 mb-2">{{ 'category.title' | translate }}</h3>
-    <p class="text-sm text-aquamarine-600 dark:text-aquamarine-400">{{ 'category.subtitle' | translate }}</p>
+  <!-- Page Header & Category Chips -->
+  <section class="p-6 mb-6 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 card-box shadow-sm space-y-4">
+    <div>
+      <h3 class="font-bold text-2xl text-aquamarine-950 dark:text-aquamarine-50 mb-2">{{ 'category.title' | translate }}</h3>
+      <p class="text-sm text-aquamarine-600 dark:text-aquamarine-400">{{ 'category.subtitle' | translate }}</p>
+    </div>
+
+    <!-- Dynamic Category Pills from GET /api/v1/categories -->
+    <div class="flex flex-wrap items-center gap-2 pt-2 border-t border-aquamarine-100 dark:border-aquamarine-800">
+      <button (click)="selectCategory(null)" class="category-pill text-xs font-semibold px-3 py-1.5 rounded-full transition-colors"
+        [class.bg-aquamarine-600]="selectedCategoryId() === null" [class.text-white]="selectedCategoryId() === null">
+        {{ 'category.all' | translate }}
+      </button>
+
+      @if (isLoadingCategories()) {
+        <div class="flex items-center gap-2 animate-pulse">
+          <div class="h-7 w-20 bg-aquamarine-200 dark:bg-aquamarine-800 rounded-full"></div>
+          <div class="h-7 w-24 bg-aquamarine-200 dark:bg-aquamarine-800 rounded-full"></div>
+        </div>
+      } @else if (categories().length > 0) {
+        @for (cat of categories(); track cat.id) {
+          <button (click)="selectCategory(cat.id)" class="category-pill text-xs font-semibold px-3 py-1.5 rounded-full border border-aquamarine-200 dark:border-aquamarine-800 transition-colors"
+            [class.bg-aquamarine-600]="selectedCategoryId() === cat.id" [class.text-white]="selectedCategoryId() === cat.id">
+            {{ cat.name }}
+          </button>
+        }
+      } @else {
+        <!-- Fallback static chips -->
+        <button class="category-pill">Backend</button>
+        <button class="category-pill">Frontend</button>
+        <button class="category-pill">Angular</button>
+      }
+    </div>
   </section>
 
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -15,14 +44,25 @@
     </app-public-sidebar-left>
     
     <section class="lg:col-span-6">
-      @for (post of visiblePosts(); track post.id) {
-        <app-post-card [post]="post"></app-post-card>
+      @if (isLoading()) {
+        <div class="animate-pulse space-y-4">
+          <div class="h-32 bg-aquamarine-200 dark:bg-aquamarine-800 rounded-2xl"></div>
+          <div class="h-32 bg-aquamarine-200 dark:bg-aquamarine-800 rounded-2xl"></div>
+        </div>
+      } @else if (visiblePosts().length > 0) {
+        @for (post of visiblePosts(); track post.id) {
+          <app-post-card [post]="post"></app-post-card>
+        }
+        <app-pagination 
+          [totalItems]="totalItems()" 
+          [itemsPerPage]="itemsPerPage" 
+          [(currentPage)]="currentPage">
+        </app-pagination>
+      } @else {
+        <div class="p-8 text-center rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900">
+          <p class="text-aquamarine-600 dark:text-aquamarine-400">Không tìm thấy bài viết nào thuộc danh mục này.</p>
+        </div>
       }
-      <app-pagination 
-        [totalItems]="filteredPosts().length" 
-        [itemsPerPage]="itemsPerPage" 
-        [(currentPage)]="currentPage">
-      </app-pagination>
     </section>
 
     <app-public-sidebar-right class="lg:col-span-3"></app-public-sidebar-right>

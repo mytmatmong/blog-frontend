@@ -1,35 +1,54 @@
 <main class="container mx-auto px-4 max-w-7xl py-6">
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
     <div class="lg:col-span-4">
-      <div class="p-6 text-center rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-        <div class="mb-4 flex justify-center">
-          <span class="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-emerald-400 flex items-center justify-center text-white text-3xl font-bold">S</span>
+      <div class="p-6 text-center rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm space-y-4">
+        <div class="flex justify-center">
+          @if (user()?.avatarUrl) {
+            <img [src]="user()?.avatarUrl" [alt]="user()?.username" class="w-24 h-24 rounded-full object-cover border-2 border-aquamarine-500 shadow-md">
+          } @else {
+            <span class="w-24 h-24 rounded-full bg-gradient-to-br from-aquamarine-600 to-emerald-500 flex items-center justify-center text-white text-3xl font-bold shadow-md">
+              {{ getAvatarInitial(user()?.username) }}
+            </span>
+          }
         </div>
-        <h4 class="font-bold text-xl text-aquamarine-950 dark:text-aquamarine-50 mb-1">Lê Hồng Sơn</h4>
-        <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400 mb-4">Fullstack Developer</p>
-        <div class="flex justify-center gap-6 text-xs text-aquamarine-600 dark:text-aquamarine-400">
-          <div><strong class="text-sm font-bold text-aquamarine-950 dark:text-aquamarine-50">120</strong> followers</div>
-          <div><strong class="text-sm font-bold text-aquamarine-950 dark:text-aquamarine-50">24</strong> bài viết</div>
+
+        <div>
+          <h4 class="font-bold text-xl text-aquamarine-950 dark:text-aquamarine-50 mb-1">
+            {{ user()?.username || 'Người dùng' }}
+          </h4>
+          <span class="inline-block text-xs font-semibold px-3 py-1 rounded-full bg-aquamarine-100 dark:bg-aquamarine-800 text-aquamarine-700 dark:text-aquamarine-300">
+            Role: {{ user()?.role || 'USER' }}
+          </span>
         </div>
+
+        <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">
+          {{ user()?.bio || 'Chưa có thông tin giới thiệu' }}
+        </p>
+
+        @if (user()?.createdAt) {
+          <div class="text-xs text-aquamarine-500 pt-2 border-t border-aquamarine-100 dark:border-aquamarine-800">
+            Tham gia từ: {{ user()?.createdAt }}
+          </div>
+        }
       </div>
     </div>
+
     <div class="lg:col-span-8">
       <div class="p-6 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
         <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50 mb-4">Thông tin cá nhân</h5>
         <form class="space-y-4">
           <div>
-            <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">Họ và tên</label>
-            <input type="text" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" value="Lê Hồng Sơn">
+            <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">Tên tài khoản / Username</label>
+            <input type="text" [value]="username()" readonly class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-100/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none cursor-not-allowed">
           </div>
           <div>
             <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">Email</label>
-            <input type="email" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-100/50 dark:bg-aquamarine-900 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 cursor-not-allowed" value="son.dev@gmail.com" readonly>
+            <input type="email" [value]="email()" readonly class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-100/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 cursor-not-allowed">
           </div>
           <div>
             <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">Bio / Giới thiệu</label>
-            <textarea class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 p-3 text-sm text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" rows="3">Lập trình viên yêu thích Angular và NodeJS.</textarea>
+            <textarea [value]="bio()" readonly class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-100/50 dark:bg-aquamarine-950 p-3 text-sm text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none cursor-not-allowed" rows="3"></textarea>
           </div>
-          <button type="submit" class="px-5 py-2.5 font-semibold text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 rounded-xl transition-colors">Lưu thay đổi</button>
         </form>
       </div>
     </div>

@@ -33,4 +33,9 @@ export class PublicHeader {
     this.ts.setLanguage(lang);
     this.isLangDropdownOpen.set(false);
   }
+
+  onLogout() {
+    this.auth.logoutApi().subscribe();
+    this.isUserDropdownOpen.set(false);
+  }
 }

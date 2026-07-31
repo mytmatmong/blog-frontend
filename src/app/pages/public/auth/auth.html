@@ -2,55 +2,147 @@
   <div
     class="w-full max-w-md p-6 lg:p-8 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
     <div class="flex rounded-xl bg-aquamarine-50 dark:bg-aquamarine-950 p-1 mb-6">
-      <button class="flex-1 py-2 text-sm font-semibold rounded-lg transition-all"
+      <button class="flex-1 min-w-[75px] py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all"
         [class.bg-aquamarine-600]="activeTab() === 'login'" [class.text-white]="activeTab() === 'login'"
         [class.text-aquamarine-700]="activeTab() !== 'login'" [class.dark:text-aquamarine-300]="activeTab() !== 'login'"
         (click)="setTab('login')">{{ 'auth.login_tab' | translate }}</button>
-      <button class="flex-1 py-2 text-sm font-semibold rounded-lg transition-all"
+      <button class="flex-1 min-w-[75px] py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all"
         [class.bg-aquamarine-600]="activeTab() === 'register'" [class.text-white]="activeTab() === 'register'"
         [class.text-aquamarine-700]="activeTab() !== 'register'"
         [class.dark:text-aquamarine-300]="activeTab() !== 'register'" (click)="setTab('register')">{{ 'auth.register_tab' | translate }}</button>
-      <button class="flex-1 py-2 text-sm font-semibold rounded-lg transition-all"
+      <button class="flex-1 min-w-[75px] py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all"
         [class.bg-aquamarine-600]="activeTab() === 'forgot'" [class.text-white]="activeTab() === 'forgot'"
         [class.text-aquamarine-700]="activeTab() !== 'forgot'"
         [class.dark:text-aquamarine-300]="activeTab() !== 'forgot'" (click)="setTab('forgot')">{{ 'auth.forgot_tab' | translate }}</button>
     </div>
 
+    <!-- 1. LOGIN TAB -->
     @if (activeTab() === 'login') {
     <div>
       <h4 class="font-bold text-xl text-center text-aquamarine-950 dark:text-aquamarine-50 mb-6">{{ 'auth.login_title' | translate }}</h4>
-      <form class="flex flex-col gap-4">
-        <app-input type="email" [placeholder]="ts.translate('auth.email_placeholder')" icon="bi bi-envelope" [required]="true"></app-input>
-        <app-input type="password" [placeholder]="ts.translate('auth.password_placeholder')" icon="bi bi-lock" [required]="true"></app-input>
-        <button type="submit"
-          class="w-full py-2.5 mt-2 font-semibold text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 rounded-xl transition-colors">{{ 'auth.submit_login' | translate }}</button>
+      <form (submit)="onLogin($event)" class="flex flex-col gap-4">
+        <app-input type="text" [placeholder]="ts.translate('auth.email_placeholder')" icon="bi bi-person-badge" [required]="true"
+          [value]="loginIdentifier()" (valueChange)="loginIdentifier.set($event)"></app-input>
+        <app-input type="password" [placeholder]="ts.translate('auth.password_placeholder')" icon="bi bi-lock" [required]="true"
+          [value]="loginPassword()" (valueChange)="loginPassword.set($event)"></app-input>
+        <div class="text-right">
+          <button type="button" (click)="setTab('forgot')" class="text-xs text-aquamarine-600 hover:text-aquamarine-700 dark:text-aquamarine-400 font-medium">
+            {{ 'auth.forgot_tab' | translate }}?
+          </button>
+        </div>
+        <button type="submit" [disabled]="isLoading()"
+          class="w-full py-2.5 mt-2 font-semibold text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-colors flex items-center justify-center gap-2">
+          @if (isLoading()) {
+            <span class="inline-block animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></span>
+          }
+          {{ 'auth.submit_login' | translate }}
+        </button>
       </form>
     </div>
     }
 
+    <!-- 2. REGISTER TAB -->
     @if (activeTab() === 'register') {
     <div>
       <h4 class="font-bold text-xl text-center text-aquamarine-950 dark:text-aquamarine-50 mb-6">{{ 'auth.register_title' | translate }}</h4>
-      <form class="flex flex-col gap-4">
-        <app-input type="text" [placeholder]="ts.translate('auth.username_placeholder')" icon="bi bi-person"
-          [required]="true"></app-input>
-        <app-input type="email" [placeholder]="ts.translate('auth.email_placeholder')" icon="bi bi-envelope" [required]="true"></app-input>
-        <app-input type="password" [placeholder]="ts.translate('auth.password_placeholder')" icon="bi bi-lock" [required]="true"></app-input>
-        <button type="submit"
-          class="w-full py-2.5 mt-2 font-semibold text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 rounded-xl transition-colors">{{ 'auth.submit_register' | translate }}</button>
+      <form (submit)="onRegister($event)" class="flex flex-col gap-4">
+        <app-input type="text" [placeholder]="ts.translate('auth.username_placeholder')" icon="bi bi-person" [required]="true"
+          [value]="registerUsername()" (valueChange)="registerUsername.set($event)"></app-input>
+        <app-input type="email" [placeholder]="ts.translate('auth.email_placeholder')" icon="bi bi-envelope" [required]="true"
+          [value]="registerEmail()" (valueChange)="registerEmail.set($event)"></app-input>
+        <app-input type="password" [placeholder]="ts.translate('auth.password_placeholder')" icon="bi bi-lock" [required]="true"
+          [value]="registerPassword()" (valueChange)="registerPassword.set($event)"></app-input>
+        <button type="submit" [disabled]="isLoading()"
+          class="w-full py-2.5 mt-2 font-semibold text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-colors flex items-center justify-center gap-2">
+          @if (isLoading()) {
+            <span class="inline-block animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></span>
+          }
+          {{ 'auth.submit_register' | translate }}
+        </button>
       </form>
     </div>
     }
 
+    <!-- 3. FORGOT / RESET PASSWORD TAB (INTEGRATED SINGLE VIEW) -->
     @if (activeTab() === 'forgot') {
     <div>
-      <h4 class="font-bold text-xl text-center text-aquamarine-950 dark:text-aquamarine-50 mb-6">{{ 'auth.forgot_title' | translate }}</h4>
-      <form class="flex flex-col gap-4">
-        <app-input type="email" [placeholder]="ts.translate('auth.email_placeholder')" icon="bi bi-envelope"
-          [required]="true"></app-input>
-        <button type="submit"
-          class="w-full py-2.5 mt-2 font-semibold text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 rounded-xl transition-colors">{{ 'auth.submit_forgot' | translate }}</button>
+      <h4 class="font-bold text-xl text-center text-aquamarine-950 dark:text-aquamarine-50 mb-4">{{ 'auth.forgot_title' | translate }}</h4>
+
+      <!-- Stepper / Switcher for Request vs Reset -->
+      <div class="flex border-b border-aquamarine-200 dark:border-aquamarine-800 mb-6 text-xs sm:text-sm font-medium">
+        <button type="button"
+          (click)="setForgotStep('request')"
+          class="flex-1 py-2 text-center border-b-2 transition-colors"
+          [class.border-aquamarine-600]="forgotStep() === 'request'"
+          [class.text-aquamarine-600]="forgotStep() === 'request'"
+          [class.dark:text-aquamarine-400]="forgotStep() === 'request'"
+          [class.border-transparent]="forgotStep() !== 'request'"
+          [class.text-aquamarine-800]="forgotStep() !== 'request'"
+          [class.dark:text-aquamarine-300]="forgotStep() !== 'request'"
+          [class.opacity-60]="forgotStep() !== 'request'">
+          1. Yêu cầu khôi phục
+        </button>
+        <button type="button"
+          (click)="setForgotStep('reset')"
+          class="flex-1 py-2 text-center border-b-2 transition-colors"
+          [class.border-aquamarine-600]="forgotStep() === 'reset'"
+          [class.text-aquamarine-600]="forgotStep() === 'reset'"
+          [class.dark:text-aquamarine-400]="forgotStep() === 'reset'"
+          [class.border-transparent]="forgotStep() !== 'reset'"
+          [class.text-aquamarine-800]="forgotStep() !== 'reset'"
+          [class.dark:text-aquamarine-300]="forgotStep() !== 'reset'"
+          [class.opacity-60]="forgotStep() !== 'reset'">
+          2. Đặt lại mật khẩu
+        </button>
+      </div>
+
+      <!-- STEP 1: REQUEST RESET LINK (POST /api/v1/forgot-password) -->
+      @if (forgotStep() === 'request') {
+      <form (submit)="onForgotPassword($event)" class="flex flex-col gap-4">
+        <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">
+          Nhập địa chỉ email đã đăng ký. Hệ thống sẽ gửi liên kết/mã khôi phục cho bạn.
+        </p>
+        <app-input type="email" [placeholder]="ts.translate('auth.email_placeholder')" icon="bi bi-envelope" [required]="true"
+          [value]="forgotEmail()" (valueChange)="forgotEmail.set($event)"></app-input>
+        <button type="submit" [disabled]="isLoading()"
+          class="w-full py-2.5 mt-2 font-semibold text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-colors flex items-center justify-center gap-2">
+          @if (isLoading()) {
+            <span class="inline-block animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></span>
+          }
+          {{ 'auth.submit_forgot' | translate }}
+        </button>
+        <div class="text-center mt-1">
+          <button type="button" (click)="setForgotStep('reset')" class="text-xs text-aquamarine-600 hover:underline dark:text-aquamarine-400">
+            Đã có mã token? Đặt lại mật khẩu ngay &rarr;
+          </button>
+        </div>
       </form>
+      }
+
+      <!-- STEP 2: RESET PASSWORD WITH TOKEN (POST /api/v1/reset-password) -->
+      @if (forgotStep() === 'reset') {
+      <form (submit)="onResetPassword($event)" class="flex flex-col gap-4">
+        <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">
+          Nhập mã token nhận được và mật khẩu mới để tiến hành khôi phục.
+        </p>
+        <app-input type="text" [placeholder]="ts.translate('auth.token_placeholder')" icon="bi bi-key" [required]="true"
+          [value]="resetToken()" (valueChange)="resetToken.set($event)"></app-input>
+        <app-input type="password" [placeholder]="ts.translate('auth.new_password_placeholder')" icon="bi bi-shield-lock" [required]="true"
+          [value]="resetPassword()" (valueChange)="resetPassword.set($event)"></app-input>
+        <button type="submit" [disabled]="isLoading()"
+          class="w-full py-2.5 mt-2 font-semibold text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-colors flex items-center justify-center gap-2">
+          @if (isLoading()) {
+            <span class="inline-block animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></span>
+          }
+          {{ 'auth.submit_reset' | translate }}
+        </button>
+        <div class="text-center mt-1">
+          <button type="button" (click)="setForgotStep('request')" class="text-xs text-aquamarine-600 hover:underline dark:text-aquamarine-400">
+            &larr; Chưa nhận được email? Gửi lại yêu cầu
+          </button>
+        </div>
+      </form>
+      }
     </div>
     }
   </div>

@@ -1,0 +1,75 @@
+<main class="container mx-auto px-4 max-w-7xl py-6">
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div class="lg:col-span-9">
+      @if (isLoading()) {
+        <div class="p-6 mb-6 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm animate-pulse flex gap-4 items-center">
+          <div class="w-20 h-20 rounded-full bg-aquamarine-200 dark:bg-aquamarine-800"></div>
+          <div class="flex-1 space-y-2">
+            <div class="h-6 bg-aquamarine-200 dark:bg-aquamarine-800 rounded w-1/3"></div>
+            <div class="h-4 bg-aquamarine-200 dark:bg-aquamarine-800 rounded w-2/3"></div>
+          </div>
+        </div>
+      } @else if (author()) {
+        <section class="p-6 mb-6 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
+          <div class="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
+            @if (author()?.avatarUrl) {
+              <img [src]="author()?.avatarUrl" [alt]="author()?.username" class="w-24 h-24 rounded-full object-cover border-2 border-aquamarine-500 shadow-md">
+            } @else {
+              <div class="w-24 h-24 rounded-full bg-gradient-to-br from-aquamarine-600 to-emerald-500 text-white font-bold text-3xl flex items-center justify-center shadow-md">
+                {{ getAvatarInitial(author()?.username) }}
+              </div>
+            }
+
+            <div class="space-y-2 flex-1">
+              <h2 class="font-bold text-2xl text-aquamarine-950 dark:text-aquamarine-50">
+                {{ author()?.username }}
+              </h2>
+              <p class="text-sm text-aquamarine-600 dark:text-aquamarine-400">
+                {{ author()?.bio || 'Tác giả chia sẻ bài viết trên CMS Blog' }}
+              </p>
+
+              <div class="flex flex-wrap items-center justify-center sm:justify-start gap-4 pt-2 text-xs text-aquamarine-700 dark:text-aquamarine-300">
+                <span class="bg-aquamarine-50 dark:bg-aquamarine-950 px-3 py-1 rounded-full border border-aquamarine-200 dark:border-aquamarine-800">
+                  <i class="bi bi-journal-text me-1 text-aquamarine-600"></i> {{ author()?.postCount || 0 }} bài viết
+                </span>
+                <span class="bg-aquamarine-50 dark:bg-aquamarine-950 px-3 py-1 rounded-full border border-aquamarine-200 dark:border-aquamarine-800">
+                  <i class="bi bi-calendar-check me-1 text-aquamarine-600"></i> Tham gia {{ author()?.createdAt | date:'MM/yyyy' }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Author Posts List -->
+        <section class="space-y-4">
+          <h4 class="font-bold text-xl text-aquamarine-950 dark:text-aquamarine-50 mb-4">
+            Bài viết của {{ author()?.username }}
+          </h4>
+
+          @if (posts().length > 0) {
+            @for (post of posts(); track post.id) {
+              <app-post-card [post]="post"></app-post-card>
+            }
+            <app-pagination 
+              [totalItems]="totalItems()" 
+              [itemsPerPage]="itemsPerPage" 
+              [(currentPage)]="currentPage"
+              (currentPageChange)="onPageChange($event)">
+            </app-pagination>
+          } @else {
+            <div class="p-8 text-center rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900">
+              <p class="text-aquamarine-600 dark:text-aquamarine-400">Tác giả này chưa có bài viết nào được xuất bản.</p>
+            </div>
+          }
+        </section>
+      } @else {
+        <div class="p-8 text-center rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900">
+          <p class="text-red-500 font-semibold">{{ errorMessage() || 'Không tìm thấy thông tin tác giả.' }}</p>
+          <a routerLink="/" class="inline-block mt-4 text-sm font-semibold text-aquamarine-600 hover:underline">Quay lại trang chủ</a>
+        </div>
+      }
+    </div>
+
+    <app-public-sidebar-right class="lg:col-span-3"></app-public-sidebar-right>
+  </div>
+</main>

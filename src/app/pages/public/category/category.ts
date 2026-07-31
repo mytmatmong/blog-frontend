@@ -1,9 +1,11 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { PublicSidebarLeft, FilterSortOption } from '../../../shared/components/public-sidebar-left/public-sidebar-left';
 import { PublicSidebarRight } from '../../../shared/components/public-sidebar-right/public-sidebar-right';
 import { PostCard, PostItem } from '../../../shared/components/post-card/post-card';
 import { Pagination } from '../../../shared/components/pagination/pagination';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+import { PublicApiService } from '../../../core/services/public-api.service';
+import { CategoryItem, PublicPost } from '../../../core/models/post.model';
 
 @Component({
   selector: 'app-category',
@@ -11,88 +13,102 @@ import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
   templateUrl: './category.html',
   styleUrl: './category.css',
 })
-export class Category {
-  mockPosts: PostItem[] = [];
-  currentPage = signal(1);
+export class Category implements OnInit {
+  private readonly publicApiService = inject(PublicApiService);
+
+  categories = signal<CategoryItem[]>([]);
+  selectedCategoryId = signal<number | null>(null);
+  posts = signal<PostItem[]>([]);
+  totalItems = signal<number>(0);
+  currentPage = signal<number>(1);
   itemsPerPage = 10;
-  searchTerm = signal('');
+  searchTerm = signal<string>('');
   activeFilter = signal<FilterSortOption>('latest');
+  isLoading = signal<boolean>(false);
+  isLoadingCategories = signal<boolean>(false);
 
-  filteredPosts = computed(() => {
-    const term = this.searchTerm().toLowerCase().trim();
-    let posts = [...this.mockPosts];
-    if (term) {
-      posts = posts.filter(post => 
-        post.categories.some(cat => cat.toLowerCase().includes(term))
-      );
-    }
-    const filter = this.activeFilter();
-    if (filter === 'mostViewed') {
-      posts.sort((a, b) => b.views - a.views);
-    } else if (filter === 'mostLiked') {
-      posts.sort((a, b) => b.likes - a.likes);
-    } else if (filter === 'mostCommented') {
-      posts.sort((a, b) => b.comments - a.comments);
-    } else {
-      posts.sort((a, b) => b.id - a.id);
-    }
-    return posts;
-  });
+  visiblePosts = computed(() => this.posts());
+  filteredPosts = computed(() => this.posts());
 
-  visiblePosts = computed(() => {
-    const startIndex = (this.currentPage() - 1) * this.itemsPerPage;
-    return this.filteredPosts().slice(startIndex, startIndex + this.itemsPerPage);
-  });
+  ngOnInit() {
+    this.loadCategories();
+    this.loadPosts();
+  }
+
+  loadCategories() {
+    this.isLoadingCategories.set(true);
+    this.publicApiService.getCategories({ limit: 20 }).subscribe({
+      next: (res) => {
+        this.isLoadingCategories.set(false);
+        if (res.success && res.data) {
+          this.categories.set(res.data.items);
+        }
+      },
+      error: () => {
+        this.isLoadingCategories.set(false);
+      }
+    });
+  }
+
+  selectCategory(id: number | null) {
+    this.selectedCategoryId.set(id);
+    this.currentPage.set(1);
+    this.loadPosts();
+  }
+
+  loadPosts() {
+    this.isLoading.set(true);
+    const search = this.searchTerm().trim();
+    const catId = this.selectedCategoryId() || undefined;
+
+    this.publicApiService.getPosts({
+      search: search || undefined,
+      categoryId: catId,
+      page: this.currentPage(),
+      limit: this.itemsPerPage
+    }).subscribe({
+      next: (res) => {
+        this.isLoading.set(false);
+        if (res.success && res.data) {
+          const mapped = res.data.items.map((p) => this.mapToPostItem(p));
+          this.posts.set(mapped);
+          this.totalItems.set(res.data.meta.totalItems);
+        }
+      },
+      error: () => {
+        this.isLoading.set(false);
+      }
+    });
+  }
 
   onSearchChange(event: Event) {
     const input = event.target as HTMLInputElement;
     this.searchTerm.set(input.value);
     this.currentPage.set(1);
+    this.loadPosts();
   }
 
   clearSearch() {
     this.searchTerm.set('');
     this.currentPage.set(1);
+    this.loadPosts();
   }
 
-  constructor() {
-    const basePosts: Omit<PostItem, 'id'>[] = [
-      {
-        title: 'Hướng dẫn xây dựng RESTful API với NestJS',
-        excerpt: 'NestJS mang lại cấu trúc của Angular cho backend NodeJS, giúp quản lý dependency dễ dàng.',
-        authorName: 'Hoàng Backend',
-        authorAvatar: 'HB',
-        timeAgo: '4 giờ trước',
-        readTime: '12 phút đọc',
-        categories: ['Backend', 'NestJS'],
-        tags: ['#nestjs', '#nodejs', '#backend'],
-        likes: 215,
-        views: 3100,
-        comments: 20
-      },
-      {
-        title: 'GraphQL vs REST: Nên chọn gì cho dự án mới?',
-        excerpt: 'So sánh ưu nhược điểm của GraphQL và REST, khi nào nên dùng công nghệ nào để tối ưu cho Frontend.',
-        authorName: 'Sơn Dev',
-        authorAvatar: 'S',
-        timeAgo: '2 ngày trước',
-        readTime: '7 phút đọc',
-        categories: ['Backend', 'Architecture'],
-        tags: ['#graphql', '#rest', '#api'],
-        likes: 180,
-        views: 2900,
-        comments: 34
-      }
-    ];
-
-    for (let i = 0; i < 20; i++) {
-      const post = { ...basePosts[i % basePosts.length] } as PostItem;
-      post.id = i + 1;
-      post.title = `${post.title} (Phần ${i + 1})`;
-      post.likes = Math.floor(Math.random() * 500) + 10;
-      post.views = post.likes * 15;
-      post.comments = Math.floor(post.likes / 8);
-      this.mockPosts.push(post);
-    }
+  private mapToPostItem(p: PublicPost): PostItem {
+    return {
+      id: p.id,
+      authorId: p.author?.id || 1,
+      title: p.title,
+      excerpt: p.summary || (p.content ? (p.content.length > 150 ? p.content.substring(0, 150) + '...' : p.content) : ''),
+      authorName: p.author?.username || 'Tác giả',
+      authorAvatar: p.author?.username ? p.author.username.charAt(0).toUpperCase() : 'A',
+      timeAgo: p.createdAt ? new Date(p.createdAt).toLocaleDateString('vi-VN') : 'Gần đây',
+      readTime: '5 phút đọc',
+      categories: p.categories?.map(c => c.name) || [],
+      tags: p.tags?.map(t => t.name.startsWith('#') ? t.name : '#' + t.name) || [],
+      likes: p.likeCount || 0,
+      views: p.viewCount || 0,
+      comments: 0
+    };
   }
 }
