@@ -1,8 +1,9 @@
 import { Component, signal } from '@angular/core';
+import { InputComponent } from '../../../shared/components/input/input';
 
 @Component({
   selector: 'app-auth',
-  imports: [],
+  imports: [InputComponent],
   templateUrl: './auth.html',
   styleUrl: './auth.css',
 })

@@ -1,5 +1,5 @@
 import { Component, signal, computed } from '@angular/core';
-import { PublicSidebarLeft } from '../../../shared/components/public-sidebar-left/public-sidebar-left';
+import { PublicSidebarLeft, FilterSortOption } from '../../../shared/components/public-sidebar-left/public-sidebar-left';
 import { PublicSidebarRight } from '../../../shared/components/public-sidebar-right/public-sidebar-right';
 import { PostCard, PostItem } from '../../../shared/components/post-card/post-card';
 import { Pagination } from '../../../shared/components/pagination/pagination';
@@ -15,13 +15,27 @@ export class Hashtag {
   currentPage = signal(1);
   itemsPerPage = 10;
   searchTerm = signal('');
+  activeFilter = signal<FilterSortOption>('latest');
 
   filteredPosts = computed(() => {
     const term = this.searchTerm().toLowerCase().trim();
-    if (!term) return this.mockPosts;
-    return this.mockPosts.filter(post => 
-      post.tags.some(tag => tag.toLowerCase().includes(term))
-    );
+    let posts = [...this.mockPosts];
+    if (term) {
+      posts = posts.filter(post => 
+        post.tags.some(tag => tag.toLowerCase().includes(term))
+      );
+    }
+    const filter = this.activeFilter();
+    if (filter === 'mostViewed') {
+      posts.sort((a, b) => b.views - a.views);
+    } else if (filter === 'mostLiked') {
+      posts.sort((a, b) => b.likes - a.likes);
+    } else if (filter === 'mostCommented') {
+      posts.sort((a, b) => b.comments - a.comments);
+    } else {
+      posts.sort((a, b) => b.id - a.id);
+    }
+    return posts;
   });
 
   visiblePosts = computed(() => {

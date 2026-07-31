@@ -1,0 +1,43 @@
+<div class="fixed top-20 right-4 z-[9999] flex flex-col gap-3 w-full max-w-sm px-4 md:px-0 pointer-events-none">
+  @for (toast of toastService.toasts(); track toast.id) {
+    <div 
+      class="pointer-events-auto rounded-xl shadow-xl border p-4 flex items-start gap-3 transform transition-all duration-300 animate-slide-in-right bg-white dark:bg-aquamarine-900 border-aquamarine-200 dark:border-aquamarine-800"
+      [class.border-l-4]="true"
+      [class.border-l-green-500]="toast.type === 'success'"
+      [class.border-l-red-500]="toast.type === 'error'"
+      [class.border-l-blue-500]="toast.type === 'info'"
+      [class.border-l-yellow-500]="toast.type === 'warning'">
+      
+      <div class="flex-shrink-0 mt-0.5">
+        @switch (toast.type) {
+          @case ('success') {
+            <i class="bi bi-check-circle-fill text-green-500 text-lg"></i>
+          }
+          @case ('error') {
+            <i class="bi bi-x-circle-fill text-red-500 text-lg"></i>
+          }
+          @case ('info') {
+            <i class="bi bi-info-circle-fill text-blue-500 text-lg"></i>
+          }
+          @case ('warning') {
+            <i class="bi bi-exclamation-triangle-fill text-yellow-500 text-lg"></i>
+          }
+        }
+      </div>
+
+      <div class="flex-grow">
+        @if (toast.title) {
+          <h5 class="text-sm font-bold text-aquamarine-950 dark:text-aquamarine-50 mb-0.5">{{ toast.title }}</h5>
+        }
+        <p class="text-sm text-aquamarine-700 dark:text-aquamarine-200">{{ toast.message }}</p>
+      </div>
+
+      <button 
+        type="button" 
+        class="flex-shrink-0 text-aquamarine-400 hover:text-aquamarine-600 dark:hover:text-aquamarine-200 transition-colors"
+        (click)="toastService.remove(toast.id)">
+        <i class="bi bi-x-lg text-sm"></i>
+      </button>
+    </div>
+  }
+</div>

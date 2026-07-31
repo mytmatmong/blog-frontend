@@ -1,0 +1,39 @@
+.app-input-field {
+  background-color: #ffffff;
+  color: #0F0F0F !important;
+  border-color: #99FFF1;
+}
+
+.app-input-field::placeholder {
+  color: #737373 !important;
+}
+
+.app-input-field:focus {
+  border-color: #00CCB1;
+  box-shadow: 0 0 0 2px rgba(0, 204, 177, 0.25);
+}
+
+/* Dark Mode Styles */
+:host-context(.dark) .app-input-field,
+:host-context(.dark-mode) .app-input-field,
+.dark .app-input-field,
+.dark-mode .app-input-field {
+  background-color: #001F1B;
+  color: #E0E0E0 !important;
+  border-color: #006658;
+}
+
+:host-context(.dark) .app-input-field::placeholder,
+:host-context(.dark-mode) .app-input-field::placeholder,
+.dark .app-input-field::placeholder,
+.dark-mode .app-input-field::placeholder {
+  color: #A3A3A3 !important;
+}
+
+:host-context(.dark) .app-input-field:focus,
+:host-context(.dark-mode) .app-input-field:focus,
+.dark .app-input-field:focus,
+.dark-mode .app-input-field:focus {
+  border-color: #00FFDD;
+  box-shadow: 0 0 0 2px rgba(0, 255, 221, 0.25);
+}

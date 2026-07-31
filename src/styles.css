@@ -135,26 +135,49 @@ a {
   color: var(--btn-color-disabled);
 }
 
-/* Tertiary Button: Viền = màu thẻ, Nền = màu thẻ, Chữ = màu nút */
-.btn-tertiary {
-  border-color: var(--card-bg);
-  background-color: var(--card-bg);
-  color: var(--btn-color-default);
+/* Tertiary Button, Badges & Tags */
+.btn-tertiary, .tag, .category-badge, .category-pill {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.25rem 0.625rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(0, 204, 177, 0.25);
+  background-color: rgba(0, 204, 177, 0.08);
+  color: var(--card-text-default) !important;
+  transition: all 0.2s ease-in-out;
+  text-decoration: none;
+  cursor: pointer;
 }
-.btn-tertiary:hover:not(:disabled) {
-  border-color: var(--card-bg);
-  background-color: var(--card-bg);
-  color: var(--btn-color-hover);
+
+.dark .btn-tertiary, .dark .tag, .dark .category-badge, .dark .category-pill,
+.dark-mode .btn-tertiary, .dark-mode .tag, .dark-mode .category-badge, .dark-mode .category-pill {
+  border-color: rgba(51, 255, 228, 0.25);
+  background-color: rgba(51, 255, 228, 0.08);
+  color: var(--card-text-default) !important;
 }
-.btn-tertiary:active:not(:disabled), .btn-tertiary.active {
-  border-color: var(--card-bg);
-  background-color: var(--card-bg);
-  color: var(--btn-color-active);
+
+.btn-tertiary:hover, .tag:hover, .category-badge:hover, .category-pill:hover {
+  border-color: var(--btn-color-default) !important;
+  background-color: rgba(0, 204, 177, 0.2) !important;
+  color: var(--btn-color-hover) !important;
 }
-.btn-tertiary:disabled, .btn-tertiary[disabled], .btn-tertiary.disabled {
-  border-color: var(--card-bg);
-  background-color: var(--card-bg);
-  color: var(--btn-color-disabled);
+
+.dark .btn-tertiary:hover, .dark .tag:hover, .dark .category-badge:hover, .dark .category-pill:hover,
+.dark-mode .btn-tertiary:hover, .dark-mode .tag:hover, .dark-mode .category-badge:hover, .dark-mode .category-pill:hover {
+  border-color: var(--btn-color-default) !important;
+  background-color: rgba(51, 255, 228, 0.2) !important;
+  color: var(--btn-color-hover) !important;
+}
+
+.category-pill.active, .tag.active, .category-badge.active {
+  background-color: var(--btn-color-default) !important;
+  color: #ffffff !important;
+  border-color: var(--btn-color-default) !important;
+}
+.dark .category-pill.active, .dark .tag.active, .dark .category-badge.active {
+  color: #000000 !important;
 }
 
 /* ==========================================================================
@@ -290,3 +313,88 @@ body.dark-mode .dark\:active\:text-aquamarine-300.active {
   height: 100%;
   object-fit: cover;
 }
+
+/* ==========================================================================
+   GLOBAL INPUT SYSTEM (High-contrast text)
+   ========================================================================== */
+input, textarea, select,
+.app-input-field,
+input.text-aquamarine-950,
+textarea.text-aquamarine-950,
+select.text-aquamarine-950,
+input[class*="text-"],
+textarea[class*="text-"],
+select[class*="text-"] {
+  color: #0F0F0F !important;
+}
+
+input::placeholder, textarea::placeholder,
+.app-input-field::placeholder {
+  color: #737373 !important;
+}
+
+.dark input,
+.dark textarea,
+.dark select,
+.dark .app-input-field,
+.dark input.text-aquamarine-950,
+.dark textarea.text-aquamarine-950,
+.dark select.text-aquamarine-950,
+.dark input[class*="dark:text-"],
+.dark textarea[class*="dark:text-"],
+.dark select[class*="dark:text-"],
+.dark-mode input,
+.dark-mode textarea,
+.dark-mode select,
+.dark-mode .app-input-field,
+.dark-mode input.text-aquamarine-950,
+.dark-mode textarea.text-aquamarine-950,
+.dark-mode select.text-aquamarine-950,
+.dark-mode input[class*="dark:text-"],
+.dark-mode textarea[class*="dark:text-"],
+.dark-mode select[class*="dark:text-"],
+body.dark-mode input,
+body.dark-mode textarea,
+body.dark-mode select,
+body.dark-mode .app-input-field,
+body.dark-mode input.text-aquamarine-950,
+body.dark-mode textarea.text-aquamarine-950,
+body.dark-mode select.text-aquamarine-950,
+body.dark-mode input[class*="dark:text-"],
+body.dark-mode textarea[class*="dark:text-"],
+body.dark-mode select[class*="dark:text-"] {
+  color: #E0E0E0 !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder,
+.dark .app-input-field::placeholder,
+.dark-mode input::placeholder,
+.dark-mode textarea::placeholder,
+.dark-mode .app-input-field::placeholder,
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder,
+body.dark-mode .app-input-field::placeholder {
+  color: #A3A3A3 !important;
+}
+
+/* ==========================================================================
+   PUBLIC LAYOUT CONTAINER (90% screen width, 10% margins centered)
+   ========================================================================== */
+.container {
+  width: 90% !important;
+  max-width: 90% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+@media (max-width: 768px) {
+  .container {
+    width: 95% !important;
+    max-width: 95% !important;
+  }
+}
+
+
+
+

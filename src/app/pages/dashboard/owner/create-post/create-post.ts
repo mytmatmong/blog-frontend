@@ -1,5 +1,6 @@
-import { Component, AfterViewInit, signal, effect } from '@angular/core';
+import { Component, AfterViewInit, signal, effect, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ToastService } from '../../../../core/services/toast.service';
 
 declare var Quill: any;
 
@@ -36,9 +37,9 @@ export class CreatePost implements AfterViewInit {
     { id: 'catNodeJS', label: 'NodeJS', checked: false },
   ];
 
-  toastMsg = signal<string>('');
-  toastType = signal<'success' | 'danger' | 'secondary'>('success');
-  showToast = signal<boolean>(false);
+
+
+  private toastService = inject(ToastService);
 
   constructor() {
     // Listen for language switch to preserve and load content
@@ -96,14 +97,7 @@ export class CreatePost implements AfterViewInit {
     this.originalLanguage.set(lang);
   }
 
-  triggerToast(msg: string, type: 'success' | 'danger' | 'secondary') {
-    this.toastMsg.set(msg);
-    this.toastType.set(type);
-    this.showToast.set(true);
-    setTimeout(() => {
-      this.showToast.set(false);
-    }, 3000);
-  }
+
 
   handleSave(status: 'PUBLISHED' | 'DRAFT') {
     // Save current active tab data
@@ -118,11 +112,11 @@ export class CreatePost implements AfterViewInit {
     const mainContent = this.postLangData[origLang].content.trim();
 
     if (!mainTitle) {
-      this.triggerToast('Vui lòng nhập tiêu đề bài gốc!', 'danger');
+      this.toastService.error('Vui lòng nhập tiêu đề bài gốc!', 'Lỗi');
       return;
     }
     if (mainContent === '<p><br></p>' || mainContent === '') {
-      this.triggerToast('Vui lòng nhập nội dung bài gốc!', 'danger');
+      this.toastService.error('Vui lòng nhập nội dung bài gốc!', 'Lỗi');
       return;
     }
 
@@ -139,9 +133,9 @@ export class CreatePost implements AfterViewInit {
     console.log("🚀 Dữ liệu bài viết mới:", postData);
 
     if (status === 'PUBLISHED') {
-      this.triggerToast('🎉 Đã xuất bản bài viết thành công!', 'success');
+      this.toastService.success('Đã xuất bản bài viết thành công!', 'Thành công');
     } else {
-      this.triggerToast('💾 Đã lưu bản nháp thành công!', 'secondary');
+      this.toastService.info('Đã lưu bản nháp thành công!', 'Lưu nháp');
     }
   }
 }
