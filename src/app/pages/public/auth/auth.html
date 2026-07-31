@@ -5,54 +5,51 @@
       <button class="flex-1 py-2 text-sm font-semibold rounded-lg transition-all"
         [class.bg-aquamarine-600]="activeTab() === 'login'" [class.text-white]="activeTab() === 'login'"
         [class.text-aquamarine-700]="activeTab() !== 'login'" [class.dark:text-aquamarine-300]="activeTab() !== 'login'"
-        (click)="setTab('login')">Login</button>
+        (click)="setTab('login')">{{ 'auth.login_tab' | translate }}</button>
       <button class="flex-1 py-2 text-sm font-semibold rounded-lg transition-all"
         [class.bg-aquamarine-600]="activeTab() === 'register'" [class.text-white]="activeTab() === 'register'"
         [class.text-aquamarine-700]="activeTab() !== 'register'"
-        [class.dark:text-aquamarine-300]="activeTab() !== 'register'" (click)="setTab('register')">Register</button>
+        [class.dark:text-aquamarine-300]="activeTab() !== 'register'" (click)="setTab('register')">{{ 'auth.register_tab' | translate }}</button>
       <button class="flex-1 py-2 text-sm font-semibold rounded-lg transition-all"
         [class.bg-aquamarine-600]="activeTab() === 'forgot'" [class.text-white]="activeTab() === 'forgot'"
         [class.text-aquamarine-700]="activeTab() !== 'forgot'"
-        [class.dark:text-aquamarine-300]="activeTab() !== 'forgot'" (click)="setTab('forgot')">Forgot</button>
+        [class.dark:text-aquamarine-300]="activeTab() !== 'forgot'" (click)="setTab('forgot')">{{ 'auth.forgot_tab' | translate }}</button>
     </div>
 
     @if (activeTab() === 'login') {
     <div>
-      <h4 class="font-bold text-xl text-center text-aquamarine-950 dark:text-aquamarine-50 mb-6">Đăng nhập</h4>
+      <h4 class="font-bold text-xl text-center text-aquamarine-950 dark:text-aquamarine-50 mb-6">{{ 'auth.login_title' | translate }}</h4>
       <form class="flex flex-col gap-4">
-        <app-input type="email" placeholder="Nhập địa chỉ email..." icon="bi bi-envelope" [required]="true"></app-input>
-        <app-input type="password" placeholder="Nhập mật khẩu..." icon="bi bi-lock" [required]="true"></app-input>
+        <app-input type="email" [placeholder]="ts.translate('auth.email_placeholder')" icon="bi bi-envelope" [required]="true"></app-input>
+        <app-input type="password" [placeholder]="ts.translate('auth.password_placeholder')" icon="bi bi-lock" [required]="true"></app-input>
         <button type="submit"
-          class="w-full py-2.5 mt-2 font-semibold text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 rounded-xl transition-colors">Đăng
-          nhập demo</button>
+          class="w-full py-2.5 mt-2 font-semibold text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 rounded-xl transition-colors">{{ 'auth.submit_login' | translate }}</button>
       </form>
     </div>
     }
 
     @if (activeTab() === 'register') {
     <div>
-      <h4 class="font-bold text-xl text-center text-aquamarine-950 dark:text-aquamarine-50 mb-6">Đăng ký</h4>
+      <h4 class="font-bold text-xl text-center text-aquamarine-950 dark:text-aquamarine-50 mb-6">{{ 'auth.register_title' | translate }}</h4>
       <form class="flex flex-col gap-4">
-        <app-input type="text" placeholder="Tên người dùng (Username)..." icon="bi bi-person"
+        <app-input type="text" [placeholder]="ts.translate('auth.username_placeholder')" icon="bi bi-person"
           [required]="true"></app-input>
-        <app-input type="email" placeholder="Địa chỉ email..." icon="bi bi-envelope" [required]="true"></app-input>
-        <app-input type="password" placeholder="Mật khẩu..." icon="bi bi-lock" [required]="true"></app-input>
+        <app-input type="email" [placeholder]="ts.translate('auth.email_placeholder')" icon="bi bi-envelope" [required]="true"></app-input>
+        <app-input type="password" [placeholder]="ts.translate('auth.password_placeholder')" icon="bi bi-lock" [required]="true"></app-input>
         <button type="submit"
-          class="w-full py-2.5 mt-2 font-semibold text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 rounded-xl transition-colors">Tạo
-          tài khoản</button>
+          class="w-full py-2.5 mt-2 font-semibold text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 rounded-xl transition-colors">{{ 'auth.submit_register' | translate }}</button>
       </form>
     </div>
     }
 
     @if (activeTab() === 'forgot') {
     <div>
-      <h4 class="font-bold text-xl text-center text-aquamarine-950 dark:text-aquamarine-50 mb-6">Khôi phục mật khẩu</h4>
+      <h4 class="font-bold text-xl text-center text-aquamarine-950 dark:text-aquamarine-50 mb-6">{{ 'auth.forgot_title' | translate }}</h4>
       <form class="flex flex-col gap-4">
-        <app-input type="email" placeholder="Địa chỉ email đã đăng ký..." icon="bi bi-envelope"
+        <app-input type="email" [placeholder]="ts.translate('auth.email_placeholder')" icon="bi bi-envelope"
           [required]="true"></app-input>
         <button type="submit"
-          class="w-full py-2.5 mt-2 font-semibold text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 rounded-xl transition-colors">Gửi
-          link khôi phục</button>
+          class="w-full py-2.5 mt-2 font-semibold text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 rounded-xl transition-colors">{{ 'auth.submit_forgot' | translate }}</button>
       </form>
     </div>
     }

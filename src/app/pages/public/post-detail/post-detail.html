@@ -26,19 +26,19 @@
         
         <div class="border-t border-aquamarine-200 dark:border-aquamarine-800 pt-6 mt-8 flex gap-3">
           <button class="px-4 py-2 rounded-lg font-medium text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 transition-colors flex items-center gap-2">
-            <i class="bi bi-hand-thumbs-up"></i> Like
+            <i class="bi bi-hand-thumbs-up"></i> {{ 'post.like' | translate }}
           </button>
           <button class="px-4 py-2 rounded-lg font-medium text-sm text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors flex items-center gap-2">
-            <i class="bi bi-bookmark"></i> Save
+            <i class="bi bi-bookmark"></i> {{ 'post.save' | translate }}
           </button>
         </div>
       </article>
 
       <section class="p-6 mt-6 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50 mb-4">Bình luận</h5>
+        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50 mb-4">{{ 'comments.title' | translate }}</h5>
         <div class="mb-6">
-          <textarea class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 p-3 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500 mb-3" rows="3" placeholder="Viết bình luận..."></textarea>
-          <button class="px-5 py-2 rounded-lg font-semibold text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 transition-colors">Gửi bình luận</button>
+          <textarea class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 p-3 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500 mb-3" rows="3" [placeholder]="'comments.placeholder' | translate"></textarea>
+          <button class="px-5 py-2 rounded-lg font-semibold text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 transition-colors">{{ 'comments.submit' | translate }}</button>
         </div>
         <app-comment-item></app-comment-item>
       </section>

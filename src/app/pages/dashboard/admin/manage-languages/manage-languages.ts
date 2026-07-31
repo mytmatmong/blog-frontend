@@ -1,5 +1,6 @@
 import { Component, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 interface LanguageItem {
   id: number;
@@ -12,7 +13,7 @@ interface LanguageItem {
 
 @Component({
   selector: 'app-manage-languages',
-  imports: [FormsModule],
+  imports: [FormsModule, TranslatePipe],
   templateUrl: './manage-languages.html',
   styleUrl: './manage-languages.css',
 })

@@ -1,5 +1,6 @@
 import { Component, signal, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 interface PostItem {
   id: number;
@@ -14,7 +15,7 @@ interface PostItem {
 
 @Component({
   selector: 'app-posts',
-  imports: [RouterLink],
+  imports: [RouterLink, TranslatePipe],
   templateUrl: './posts.html',
   styleUrl: './posts.css',
 })

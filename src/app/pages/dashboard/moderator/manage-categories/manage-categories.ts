@@ -1,5 +1,6 @@
 import { Component, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 interface CategoryItem {
   id: number;
@@ -11,7 +12,7 @@ interface CategoryItem {
 
 @Component({
   selector: 'app-manage-categories',
-  imports: [FormsModule],
+  imports: [FormsModule, TranslatePipe],
   templateUrl: './manage-categories.html',
   styleUrl: './manage-categories.css',
 })

@@ -1,8 +1,8 @@
 <section class="space-y-6">
   <div class="flex justify-between items-center">
-    <h3 class="font-bold text-xl text-aquamarine-950 dark:text-aquamarine-50">Languages</h3>
+    <h3 class="font-bold text-xl text-aquamarine-950 dark:text-aquamarine-50">{{ 'dashboard.languages' | translate }}</h3>
     <button class="px-4 py-2.5 rounded-xl font-semibold text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 transition-colors shadow-sm flex items-center gap-2" (click)="openAddModal()">
-      <i class="bi bi-plus-circle"></i>Thêm language
+      <i class="bi bi-plus-circle"></i>{{ 'modal.add_language_title' | translate }}
     </button>
   </div>
 
@@ -10,11 +10,11 @@
     <table class="w-full text-left border-collapse text-sm">
       <thead>
         <tr class="border-b border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950/50">
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">Code</th>
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">Tên ngôn ngữ</th>
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">Default</th>
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">Trạng thái</th>
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">Thao tác</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'table.lang_code' | translate }}</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'table.lang_name' | translate }}</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.default' | translate }}</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.status' | translate }}</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.actions' | translate }}</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-aquamarine-100 dark:divide-aquamarine-800">
@@ -62,7 +62,7 @@
   <div class="mt-6 flex justify-center">
     <ul class="inline-flex items-center space-x-1 text-sm">
       <li>
-        <button [disabled]="currentPage() === 1" [class.opacity-50]="currentPage() === 1" class="px-3 py-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="setPage(currentPage() - 1)">Previous</button>
+        <button [disabled]="currentPage() === 1" [class.opacity-50]="currentPage() === 1" class="px-3 py-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="setPage(currentPage() - 1)">{{ 'pagination.prev' | translate }}</button>
       </li>
       @for (p of pageNumbers; track p) {
         <li>
@@ -70,7 +70,7 @@
         </li>
       }
       <li>
-        <button [disabled]="currentPage() === totalPages()" [class.opacity-50]="currentPage() === totalPages()" class="px-3 py-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="setPage(currentPage() + 1)">Next</button>
+        <button [disabled]="currentPage() === totalPages()" [class.opacity-50]="currentPage() === totalPages()" class="px-3 py-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="setPage(currentPage() + 1)">{{ 'pagination.next' | translate }}</button>
       </li>
     </ul>
   </div>
@@ -81,7 +81,7 @@
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
     <div class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-md p-6">
       <div class="flex justify-between items-center mb-4">
-        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">Thêm Ngôn ngữ mới</h5>
+        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">{{ 'modal.add_language_title' | translate }}</h5>
         <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" (click)="closeAddModal()">
           <i class="bi bi-x-lg text-lg"></i>
         </button>
@@ -127,8 +127,8 @@
           <label class="text-xs text-aquamarine-800 dark:text-aquamarine-200 cursor-pointer" for="isActiveLang">Kích hoạt ngay (Active)</label>
         </div>
         <div class="flex justify-end gap-3 pt-2">
-          <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="closeAddModal()">Hủy</button>
-          <button type="submit" class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-aquamarine-600 hover:bg-aquamarine-700 disabled:opacity-50 transition-colors" [disabled]="!addCode.trim() || !addName.trim()">Lưu ngôn ngữ</button>
+          <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="closeAddModal()">{{ 'modal.cancel' | translate }}</button>
+          <button type="submit" class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-aquamarine-600 hover:bg-aquamarine-700 disabled:opacity-50 transition-colors" [disabled]="!addCode.trim() || !addName.trim()">{{ 'modal.save' | translate }}</button>
         </div>
       </form>
     </div>
@@ -186,8 +186,8 @@
           <label class="text-xs text-aquamarine-800 dark:text-aquamarine-200 cursor-pointer" for="editIsActiveLang">Kích hoạt ngay (Active)</label>
         </div>
         <div class="flex justify-end gap-3 pt-2">
-          <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="closeEditModal()">Hủy</button>
-          <button type="submit" class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-aquamarine-600 hover:bg-aquamarine-700 disabled:opacity-50 transition-colors" [disabled]="!editCode.trim() || !editName.trim()">Cập nhật</button>
+          <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="closeEditModal()">{{ 'modal.cancel' | translate }}</button>
+          <button type="submit" class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-aquamarine-600 hover:bg-aquamarine-700 disabled:opacity-50 transition-colors" [disabled]="!editCode.trim() || !editName.trim()">{{ 'modal.save' | translate }}</button>
         </div>
       </form>
     </div>

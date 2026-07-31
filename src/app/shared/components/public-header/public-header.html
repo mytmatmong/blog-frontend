@@ -16,35 +16,46 @@
           <a class="block px-3 py-2 text-sm font-medium rounded-lg transition-colors text-aquamarine-700 dark:text-aquamarine-300 hover:text-aquamarine-600 dark:hover:text-aquamarine-400" 
              routerLink="/" 
              routerLinkActive="!bg-aquamarine-600 !text-white dark:!bg-aquamarine-400 dark:!text-black font-semibold"
-             [routerLinkActiveOptions]="{exact: true}">Bài viết</a>
+             [routerLinkActiveOptions]="{exact: true}">{{ 'nav.posts' | translate }}</a>
         </li>
 
         <li>
           <a class="block px-3 py-2 text-sm font-medium rounded-lg transition-colors text-aquamarine-700 dark:text-aquamarine-300 hover:text-aquamarine-600 dark:hover:text-aquamarine-400" 
              routerLink="/category"
-             routerLinkActive="!bg-aquamarine-600 !text-white dark:!bg-aquamarine-400 dark:!text-black font-semibold">Danh mục</a>
+             routerLinkActive="!bg-aquamarine-600 !text-white dark:!bg-aquamarine-400 dark:!text-black font-semibold">{{ 'nav.categories' | translate }}</a>
         </li>
 
         <li>
           <a class="block px-3 py-2 text-sm font-medium rounded-lg transition-colors text-aquamarine-700 dark:text-aquamarine-300 hover:text-aquamarine-600 dark:hover:text-aquamarine-400" 
              routerLink="/hashtag"
-             routerLinkActive="!bg-aquamarine-600 !text-white dark:!bg-aquamarine-400 dark:!text-black font-semibold">Hashtag</a>
+             routerLinkActive="!bg-aquamarine-600 !text-white dark:!bg-aquamarine-400 dark:!text-black font-semibold">{{ 'nav.hashtags' | translate }}</a>
         </li>
 
         <li class="relative">
-          <button class="flex items-center gap-1 px-3 py-2 text-sm font-medium text-aquamarine-700 dark:text-aquamarine-300 hover:text-aquamarine-600 dark:hover:text-aquamarine-400 rounded-lg" (click)="toggleLangDropdown()">
-            <i class="bi bi-translate"></i> VI
+          <button class="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-aquamarine-700 dark:text-aquamarine-300 hover:text-aquamarine-600 dark:hover:text-aquamarine-400 rounded-lg" (click)="toggleLangDropdown()">
+            <span class="text-base">{{ ts.currentLang() === 'VI' ? '🇻🇳' : '🇬🇧' }}</span>
+            <span>{{ ts.currentLang() }}</span>
+            <i class="bi bi-chevron-down text-xs ms-1"></i>
           </button>
           @if (isLangDropdownOpen()) {
-            <ul class="absolute right-0 mt-1 w-36 bg-white dark:bg-aquamarine-900 rounded-xl shadow-lg border border-aquamarine-200 dark:border-aquamarine-800 py-1 z-50">
-              <li><a class="block px-4 py-2 text-sm text-aquamarine-800 dark:text-aquamarine-100 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800" href="#">Tiếng Việt</a></li>
-              <li><a class="block px-4 py-2 text-sm text-aquamarine-800 dark:text-aquamarine-100 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800" href="#">English</a></li>
+            <ul class="absolute right-0 mt-1 w-44 bg-white dark:bg-aquamarine-900 rounded-xl shadow-lg border border-aquamarine-200 dark:border-aquamarine-800 py-1 z-50">
+              @for (lang of ts.languages; track lang.code) {
+                <li>
+                  <button (click)="selectLang(lang.code)" class="w-full text-left flex items-center gap-2 px-4 py-2 text-sm text-aquamarine-800 dark:text-aquamarine-100 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800" [class.font-bold]="ts.currentLang() === lang.code">
+                    <span class="text-base">{{ lang.flag }}</span>
+                    <span>{{ lang.name }}</span>
+                    @if (ts.currentLang() === lang.code) {
+                      <i class="bi bi-check2 ms-auto text-aquamarine-600 dark:text-aquamarine-400 font-bold"></i>
+                    }
+                  </button>
+                </li>
+              }
             </ul>
           }
         </li>
 
         <li>
-          <button type="button" class="w-9 h-9 flex items-center justify-center rounded-full border border-aquamarine-200 dark:border-aquamarine-700 hover:scale-105 transition-transform" (click)="auth.toggleTheme()" title="Chuyển chế độ Sáng/Tối">
+          <button type="button" class="w-9 h-9 flex items-center justify-center rounded-full border border-aquamarine-200 dark:border-aquamarine-700 hover:scale-105 transition-transform" (click)="auth.toggleTheme()" [title]="'nav.toggle_theme' | translate">
             @if (auth.isDarkMode()) {
               <i class="bi bi-sun-fill text-yellow-400"></i>
             } @else {
@@ -55,7 +66,7 @@
 
         @if (auth.currentRole() === 'guest') {
           <li>
-            <a class="block px-4 py-2 text-sm font-semibold text-white bg-aquamarine-600 hover:bg-aquamarine-700 rounded-lg transition-colors text-center" routerLink="/auth">Đăng nhập</a>
+            <a class="block px-4 py-2 text-sm font-semibold text-white bg-aquamarine-600 hover:bg-aquamarine-700 rounded-lg transition-colors text-center" routerLink="/auth">{{ 'nav.login' | translate }}</a>
           </li>
         } @else {
           <li class="relative">
@@ -71,12 +82,12 @@
                 </li>
                 <li>
                   <a class="flex items-center px-4 py-2 text-sm text-aquamarine-800 dark:text-aquamarine-100 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800" routerLink="/account/profile">
-                    <i class="bi bi-person me-2"></i>Profile
+                    <i class="bi bi-person me-2"></i>{{ 'nav.profile' | translate }}
                   </a>
                 </li>
                 <li>
                   <a class="flex items-center px-4 py-2 text-sm text-aquamarine-800 dark:text-aquamarine-100 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800" routerLink="/account/request-blog-owner">
-                    <i class="bi bi-send me-2"></i>Yêu cầu Blog Owner
+                    <i class="bi bi-send me-2"></i>{{ 'nav.request_owner' | translate }}
                   </a>
                 </li>
                 
@@ -84,7 +95,7 @@
                   <li class="my-1 border-t border-aquamarine-100 dark:border-aquamarine-800"></li>
                   <li>
                     <a class="flex items-center px-4 py-2 text-sm text-aquamarine-800 dark:text-aquamarine-100 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800" routerLink="/dashboard/owner">
-                      <i class="bi bi-pencil-square me-2"></i>Owner Dashboard
+                      <i class="bi bi-pencil-square me-2"></i>{{ 'nav.owner_dashboard' | translate }}
                     </a>
                   </li>
                 }
@@ -92,7 +103,7 @@
                 @if (auth.currentRole() === 'moderator' || auth.currentRole() === 'admin') {
                   <li>
                     <a class="flex items-center px-4 py-2 text-sm text-aquamarine-800 dark:text-aquamarine-100 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800" routerLink="/dashboard/moderator">
-                      <i class="bi bi-shield-check me-2"></i>Moderator Dashboard
+                      <i class="bi bi-shield-check me-2"></i>{{ 'nav.moderator_dashboard' | translate }}
                     </a>
                   </li>
                 }
@@ -100,7 +111,7 @@
                 @if (auth.currentRole() === 'admin') {
                   <li>
                     <a class="flex items-center px-4 py-2 text-sm text-aquamarine-800 dark:text-aquamarine-100 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800" routerLink="/dashboard/admin">
-                      <i class="bi bi-gear me-2"></i>Admin Dashboard
+                      <i class="bi bi-gear me-2"></i>{{ 'nav.admin_dashboard' | translate }}
                     </a>
                   </li>
                 }
@@ -108,7 +119,7 @@
                 <li class="my-1 border-t border-aquamarine-100 dark:border-aquamarine-800"></li>
                 <li>
                   <button class="w-full flex items-center px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 text-left" (click)="auth.setRole('guest'); isUserDropdownOpen.set(false)">
-                    <i class="bi bi-box-arrow-right me-2"></i>Logout demo
+                    <i class="bi bi-box-arrow-right me-2"></i>{{ 'nav.logout' | translate }}
                   </button>
                 </li>
               </ul>
@@ -122,7 +133,7 @@
 
 <div class="border-b border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50 dark:bg-aquamarine-900">
   <div class="container mx-auto px-4 max-w-7xl flex flex-wrap items-center gap-2 py-2 text-xs">
-    <span class="text-aquamarine-600 dark:text-aquamarine-400">Demo trạng thái header:</span>
+    <span class="text-aquamarine-600 dark:text-aquamarine-400">{{ 'header.demo_role' | translate }}</span>
     <button class="px-2.5 py-1 rounded-full text-xs font-medium border border-aquamarine-300 dark:border-aquamarine-700 transition-colors" [class.bg-aquamarine-600]="auth.currentRole() === 'guest'" [class.text-white]="auth.currentRole() === 'guest'" (click)="auth.setRole('guest')">Guest</button>
     <button class="px-2.5 py-1 rounded-full text-xs font-medium border border-aquamarine-300 dark:border-aquamarine-700 transition-colors" [class.bg-aquamarine-600]="auth.currentRole() === 'user'" [class.text-white]="auth.currentRole() === 'user'" (click)="auth.setRole('user')">User</button>
     <button class="px-2.5 py-1 rounded-full text-xs font-medium border border-aquamarine-300 dark:border-aquamarine-700 transition-colors" [class.bg-aquamarine-600]="auth.currentRole() === 'owner'" [class.text-white]="auth.currentRole() === 'owner'" (click)="auth.setRole('owner')">Blog Owner</button>

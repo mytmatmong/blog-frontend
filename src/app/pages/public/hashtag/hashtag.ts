@@ -3,10 +3,11 @@ import { PublicSidebarLeft, FilterSortOption } from '../../../shared/components/
 import { PublicSidebarRight } from '../../../shared/components/public-sidebar-right/public-sidebar-right';
 import { PostCard, PostItem } from '../../../shared/components/post-card/post-card';
 import { Pagination } from '../../../shared/components/pagination/pagination';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-hashtag',
-  imports: [PublicSidebarLeft, PublicSidebarRight, PostCard, Pagination],
+  imports: [PublicSidebarLeft, PublicSidebarRight, PostCard, Pagination, TranslatePipe],
   templateUrl: './hashtag.html',
   styleUrl: './hashtag.css',
 })

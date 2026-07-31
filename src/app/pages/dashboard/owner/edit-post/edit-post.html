@@ -1,43 +1,50 @@
 <section class="space-y-6">
   <div class="p-6 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-    <h3 class="font-bold text-xl text-aquamarine-950 dark:text-aquamarine-50 mb-6">Sửa bài viết</h3>
+    <h3 class="font-bold text-xl text-aquamarine-950 dark:text-aquamarine-50 mb-6">{{ 'post_form.edit_title' | translate }}</h3>
     
     <form (submit)="$event.preventDefault()" class="space-y-6">
       <div class="flex flex-wrap justify-between items-center gap-4 pb-4 border-b border-aquamarine-200 dark:border-aquamarine-800">
         <div class="inline-flex rounded-xl bg-aquamarine-50 dark:bg-aquamarine-950 p-1">
           <button type="button" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all" [class.bg-aquamarine-600]="currentEditLang() === 'VI'" [class.text-white]="currentEditLang() === 'VI'" [class.text-aquamarine-800]="currentEditLang() !== 'VI'" [class.dark:text-aquamarine-200]="currentEditLang() !== 'VI'" (click)="changeEditLang('VI')">
-            <img src="https://flagcdn.com/w20/vn.png" alt="VN" class="w-4 h-3 rounded-sm object-cover"> Tiếng Việt 
+            <img src="https://flagcdn.com/w20/vn.png" alt="VN" class="w-4 h-3 rounded-sm object-cover"> {{ 'lang.vietnamese' | translate }} 
             <span class="px-1.5 py-0.5 rounded text-[10px]" [class.bg-aquamarine-700]="currentEditLang() === 'VI'" [class.bg-aquamarine-200]="currentEditLang() !== 'VI'" [class.dark:bg-aquamarine-800]="currentEditLang() !== 'VI'">
-              {{ originalLanguage() === 'VI' ? 'Gốc' : 'Dịch' }}
+              {{ originalLanguage() === 'VI' ? ('post_form.original_badge' | translate) : ('post_form.translated_badge' | translate) }}
             </span>
           </button>
 
           <button type="button" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all" [class.bg-aquamarine-600]="currentEditLang() === 'EN'" [class.text-white]="currentEditLang() === 'EN'" [class.text-aquamarine-800]="currentEditLang() !== 'EN'" [class.dark:text-aquamarine-200]="currentEditLang() !== 'EN'" (click)="changeEditLang('EN')">
-            <img src="https://flagcdn.com/w20/gb.png" alt="EN" class="w-4 h-3 rounded-sm object-cover"> Tiếng Anh 
+            <img src="https://flagcdn.com/w20/gb.png" alt="EN" class="w-4 h-3 rounded-sm object-cover"> {{ 'lang.english' | translate }} 
             <span class="px-1.5 py-0.5 rounded text-[10px]" [class.bg-aquamarine-700]="currentEditLang() === 'EN'" [class.bg-aquamarine-200]="currentEditLang() !== 'EN'" [class.dark:bg-aquamarine-800]="currentEditLang() !== 'EN'">
-              {{ originalLanguage() === 'EN' ? 'Gốc' : 'Dịch' }}
+              {{ originalLanguage() === 'EN' ? ('post_form.original_badge' | translate) : ('post_form.translated_badge' | translate) }}
             </span>
           </button>
         </div>
 
         <div class="flex items-center gap-2">
-          <label class="text-xs text-aquamarine-600 dark:text-aquamarine-400">Ngôn ngữ gốc:</label>
-          <select [value]="originalLanguage()" (change)="changeOriginalLanguage($any($event.target).value)" class="text-xs rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 px-3 py-1.5 text-aquamarine-900 dark:text-aquamarine-100 outline-none">
-            <option value="VI">Tiếng Việt</option>
-            <option value="EN">Tiếng Anh</option>
-          </select>
+          <label class="text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ 'post_form.original_lang' | translate }}</label>
+          <div class="flex items-center gap-1.5 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 px-2.5 py-1 shadow-sm">
+            @if (originalLanguage() === 'VI') {
+              <img src="https://flagcdn.com/w20/vn.png" alt="VN" class="w-4 h-3 rounded-sm object-cover">
+            } @else {
+              <img src="https://flagcdn.com/w20/gb.png" alt="EN" class="w-4 h-3 rounded-sm object-cover">
+            }
+            <select [value]="originalLanguage()" (change)="changeOriginalLanguage($any($event.target).value)" class="text-xs bg-transparent text-aquamarine-900 dark:text-aquamarine-100 outline-none cursor-pointer">
+              <option value="VI" class="bg-white dark:bg-aquamarine-900">{{ 'lang.vietnamese' | translate }}</option>
+              <option value="EN" class="bg-white dark:bg-aquamarine-900">{{ 'lang.english' | translate }}</option>
+            </select>
+          </div>
         </div>
       </div>
 
       <div class="space-y-4">
         <div>
-          <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">Tiêu đề bài viết (<span>{{ currentEditLang() }}</span>) <span class="text-red-500">*</span></label>
-          <input type="text" [(ngModel)]="titleModel" name="title" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" placeholder="Nhập tiêu đề..." required>
+          <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'post_form.title_label' | translate }} (<span>{{ currentEditLang() }}</span>) <span class="text-red-500">*</span></label>
+          <input type="text" [(ngModel)]="titleModel" name="title" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" [placeholder]="'post_form.title_placeholder' | translate" required>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">Danh mục</label>
+            <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'post_form.category_label' | translate }}</label>
             <div class="rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 p-3 h-28 overflow-y-auto space-y-2">
               @for (cat of categories; track cat.id) {
                 <label class="flex items-center gap-2 text-xs text-aquamarine-900 dark:text-aquamarine-100 cursor-pointer">
@@ -46,35 +53,35 @@
                 </label>
               }
             </div>
-            <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400 mt-1 block">Tích chọn các danh mục phù hợp</small>
+            <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400 mt-1 block">{{ 'post_form.category_hint' | translate }}</small>
           </div>
           
           <div>
-            <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">Hashtags</label>
-            <input type="text" [(ngModel)]="hashtags" name="hashtags" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" placeholder="#tag1 #tag2">
+            <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'post_form.hashtags_label' | translate }}</label>
+            <input type="text" [(ngModel)]="hashtags" name="hashtags" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" [placeholder]="'post_form.hashtags_placeholder' | translate">
           </div>
           
           <div>
-            <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">Ảnh bìa hiện tại</label>
+            <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'post_form.thumbnail_current' | translate }}</label>
             <div class="mb-1 text-aquamarine-600 dark:text-aquamarine-400 text-xs">
-              Đang dùng: <i class="bi bi-image me-1"></i>{{ thumbnailName }}
+              {{ 'post_form.using' | translate }} <i class="bi bi-image me-1"></i>{{ thumbnailName }}
             </div>
             <input type="file" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-3 py-2 text-xs text-aquamarine-950 dark:text-aquamarine-50 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-aquamarine-200 file:text-aquamarine-800 hover:file:bg-aquamarine-300" accept="image/*">
-            <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400 mt-1 block">Chọn ảnh mới để thay thế ảnh cũ</small>
+            <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400 mt-1 block">{{ 'post_form.thumbnail_edit_hint' | translate }}</small>
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">Video đính kèm hiện tại</label>
+            <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'post_form.video_current' | translate }}</label>
             <div class="mb-1 text-aquamarine-600 dark:text-aquamarine-400 text-xs">
-              {{ videoName ? 'Đang dùng: ' + videoName : 'Chưa có video đính kèm' }}
+              {{ videoName ? (('post_form.using' | translate) + ' ' + videoName) : ('post_form.no_video' | translate) }}
             </div>
             <input type="file" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-3 py-2 text-xs text-aquamarine-950 dark:text-aquamarine-50 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-aquamarine-200 file:text-aquamarine-800 hover:file:bg-aquamarine-300" accept="video/mp4,video/webm,video/ogg">
-            <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400 mt-1 block">Chọn video mới để cập nhật</small>
+            <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400 mt-1 block">{{ 'post_form.video_edit_hint' | translate }}</small>
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">Content <span class="text-red-500">*</span></label>
+          <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'post_form.content_label' | translate }} <span class="text-red-500">*</span></label>
           <div class="rounded-xl overflow-hidden border border-aquamarine-200 dark:border-aquamarine-800">
             <div id="editor-container" class="h-80 bg-white dark:bg-aquamarine-950 text-aquamarine-950 dark:text-aquamarine-50"></div>
           </div>
@@ -83,10 +90,10 @@
       
       <div class="flex gap-3 pt-4 border-t border-aquamarine-200 dark:border-aquamarine-800">
         <button type="button" (click)="handleUpdate()" class="px-6 py-2.5 rounded-xl font-semibold text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 transition-colors flex items-center gap-2">
-          <i class="bi bi-check2-circle"></i> Cập nhật
+          <i class="bi bi-check2-circle"></i> {{ 'post_form.update_btn' | translate }}
         </button>
         <button type="button" (click)="cancelChanges()" class="px-6 py-2.5 rounded-xl font-semibold text-sm text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors flex items-center gap-2">
-          <i class="bi bi-x-circle"></i> Hủy thay đổi
+          <i class="bi bi-x-circle"></i> {{ 'post_form.cancel_changes_btn' | translate }}
         </button>
       </div>
     </form>

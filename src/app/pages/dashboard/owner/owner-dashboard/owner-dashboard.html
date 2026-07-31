@@ -1,19 +1,19 @@
 <section class="space-y-6">
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
     <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-      <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400">Tổng bài viết</div>
+      <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ 'dashboard.total_posts' | translate }}</div>
       <h3 class="font-bold text-2xl text-aquamarine-600 dark:text-aquamarine-400 mt-1">24</h3>
     </div>
     <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-      <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400">Lượt xem (Views)</div>
+      <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ 'dashboard.total_views' | translate }}</div>
       <h3 class="font-bold text-2xl text-cyan-500 mt-1">12.4k</h3>
     </div>
     <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-      <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400">Lượt thích (Likes)</div>
+      <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ 'dashboard.total_likes' | translate }}</div>
       <h3 class="font-bold text-2xl text-red-500 mt-1">3.2k</h3>
     </div>
     <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-      <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400">Bản nháp (Draft)</div>
+      <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ 'dashboard.total_comments' | translate }}</div>
       <h3 class="font-bold text-2xl text-gray-500 dark:text-gray-400 mt-1">4</h3>
     </div>
   </div>
@@ -22,7 +22,7 @@
     <div class="lg:col-span-8">
       <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm h-full flex flex-col justify-between">
         <h6 class="font-bold text-base text-aquamarine-950 dark:text-aquamarine-50 mb-4">
-          Tương tác bài viết (7 ngày qua)
+          {{ 'dashboard.interaction_chart' | translate }}
         </h6>
         <div>
           <canvas id="interactionChart" height="100"></canvas>
@@ -32,17 +32,17 @@
     <div class="lg:col-span-4">
       <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm h-full">
         <h6 class="font-bold text-base text-aquamarine-950 dark:text-aquamarine-50 mb-4">
-          Thao tác nhanh
+          {{ 'dashboard.quick_actions' | translate }}
         </h6>
         <div class="flex flex-col gap-3">
           <a routerLink="/dashboard/owner/create-post" class="flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 transition-colors">
-            <i class="bi bi-pencil-square"></i>Viết bài mới
+            <i class="bi bi-pencil-square"></i>{{ 'dashboard.create_new_post' | translate }}
           </a>
           <a routerLink="/dashboard/owner/posts" class="flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors">
-            <i class="bi bi-list-task"></i>Quản lý bài viết
+            <i class="bi bi-list-task"></i>{{ 'dashboard.my_posts' | translate }}
           </a>
           <button class="flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm text-cyan-700 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-700 hover:bg-cyan-50 dark:hover:bg-cyan-950/30 transition-colors text-left" (click)="openShareModal()">
-            <i class="bi bi-share"></i>Chia sẻ trang Blog
+            <i class="bi bi-share"></i>{{ 'dashboard.share_blog' | translate }}
           </button>
         </div>
       </div>
@@ -51,10 +51,10 @@
 
   <div class="flex justify-between items-center pt-2">
     <div class="flex items-center gap-3">
-      <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">Bài viết nổi bật</h5>
+      <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">{{ 'dashboard.featured_posts' | translate }}</h5>
       <select [value]="sortCriteria()" (change)="onSortChange($event)" class="text-sm rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 px-3 py-1.5 text-aquamarine-900 dark:text-aquamarine-100 outline-none">
-        <option value="views">Theo Lượt xem (View)</option>
-        <option value="likes">Theo Lượt thích (Like)</option>
+        <option value="views">{{ 'filter.most_viewed' | translate }}</option>
+        <option value="likes">{{ 'filter.most_liked' | translate }}</option>
       </select>
     </div>
     <a routerLink="/dashboard/owner/posts" class="text-sm text-aquamarine-600 hover:text-aquamarine-700 font-medium">Xem tất cả</a>
@@ -64,11 +64,11 @@
     <table class="w-full text-left border-collapse text-sm">
       <thead>
         <tr class="border-b border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950/50">
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">Bài viết</th>
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">Trạng thái</th>
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">View</th>
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">Like</th>
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">Thao tác</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'table.post_title' | translate }}</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.status' | translate }}</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.views' | translate }}</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.likes' | translate }}</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.actions' | translate }}</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-aquamarine-100 dark:divide-aquamarine-800">
@@ -107,17 +107,17 @@
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
     <div class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-md p-6">
       <div class="flex justify-between items-center mb-4">
-        <h3 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">Chia sẻ Blog của bạn</h3>
+        <h3 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">{{ 'modal.share_title' | translate }}</h3>
         <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" (click)="closeShareModal()">
           <i class="bi bi-x-lg text-lg"></i>
         </button>
       </div>
-      <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400 mb-4">Sao chép đường dẫn bên dưới để chia sẻ trang Blog của bạn với mọi người:</p>
+      <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400 mb-4">{{ 'modal.share_desc' | translate }}</p>
       <div class="flex rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 overflow-hidden mb-2">
         <input type="text" id="blogLinkInput" class="w-full px-3 py-2 text-sm bg-transparent outline-none text-aquamarine-950 dark:text-aquamarine-50" value="https://devblog.com/@sondev" readonly>
         <button (click)="copyBlogLink()" class="px-4 py-2 text-xs font-semibold text-white transition-colors" [class.bg-aquamarine-600]="!copySuccess()" [class.bg-emerald-600]="copySuccess()" type="button">
           <i class="bi me-1" [class.bi-clipboard]="!copySuccess()" [class.bi-check2]="copySuccess()"></i> 
-          {{ copySuccess() ? 'Đã copy' : 'Copy' }}
+          {{ copySuccess() ? ('modal.copied' | translate) : ('modal.copy' | translate) }}
         </button>
       </div>
     </div>
@@ -129,7 +129,7 @@
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
     <div class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-3xl max-h-[85vh] flex flex-col">
       <div class="flex justify-between items-center p-5 border-b border-aquamarine-200 dark:border-aquamarine-800">
-        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">Xem trước: {{ activePreviewPost()?.title }}</h5>
+        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">{{ 'modal.preview_title' | translate }}: {{ activePreviewPost()?.title }}</h5>
         <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" (click)="closePreviewModal()">
           <i class="bi bi-x-lg text-lg"></i>
         </button>
@@ -142,7 +142,7 @@
         <div class="prose dark:prose-invert max-w-none text-aquamarine-800 dark:text-aquamarine-200" [innerHTML]="activePreviewPost()?.content"></div>
       </div>
       <div class="p-4 border-t border-aquamarine-200 dark:border-aquamarine-800 flex justify-end">
-        <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="closePreviewModal()">Đóng</button>
+        <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="closePreviewModal()">{{ 'modal.close' | translate }}</button>
       </div>
     </div>
   </div>

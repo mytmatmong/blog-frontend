@@ -1,11 +1,12 @@
 import { Component, AfterViewInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 declare var Chart: any;
 
 @Component({
   selector: 'app-moderator-dashboard',
-  imports: [RouterLink],
+  imports: [RouterLink, TranslatePipe],
   templateUrl: './moderator-dashboard.html',
   styleUrl: './moderator-dashboard.css',
 })

@@ -1,5 +1,6 @@
 import { Component, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 interface BlogItem {
   id: number;
@@ -12,7 +13,7 @@ interface BlogItem {
 
 @Component({
   selector: 'app-manage-blogs',
-  imports: [FormsModule],
+  imports: [FormsModule, TranslatePipe],
   templateUrl: './manage-blogs.html',
   styleUrl: './manage-blogs.css',
 })

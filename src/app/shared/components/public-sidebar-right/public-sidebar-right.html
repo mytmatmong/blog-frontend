@@ -1,11 +1,11 @@
 <div class="p-4 mb-4 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-  <h6 class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-50 mb-3">Top Authors</h6>
+  <h6 class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-50 mb-3">{{ 'sidebar.top_authors' | translate }}</h6>
 
   <div class="flex items-center mb-3 gap-2">
     <span class="avatar-sm">S</span>
     <div>
       <div class="font-semibold text-sm text-aquamarine-900 dark:text-aquamarine-100">Sơn Dev</div>
-      <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400">120 followers</small>
+      <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400">120 {{ 'author.followers' | translate }}</small>
     </div>
   </div>
 
@@ -13,7 +13,7 @@
     <span class="avatar-sm">A</span>
     <div>
       <div class="font-semibold text-sm text-aquamarine-900 dark:text-aquamarine-100">Angular Master</div>
-      <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400">98 followers</small>
+      <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400">98 {{ 'author.followers' | translate }}</small>
     </div>
   </div>
 
@@ -21,13 +21,13 @@
     <span class="avatar-sm">N</span>
     <div>
       <div class="font-semibold text-sm text-aquamarine-900 dark:text-aquamarine-100">NodeJS Lab</div>
-      <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400">86 followers</small>
+      <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400">86 {{ 'author.followers' | translate }}</small>
     </div>
   </div>
 </div>
 
 <div class="p-4 mb-4 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-  <h6 class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-50 mb-3">Trending Posts</h6>
+  <h6 class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-50 mb-3">{{ 'sidebar.trending_posts' | translate }}</h6>
   <ol class="list-decimal list-inside text-sm space-y-2.5">
     <li>
       <a routerLink="/post/1" class="card-text font-medium transition-colors">Thiết kế REST API chuẩn cho Blog</a>
@@ -42,7 +42,7 @@
 </div>
 
 <div class="p-4 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-  <h6 class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-50 mb-3">Popular Tags</h6>
+  <h6 class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-50 mb-3">{{ 'sidebar.popular_tags' | translate }}</h6>
   <div class="flex flex-wrap gap-2">
     <a routerLink="/hashtag" class="tag">#nodejs</a>
     <a routerLink="/hashtag" class="tag">#angular</a>

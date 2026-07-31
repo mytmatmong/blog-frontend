@@ -4,10 +4,11 @@ import { PublicSidebarLeft, FilterSortOption } from '../../../shared/components/
 import { PublicSidebarRight } from '../../../shared/components/public-sidebar-right/public-sidebar-right';
 import { PostCard, PostItem } from '../../../shared/components/post-card/post-card';
 import { Pagination } from '../../../shared/components/pagination/pagination';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, PublicSidebarLeft, PublicSidebarRight, PostCard, Pagination],
+  imports: [RouterLink, PublicSidebarLeft, PublicSidebarRight, PostCard, Pagination, TranslatePipe],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })

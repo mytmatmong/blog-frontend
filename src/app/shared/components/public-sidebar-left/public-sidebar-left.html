@@ -2,7 +2,7 @@
   <!-- Thẻ Bộ Lọc -->
   <div class="p-4 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
     <h6 class="font-bold text-xs uppercase tracking-wider text-aquamarine-600 dark:text-aquamarine-400 mb-3 flex items-center gap-1.5">
-      <i class="bi bi-funnel-fill"></i> Bộ lọc bài viết
+      <i class="bi bi-funnel-fill"></i> {{ 'sidebar.filter_title' | translate }}
     </h6>
     <div class="space-y-1">
       @for (opt of filterOptions; track opt.key) {
@@ -10,10 +10,10 @@
           type="button"
           (click)="selectFilter(opt.key)"
           class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium transition-all text-left"
-          [class.bg-aquamarine-600]="activeFilter === opt.key"
-          [class.text-white]="activeFilter === opt.key"
-          [class.dark:bg-aquamarine-400]="activeFilter === opt.key"
-          [class.dark:text-black]="activeFilter === opt.key"
+          [class.!bg-aquamarine-600]="activeFilter === opt.key"
+          [class.!text-white]="activeFilter === opt.key"
+          [class.dark:!bg-aquamarine-400]="activeFilter === opt.key"
+          [class.dark:!text-black]="activeFilter === opt.key"
           [class.font-semibold]="activeFilter === opt.key"
           [class.shadow-sm]="activeFilter === opt.key"
           [class.text-aquamarine-800]="activeFilter !== opt.key"
@@ -21,7 +21,7 @@
           [class.hover:bg-aquamarine-50]="activeFilter !== opt.key"
           [class.dark:hover:bg-aquamarine-950/60]="activeFilter !== opt.key">
           <i [class]="opt.icon" class="text-sm"></i>
-          <span>{{ opt.label }}</span>
+          <span>{{ opt.translationKey | translate }}</span>
         </button>
       }
     </div>
@@ -30,7 +30,7 @@
   <!-- Thẻ Tìm Kiếm -->
   <div class="p-4 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
     <h6 class="font-bold text-xs uppercase tracking-wider text-aquamarine-600 dark:text-aquamarine-400 mb-3 flex items-center gap-1.5">
-      <i class="bi bi-search"></i> Công cụ tìm kiếm
+      <i class="bi bi-search"></i> {{ 'sidebar.search_title' | translate }}
     </h6>
     <app-input
       type="text"

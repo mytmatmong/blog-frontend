@@ -1,6 +1,7 @@
 import { Component, AfterViewInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 declare var Quill: any;
 
@@ -11,7 +12,7 @@ interface LangData {
 
 @Component({
   selector: 'app-edit-post',
-  imports: [FormsModule],
+  imports: [FormsModule, TranslatePipe],
   templateUrl: './edit-post.html',
   styleUrl: './edit-post.css',
 })

@@ -1,6 +1,7 @@
 import { Component, AfterViewInit, signal, effect, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../../../core/services/toast.service';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 declare var Quill: any;
 
@@ -11,7 +12,7 @@ interface LangData {
 
 @Component({
   selector: 'app-create-post',
-  imports: [FormsModule],
+  imports: [FormsModule, TranslatePipe],
   templateUrl: './create-post.html',
   styleUrl: './create-post.css',
 })

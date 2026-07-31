@@ -1,4 +1,5 @@
 import { Component, signal, computed } from '@angular/core';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 interface CommentItem {
   id: number;
@@ -9,7 +10,7 @@ interface CommentItem {
 
 @Component({
   selector: 'app-manage-comments',
-  imports: [],
+  imports: [TranslatePipe],
   templateUrl: './manage-comments.html',
   styleUrl: './manage-comments.css',
 })

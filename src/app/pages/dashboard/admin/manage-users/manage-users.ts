@@ -1,5 +1,6 @@
 import { Component, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 interface UserItem {
   id: number;
@@ -11,7 +12,7 @@ interface UserItem {
 
 @Component({
   selector: 'app-manage-users',
-  imports: [FormsModule],
+  imports: [FormsModule, TranslatePipe],
   templateUrl: './manage-users.html',
   styleUrl: './manage-users.css',
 })

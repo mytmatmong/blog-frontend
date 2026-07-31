@@ -1,17 +1,20 @@
 import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { InputComponent } from '../input/input';
+import { TranslationService } from '../../../core/services/translation.service';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 export type FilterSortOption = 'latest' | 'mostViewed' | 'mostLiked' | 'mostCommented';
 
 @Component({
   selector: 'app-public-sidebar-left',
-  imports: [InputComponent],
+  imports: [InputComponent, TranslatePipe],
   templateUrl: './public-sidebar-left.html',
   styleUrl: './public-sidebar-left.css',
 })
 export class PublicSidebarLeft {
   private router = inject(Router);
+  protected readonly ts = inject(TranslationService);
 
   @Input() activeFilter: FilterSortOption = 'latest';
   @Output() filterChange = new EventEmitter<FilterSortOption>();
@@ -21,11 +24,11 @@ export class PublicSidebarLeft {
 
   @Input() searchPlaceholder?: string;
 
-  filterOptions: { key: FilterSortOption; label: string; icon: string }[] = [
-    { key: 'latest', label: 'Mới nhất', icon: 'bi bi-clock-history' },
-    { key: 'mostViewed', label: 'Nhiều lượt xem nhất', icon: 'bi bi-eye' },
-    { key: 'mostLiked', label: 'Nhiều lượt thích nhất', icon: 'bi bi-heart' },
-    { key: 'mostCommented', label: 'Nhiều bình luận nhất', icon: 'bi bi-chat-dots' }
+  filterOptions: { key: FilterSortOption; translationKey: string; icon: string }[] = [
+    { key: 'latest', translationKey: 'filter.latest', icon: 'bi bi-clock-history' },
+    { key: 'mostViewed', translationKey: 'filter.most_viewed', icon: 'bi bi-eye' },
+    { key: 'mostLiked', translationKey: 'filter.most_liked', icon: 'bi bi-heart' },
+    { key: 'mostCommented', translationKey: 'filter.most_commented', icon: 'bi bi-chat-dots' }
   ];
 
   selectFilter(key: FilterSortOption) {
@@ -41,8 +44,8 @@ export class PublicSidebarLeft {
   get computedPlaceholder(): string {
     if (this.searchPlaceholder) return this.searchPlaceholder;
     const url = this.router.url;
-    if (url.includes('/category')) return 'Tìm danh mục...';
-    if (url.includes('/hashtag')) return 'Tìm hashtag...';
-    return 'Tìm bài viết...';
+    if (url.includes('/category')) return this.ts.translate('search.placeholder_categories');
+    if (url.includes('/hashtag')) return this.ts.translate('search.placeholder_hashtags');
+    return this.ts.translate('search.placeholder_posts');
   }
 }

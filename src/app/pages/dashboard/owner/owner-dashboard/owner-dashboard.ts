@@ -1,6 +1,7 @@
 import { Component, AfterViewInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 declare var Chart: any;
 
@@ -16,7 +17,7 @@ interface Post {
 
 @Component({
   selector: 'app-owner-dashboard',
-  imports: [RouterLink, DecimalPipe],
+  imports: [RouterLink, DecimalPipe, TranslatePipe],
   templateUrl: './owner-dashboard.html',
   styleUrl: './owner-dashboard.css',
 })
