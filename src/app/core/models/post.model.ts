@@ -1,3 +1,44 @@
+export type SortOrder =
+  | 'asc'
+  | 'desc';
+
+export type PostSortBy =
+  | 'createdAt'
+  | 'publishedAt'
+  | 'viewCount'
+  | 'likesCount'
+  | 'title';
+
+export type CategorySortBy =
+  | 'createdAt'
+  | 'name'
+  | 'postsCount';
+
+export type TagSortBy =
+  | 'createdAt'
+  | 'name'
+  | 'postsCount';
+
+export type CommentSortBy =
+  | 'createdAt'
+  | 'updatedAt';
+
+export interface SortQueryParams<
+  TSortBy extends string,
+> {
+  sortBy?: TSortBy;
+
+  /**
+   * Frontend ưu tiên dùng sortOrder.
+   */
+  sortOrder?: SortOrder;
+
+  /**
+   * Backend cũng chấp nhận alias order.
+   * Không nên gửi đồng thời order và sortOrder.
+   */
+  order?: SortOrder;
+}
 export type PostStatus =
   | 'DRAFT'
   | 'PENDING_REVIEW'
@@ -59,11 +100,10 @@ export interface CategoryItem {
   language?: PublicLanguage;
   categoryGroup?: CategoryGroup;
 }
-
-export interface GetCategoriesQueryParams {
+export interface GetCategoriesQueryParams
+  extends SortQueryParams<CategorySortBy> {
   search?: string;
   languageId?: number;
-  lang?: string;
   page?: number;
   limit?: number;
 }
@@ -127,14 +167,9 @@ export interface TopTagItem {
   tagScore: number;
 }
 
-export interface GetTagsQueryParams {
+export interface GetTagsQueryParams
+  extends SortQueryParams<TagSortBy> {
   search?: string;
-
-  /**
-   * Backend nhận field này nhưng P13 hiện chưa dùng để lọc.
-   */
-  lang?: string;
-
   page?: number;
   limit?: number;
 }
@@ -180,26 +215,20 @@ export interface PublicPost {
   media: PostMediaSummary[];
 }
 
-export interface GetPostsQueryParams {
+export interface GetPostsQueryParams
+  extends SortQueryParams<PostSortBy> {
   search?: string;
   categoryId?: number;
   languageId?: number;
-  lang?: string;
   authorId?: number;
   parentPostId?: number;
-
-  /**
-   * Public service backend luôn ép thành PUBLISH.
-   */
   status?: PostStatus;
-
   tagId?: number;
   tagName?: string;
   bookmarkedByUserId?: number;
   page?: number;
   limit?: number;
 }
-
 export type PaginatedPostsResponse =
   PaginatedResponse<PublicPost>;
 
@@ -211,6 +240,12 @@ export interface CommentUser {
   id: number;
   username: string;
   avatarUrl: string | null;
+}
+
+export interface GetCommentsQueryParams
+  extends SortQueryParams<CommentSortBy> {
+  page?: number;
+  limit?: number;
 }
 
 export interface CommentReply {

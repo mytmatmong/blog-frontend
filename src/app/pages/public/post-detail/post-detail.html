@@ -3,30 +3,84 @@
     <div class="lg:col-span-9">
       @if (isLoading()) {
       <article
-        class="p-6 lg:p-8 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm animate-pulse space-y-4">
+        class="p-6 lg:p-8 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm animate-pulse space-y-4"
+        aria-busy="true">
         <div class="h-8 bg-aquamarine-200 dark:bg-aquamarine-800 rounded w-3/4"></div>
 
         <div class="h-4 bg-aquamarine-200 dark:bg-aquamarine-800 rounded w-1/3"></div>
 
         <div class="h-64 bg-aquamarine-200 dark:bg-aquamarine-800 rounded w-full"></div>
       </article>
-      } @else if (post(); as currentPost) {
+      } @else if (
+      post();
+      as currentPost
+      ) {
       <article
-        class="p-6 lg:p-8 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
+        class="relative p-6 lg:p-8 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
+        <!-- Trạng thái đổi ngôn ngữ -->
+        @if (
+        isRefreshingLanguage()
+        ) {
+        <div
+          class="mb-5 flex items-center gap-2 rounded-xl border border-aquamarine-200 dark:border-aquamarine-700 bg-aquamarine-50 dark:bg-aquamarine-950/40 px-4 py-2 text-sm text-aquamarine-700 dark:text-aquamarine-300"
+          role="status" aria-live="polite">
+          <span
+            class="inline-block h-4 w-4 rounded-full border-2 border-aquamarine-300 border-t-aquamarine-600 animate-spin"
+            aria-hidden="true"></span>
+
+          {{
+          'post.refreshing_language'
+          | translate
+          }}
+        </div>
+        }
+
+        <!-- Đổi ngôn ngữ lỗi nhưng vẫn giữ bài cũ -->
+        @if (
+        errorMessage() &&
+        !isRefreshingLanguage()
+        ) {
+        <div
+          class="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 px-4 py-3 text-sm text-amber-800 dark:text-amber-300"
+          role="alert">
+          <span>
+            {{ errorMessage() }}
+          </span>
+
+          <button type="button" class="font-semibold underline" (click)="retryPost()">
+            {{
+            'common.retry'
+            | translate
+            }}
+          </button>
+        </div>
+        }
+
+        <!-- Tác giả -->
         <div class="flex items-center gap-3 mb-4">
           <a [routerLink]="[
                 '/author',
                 currentPost.authorId
               ]" class="flex items-center gap-3 group hover:opacity-80 transition-opacity">
-            @if (currentPost.author.avatarUrl) {
-            <img [src]="currentPost.author.avatarUrl" [alt]="currentPost.author.username"
-              class="w-10 h-10 rounded-full object-cover border border-aquamarine-300" />
+            @if (
+            currentPost.author
+            .avatarUrl
+            ) {
+            <img [src]="
+                    currentPost.author
+                      .avatarUrl
+                  " [alt]="
+                    currentPost.author
+                      .username
+                  " class="w-10 h-10 rounded-full object-cover border border-aquamarine-300" width="40" height="40" />
             } @else {
             <span
-              class="w-10 h-10 rounded-full bg-aquamarine-600 text-white font-bold flex items-center justify-center text-sm">
+              class="w-10 h-10 rounded-full bg-aquamarine-600 text-white font-bold flex items-center justify-center text-sm"
+              aria-hidden="true">
               {{
               getAvatarInitial(
-              currentPost.author.username
+              currentPost.author
+              .username
               )
               }}
             </span>
@@ -34,7 +88,10 @@
 
             <div>
               <div class="font-semibold text-sm text-aquamarine-950 dark:text-aquamarine-50">
-                {{ currentPost.author.username }}
+                {{
+                currentPost.author
+                .username
+                }}
               </div>
 
               <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400">
@@ -44,26 +101,43 @@
                 currentPost.createdAt
                 )
                 }}
-                •
-                {{ currentPost.viewCount }}
-                lượt xem
+
+                <span aria-hidden="true">
+                  •
+                </span>
+
+                {{
+                currentPost.viewCount
+                }}
+
+                {{
+                'post.views'
+                | translate
+                }}
               </small>
             </div>
           </a>
         </div>
 
+        <!-- Tiêu đề -->
         <h1 class="font-bold text-2xl lg:text-3xl text-aquamarine-950 dark:text-aquamarine-50 mb-4">
           {{ currentPost.title }}
         </h1>
 
-        @if (currentPost.categories.length > 0) {
+        <!-- Danh mục -->
+        @if (
+        currentPost.categories
+        .length > 0
+        ) {
         <div class="flex flex-wrap gap-2 mb-3">
           @for (
-          category of currentPost.categories;
+          category of
+          currentPost.categories;
           track category.id
           ) {
           <a class="category-badge" routerLink="/category" [queryParams]="{
-                    categoryId: category.id
+                    categoryId:
+                      category.id
                   }">
             {{ category.name }}
           </a>
@@ -71,10 +145,14 @@
         </div>
         }
 
-        @if (currentPost.tags.length > 0) {
+        <!-- Hashtag -->
+        @if (
+        currentPost.tags.length > 0
+        ) {
         <div class="flex flex-wrap gap-2 mb-6">
           @for (
-          tag of currentPost.tags;
+          tag of
+          currentPost.tags;
           track tag.id
           ) {
           <a class="tag" routerLink="/hashtag" [queryParams]="{
@@ -87,105 +165,213 @@
         </div>
         }
 
-        @if (currentPost.thumbnailUrl) {
+        <!-- Ảnh đại diện bài -->
+        @if (
+        currentPost.thumbnailUrl
+        ) {
         <div class="mb-6 rounded-2xl overflow-hidden max-h-96">
-          <img [src]="currentPost.thumbnailUrl" [alt]="currentPost.title" class="w-full h-auto object-cover" />
+          <img [src]="
+                  currentPost.thumbnailUrl
+                " [alt]="
+                  currentPost.title
+                " class="w-full h-auto object-cover" loading="eager" />
         </div>
         }
 
-        <div class="prose dark:prose-invert max-w-none text-aquamarine-950 dark:text-aquamarine-50 whitespace-pre-line">
-          {{ currentPost.content }}
-        </div>
+        <!-- Nội dung HTML -->
+        <div class="prose dark:prose-invert max-w-none text-aquamarine-950 dark:text-aquamarine-50" [innerHTML]="
+              currentPost.content
+            "></div>
 
-        @if (currentPost.media.length > 0) {
+        <!-- Media phụ -->
+        @if (
+        currentPost.media.length >
+        0
+        ) {
         <div class="mt-6 space-y-4">
           @for (
-          item of currentPost.media;
+          item of
+          currentPost.media;
           track item.id
           ) {
-          @if (item.mediaType === 'IMAGE') {
-          <img [src]="item.mediaUrl" [alt]="currentPost.title" class="max-w-full rounded-xl" loading="lazy" />
+          @if (
+          item.mediaType ===
+          'IMAGE'
+          ) {
+          <img [src]="item.mediaUrl" [alt]="
+                      currentPost.title
+                    " class="max-w-full rounded-xl" loading="lazy" />
           } @else {
-          <video [src]="item.mediaUrl" controls class="w-full rounded-xl"></video>
+          <video [src]="item.mediaUrl" controls preload="metadata" class="w-full rounded-xl"></video>
           }
           }
         </div>
         }
 
+        <!-- Thống kê -->
         <div
           class="border-t border-aquamarine-200 dark:border-aquamarine-800 pt-6 mt-8 flex flex-wrap gap-4 text-sm text-aquamarine-700 dark:text-aquamarine-300">
           <span>
-            <i class="bi bi-hand-thumbs-up me-1"></i>
+            <i class="bi bi-hand-thumbs-up me-1" aria-hidden="true"></i>
 
-            {{ currentPost.likeCount }}
-            lượt thích
+            {{
+            currentPost.likeCount
+            }}
+
+            {{
+            'post.likes'
+            | translate
+            }}
           </span>
 
           <span>
-            <i class="bi bi-eye me-1"></i>
+            <i class="bi bi-eye me-1" aria-hidden="true"></i>
 
-            {{ currentPost.viewCount }}
-            lượt xem
+            {{
+            currentPost.viewCount
+            }}
+
+            {{
+            'post.views'
+            | translate
+            }}
           </span>
         </div>
       </article>
       } @else {
+      <!-- Lỗi tải bài lần đầu -->
       <div
-        class="p-8 text-center rounded-2xl border border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300">
+        class="p-8 text-center rounded-2xl border border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300"
+        role="alert">
         <p class="font-semibold">
           {{
           errorMessage() ||
-          'Không tìm thấy bài viết.'
+          (
+          'post.not_found'
+          | translate
+          )
           }}
         </p>
 
         <button type="button" class="mt-4 px-4 py-2 rounded-lg border border-red-300 dark:border-red-800"
-          (click)="loadPost()">
-          Thử lại
+          (click)="retryPost()">
+          {{
+          'common.retry'
+          | translate
+          }}
         </button>
       </div>
       }
 
+      <!-- Bình luận -->
       @if (post()) {
-      <section
-        class="p-6 mt-6 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-        <h2 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50 mb-4">
-          {{ 'comments.title' | translate }}
-        </h2>
+      <section id="post-comments"
+        class="p-6 mt-6 scroll-mt-24 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <h2 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">
+            {{
+            'comments.title'
+            | translate
+            }}
 
-        @if (isLoadingComments()) {
-        <div class="animate-pulse space-y-3 py-2">
+            @if (
+            commentsTotalItems() > 0
+            ) {
+            <span class="ms-1 text-sm font-normal text-aquamarine-500 dark:text-aquamarine-400">
+              ({{
+              commentsTotalItems()
+              }})
+            </span>
+            }
+          </h2>
+
+          <select
+            class="rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 px-3 py-2 text-xs"
+            [value]="commentsSortOrder()" (change)="
+      onCommentsSortChange(
+        $any($event.target).value
+      )
+    ">
+            <option value="desc">
+              {{
+              'comments.newest_first'
+              | translate
+              }}
+            </option>
+
+            <option value="asc">
+              {{
+              'comments.oldest_first'
+              | translate
+              }}
+            </option>
+          </select>
+        </div>
+
+        @if (
+        isLoadingComments() &&
+        comments().length === 0
+        ) {
+        <div class="animate-pulse space-y-3 py-2" aria-busy="true">
           <div class="h-4 bg-aquamarine-200 dark:bg-aquamarine-800 rounded w-1/3"></div>
 
           <div class="h-10 bg-aquamarine-200 dark:bg-aquamarine-800 rounded w-full"></div>
         </div>
-        } @else if (commentsErrorMessage()) {
+        } @else if (
+        commentsErrorMessage()
+        ) {
         <div
-          class="p-4 rounded-xl border border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300">
-          {{ commentsErrorMessage() }}
+          class="p-4 rounded-xl border border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300"
+          role="alert">
+          {{
+          commentsErrorMessage()
+          }}
 
           <button type="button" class="ms-2 underline" (click)="loadComments()">
-            Thử lại
+            {{
+            'common.retry'
+            | translate
+            }}
           </button>
         </div>
-        } @else if (comments().length > 0) {
-        @for (
-        comment of comments();
-        track comment.id
+        } @else if (
+        comments().length > 0
         ) {
-        <app-comment-item [comment]="comment"></app-comment-item>
-        }
+        <div class="transition-opacity" [class.opacity-60]="
+                isLoadingComments()
+              ">
+          @for (
+          comment of
+          comments();
+          track comment.id
+          ) {
+          <app-comment-item [comment]="comment"></app-comment-item>
+          }
+        </div>
 
-        @if (commentsTotalPages() > 1) {
-        <app-pagination [totalItems]="commentsTotalItems()" [itemsPerPage]="commentsPerPage"
-          [currentPage]="commentsCurrentPage()" (currentPageChange)="
-                  onCommentsPageChange($event)
+        @if (
+        commentsTotalPages() >
+        1
+        ) {
+        <app-pagination [totalItems]="
+                  commentsTotalItems()
+                " [itemsPerPage]="
+                  commentsPerPage
+                " [currentPage]="
+                  commentsCurrentPage()
+                " (currentPageChange)="
+                  onCommentsPageChange(
+                    $event
+                  )
                 ">
         </app-pagination>
         }
         } @else {
         <p class="text-sm text-aquamarine-600 dark:text-aquamarine-400">
-          Chưa có bình luận nào.
+          {{
+          'comments.empty'
+          | translate
+          }}
         </p>
         }
       </section>

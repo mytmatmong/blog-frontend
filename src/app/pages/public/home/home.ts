@@ -21,6 +21,7 @@ import {
 
 import {
   FilterSortOption,
+  getPostSortQuery,
   PublicSidebarLeft,
 } from '../../../shared/components/public-sidebar-left/public-sidebar-left';
 
@@ -87,34 +88,7 @@ export class Home implements OnInit {
    * mostViewed và mostLiked chỉ sắp xếp các item
    * của trang hiện tại.
    */
-  readonly visiblePosts = computed(() => {
-    const result = [...this.posts()];
 
-    switch (this.activeFilter()) {
-      case 'mostViewed':
-        return result.sort(
-          (first, second) =>
-            second.views - first.views,
-        );
-
-      case 'mostLiked':
-        return result.sort(
-          (first, second) =>
-            second.likes - first.likes,
-        );
-
-      case 'mostCommented':
-        /**
-         * PublicPost không trả commentCount.
-         * Giữ nguyên thứ tự backend.
-         */
-        return result;
-
-      case 'latest':
-      default:
-        return result;
-    }
-  });
 
   constructor() {
     this.searchChanges
@@ -138,12 +112,6 @@ export class Home implements OnInit {
       )
       .subscribe(() => {
         this.currentPage.set(1);
-
-        /**
-         * Gọi lại:
-         * GET /categories?lang=vi|en
-         * GET /posts?lang=vi|en
-         */
         this.loadCategories();
         this.loadPosts();
       });
@@ -161,12 +129,29 @@ export class Home implements OnInit {
     const search =
       this.searchTerm().trim();
 
+    const sort =
+      getPostSortQuery(
+        this.activeFilter(),
+      );
+
+
     this.publicApiService
+
       .getPosts({
-        search: search || undefined,
-        lang: this.currentLanguageCode(),
-        page: this.currentPage(),
-        limit: this.itemsPerPage,
+        search:
+          search || undefined,
+
+        page:
+          this.currentPage(),
+
+        limit:
+          this.itemsPerPage,
+
+        sortBy:
+          sort.sortBy,
+
+        sortOrder:
+          sort.sortOrder,
       })
       .subscribe({
         next: (response) => {
@@ -183,7 +168,10 @@ export class Home implements OnInit {
           );
 
           this.totalPages.set(
-            data.meta.totalPages,
+            Math.max(
+              1,
+              data.meta.totalPages,
+            ),
           );
 
           this.currentPage.set(
@@ -204,6 +192,7 @@ export class Home implements OnInit {
           );
         },
       });
+
   }
 
   loadCategories(): void {
@@ -211,9 +200,10 @@ export class Home implements OnInit {
 
     this.publicApiService
       .getCategories({
-        lang: this.currentLanguageCode(),
         page: 1,
         limit: 20,
+        sortBy: 'name',
+        sortOrder: 'asc',
       })
       .subscribe({
         next: (response) => {
@@ -247,7 +237,20 @@ export class Home implements OnInit {
   onFilterChange(
     filter: FilterSortOption,
   ): void {
+    if (
+      filter === this.activeFilter()
+    ) {
+      return;
+    }
+
     this.activeFilter.set(filter);
+    this.currentPage.set(1);
+
+    /**
+     * Gọi lại backend để sort toàn bộ dữ liệu,
+     * không sort riêng 10 bài của trang hiện tại.
+     */
+    this.loadPosts();
   }
 
   onPageChange(page: number): void {
@@ -293,6 +296,8 @@ export class Home implements OnInit {
         post.author.username
           .charAt(0)
           .toUpperCase(),
+      authorAvatarUrl:
+        post.author.avatarUrl,
 
       timeAgo:
         this.formatDate(
@@ -302,20 +307,22 @@ export class Home implements OnInit {
 
       readTime:
         this.calculateReadTime(
-          plainContent,
+          post.content,
         ),
 
       categories:
         post.categories.map(
-          (category) => category.name,
+          (category) => ({
+            id: category.id,
+            name: category.name,
+          }),
         ),
 
       tags:
-        post.tags.map((tag) =>
-          tag.name.startsWith('#')
-            ? tag.name
-            : `#${tag.name}`,
-        ),
+        post.tags.map((tag) => ({
+          id: tag.id,
+          name: tag.name.replace(/^#/, ''),
+        })),
 
       likes: post.likeCount,
       views: post.viewCount,
@@ -345,19 +352,101 @@ export class Home implements OnInit {
   }
 
   private calculateReadTime(
-    content: string,
+    htmlContent: string,
   ): string {
-    const wordCount = content
+    const plainText =
+      this.extractPlainText(htmlContent);
+
+    const wordCount = plainText
       .split(/\s+/)
       .filter(Boolean)
       .length;
 
+    const wordsPerMinute =
+      this.currentLanguageCode() === 'en'
+        ? 200
+        : 180;
+
     const minutes = Math.max(
       1,
-      Math.ceil(wordCount / 200),
+      Math.ceil(
+        wordCount / wordsPerMinute,
+      ),
     );
 
-    return `${minutes} phút đọc`;
+    const translatedLabel =
+      this.translationService
+        .translate('post.read_time')
+        .trim();
+
+    /**
+     * Hỗ trợ translation dạng:
+     * "{count} phút đọc"
+     * hoặc chỉ "phút đọc".
+     */
+    if (
+      translatedLabel.includes('{count}')
+    ) {
+      return translatedLabel.replace(
+        '{count}',
+        String(minutes),
+      );
+    }
+
+    return `${minutes} ${translatedLabel}`;
+  }
+
+  private extractPlainText(
+    htmlContent: string,
+  ): string {
+    if (!htmlContent) {
+      return '';
+    }
+
+    /**
+     * Chạy trên trình duyệt.
+     */
+    if (
+      typeof DOMParser !== 'undefined'
+    ) {
+      const document = new DOMParser()
+        .parseFromString(
+          htmlContent,
+          'text/html',
+        );
+
+      document
+        .querySelectorAll(
+          'script, style, noscript',
+        )
+        .forEach((element) =>
+          element.remove(),
+        );
+
+      return (
+        document.body.textContent ?? ''
+      )
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    /**
+     * Fallback khi chạy SSR.
+     */
+    return htmlContent
+      .replace(
+        /<(script|style|noscript)[^>]*>[\s\S]*?<\/\1>/gi,
+        ' ',
+      )
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&nbsp;/gi, ' ')
+      .replace(/&amp;/gi, '&')
+      .replace(/&lt;/gi, '<')
+      .replace(/&gt;/gi, '>')
+      .replace(/&quot;/gi, '"')
+      .replace(/&#39;/gi, "'")
+      .replace(/\s+/g, ' ')
+      .trim();
   }
 
   private formatDate(

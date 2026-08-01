@@ -1,23 +1,66 @@
 <main class="container mx-auto px-4 max-w-7xl py-6">
   <section class="p-6 mb-6 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 card-box shadow-sm">
+    @if (isTagSelected()) {
+    <button type="button"
+      class="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-aquamarine-600 dark:text-aquamarine-300 hover:underline"
+      (click)="showAllTags()">
+      <i class="bi bi-arrow-left" aria-hidden="true"></i>
+
+      {{
+      'hashtag.back_to_all'
+      | translate
+      }}
+    </button>
+    }
+
     <h1 class="font-bold text-2xl text-aquamarine-950 dark:text-aquamarine-50 mb-2">
-      @if (selectedTagName()) {
+      @if (isTagSelected()) {
       #{{
-      selectedTagName()
+      selectedTagName() ||
+      selectedTagId()
       }}
       } @else {
-      {{ 'hashtag.title' | translate }}
+      {{
+      'hashtag.title'
+      | translate
+      }}
       }
     </h1>
 
     <p class="text-sm text-aquamarine-600 dark:text-aquamarine-400">
-      {{ 'hashtag.subtitle' | translate }}
+      {{
+      (
+      isTagSelected()
+      ? 'hashtag.selected_subtitle'
+      : 'hashtag.list_subtitle'
+      ) | translate
+      }}
     </p>
   </section>
 
+  <div class="lg:hidden mb-4">
+    <div class="relative">
+      <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-aquamarine-500" aria-hidden="true"></i>
+
+      <input type="search"
+        class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 py-3 ps-10 pe-4"
+        [placeholder]="searchPlaceholder()" [value]="searchTerm()" (input)="
+          onSearchChange(
+            $any($event.target).value
+          )
+        " />
+    </div>
+  </div>
+
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-    <app-public-sidebar-left class="hidden lg:block lg:col-span-3" [activeFilter]="activeFilter()"
-      (filterChange)="onFilterChange($event)" [searchTerm]="searchTerm()" (searchChange)="onSearchChange($event)">
+    <app-public-sidebar-left class="hidden lg:block lg:col-span-3" [showFilters]="isTagSelected()"
+      [activeFilter]="activeFilter()" [searchPlaceholder]="
+        searchPlaceholder()
+      " [searchTerm]="searchTerm()" (filterChange)="
+        onFilterChange($event)
+      " (searchChange)="
+        onSearchChange($event)
+      ">
     </app-public-sidebar-left>
 
     <section class="lg:col-span-6">
@@ -33,7 +76,10 @@
       <div
         class="p-6 rounded-2xl border border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300">
         <p class="font-semibold">
-          Không tải được bài viết
+          {{
+          'hashtag.load_error'
+          | translate
+          }}
         </p>
 
         <p class="text-sm mt-1">
@@ -41,13 +87,75 @@
         </p>
 
         <button type="button" class="mt-4 px-3 py-1.5 rounded-lg border border-red-300 dark:border-red-800"
-          (click)="loadPosts()">
-          Thử lại
+          (click)="loadCurrentMode()">
+          {{
+          'common.retry'
+          | translate
+          }}
         </button>
       </div>
-      } @else if (visiblePosts().length > 0) {
+      } @else if (!isTagSelected()) {
+      @if (tags().length > 0) {
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        @for (
+        tag of tags();
+        track tag.id
+        ) {
+        <button type="button"
+          class="group p-4 text-left rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 hover:border-aquamarine-500 hover:shadow-md transition-all"
+          (click)="selectTag(tag)">
+          <div class="flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <p class="font-bold text-aquamarine-900 dark:text-aquamarine-100 truncate">
+                #{{ tag.name }}
+              </p>
+
+              <p class="mt-1 text-xs text-aquamarine-500 dark:text-aquamarine-400">
+                {{
+                'hashtag.related_posts'
+                | translate
+                }}
+              </p>
+            </div>
+
+            <i class="bi bi-chevron-right text-aquamarine-400 group-hover:translate-x-1 transition-transform"
+              aria-hidden="true"></i>
+          </div>
+        </button>
+        }
+      </div>
+
+      @if (totalPages() > 1) {
+      <app-pagination [totalItems]="totalItems()" [itemsPerPage]="itemsPerPage" [currentPage]="currentPage()"
+        (currentPageChange)="
+                onPageChange($event)
+              ">
+      </app-pagination>
+      }
+      } @else {
+      <div
+        class="p-8 text-center rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900">
+        <p class="text-aquamarine-600 dark:text-aquamarine-400">
+          {{
+          'hashtag.empty_tags'
+          | translate
+          }}
+        </p>
+
+        @if (searchTerm()) {
+        <button type="button" class="mt-4 px-4 py-2 rounded-xl bg-aquamarine-600 text-white" (click)="clearSearch()">
+          {{
+          'common.clear_search'
+          | translate
+          }}
+        </button>
+        }
+      </div>
+      }
+      } @else {
+      @if (posts().length > 0) {
       @for (
-      post of visiblePosts();
+      post of posts();
       track post.id
       ) {
       <app-post-card [post]="post"></app-post-card>
@@ -55,24 +163,31 @@
 
       @if (totalPages() > 1) {
       <app-pagination [totalItems]="totalItems()" [itemsPerPage]="itemsPerPage" [currentPage]="currentPage()"
-        (currentPageChange)="onPageChange($event)">
+        (currentPageChange)="
+                onPageChange($event)
+              ">
       </app-pagination>
       }
       } @else {
       <div
         class="p-8 text-center rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900">
-        <i class="bi bi-tags text-4xl text-aquamarine-400"></i>
-
-        <p class="mt-3 text-aquamarine-600 dark:text-aquamarine-400">
-          Không tìm thấy bài viết phù hợp với hashtag này.
+        <p class="text-aquamarine-600 dark:text-aquamarine-400">
+          {{
+          'hashtag.empty_posts'
+          | translate
+          }}
         </p>
 
         @if (searchTerm()) {
         <button type="button" class="mt-4 px-4 py-2 rounded-xl bg-aquamarine-600 text-white" (click)="clearSearch()">
-          Xóa tìm kiếm
+          {{
+          'common.clear_search'
+          | translate
+          }}
         </button>
         }
       </div>
+      }
       }
     </section>
 

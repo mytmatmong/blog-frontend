@@ -1,17 +1,33 @@
 import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
+export interface PostItemCategory {
+  id: number;
+  name: string;
+}
+
+export interface PostItemTag {
+  id: number;
+  name: string;
+}
+
 export interface PostItem {
   id: number;
-  authorId?: number;
+  authorId: number;
+
   title: string;
   excerpt: string;
+
   authorName: string;
   authorAvatar: string;
+  authorAvatarUrl?: string | null;
+
   timeAgo: string;
   readTime: string;
-  categories: string[];
-  tags: string[];
+
+  categories: PostItemCategory[];
+  tags: PostItemTag[];
+
   likes: number;
   views: number;
   comments: number;
@@ -20,7 +36,6 @@ export interface PostItem {
 
   /**
    * PublicPost không trả commentCount.
-   * Đặt false để không hiện số 0 giả.
    */
   showCommentCount?: boolean;
 }
@@ -32,5 +47,6 @@ export interface PostItem {
   styleUrl: './post-card.css',
 })
 export class PostCard {
-  @Input({ required: true }) post!: PostItem;
+  @Input({ required: true })
+  post!: PostItem;
 }

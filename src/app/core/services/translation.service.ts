@@ -61,10 +61,49 @@ export class TranslationService {
       'hashtag.subtitle': 'Tìm kiếm các bài viết nổi bật được đánh tag tương ứng.',
       'category.all': 'Tất cả',
 
+      'hashtag.list_subtitle':
+        'Chọn một hashtag để xem các bài viết liên quan.',
+
+      'hashtag.selected_subtitle':
+        'Các bài viết được gắn hashtag này.',
+
+      'hashtag.back_to_all':
+        'Tất cả hashtag',
+
+      'hashtag.related_posts':
+        'Xem bài viết liên quan',
+
+      'hashtag.search_tags_placeholder':
+        'Tìm hashtag...',
+
+      'hashtag.search_posts_placeholder':
+        'Tìm bài viết trong hashtag này...',
+
+      'hashtag.load_error':
+        'Không tải được dữ liệu',
+
+      'hashtag.empty_tags':
+        'Không tìm thấy hashtag phù hợp.',
+
+      'hashtag.empty_posts':
+        'Không tìm thấy bài viết phù hợp với hashtag này.',
+
+      'common.retry':
+        'Thử lại',
+
+      'common.clear_search':
+        'Xóa tìm kiếm',
+
       // Post Card & Detail
       'post.read_time': 'phút đọc',
       'post.like': 'Thích',
       'post.save': 'Lưu',
+      'post.views': 'lượt xem',
+      'post.likes': 'lượt thích',
+      'post.not_found': 'Không tìm thấy bài viết.',
+      'post.invalid_id': 'ID bài viết không hợp lệ.',
+      'post.load_error': 'Không thể tải bài viết.',
+      'post.refreshing_language': 'Đang chuyển ngôn ngữ...',
 
       // Comments
       'comments.title': 'Bình luận',
@@ -73,6 +112,12 @@ export class TranslationService {
       'comments.reply': 'Trả lời',
       'comments.edit': 'Sửa',
       'comments.delete': 'Xóa',
+      'comments.empty': 'Chưa có bình luận nào.',
+      'comments.report': "Báo cáo bình luận",
+      'comments.load_error': 'Không thể tải bình luận.',
+
+      'common.backend_unreachable':
+        'Không kết nối được tới máy chủ.',
 
       // Auth
       'auth.login_tab': 'Đăng nhập',
@@ -210,8 +255,36 @@ export class TranslationService {
       'modal.add_user_title': 'Thêm người dùng mới',
       'modal.add_lang_title': 'Thêm ngôn ngữ hệ thống',
       'modal.delete_confirm': 'Bạn có chắc chắn muốn xóa bản ghi này không?',
+
+      'posts.load_error':
+        'Không tải được bài viết',
+
+      'posts.empty':
+        'Không tìm thấy bài viết phù hợp.',
+      'filter.oldest': 'Cũ nhất',
+      'filter.title_asc': 'Tiêu đề A–Z',
+      'comments.newest_first':
+        'Mới nhất trước',
+
+      'comments.oldest_first':
+        'Cũ nhất trước',
+
+
     },
     EN: {
+      'filter.oldest': 'Oldest',
+      'filter.title_asc': 'Title A–Z',
+      'comments.newest_first':
+        'Newest first',
+
+      'comments.oldest_first':
+        'Oldest first',
+      'posts.load_error':
+        'Unable to load posts',
+
+      'posts.empty':
+        'No matching posts found.',
+
       // Header & Nav
       'nav.posts': 'Posts',
       'nav.categories': 'Categories',
@@ -250,12 +323,52 @@ export class TranslationService {
       'category.subtitle': 'Explore articles by programming categories you care about.',
       'hashtag.title': '#Article Hashtags',
       'hashtag.subtitle': 'Find featured articles tagged accordingly.',
+
+      'hashtag.list_subtitle':
+        'Choose a hashtag to view related articles.',
+
+      'hashtag.selected_subtitle':
+        'Articles tagged with this hashtag.',
+
+      'hashtag.back_to_all':
+        'All hashtags',
+
+      'hashtag.related_posts':
+        'View related articles',
+
+      'hashtag.search_tags_placeholder':
+        'Search hashtags...',
+
+      'hashtag.search_posts_placeholder':
+        'Search posts in this hashtag...',
+
+      'hashtag.load_error':
+        'Unable to load data',
+
+      'hashtag.empty_tags':
+        'No matching hashtags found.',
+
+      'hashtag.empty_posts':
+        'No matching articles found for this hashtag.',
+
+      'common.retry':
+        'Try again',
+
+      'common.clear_search':
+        'Clear search',
       'category.all': 'All',
 
       // Post Card & Detail
       'post.read_time': 'min read',
       'post.like': 'Like',
       'post.save': 'Save',
+      'post.views': 'views',
+      'post.likes': 'likes',
+      'post.not_found': 'Post not found.',
+      'post.invalid_id': 'Invalid post ID.',
+      'post.load_error': 'Unable to load the post.',
+      'post.refreshing_language':
+        'Switching language...',
 
       // Comments
       'comments.title': 'Comments',
@@ -264,6 +377,14 @@ export class TranslationService {
       'comments.reply': 'Reply',
       'comments.edit': 'Edit',
       'comments.delete': 'Delete',
+      'comments.empty': 'No comments yet.',
+      'comments.report': 'Report comment',
+
+      'comments.load_error':
+        'Unable to load comments.',
+
+      'common.backend_unreachable':
+        'Unable to connect to the server.',
 
       // Auth
       'auth.login_tab': 'Log In',

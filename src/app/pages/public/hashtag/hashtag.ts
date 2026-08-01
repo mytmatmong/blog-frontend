@@ -4,18 +4,32 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { HttpErrorResponse } from '@angular/common/http';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
+import {
+  HttpErrorResponse,
+} from '@angular/common/http';
+
+import {
+  ActivatedRoute,
+  Router,
+} from '@angular/router';
+
+import {
+  takeUntilDestroyed,
+  toObservable,
+} from '@angular/core/rxjs-interop';
 
 import {
   debounceTime,
   distinctUntilChanged,
+  skip,
   Subject,
 } from 'rxjs';
 
 import {
   FilterSortOption,
+  getPostSortQuery,
+  isFilterSortOption,
   PublicSidebarLeft,
 } from '../../../shared/components/public-sidebar-left/public-sidebar-left';
 
@@ -27,14 +41,21 @@ import {
 } from '../../../shared/components/post-card/post-card';
 
 import { Pagination } from '../../../shared/components/pagination/pagination';
+
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 
 import { PublicApiService } from '../../../core/services/public-api.service';
+
 import { TranslationService } from '../../../core/services/translation.service';
-import { PublicPost } from '../../../core/models/post.model';
+
+import {
+  PublicPost,
+  TagItem,
+} from '../../../core/models/post.model';
 
 @Component({
   selector: 'app-hashtag',
+
   imports: [
     PublicSidebarLeft,
     PublicSidebarRight,
@@ -42,11 +63,16 @@ import { PublicPost } from '../../../core/models/post.model';
     Pagination,
     TranslatePipe,
   ],
+
   templateUrl: './hashtag.html',
   styleUrl: './hashtag.css',
 })
 export class Hashtag {
-  private readonly route = inject(ActivatedRoute);
+  private readonly route =
+    inject(ActivatedRoute);
+
+  private readonly router =
+    inject(Router);
 
   private readonly publicApiService =
     inject(PublicApiService);
@@ -57,7 +83,14 @@ export class Hashtag {
   private readonly searchChanges =
     new Subject<string>();
 
-  readonly posts = signal<PostItem[]>([]);
+  private initialized = false;
+  private requestVersion = 0;
+
+  readonly tags =
+    signal<TagItem[]>([]);
+
+  readonly posts =
+    signal<PostItem[]>([]);
 
   readonly selectedTagId =
     signal<number | null>(null);
@@ -65,49 +98,110 @@ export class Hashtag {
   readonly selectedTagName =
     signal<string | null>(null);
 
-  readonly currentPage = signal(1);
-  readonly totalItems = signal(0);
-  readonly totalPages = signal(1);
+  readonly currentPage =
+    signal(1);
 
-  readonly searchTerm = signal('');
+  readonly totalItems =
+    signal(0);
+
+  readonly totalPages =
+    signal(1);
+
+  readonly searchTerm =
+    signal('');
 
   readonly activeFilter =
     signal<FilterSortOption>('latest');
 
-  readonly isLoading = signal(false);
+  readonly isLoading =
+    signal(false);
 
   readonly errorMessage =
     signal<string | null>(null);
 
   readonly itemsPerPage = 10;
 
-  /**
-   * Backend hiện chưa hỗ trợ query sort.
-   * Hai bộ lọc này chỉ sắp xếp các bài trong trang hiện tại.
-   */
-  readonly visiblePosts = computed(() => {
-    const posts = [...this.posts()];
+  readonly isTagSelected =
+    computed(
+      () =>
+        this.selectedTagId() !==
+        null ||
+        Boolean(
+          this.selectedTagName(),
+        ),
+    );
 
-    switch (this.activeFilter()) {
-      case 'mostViewed':
-        return posts.sort(
-          (first, second) =>
-            second.views - first.views,
-        );
+  readonly searchPlaceholder =
+    computed(() => {
+      const key =
+        this.isTagSelected()
+          ? 'hashtag.search_posts_placeholder'
+          : 'hashtag.search_tags_placeholder';
 
-      case 'mostLiked':
-        return posts.sort(
-          (first, second) =>
-            second.likes - first.likes,
-        );
-
-      case 'latest':
-      default:
-        return posts;
-    }
-  });
+      return this.translationService
+        .translate(key);
+    });
 
   constructor() {
+    this.route.queryParamMap
+      .pipe(takeUntilDestroyed())
+      .subscribe((params) => {
+        const tagId =
+          this.parsePositiveInteger(
+            params.get('tagId'),
+          );
+
+        const tagName =
+          params
+            .get('tagName')
+            ?.trim() || null;
+
+        const page =
+          this.parsePositiveInteger(
+            params.get('page'),
+          ) ?? 1;
+
+        const search =
+          params.get('search')?.trim() ??
+          '';
+
+        const sortParam =
+          params.get('sort');
+
+        const sort =
+          isFilterSortOption(sortParam)
+            ? sortParam
+            : 'latest';
+
+        const stateChanged =
+          tagId !==
+          this.selectedTagId() ||
+          tagName !==
+          this.selectedTagName() ||
+          page !==
+          this.currentPage() ||
+          search !==
+          this.searchTerm() ||
+          sort !==
+          this.activeFilter();
+
+        this.selectedTagId.set(tagId);
+        this.selectedTagName.set(
+          tagName,
+        );
+
+        this.currentPage.set(page);
+        this.searchTerm.set(search);
+        this.activeFilter.set(sort);
+
+        if (
+          this.initialized &&
+          stateChanged
+        ) {
+          this.loadCurrentMode();
+        }
+      });
+
     this.searchChanges
       .pipe(
         debounceTime(350),
@@ -115,49 +209,150 @@ export class Hashtag {
         takeUntilDestroyed(),
       )
       .subscribe((value) => {
-        this.searchTerm.set(value);
-        this.currentPage.set(1);
-        this.loadPosts();
+        const normalized =
+          value.trim();
+
+        this.updateQueryParams({
+          search:
+            normalized || null,
+          page: 1,
+        });
       });
 
-    this.route.queryParamMap
-      .pipe(takeUntilDestroyed())
-      .subscribe((params) => {
-        const rawTagId =
-          params.get('tagId');
+    toObservable(
+      this.translationService.currentLang,
+    )
+      .pipe(
+        skip(1),
+        distinctUntilChanged(),
+        takeUntilDestroyed(),
+      )
+      .subscribe(() => {
+        if (
+          this.currentPage() !== 1
+        ) {
+          this.updateQueryParams({
+            page: 1,
+          });
+        } else {
+          this.loadCurrentMode();
+        }
+      });
 
-        const parsedTagId = rawTagId
-          ? Number(rawTagId)
-          : null;
+    queueMicrotask(() => {
+      this.initialized = true;
+      this.loadCurrentMode();
+    });
+  }
 
-        const tagName =
-          params.get('tagName')?.trim() ||
-          null;
+  loadCurrentMode(): void {
+    if (this.isTagSelected()) {
+      this.loadPosts();
+    } else {
+      this.loadTags();
+    }
+  }
 
-        const validTagId =
-          parsedTagId !== null &&
-            Number.isInteger(parsedTagId) &&
-            parsedTagId > 0
-            ? parsedTagId
-            : null;
+  loadTags(): void {
+    const requestVersion =
+      ++this.requestVersion;
 
-        this.selectedTagId.set(validTagId);
-        this.selectedTagName.set(tagName);
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
 
-        this.currentPage.set(1);
-        this.loadPosts();
+    this.posts.set([]);
+
+    this.publicApiService
+      .getTags({
+        search:
+          this.searchTerm().trim() ||
+          undefined,
+
+        page:
+          this.currentPage(),
+
+        limit:
+          this.itemsPerPage,
+
+        sortBy: 'name',
+        sortOrder: 'asc',
+      })
+      .subscribe({
+        next: (response) => {
+          if (
+            requestVersion !==
+            this.requestVersion
+          ) {
+            return;
+          }
+
+          const data = response.data;
+
+          this.tags.set(data.items);
+
+          this.totalItems.set(
+            data.meta.totalItems,
+          );
+
+          this.totalPages.set(
+            Math.max(
+              1,
+              data.meta.totalPages,
+            ),
+          );
+
+          this.currentPage.set(
+            data.meta.currentPage,
+          );
+
+          this.isLoading.set(false);
+        },
+
+        error: (error: unknown) => {
+          if (
+            requestVersion !==
+            this.requestVersion
+          ) {
+            return;
+          }
+
+          this.tags.set([]);
+          this.totalItems.set(0);
+          this.totalPages.set(1);
+          this.isLoading.set(false);
+
+          this.errorMessage.set(
+            this.getErrorMessage(
+              error,
+              this.translationService
+                .translate(
+                  'hashtag.load_error',
+                ),
+            ),
+          );
+        },
       });
   }
 
   loadPosts(): void {
+    const requestVersion =
+      ++this.requestVersion;
+
     this.isLoading.set(true);
     this.errorMessage.set(null);
+
+    this.tags.set([]);
 
     const tagId =
       this.selectedTagId();
 
     const tagName =
       this.selectedTagName();
+
+    const sort =
+      getPostSortQuery(
+        this.activeFilter(),
+      );
 
     this.publicApiService
       .getPosts({
@@ -168,21 +363,32 @@ export class Hashtag {
         tagId:
           tagId ?? undefined,
 
-        /**
-         * Nếu có tagId thì ưu tiên tagId,
-         * không gửi thêm tagName.
-         */
         tagName:
           tagId === null
             ? tagName ?? undefined
             : undefined,
 
-        lang: this.currentLanguageCode(),
-        page: this.currentPage(),
-        limit: this.itemsPerPage,
+        page:
+          this.currentPage(),
+
+        limit:
+          this.itemsPerPage,
+
+        sortBy:
+          sort.sortBy,
+
+        sortOrder:
+          sort.sortOrder,
       })
       .subscribe({
         next: (response) => {
+          if (
+            requestVersion !==
+            this.requestVersion
+          ) {
+            return;
+          }
+
           const data = response.data;
 
           this.posts.set(
@@ -196,7 +402,10 @@ export class Hashtag {
           );
 
           this.totalPages.set(
-            data.meta.totalPages,
+            Math.max(
+              1,
+              data.meta.totalPages,
+            ),
           );
 
           this.currentPage.set(
@@ -207,16 +416,49 @@ export class Hashtag {
         },
 
         error: (error: unknown) => {
+          if (
+            requestVersion !==
+            this.requestVersion
+          ) {
+            return;
+          }
+
           this.posts.set([]);
           this.totalItems.set(0);
           this.totalPages.set(1);
           this.isLoading.set(false);
 
           this.errorMessage.set(
-            this.getErrorMessage(error),
+            this.getErrorMessage(
+              error,
+              this.translationService
+                .translate(
+                  'posts.load_error',
+                ),
+            ),
           );
         },
       });
+  }
+
+  selectTag(tag: TagItem): void {
+    this.updateQueryParams({
+      tagId: tag.id,
+      tagName: tag.name,
+      search: null,
+      page: 1,
+      sort: 'latest',
+    });
+  }
+
+  showAllTags(): void {
+    this.updateQueryParams({
+      tagId: null,
+      tagName: null,
+      search: null,
+      page: 1,
+      sort: 'latest',
+    });
   }
 
   onSearchChange(value: string): void {
@@ -224,15 +466,23 @@ export class Hashtag {
   }
 
   clearSearch(): void {
-    this.searchTerm.set('');
-    this.currentPage.set(1);
     this.searchChanges.next('');
   }
 
   onFilterChange(
     filter: FilterSortOption,
   ): void {
-    this.activeFilter.set(filter);
+    if (
+      !this.isTagSelected() ||
+      filter === this.activeFilter()
+    ) {
+      return;
+    }
+
+    this.updateQueryParams({
+      sort: filter,
+      page: 1,
+    });
   }
 
   onPageChange(page: number): void {
@@ -244,10 +494,13 @@ export class Hashtag {
       return;
     }
 
-    this.currentPage.set(page);
-    this.loadPosts();
+    this.updateQueryParams({
+      page,
+    });
 
-    if (typeof window !== 'undefined') {
+    if (
+      typeof window !== 'undefined'
+    ) {
       window.scrollTo({
         top: 0,
         behavior: 'smooth',
@@ -255,29 +508,43 @@ export class Hashtag {
     }
   }
 
+  private updateQueryParams(
+    queryParams: {
+      tagId?: number | null;
+      tagName?: string | null;
+      search?: string | null;
+      page?: number;
+      sort?: FilterSortOption;
+    },
+  ): void {
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams,
+      queryParamsHandling: 'merge',
+    });
+  }
+
   private mapToPostItem(
     post: PublicPost,
   ): PostItem {
-    const plainContent =
-      this.stripHtml(post.content);
-
     return {
       id: post.id,
       authorId: post.authorId,
       title: post.title,
 
       excerpt:
-        plainContent.length > 150
-          ? `${plainContent.slice(0, 150)}...`
-          : plainContent,
+        this.buildExcerpt(post),
 
       authorName:
         post.author.username,
 
       authorAvatar:
-        post.author.username
-          .charAt(0)
-          .toUpperCase(),
+        this.getAvatarInitial(
+          post.author.username,
+        ),
+
+      authorAvatarUrl:
+        post.author.avatarUrl,
 
       timeAgo:
         this.formatDate(
@@ -287,27 +554,26 @@ export class Hashtag {
 
       readTime:
         this.calculateReadTime(
-          plainContent,
+          post.content,
         ),
 
       categories:
         post.categories.map(
-          (category) => category.name,
+          (category) => ({
+            id: category.id,
+            name: category.name,
+          }),
         ),
 
       tags:
-        post.tags.map((tag) =>
-          tag.name.startsWith('#')
-            ? tag.name
-            : `#${tag.name}`,
-        ),
+        post.tags.map((tag) => ({
+          id: tag.id,
+          name: tag.name,
+        })),
 
       likes: post.likeCount,
       views: post.viewCount,
 
-      /**
-       * PublicPost không trả commentCount.
-       */
       comments: 0,
       showCommentCount: false,
 
@@ -316,38 +582,156 @@ export class Hashtag {
     };
   }
 
-  private stripHtml(content: string): string {
-    return content
-      .replace(/<[^>]*>/g, ' ')
+  private buildExcerpt(
+    post: PublicPost,
+    maxLength = 150,
+  ): string {
+    const title =
+      post.title
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    let content =
+      this.extractPlainText(
+        post.content,
+      );
+
+    if (
+      content
+        .toLocaleLowerCase()
+        .startsWith(
+          title.toLocaleLowerCase(),
+        )
+    ) {
+      content = content
+        .slice(title.length)
+        .replace(
+          /^[\s:;,.|–—-]+/,
+          '',
+        )
+        .trim();
+    }
+
+    if (
+      content.length <= maxLength
+    ) {
+      return content;
+    }
+
+    return `${content
+      .slice(0, maxLength)
+      .trimEnd()}…`;
+  }
+
+  private calculateReadTime(
+    htmlContent: string,
+  ): string {
+    const plainText =
+      this.extractPlainText(
+        htmlContent,
+      );
+
+    const wordCount =
+      plainText
+        .split(/\s+/)
+        .filter(Boolean)
+        .length;
+
+    const wordsPerMinute =
+      this.currentLanguageCode() ===
+        'en'
+        ? 200
+        : 180;
+
+    const minutes = Math.max(
+      1,
+      Math.ceil(
+        wordCount /
+        wordsPerMinute,
+      ),
+    );
+
+    const label =
+      this.translationService
+        .translate(
+          'post.read_time',
+        )
+        .trim();
+
+    if (
+      label.includes('{count}')
+    ) {
+      return label.replace(
+        '{count}',
+        String(minutes),
+      );
+    }
+
+    return `${minutes} ${label}`;
+  }
+
+  private extractPlainText(
+    htmlContent: string,
+  ): string {
+    if (!htmlContent) {
+      return '';
+    }
+
+    if (
+      typeof DOMParser !==
+      'undefined'
+    ) {
+      const document =
+        new DOMParser()
+          .parseFromString(
+            htmlContent,
+            'text/html',
+          );
+
+      document
+        .querySelectorAll(
+          'script, style, noscript',
+        )
+        .forEach((element) =>
+          element.remove(),
+        );
+
+      return (
+        document.body.textContent ??
+        ''
+      )
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    return htmlContent
+      .replace(
+        /<(script|style|noscript)[^>]*>[\s\S]*?<\/\1>/gi,
+        ' ',
+      )
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&nbsp;/gi, ' ')
+      .replace(/&amp;/gi, '&')
       .replace(/\s+/g, ' ')
       .trim();
   }
 
-  private calculateReadTime(
-    content: string,
+  private formatDate(
+    value: string,
   ): string {
-    const wordCount = content
-      .split(/\s+/)
-      .filter(Boolean)
-      .length;
-
-    const minutes = Math.max(
-      1,
-      Math.ceil(wordCount / 200),
-    );
-
-    return `${minutes} phút đọc`;
-  }
-
-  private formatDate(value: string): string {
     const date = new Date(value);
 
-    if (Number.isNaN(date.getTime())) {
-      return 'Gần đây';
+    if (
+      Number.isNaN(
+        date.getTime(),
+      )
+    ) {
+      return '';
     }
 
     return date.toLocaleDateString(
-      this.currentLanguageCode() === 'en'
+      this.currentLanguageCode() ===
+        'en'
         ? 'en-US'
         : 'vi-VN',
       {
@@ -358,17 +742,47 @@ export class Hashtag {
     );
   }
 
+  private getAvatarInitial(
+    name?: string | null,
+  ): string {
+    return (
+      name
+        ?.trim()
+        .charAt(0)
+        .toUpperCase() || 'A'
+    );
+  }
+
   private currentLanguageCode(): string {
     return this.translationService
       .currentLang()
       .toLowerCase();
   }
 
+  private parsePositiveInteger(
+    value: string | null,
+  ): number | null {
+    if (!value) {
+      return null;
+    }
+
+    const parsed = Number(value);
+
+    return (
+      Number.isInteger(parsed) &&
+      parsed > 0
+    )
+      ? parsed
+      : null;
+  }
+
   private getErrorMessage(
     error: unknown,
+    fallback: string,
   ): string {
     if (
-      error instanceof HttpErrorResponse
+      error instanceof
+      HttpErrorResponse
     ) {
       const message: unknown =
         error.error?.message;
@@ -377,17 +791,23 @@ export class Hashtag {
         return message.join(', ');
       }
 
-      if (typeof message === 'string') {
+      if (
+        typeof message ===
+        'string'
+      ) {
         return message;
       }
 
       if (error.status === 0) {
-        return 'Không kết nối được tới backend.';
+        return this.translationService
+          .translate(
+            'common.backend_unreachable',
+          );
       }
 
-      return `Không tải được bài viết. HTTP ${error.status}.`;
+      return `${fallback} HTTP ${error.status}.`;
     }
 
-    return 'Không thể tải bài viết theo hashtag.';
+    return fallback;
   }
 }

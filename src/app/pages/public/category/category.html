@@ -3,11 +3,17 @@
     class="p-6 mb-6 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 card-box shadow-sm space-y-4">
     <div>
       <h1 class="font-bold text-2xl text-aquamarine-950 dark:text-aquamarine-50 mb-2">
-        {{ 'category.title' | translate }}
+        {{
+        'category.title'
+        | translate
+        }}
       </h1>
 
       <p class="text-sm text-aquamarine-600 dark:text-aquamarine-400">
-        {{ 'category.subtitle' | translate }}
+        {{
+        'category.subtitle'
+        | translate
+        }}
       </p>
     </div>
 
@@ -18,7 +24,10 @@
         " [class.text-white]="
           selectedCategoryId() === null
         " (click)="selectCategory(null)">
-        {{ 'category.all' | translate }}
+        {{
+        'category.all'
+        | translate
+        }}
       </button>
 
       @if (isLoadingCategories()) {
@@ -43,7 +52,9 @@
               selectedCategoryId() ===
               category.id
             " (click)="
-              selectCategory(category.id)
+              selectCategory(
+                category.id
+              )
             ">
         {{ category.name }}
       </button>
@@ -56,16 +67,37 @@
       {{ categoriesErrorMessage() }}
 
       <button type="button" class="ms-2 underline" (click)="loadCategories()">
-        Thử lại
+        {{
+        'common.retry'
+        | translate
+        }}
       </button>
     </div>
     }
   </section>
 
+  <div class="lg:hidden mb-4">
+    <div class="relative">
+      <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-aquamarine-500" aria-hidden="true"></i>
+
+      <input type="search"
+        class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 py-3 ps-10 pe-4"
+        [placeholder]="
+          'search.placeholder_posts'
+            | translate
+        " [value]="searchTerm()" (input)="
+          onSidebarSearchChange(
+            $any($event.target).value
+          )
+        " />
+    </div>
+  </div>
+
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-    <app-public-sidebar-left class="hidden lg:block lg:col-span-3" [activeFilter]="activeFilter()" (filterChange)="
+    <app-public-sidebar-left class="hidden lg:block lg:col-span-3" [showFilters]="true" [activeFilter]="activeFilter()"
+      [searchTerm]="searchTerm()" (filterChange)="
         onFilterChange($event)
-      " [searchTerm]="searchTerm()" (searchChange)="
+      " (searchChange)="
         onSidebarSearchChange($event)
       ">
     </app-public-sidebar-left>
@@ -83,7 +115,10 @@
       <div
         class="p-6 rounded-2xl border border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300">
         <p class="font-semibold">
-          Không tải được bài viết
+          {{
+          'posts.load_error'
+          | translate
+          }}
         </p>
 
         <p class="text-sm mt-1">
@@ -92,14 +127,17 @@
 
         <button type="button" class="mt-4 px-3 py-1.5 rounded-lg border border-red-300 dark:border-red-800"
           (click)="loadPosts()">
-          Thử lại
+          {{
+          'common.retry'
+          | translate
+          }}
         </button>
       </div>
       } @else if (
-      visiblePosts().length > 0
+      posts().length > 0
       ) {
       @for (
-      post of visiblePosts();
+      post of posts();
       track post.id
       ) {
       <app-post-card [post]="post"></app-post-card>
@@ -115,15 +153,21 @@
       } @else {
       <div
         class="p-8 text-center rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900">
-        <i class="bi bi-folder2-open text-4xl text-aquamarine-400"></i>
+        <i class="bi bi-folder2-open text-4xl text-aquamarine-400" aria-hidden="true"></i>
 
         <p class="mt-3 text-aquamarine-600 dark:text-aquamarine-400">
-          Không tìm thấy bài viết nào thuộc danh mục này.
+          {{
+          'category.empty_posts'
+          | translate
+          }}
         </p>
 
         @if (searchTerm()) {
         <button type="button" class="mt-4 px-4 py-2 rounded-xl bg-aquamarine-600 text-white" (click)="clearSearch()">
-          Xóa tìm kiếm
+          {{
+          'common.clear_search'
+          | translate
+          }}
         </button>
         }
       </div>

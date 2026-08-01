@@ -1,50 +1,76 @@
 <article
   class="p-5 mb-4 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 card-box shadow-sm hover:shadow-md transition-shadow">
   <div class="flex gap-4">
-    <div class="hidden sm:flex flex-col items-center justify-center gap-1 w-12 flex-shrink-0">
-      <button
-        class="p-1 rounded-lg text-aquamarine-600 dark:text-aquamarine-300 hover:bg-aquamarine-100 dark:hover:bg-aquamarine-800 transition-colors">
-        <i class="bi bi-caret-up-fill"></i>
-      </button>
-      <div class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-100">{{ post.likes }}</div>
-      <button
-        class="p-1 rounded-lg text-aquamarine-600 dark:text-aquamarine-300 hover:bg-aquamarine-100 dark:hover:bg-aquamarine-800 transition-colors">
+    <!-- Public hiện chưa gọi User API like/bookmark,
+         nên không dùng button giả có thể click -->
+    <div class="hidden sm:flex flex-col items-center justify-center gap-2 w-12 flex-shrink-0">
+      <span class="p-1 text-aquamarine-600 dark:text-aquamarine-300" title="Lượt thích">
+        <i class="bi bi-heart-fill"></i>
+      </span>
+
+      <div class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-100">
+        {{ post.likes }}
+      </div>
+
+      <span class="p-1 text-aquamarine-500 dark:text-aquamarine-400" title="Lưu bài viết yêu cầu đăng nhập">
         <i class="bi bi-bookmark"></i>
-      </button>
+      </span>
     </div>
 
     <div
       class="hidden md:flex w-28 h-20 rounded-xl bg-aquamarine-100 dark:bg-aquamarine-800 items-center justify-center flex-shrink-0 overflow-hidden">
       @if (post.thumbnailUrl) {
-      <img [src]="post.thumbnailUrl" [alt]="post.title" class="w-full h-full object-cover" loading="lazy" />
+      <img [src]="post.thumbnailUrl" [alt]="post.title" class="w-full h-full object-cover" loading="lazy" width="112"
+        height="80" />
       } @else {
       <i class="bi bi-code-slash text-2xl text-aquamarine-600 dark:text-aquamarine-300"></i>
       }
     </div>
 
-    <div class="flex-grow">
-      <div class="flex items-center gap-2 mb-2">
-        <a [routerLink]="['/author', post.authorId || 1]"
+    <div class="flex-grow min-w-0">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <a [routerLink]="['/author', post.authorId]"
           class="flex items-center gap-2 group hover:opacity-80 transition-opacity">
-          <span class="avatar-sm">{{ post.authorAvatar }}</span>
-          <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400 group-hover:underline font-semibold">{{
-            post.authorName }}</small>
+          @if (post.authorAvatarUrl) {
+          <img [src]="post.authorAvatarUrl" [alt]="post.authorName"
+            class="w-7 h-7 rounded-full object-cover border border-aquamarine-200 dark:border-aquamarine-700"
+            loading="lazy" width="28" height="28" />
+          } @else {
+          <span class="avatar-sm">
+            {{ post.authorAvatar }}
+          </span>
+          }
+
+          <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400 group-hover:underline font-semibold">
+            {{ post.authorName }}
+          </small>
         </a>
-        <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400">• {{ post.timeAgo }} • {{ post.readTime
-          }}</small>
+
+        <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400">
+          • {{ post.timeAgo }} • {{ post.readTime }}
+        </small>
       </div>
 
-      <div class="mb-2">
-        @for (cat of post.categories; track cat) {
-        <a routerLink="/category" class="category-badge me-1">{{ cat }}</a>
+      @if (post.categories.length > 0) {
+      <div class="mb-2 flex flex-wrap gap-1">
+        @for (
+        category of post.categories;
+        track category.id
+        ) {
+        <a routerLink="/category" [queryParams]="{
+                categoryId: category.id
+              }" class="category-badge">
+          {{ category.name }}
+        </a>
         }
       </div>
+      }
 
-      <h5 class="font-bold text-lg mb-2">
+      <h2 class="font-bold text-lg mb-2">
         <a [routerLink]="['/post', post.id]" class="card-text transition-colors">
           {{ post.title }}
         </a>
-      </h5>
+      </h2>
 
       <p class="text-sm opacity-90 mb-3 line-clamp-2">
         {{ post.excerpt }}
@@ -52,15 +78,27 @@
 
       <div class="flex flex-wrap justify-between items-center gap-2">
         <div class="flex flex-wrap gap-2">
-          @for (tag of post.tags; track tag) {
-          <a class="tag" routerLink="/hashtag">{{ tag }}</a>
+          @for (tag of post.tags; track tag.id) {
+          <a class="tag" routerLink="/hashtag" [queryParams]="{
+                tagId: tag.id,
+                tagName: tag.name
+              }">
+            #{{ tag.name }}
+          </a>
           }
         </div>
 
         <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400 flex items-center gap-2">
-          <span><i class="bi bi-eye me-1"></i>{{ post.views }}</span>
+          <span>
+            <i class="bi bi-eye me-1"></i>
+            {{ post.views }}
+          </span>
+
           @if (post.showCommentCount ?? true) {
-          <span><i class="bi bi-chat me-1"></i>{{ post.comments }}</span>
+          <span>
+            <i class="bi bi-chat me-1"></i>
+            {{ post.comments }}
+          </span>
           }
         </small>
       </div>
