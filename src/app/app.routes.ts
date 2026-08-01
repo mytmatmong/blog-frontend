@@ -12,6 +12,8 @@ import { AuthorDetailComponent } from './pages/public/author-detail/author-detai
 
 import { Profile } from './pages/account/profile/profile';
 import { RequestBlogOwner } from './pages/account/request-blog-owner/request-blog-owner';
+import { AccountLibrary } from './pages/account/library/library';
+import { AccountConnections } from './pages/account/connections/connections';
 
 import { DashboardAuth } from './pages/dashboard/dashboard-auth/dashboard-auth';
 
@@ -43,8 +45,10 @@ export const routes: Routes = [
       { path: 'author/:id', component: AuthorDetailComponent },
       { path: 'category', component: Category },
       { path: 'hashtag', component: Hashtag },
-      { path: 'account/profile', component: Profile },
-      { path: 'account/request-blog-owner', component: RequestBlogOwner },
+      { path: 'account/profile', component: Profile, canActivate: [roleGuard('user')] },
+      { path: 'account/request-blog-owner', component: RequestBlogOwner, canActivate: [roleGuard('user')] },
+      { path: 'account/library', component: AccountLibrary, canActivate: [roleGuard('user')] },
+      { path: 'account/connections', component: AccountConnections, canActivate: [roleGuard('user')] },
     ],
   },
   // Standalone Auth for Dashboard

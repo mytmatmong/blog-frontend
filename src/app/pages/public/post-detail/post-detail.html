@@ -2,382 +2,212 @@
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
     <div class="lg:col-span-9">
       @if (isLoading()) {
-      <article
-        class="p-6 lg:p-8 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm animate-pulse space-y-4"
-        aria-busy="true">
-        <div class="h-8 bg-aquamarine-200 dark:bg-aquamarine-800 rounded w-3/4"></div>
-
-        <div class="h-4 bg-aquamarine-200 dark:bg-aquamarine-800 rounded w-1/3"></div>
-
-        <div class="h-64 bg-aquamarine-200 dark:bg-aquamarine-800 rounded w-full"></div>
-      </article>
-      } @else if (
-      post();
-      as currentPost
-      ) {
-      <article
-        class="relative p-6 lg:p-8 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-        <!-- Trạng thái đổi ngôn ngữ -->
-        @if (
-        isRefreshingLanguage()
-        ) {
-        <div
-          class="mb-5 flex items-center gap-2 rounded-xl border border-aquamarine-200 dark:border-aquamarine-700 bg-aquamarine-50 dark:bg-aquamarine-950/40 px-4 py-2 text-sm text-aquamarine-700 dark:text-aquamarine-300"
-          role="status" aria-live="polite">
-          <span
-            class="inline-block h-4 w-4 rounded-full border-2 border-aquamarine-300 border-t-aquamarine-600 animate-spin"
-            aria-hidden="true"></span>
-
-          {{
-          'post.refreshing_language'
-          | translate
-          }}
-        </div>
-        }
-
-        <!-- Đổi ngôn ngữ lỗi nhưng vẫn giữ bài cũ -->
-        @if (
-        errorMessage() &&
-        !isRefreshingLanguage()
-        ) {
-        <div
-          class="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 px-4 py-3 text-sm text-amber-800 dark:text-amber-300"
-          role="alert">
-          <span>
-            {{ errorMessage() }}
-          </span>
-
-          <button type="button" class="font-semibold underline" (click)="retryPost()">
-            {{
-            'common.retry'
-            | translate
-            }}
-          </button>
-        </div>
-        }
-
-        <!-- Tác giả -->
-        <div class="flex items-center gap-3 mb-4">
-          <a [routerLink]="[
-                '/author',
-                currentPost.authorId
-              ]" class="flex items-center gap-3 group hover:opacity-80 transition-opacity">
-            @if (
-            currentPost.author
-            .avatarUrl
-            ) {
-            <img [src]="
-                    currentPost.author
-                      .avatarUrl
-                  " [alt]="
-                    currentPost.author
-                      .username
-                  " class="w-10 h-10 rounded-full object-cover border border-aquamarine-300" width="40" height="40" />
-            } @else {
-            <span
-              class="w-10 h-10 rounded-full bg-aquamarine-600 text-white font-bold flex items-center justify-center text-sm"
-              aria-hidden="true">
-              {{
-              getAvatarInitial(
-              currentPost.author
-              .username
-              )
-              }}
-            </span>
-            }
-
-            <div>
-              <div class="font-semibold text-sm text-aquamarine-950 dark:text-aquamarine-50">
-                {{
-                currentPost.author
-                .username
-                }}
-              </div>
-
-              <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400">
-                {{
-                formatDate(
-                currentPost.publishedAt ??
-                currentPost.createdAt
-                )
-                }}
-
-                <span aria-hidden="true">
-                  •
-                </span>
-
-                {{
-                currentPost.viewCount
-                }}
-
-                {{
-                'post.views'
-                | translate
-                }}
-              </small>
+        <article class="p-6 lg:p-8 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm animate-pulse space-y-4">
+          <div class="h-8 bg-aquamarine-200 dark:bg-aquamarine-800 rounded w-3/4"></div>
+          <div class="h-4 bg-aquamarine-200 dark:bg-aquamarine-800 rounded w-1/3"></div>
+          <div class="h-64 bg-aquamarine-200 dark:bg-aquamarine-800 rounded w-full"></div>
+        </article>
+      } @else if (post(); as currentPost) {
+        <article class="relative p-6 lg:p-8 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
+          @if (isRefreshingLanguage()) {
+            <div class="mb-5 flex items-center gap-2 rounded-xl border border-aquamarine-200 bg-aquamarine-50 px-4 py-2 text-sm text-aquamarine-700">
+              <span class="inline-block h-4 w-4 rounded-full border-2 border-aquamarine-300 border-t-aquamarine-600 animate-spin"></span>
+              {{ 'post.refreshing_language' | translate }}
             </div>
-          </a>
-        </div>
-
-        <!-- Tiêu đề -->
-        <h1 class="font-bold text-2xl lg:text-3xl text-aquamarine-950 dark:text-aquamarine-50 mb-4">
-          {{ currentPost.title }}
-        </h1>
-
-        <!-- Danh mục -->
-        @if (
-        currentPost.categories
-        .length > 0
-        ) {
-        <div class="flex flex-wrap gap-2 mb-3">
-          @for (
-          category of
-          currentPost.categories;
-          track category.id
-          ) {
-          <a class="category-badge" routerLink="/category" [queryParams]="{
-                    categoryId:
-                      category.id
-                  }">
-            {{ category.name }}
-          </a>
           }
-        </div>
-        }
 
-        <!-- Hashtag -->
-        @if (
-        currentPost.tags.length > 0
-        ) {
-        <div class="flex flex-wrap gap-2 mb-6">
-          @for (
-          tag of
-          currentPost.tags;
-          track tag.id
-          ) {
-          <a class="tag" routerLink="/hashtag" [queryParams]="{
-                    tagId: tag.id,
-                    tagName: tag.name
-                  }">
-            #{{ tag.name }}
-          </a>
+          @if (errorMessage() && !isRefreshingLanguage()) {
+            <div class="mb-5 flex items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+              <span>{{ errorMessage() }}</span>
+              <button type="button" class="font-semibold underline" (click)="retryPost()">{{ 'common.retry' | translate }}</button>
+            </div>
           }
-        </div>
-        }
 
-        <!-- Ảnh đại diện bài -->
-        @if (
-        currentPost.thumbnailUrl
-        ) {
-        <div class="mb-6 rounded-2xl overflow-hidden max-h-96">
-          <img [src]="
-                  currentPost.thumbnailUrl
-                " [alt]="
-                  currentPost.title
-                " class="w-full h-auto object-cover" loading="eager" />
-        </div>
-        }
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <a [routerLink]="['/author', currentPost.authorId]" class="flex items-center gap-3 group hover:opacity-80">
+              @if (currentPost.author.avatarUrl) {
+                <img [src]="currentPost.author.avatarUrl" [alt]="currentPost.author.username" class="w-10 h-10 rounded-full object-cover border border-aquamarine-300" />
+              } @else {
+                <span class="w-10 h-10 rounded-full bg-aquamarine-600 text-white font-bold flex items-center justify-center text-sm">{{ getAvatarInitial(currentPost.author.username) }}</span>
+              }
+              <div>
+                <div class="font-semibold text-sm">{{ currentPost.author.username }}</div>
+                <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400">
+                  {{ formatDate(currentPost.publishedAt ?? currentPost.createdAt) }} • {{ currentPost.viewCount }} {{ 'post.views' | translate }}
+                </small>
+              </div>
+            </a>
 
-        <!-- Nội dung HTML -->
-        <div class="prose dark:prose-invert max-w-none text-aquamarine-950 dark:text-aquamarine-50" [innerHTML]="
-              currentPost.content
-            "></div>
+            @if (isAuthenticated() && currentUserId() !== currentPost.authorId) {
+              <button type="button" class="btn-tertiary text-amber-700" (click)="openPostReport()">
+                <i class="bi bi-flag me-1"></i>{{ 'post.report' | translate }}
+              </button>
+            }
+          </div>
 
-        <!-- Media phụ -->
-        @if (
-        currentPost.media.length >
-        0
-        ) {
-        <div class="mt-6 space-y-4">
-          @for (
-          item of
-          currentPost.media;
-          track item.id
-          ) {
-          @if (
-          item.mediaType ===
-          'IMAGE'
-          ) {
-          <img [src]="item.mediaUrl" [alt]="
-                      currentPost.title
-                    " class="max-w-full rounded-xl" loading="lazy" />
-          } @else {
-          <video [src]="item.mediaUrl" controls preload="metadata" class="w-full rounded-xl"></video>
+          <h1 class="font-bold text-2xl lg:text-3xl text-aquamarine-950 dark:text-aquamarine-50 mb-4">{{ currentPost.title }}</h1>
+
+          @if (currentPost.categories.length > 0) {
+            <div class="flex flex-wrap gap-2 mb-3">
+              @for (category of currentPost.categories; track category.id) {
+                <a class="category-badge" routerLink="/category" [queryParams]="{ categoryId: category.id }">{{ category.name }}</a>
+              }
+            </div>
           }
+
+          @if (currentPost.tags.length > 0) {
+            <div class="flex flex-wrap gap-2 mb-6">
+              @for (tag of currentPost.tags; track tag.id) {
+                <a class="tag" routerLink="/hashtag" [queryParams]="{ tagId: tag.id, tagName: tag.name }">#{{ tag.name }}</a>
+              }
+            </div>
           }
-        </div>
-        }
 
-        <!-- Thống kê -->
-        <div
-          class="border-t border-aquamarine-200 dark:border-aquamarine-800 pt-6 mt-8 flex flex-wrap gap-4 text-sm text-aquamarine-700 dark:text-aquamarine-300">
-          <span>
-            <i class="bi bi-hand-thumbs-up me-1" aria-hidden="true"></i>
+          @if (currentPost.thumbnailUrl) {
+            <div class="mb-6 rounded-2xl overflow-hidden max-h-96">
+              <img [src]="currentPost.thumbnailUrl" [alt]="currentPost.title" class="w-full h-auto object-cover" />
+            </div>
+          }
 
-            {{
-            currentPost.likeCount
-            }}
+          <div class="prose dark:prose-invert max-w-none text-aquamarine-950 dark:text-aquamarine-50" [innerHTML]="currentPost.content"></div>
 
-            {{
-            'post.likes'
-            | translate
-            }}
-          </span>
+          @if (currentPost.media.length > 0) {
+            <div class="mt-6 space-y-4">
+              @for (item of currentPost.media; track item.id) {
+                @if (item.mediaType === 'IMAGE') {
+                  <img [src]="item.mediaUrl" [alt]="currentPost.title" class="max-w-full rounded-xl" loading="lazy" />
+                } @else {
+                  <video [src]="item.mediaUrl" controls preload="metadata" class="w-full rounded-xl"></video>
+                }
+              }
+            </div>
+          }
 
-          <span>
-            <i class="bi bi-eye me-1" aria-hidden="true"></i>
+          <div class="border-t border-aquamarine-200 dark:border-aquamarine-800 pt-6 mt-8 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex gap-4 text-sm text-aquamarine-700 dark:text-aquamarine-300">
+              <span><i class="bi bi-hand-thumbs-up me-1"></i>{{ currentPost.likeCount }} {{ 'post.likes' | translate }}</span>
+              <span><i class="bi bi-eye me-1"></i>{{ currentPost.viewCount }} {{ 'post.views' | translate }}</span>
+            </div>
 
-            {{
-            currentPost.viewCount
-            }}
-
-            {{
-            'post.views'
-            | translate
-            }}
-          </span>
-        </div>
-      </article>
+            <div class="flex flex-wrap gap-2">
+              <button type="button" class="btn btn-secondary" [class.active]="isLiked()" [disabled]="isLikeBusy() || isLoadingInteractions()" (click)="toggleLike()">
+                <i class="bi me-2" [class.bi-heart-fill]="isLiked()" [class.bi-heart]="!isLiked()"></i>
+                {{ isLiked() ? ('post.unlike' | translate) : ('post.like' | translate) }}
+              </button>
+              <button type="button" class="btn btn-secondary" [class.active]="isBookmarked()" [disabled]="isBookmarkBusy() || isLoadingInteractions()" (click)="toggleBookmark()">
+                <i class="bi me-2" [class.bi-bookmark-fill]="isBookmarked()" [class.bi-bookmark]="!isBookmarked()"></i>
+                {{ isBookmarked() ? ('post.unsave' | translate) : ('post.save' | translate) }}
+              </button>
+            </div>
+          </div>
+        </article>
       } @else {
-      <!-- Lỗi tải bài lần đầu -->
-      <div
-        class="p-8 text-center rounded-2xl border border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300"
-        role="alert">
-        <p class="font-semibold">
-          {{
-          errorMessage() ||
-          (
-          'post.not_found'
-          | translate
-          )
-          }}
-        </p>
-
-        <button type="button" class="mt-4 px-4 py-2 rounded-lg border border-red-300 dark:border-red-800"
-          (click)="retryPost()">
-          {{
-          'common.retry'
-          | translate
-          }}
-        </button>
-      </div>
+        <div class="p-8 text-center rounded-2xl border border-red-200 bg-red-50 text-red-700">
+          <p class="font-semibold">{{ errorMessage() || ('post.not_found' | translate) }}</p>
+          <button type="button" class="mt-4 px-4 py-2 rounded-lg border border-red-300" (click)="retryPost()">{{ 'common.retry' | translate }}</button>
+        </div>
       }
 
-      <!-- Bình luận -->
       @if (post()) {
-      <section id="post-comments"
-        class="p-6 mt-6 scroll-mt-24 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-        <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <h2 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">
-            {{
-            'comments.title'
-            | translate
-            }}
+        <section id="post-comments" class="p-6 mt-6 scroll-mt-24 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
+          <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <h2 class="font-bold text-lg">
+              {{ 'comments.title' | translate }}
+              @if (commentsTotalItems() > 0) { <span class="ms-1 text-sm font-normal text-aquamarine-500">({{ commentsTotalItems() }})</span> }
+            </h2>
+            <select class="rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 px-3 py-2 text-xs" [value]="commentsSortOrder()" (change)="onCommentsSortChange($any($event.target).value)">
+              <option value="desc">{{ 'comments.newest_first' | translate }}</option>
+              <option value="asc">{{ 'comments.oldest_first' | translate }}</option>
+            </select>
+          </div>
 
-            @if (
-            commentsTotalItems() > 0
-            ) {
-            <span class="ms-1 text-sm font-normal text-aquamarine-500 dark:text-aquamarine-400">
-              ({{
-              commentsTotalItems()
-              }})
-            </span>
-            }
-          </h2>
-
-          <select
-            class="rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 px-3 py-2 text-xs"
-            [value]="commentsSortOrder()" (change)="
-      onCommentsSortChange(
-        $any($event.target).value
-      )
-    ">
-            <option value="desc">
-              {{
-              'comments.newest_first'
-              | translate
-              }}
-            </option>
-
-            <option value="asc">
-              {{
-              'comments.oldest_first'
-              | translate
-              }}
-            </option>
-          </select>
-        </div>
-
-        @if (
-        isLoadingComments() &&
-        comments().length === 0
-        ) {
-        <div class="animate-pulse space-y-3 py-2" aria-busy="true">
-          <div class="h-4 bg-aquamarine-200 dark:bg-aquamarine-800 rounded w-1/3"></div>
-
-          <div class="h-10 bg-aquamarine-200 dark:bg-aquamarine-800 rounded w-full"></div>
-        </div>
-        } @else if (
-        commentsErrorMessage()
-        ) {
-        <div
-          class="p-4 rounded-xl border border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300"
-          role="alert">
-          {{
-          commentsErrorMessage()
-          }}
-
-          <button type="button" class="ms-2 underline" (click)="loadComments()">
-            {{
-            'common.retry'
-            | translate
-            }}
-          </button>
-        </div>
-        } @else if (
-        comments().length > 0
-        ) {
-        <div class="transition-opacity" [class.opacity-60]="
-                isLoadingComments()
-              ">
-          @for (
-          comment of
-          comments();
-          track comment.id
-          ) {
-          <app-comment-item [comment]="comment"></app-comment-item>
+          @if (isAuthenticated()) {
+            <form class="mb-6 p-4 rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/40 dark:bg-aquamarine-950/30" (submit)="submitComment($event)">
+              @if (replyTo(); as target) {
+                <div class="mb-2 text-xs text-aquamarine-600">{{ 'comments.replying_to' | translate }} <strong>{{ target.username }}</strong></div>
+              }
+              @if (editingComment()) {
+                <div class="mb-2 text-xs text-aquamarine-600">{{ 'comments.editing' | translate }}</div>
+              }
+              <textarea [(ngModel)]="commentDraft" name="commentDraft" maxlength="1000" rows="3" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 p-3 text-sm" [placeholder]="'comments.placeholder' | translate"></textarea>
+              <div class="mt-2 flex flex-wrap items-center justify-between gap-3">
+                <span class="text-[11px] text-aquamarine-500">{{ commentDraft.length }}/1000</span>
+                <div class="flex gap-2">
+                  @if (replyTo() || editingComment()) {
+                    <button type="button" class="btn btn-secondary" (click)="cancelCommentMode()">{{ 'modal.cancel' | translate }}</button>
+                  }
+                  <button type="submit" class="btn btn-primary" [disabled]="isSavingComment()">
+                    {{ editingComment() ? ('comments.save_edit' | translate) : ('comments.submit' | translate) }}
+                  </button>
+                </div>
+              </div>
+            </form>
+          } @else {
+            <a routerLink="/auth" [queryParams]="{ redirect: router.url }" class="mb-5 block p-4 rounded-xl border border-aquamarine-200 bg-aquamarine-50 text-sm text-aquamarine-700 hover:underline">
+              {{ 'comments.login_required' | translate }}
+            </a>
           }
-        </div>
 
-        @if (
-        commentsTotalPages() >
-        1
-        ) {
-        <app-pagination [totalItems]="
-                  commentsTotalItems()
-                " [itemsPerPage]="
-                  commentsPerPage
-                " [currentPage]="
-                  commentsCurrentPage()
-                " (currentPageChange)="
-                  onCommentsPageChange(
-                    $event
-                  )
-                ">
-        </app-pagination>
-        }
-        } @else {
-        <p class="text-sm text-aquamarine-600 dark:text-aquamarine-400">
-          {{
-          'comments.empty'
-          | translate
-          }}
-        </p>
-        }
-      </section>
+          @if (isLoadingComments() && comments().length === 0) {
+            <div class="animate-pulse space-y-3 py-2"><div class="h-4 bg-aquamarine-200 rounded w-1/3"></div><div class="h-10 bg-aquamarine-200 rounded w-full"></div></div>
+          } @else if (commentsErrorMessage()) {
+            <div class="p-4 rounded-xl border border-red-200 bg-red-50 text-red-700">
+              {{ commentsErrorMessage() }} <button type="button" class="ms-2 underline" (click)="loadComments()">{{ 'common.retry' | translate }}</button>
+            </div>
+          } @else if (comments().length > 0) {
+            <div [class.opacity-60]="isLoadingComments()">
+              @for (comment of comments(); track comment.id) {
+                <app-comment-item
+                  [comment]="comment"
+                  [currentUserId]="currentUserId()"
+                  [isAuthenticated]="isAuthenticated()"
+                  (replyRequested)="beginReply($event)"
+                  (editRequested)="beginEdit($event)"
+                  (deleteRequested)="deleteComment($event)"
+                  (reportRequested)="openCommentReport($event)">
+                </app-comment-item>
+              }
+            </div>
+
+            @if (commentsTotalPages() > 1) {
+              <app-pagination [totalItems]="commentsTotalItems()" [itemsPerPage]="commentsPerPage" [currentPage]="commentsCurrentPage()" (currentPageChange)="onCommentsPageChange($event)"></app-pagination>
+            }
+          } @else {
+            <p class="text-sm text-aquamarine-600 dark:text-aquamarine-400">{{ 'comments.empty' | translate }}</p>
+          }
+        </section>
       }
     </div>
 
     <app-public-sidebar-right class="lg:col-span-3"></app-public-sidebar-right>
   </div>
 </main>
+
+@if (reportTarget(); as target) {
+  <div class="fixed inset-0 z-[100] bg-black/50 flex items-center justify-center p-4" (click)="closeReport()">
+    <form class="w-full max-w-lg p-6 rounded-2xl bg-white dark:bg-aquamarine-900 shadow-xl space-y-4" (submit)="submitReport($event)" (click)="$event.stopPropagation()">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <h2 class="font-bold text-lg">{{ target.type === 'POST' ? ('post.report' | translate) : ('comments.report' | translate) }}</h2>
+          <p class="text-xs text-aquamarine-500 line-clamp-2">{{ target.label }}</p>
+        </div>
+        <button type="button" class="text-xl" (click)="closeReport()"><i class="bi bi-x-lg"></i></button>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold mb-1">{{ 'report.reason' | translate }}</label>
+        <select [(ngModel)]="reportReason" name="reportReason" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 px-3 py-2 text-sm">
+          @for (reason of reportReasons; track reason) { <option [value]="reason">{{ reason }}</option> }
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold mb-1">{{ 'report.description' | translate }}</label>
+        <textarea [(ngModel)]="reportDescription" name="reportDescription" maxlength="1000" rows="4" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 p-3 text-sm"></textarea>
+      </div>
+      <div class="flex justify-end gap-2">
+        <button type="button" class="btn btn-secondary" (click)="closeReport()">{{ 'modal.cancel' | translate }}</button>
+        <button type="submit" class="btn btn-primary" [disabled]="isSubmittingReport()">{{ 'report.submit' | translate }}</button>
+      </div>
+    </form>
+  </div>
+}

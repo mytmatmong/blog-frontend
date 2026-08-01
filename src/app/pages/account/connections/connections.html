@@ -1,0 +1,59 @@
+<main class="container mx-auto px-4 max-w-4xl py-6">
+  <section class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+      <div>
+        <h1 class="font-bold text-xl text-aquamarine-950 dark:text-aquamarine-50">{{ 'connections.title' | translate }}</h1>
+        <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ 'connections.subtitle' | translate }}</p>
+      </div>
+      <div class="flex gap-2">
+        <button type="button" class="btn btn-secondary" [class.active]="activeTab() === 'followers'" (click)="selectTab('followers')">
+          {{ 'connections.followers' | translate }}
+        </button>
+        <button type="button" class="btn btn-secondary" [class.active]="activeTab() === 'following'" (click)="selectTab('following')">
+          {{ 'connections.following' | translate }}
+        </button>
+      </div>
+    </div>
+
+    @if (isLoading()) {
+      <div class="space-y-3 animate-pulse">
+        <div class="h-16 rounded-xl bg-aquamarine-100 dark:bg-aquamarine-800"></div>
+        <div class="h-16 rounded-xl bg-aquamarine-100 dark:bg-aquamarine-800"></div>
+      </div>
+    } @else if (errorMessage()) {
+      <div class="p-4 rounded-xl border border-red-200 bg-red-50 text-red-700">
+        {{ errorMessage() }}
+        <button type="button" class="ms-2 underline" (click)="load()">{{ 'common.retry' | translate }}</button>
+      </div>
+    } @else if (users().length > 0) {
+      <div class="divide-y divide-aquamarine-100 dark:divide-aquamarine-800">
+        @for (user of users(); track user.id) {
+          <div class="flex items-center gap-3 py-4">
+            @if (user.avatarUrl) {
+              <img [src]="user.avatarUrl" [alt]="user.username" class="w-11 h-11 rounded-full object-cover" />
+            } @else {
+              <span class="w-11 h-11 rounded-full bg-aquamarine-600 text-white font-bold flex items-center justify-center">
+                {{ avatarInitial(user.username) }}
+              </span>
+            }
+            <div class="min-w-0">
+              <div class="font-semibold text-sm text-aquamarine-950 dark:text-aquamarine-50">{{ user.username }}</div>
+              <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400 truncate">{{ user.bio || ('profile.no_bio' | translate) }}</div>
+            </div>
+          </div>
+        }
+      </div>
+
+      @if (totalPages() > 1) {
+        <app-pagination
+          [totalItems]="totalItems()"
+          [itemsPerPage]="itemsPerPage"
+          [currentPage]="currentPage()"
+          (currentPageChange)="onPageChange($event)">
+        </app-pagination>
+      }
+    } @else {
+      <p class="py-10 text-center text-sm text-aquamarine-600 dark:text-aquamarine-400">{{ 'connections.empty' | translate }}</p>
+    }
+  </section>
+</main>

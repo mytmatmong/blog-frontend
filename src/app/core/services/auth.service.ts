@@ -286,7 +286,7 @@ export class AuthService {
       )
       .pipe(
         tap((response) => {
-          this.saveUser(response.data);
+          this.syncUser(response.data);
         }),
       );
   }
@@ -378,7 +378,7 @@ export class AuthService {
     localStorage.removeItem('demoRole');
   }
 
-  private saveUser(user: User): void {
+  syncUser(user: User): void {
     this.currentUser.set(user);
     this.currentRole.set(
       this.normalizeRole(user.role),

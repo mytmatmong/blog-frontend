@@ -1,56 +1,135 @@
 <main class="container mx-auto px-4 max-w-7xl py-6">
+  @if (isLoading()) {
+  <div class="h-80 rounded-2xl bg-aquamarine-100 dark:bg-aquamarine-800 animate-pulse"></div>
+  } @else if (user(); as currentUser) {
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-    <div class="lg:col-span-4">
-      <div class="p-6 text-center rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm space-y-4">
+    <aside class="lg:col-span-4 space-y-5">
+      <div
+        class="p-6 text-center rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm space-y-4">
         <div class="flex justify-center">
-          @if (user()?.avatarUrl) {
-            <img [src]="user()?.avatarUrl" [alt]="user()?.username" class="w-24 h-24 rounded-full object-cover border-2 border-aquamarine-500 shadow-md">
+          @if (avatarPreview() || currentUser.avatarUrl) {
+          <img [src]="avatarPreview() || currentUser.avatarUrl" [alt]="currentUser.username"
+            class="w-24 h-24 rounded-full object-cover border-2 border-aquamarine-500 shadow-md" />
           } @else {
-            <span class="w-24 h-24 rounded-full bg-gradient-to-br from-aquamarine-600 to-emerald-500 flex items-center justify-center text-white text-3xl font-bold shadow-md">
-              {{ getAvatarInitial(user()?.username) }}
-            </span>
+          <span
+            class="w-24 h-24 rounded-full bg-aquamarine-600 flex items-center justify-center text-white text-3xl font-bold shadow-md">
+            {{ getAvatarInitial(currentUser.username) }}
+          </span>
           }
         </div>
 
         <div>
-          <h4 class="font-bold text-xl text-aquamarine-950 dark:text-aquamarine-50 mb-1">
-            {{ user()?.username || ('profile.default_user' | translate) }}
-          </h4>
-          <span class="inline-block text-xs font-semibold px-3 py-1 rounded-full bg-aquamarine-100 dark:bg-aquamarine-800 text-aquamarine-700 dark:text-aquamarine-300">
-            {{ 'profile.role' | translate }}: {{ user()?.role || 'USER' }}
+          <h1 class="font-bold text-xl text-aquamarine-950 dark:text-aquamarine-50">{{ currentUser.username }}</h1>
+          <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ currentUser.email }}</p>
+          <span
+            class="inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-aquamarine-100 dark:bg-aquamarine-800 text-aquamarine-700 dark:text-aquamarine-300">
+            {{ currentUser.role }} · {{ currentUser.status }}
           </span>
         </div>
 
-        <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">
-          {{ user()?.bio || ('profile.no_bio' | translate) }}
-        </p>
+        <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ currentUser.bio || ('profile.no_bio' |
+          translate) }}</p>
+        <p class="text-xs text-aquamarine-500">{{ 'author.joined' | translate }}: {{ formatDate(currentUser.createdAt)
+          }}</p>
+      </div>
 
-        @if (user()?.createdAt) {
-          <div class="text-xs text-aquamarine-500 pt-2 border-t border-aquamarine-100 dark:border-aquamarine-800">
-            {{ 'author.joined' | translate }}: {{ user()?.createdAt }}
+      <div
+        class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
+        <h2 class="font-bold text-sm mb-3">{{ 'profile.followers' | translate }} ({{ currentUser.followers?.length || 0
+          }})</h2>
+        @if (currentUser.followers?.length) {
+        <div class="space-y-3">
+          @for (follower of currentUser.followers; track follower.id) {
+          <div class="flex items-center gap-3">
+            @if (follower.avatarUrl) {
+            <img [src]="follower.avatarUrl" [alt]="follower.username" class="w-9 h-9 rounded-full object-cover" />
+            } @else {
+            <span
+              class="w-9 h-9 rounded-full bg-aquamarine-600 text-white flex items-center justify-center font-bold text-xs">{{
+              getAvatarInitial(follower.username) }}</span>
+            }
+            <div class="min-w-0">
+              <div class="text-sm font-semibold">{{ follower.username }}</div>
+              <div class="text-xs text-aquamarine-500 truncate">{{ follower.bio || ('profile.no_bio' | translate) }}
+              </div>
+            </div>
           </div>
+          }
+        </div>
+        } @else {
+        <p class="text-xs text-aquamarine-500">{{ 'connections.empty' | translate }}</p>
         }
       </div>
-    </div>
+    </aside>
 
-    <div class="lg:col-span-8">
-      <div class="p-6 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50 mb-4">{{ 'profile.personal_info' | translate }}</h5>
-        <form class="space-y-4">
+    <section class="lg:col-span-8 space-y-6">
+      <form
+        class="p-6 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm space-y-4"
+        (submit)="saveProfile($event)">
+        <div>
+          <h2 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">{{ 'profile.personal_info' |
+            translate }}</h2>
+          <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ 'profile.edit_hint' | translate }}</p>
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'profile.username_label' | translate }}</label>
-            <input type="text" [value]="username()" readonly class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-100/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none cursor-not-allowed">
+            <label class="block text-xs font-semibold mb-1">{{ 'profile.username_label' | translate }}</label>
+            <input type="text" [value]="currentUser.username" readonly
+              class="w-full rounded-xl border border-aquamarine-200 bg-aquamarine-100/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm cursor-not-allowed" />
           </div>
           <div>
-            <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'table.email' | translate }}</label>
-            <input type="email" [value]="email()" readonly class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-100/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 cursor-not-allowed">
+            <label class="block text-xs font-semibold mb-1">{{ 'table.email' | translate }}</label>
+            <input type="email" [value]="currentUser.email" readonly
+              class="w-full rounded-xl border border-aquamarine-200 bg-aquamarine-100/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm cursor-not-allowed" />
           </div>
-          <div>
-            <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'profile.bio_label' | translate }}</label>
-            <textarea [value]="bio()" readonly class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-100/50 dark:bg-aquamarine-950 p-3 text-sm text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none cursor-not-allowed" rows="3"></textarea>
-          </div>
-        </form>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold mb-1">{{ 'profile.bio_label' | translate }}</label>
+          <textarea [(ngModel)]="bio" name="bio" rows="4"
+            class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-aquamarine-500"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold mb-1">{{ 'profile.new_password' | translate }}</label>
+          <input [(ngModel)]="newPassword" name="newPassword" type="password" minlength="6"
+            class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 px-4 py-2.5 text-sm"
+            [placeholder]="'profile.password_placeholder' | translate" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold mb-1">{{ 'profile.avatar' | translate }}</label>
+          <input type="file" accept="image/*" (change)="onAvatarSelected($event)" class="block w-full text-sm" />
+          <p class="mt-1 text-xs text-aquamarine-500">{{ 'profile.avatar_hint' | translate }}</p>
+        </div>
+
+        <div class="flex flex-wrap gap-3">
+          <button type="submit" class="btn btn-primary" [disabled]="isSaving()">
+            <i class="bi bi-save me-2"></i>{{ isSaving() ? ('common.saving' | translate) : ('common.save' | translate)
+            }}
+          </button>
+          <button type="button" class="btn btn-secondary" [disabled]="!selectedAvatar || isUploadingAvatar()"
+            (click)="uploadAvatarOnly()">
+            <i class="bi bi-cloud-arrow-up me-2"></i>{{ 'profile.upload_avatar_only' | translate }}
+          </button>
+        </div>
+      </form>
+
+      <div
+        class="p-6 rounded-2xl border border-amber-200 dark:border-amber-800 bg-white dark:bg-aquamarine-900 shadow-sm">
+        <h2 class="font-bold text-lg mb-2">{{ 'profile.security' | translate }}</h2>
+        <div class="flex flex-wrap gap-3">
+          <button type="button" class="btn btn-secondary" (click)="logoutAll()">
+            <i class="bi bi-box-arrow-right me-2"></i>{{ 'profile.logout_all' | translate }}
+          </button>
+          <button type="button" class="btn border-red-500 text-red-600" [disabled]="isDeleting()"
+            (click)="deleteAccount()">
+            <i class="bi bi-trash me-2"></i>{{ 'profile.delete_account' | translate }}
+          </button>
+        </div>
       </div>
-    </div>
+    </section>
   </div>
+  }
 </main>

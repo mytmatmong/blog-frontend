@@ -77,6 +77,12 @@ export class Auth implements OnInit {
         this.isLoading.set(false);
         this.toastService.success('Đăng nhập thành công!', 'Thành công');
         
+        const redirect = this.route.snapshot.queryParamMap.get('redirect');
+        if (redirect?.startsWith('/')) {
+          this.router.navigateByUrl(redirect);
+          return;
+        }
+
         // Redirect based on user role
         const role = this.authService.currentRole();
         if (role === 'admin') {

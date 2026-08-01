@@ -85,11 +85,11 @@
           <button
             class="flex items-center gap-2 px-2 py-1 text-sm font-medium text-aquamarine-800 dark:text-aquamarine-100 rounded-lg hover:bg-aquamarine-50 dark:hover:bg-aquamarine-900"
             (click)="toggleUserDropdown()">
-            <span class="avatar-sm">
-              {{
-              auth.currentUser()?.username?.charAt(0)?.toUpperCase() || 'U'
-              }}
-            </span>
+            @if (auth.currentUser()?.avatarUrl) {
+              <img [src]="auth.currentUser()?.avatarUrl" [alt]="auth.currentUser()?.username" class="w-8 h-8 rounded-full object-cover" />
+            } @else {
+              <span class="avatar-sm">{{ auth.currentUser()?.username?.charAt(0)?.toUpperCase() || 'U' }}</span>
+            }
             <span class="lg:hidden">{{ 'nav.account' | translate }}</span>
           </button>
 
@@ -111,6 +111,16 @@
               <a class="flex items-center px-4 py-2 text-sm text-aquamarine-800 dark:text-aquamarine-100 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800"
                 routerLink="/account/request-blog-owner">
                 <i class="bi bi-send me-2"></i>{{ 'nav.request_owner' | translate }}
+              </a>
+            </li>
+            <li>
+              <a class="flex items-center px-4 py-2 text-sm text-aquamarine-800 dark:text-aquamarine-100 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800" routerLink="/account/library">
+                <i class="bi bi-bookmarks me-2"></i>{{ 'nav.library' | translate }}
+              </a>
+            </li>
+            <li>
+              <a class="flex items-center px-4 py-2 text-sm text-aquamarine-800 dark:text-aquamarine-100 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800" routerLink="/account/connections">
+                <i class="bi bi-people me-2"></i>{{ 'nav.connections' | translate }}
               </a>
             </li>
 

@@ -4,41 +4,50 @@ import {
   inject,
   signal,
 } from '@angular/core';
-
 import { HttpErrorResponse } from '@angular/common/http';
-
+import { FormsModule } from '@angular/forms';
 import {
   ActivatedRoute,
+  Router,
   RouterLink,
 } from '@angular/router';
-
 import {
   takeUntilDestroyed,
   toObservable,
 } from '@angular/core/rxjs-interop';
-
 import {
+  catchError,
   distinctUntilChanged,
+  forkJoin,
+  Observable,
+  of,
   skip,
+  switchMap,
 } from 'rxjs';
 
 import { PublicSidebarRight } from '../../../shared/components/public-sidebar-right/public-sidebar-right';
-
-import { CommentItem } from '../../../shared/components/comment-item/comment-item';
-
+import {
+  CommentActionTarget,
+  CommentItem,
+} from '../../../shared/components/comment-item/comment-item';
 import { Pagination } from '../../../shared/components/pagination/pagination';
-
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
-
 import { PublicApiService } from '../../../core/services/public-api.service';
-
 import { TranslationService } from '../../../core/services/translation.service';
-
+import { UserApiService } from '../../../core/services/user-api.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { ToastService } from '../../../core/services/toast.service';
+import { getApiErrorMessage } from '../../../core/utils/api-error.util';
 import {
   PublicComment,
   PublicPost,
   SortOrder,
 } from '../../../core/models/post.model';
+import {
+  PaginatedUserPosts,
+  ReportReason,
+} from '../../../core/models/user-api.model';
+import { ApiResponse } from '../../../core/models/auth.model';
 
 type PostErrorKey =
   | 'post.invalid_id'
@@ -51,549 +60,493 @@ type CommentsErrorKey =
   | 'common.backend_unreachable';
 
 interface LoadPostOptions {
-  /**
-   * Khi đổi ngôn ngữ, giữ bài cũ trên màn hình
-   * cho đến khi bản dịch mới tải xong.
-   */
   preserveContent?: boolean;
+}
+
+interface ReportTarget {
+  type: 'POST' | 'COMMENT';
+  id: number;
+  label: string;
 }
 
 @Component({
   selector: 'app-post-detail',
-
   imports: [
+    FormsModule,
     RouterLink,
     PublicSidebarRight,
     CommentItem,
     Pagination,
     TranslatePipe,
   ],
-
   templateUrl: './post-detail.html',
   styleUrl: './post-detail.css',
 })
 export class PostDetail {
-  private readonly route =
-    inject(ActivatedRoute);
+  private readonly route = inject(ActivatedRoute);
+  protected readonly router = inject(Router);
+  private readonly publicApi = inject(PublicApiService);
+  private readonly userApi = inject(UserApiService);
+  private readonly translationService = inject(TranslationService);
+  private readonly toast = inject(ToastService);
+  protected readonly auth = inject(AuthService);
 
-  private readonly publicApiService =
-    inject(PublicApiService);
-
-  private readonly translationService =
-    inject(TranslationService);
-
-  /**
-   * ID bài viết đang có trên URL.
-   */
   private routePostId: number | null = null;
-
-  /**
-   * ID bài thực tế backend trả về.
-   *
-   * Ví dụ:
-   * URL đang là /post/10
-   * nhưng lang=en có thể trả bản dịch ID 20.
-   * Khi đó comment phải gọi theo ID 20.
-   */
   private commentsPostId: number | null = null;
-
-  /**
-   * Dùng để vô hiệu hóa response cũ nếu người dùng
-   * đổi bài hoặc đổi ngôn ngữ quá nhanh.
-   */
   private postRequestVersion = 0;
-
   private commentsRequestVersion = 0;
 
-  readonly post =
-    signal<PublicPost | null>(null);
-
-  readonly comments =
-    signal<PublicComment[]>([]);
-
-  readonly isLoading =
-    signal(false);
-
-  readonly commentsSortOrder =
-    signal<SortOrder>('desc');
-  readonly isRefreshingLanguage =
-    signal(false);
-
-  readonly isLoadingComments =
-    signal(false);
-
-  readonly commentsTotalItems =
-    signal(0);
-
-  readonly commentsTotalPages =
-    signal(1);
-
-  readonly commentsCurrentPage =
-    signal(1);
-
+  readonly post = signal<PublicPost | null>(null);
+  readonly comments = signal<PublicComment[]>([]);
+  readonly isLoading = signal(false);
+  readonly isRefreshingLanguage = signal(false);
+  readonly isLoadingComments = signal(false);
+  readonly commentsSortOrder = signal<SortOrder>('desc');
+  readonly commentsTotalItems = signal(0);
+  readonly commentsTotalPages = signal(1);
+  readonly commentsCurrentPage = signal(1);
   readonly commentsPerPage = 10;
 
-  /**
-   * Lưu translation key thay vì lưu trực tiếp
-   * chuỗi tiếng Việt hoặc tiếng Anh.
-   */
-  private readonly postErrorKey =
-    signal<PostErrorKey | null>(null);
+  readonly isAuthenticated = computed(() => this.auth.currentRole() !== 'guest');
+  readonly currentUserId = computed(() => this.auth.currentUser()?.id ?? null);
+  readonly isLiked = signal(false);
+  readonly isBookmarked = signal(false);
+  readonly isLoadingInteractions = signal(false);
+  readonly isLikeBusy = signal(false);
+  readonly isBookmarkBusy = signal(false);
 
-  private readonly commentsErrorKey =
-    signal<CommentsErrorKey | null>(null);
+  readonly replyTo = signal<CommentActionTarget | null>(null);
+  readonly editingComment = signal<CommentActionTarget | null>(null);
+  readonly isSavingComment = signal(false);
+  commentDraft = '';
 
-  /**
-   * Khi currentLang thay đổi, nội dung lỗi cũng
-   * tự đổi ngôn ngữ ngay.
-   */
+  readonly reportTarget = signal<ReportTarget | null>(null);
+  readonly isSubmittingReport = signal(false);
+  reportReason: ReportReason = 'SPAM';
+  reportDescription = '';
+  readonly reportReasons: ReportReason[] = [
+    'SPAM',
+    'HARASSMENT',
+    'INAPPROPRIATE',
+    'COPYRIGHT',
+    'MISINFORMATION',
+    'OTHER',
+  ];
+
+  private readonly postErrorKey = signal<PostErrorKey | null>(null);
+  private readonly commentsErrorKey = signal<CommentsErrorKey | null>(null);
+
   readonly errorMessage = computed(() => {
     const key = this.postErrorKey();
-
-    return key
-      ? this.translationService.translate(key)
-      : null;
+    return key ? this.translationService.translate(key) : null;
   });
 
-  readonly commentsErrorMessage =
-    computed(() => {
-      const key =
-        this.commentsErrorKey();
-
-      return key
-        ? this.translationService.translate(key)
-        : null;
-    });
+  readonly commentsErrorMessage = computed(() => {
+    const key = this.commentsErrorKey();
+    return key ? this.translationService.translate(key) : null;
+  });
 
   constructor() {
-    /**
-     * Theo dõi ID bài viết trên URL.
-     */
     this.route.paramMap
       .pipe(takeUntilDestroyed())
       .subscribe((params) => {
-        const id = Number(
-          params.get('id'),
-        );
+        const id = Number(params.get('id'));
 
-        if (
-          !Number.isInteger(id) ||
-          id <= 0
-        ) {
+        if (!Number.isInteger(id) || id <= 0) {
           this.postRequestVersion++;
           this.commentsRequestVersion++;
-
           this.routePostId = null;
           this.commentsPostId = null;
-
           this.post.set(null);
           this.clearComments();
-
           this.isLoading.set(false);
-          this.isRefreshingLanguage.set(
-            false,
-          );
-
-          this.postErrorKey.set(
-            'post.invalid_id',
-          );
-
+          this.isRefreshingLanguage.set(false);
+          this.postErrorKey.set('post.invalid_id');
           return;
         }
 
         this.routePostId = id;
-
         this.commentsCurrentPage.set(1);
-
         this.loadPost();
       });
 
-    /**
-     * Khi đổi VI/EN:
-     *
-     * - Gọi lại GET /posts/:id?lang=...
-     * - Giữ bài hiện tại để giao diện không nháy.
-     * - Sau khi nhận bài mới, tải comment theo ID
-     *   thực tế backend trả về.
-     */
-    toObservable(
-      this.translationService.currentLang,
-    )
-      .pipe(
-        skip(1),
-        distinctUntilChanged(),
-        takeUntilDestroyed(),
-      )
+    toObservable(this.translationService.currentLang)
+      .pipe(skip(1), distinctUntilChanged(), takeUntilDestroyed())
       .subscribe(() => {
-        if (this.routePostId === null) {
-          return;
-        }
-
+        if (this.routePostId === null) return;
         this.commentsCurrentPage.set(1);
-
-        this.loadPost({
-          preserveContent: true,
-        });
+        this.loadPost({ preserveContent: true });
       });
   }
 
-  loadPost(
-    options: LoadPostOptions = {},
-  ): void {
-    const routePostId =
-      this.routePostId;
+  loadPost(options: LoadPostOptions = {}): void {
+    const routePostId = this.routePostId;
+    if (routePostId === null) return;
 
-    if (routePostId === null) {
-      return;
-    }
-
-    const preserveContent =
-      options.preserveContent === true &&
-      this.post() !== null;
-
-    const requestVersion =
-      ++this.postRequestVersion;
-
-    /**
-     * Vô hiệu hóa request comment đang chạy
-     * của bài hoặc ngôn ngữ trước đó.
-     */
+    const preserveContent = options.preserveContent === true && this.post() !== null;
+    const requestVersion = ++this.postRequestVersion;
     this.commentsRequestVersion++;
-
-    const previousCommentsPostId =
-      this.commentsPostId;
+    const previousCommentsPostId = this.commentsPostId;
 
     this.postErrorKey.set(null);
     this.commentsErrorKey.set(null);
 
     if (preserveContent) {
-      this.isRefreshingLanguage.set(
-        true,
-      );
+      this.isRefreshingLanguage.set(true);
     } else {
       this.isLoading.set(true);
-
-      this.isRefreshingLanguage.set(
-        false,
-      );
-
+      this.isRefreshingLanguage.set(false);
       this.post.set(null);
       this.commentsPostId = null;
-
       this.clearComments();
     }
 
-    this.publicApiService
-      .getPostById(
-        routePostId,
-        this.currentLanguageCode(),
-      )
+    this.publicApi
+      .getPostById(routePostId, this.currentLanguageCode())
       .subscribe({
-        next: (response) => {
-          if (
-            requestVersion !==
-            this.postRequestVersion
-          ) {
-            return;
-          }
+        next: ({ data }) => {
+          if (requestVersion !== this.postRequestVersion) return;
 
-          const actualPost =
-            response.data;
-
-          this.post.set(actualPost);
-
-          /**
-           * Bản dịch có thể có ID khác bài trên URL.
-           */
-          this.commentsPostId =
-            actualPost.id;
-
+          this.post.set(data);
+          this.commentsPostId = data.id;
           this.isLoading.set(false);
+          this.isRefreshingLanguage.set(false);
 
-          this.isRefreshingLanguage.set(
-            false,
-          );
-
-          /**
-           * Nếu ID bài bản dịch khác bài cũ,
-           * không được giữ comment của bài cũ.
-           */
-          if (
-            previousCommentsPostId !==
-            actualPost.id
-          ) {
-            this.clearComments();
-          }
+          if (previousCommentsPostId !== data.id) this.clearComments();
 
           this.loadComments();
+          this.loadInteractionState(data.id);
         },
-
         error: (error: unknown) => {
-          if (
-            requestVersion !==
-            this.postRequestVersion
-          ) {
-            return;
-          }
-
+          if (requestVersion !== this.postRequestVersion) return;
           this.isLoading.set(false);
+          this.isRefreshingLanguage.set(false);
 
-          this.isRefreshingLanguage.set(
-            false,
-          );
-
-          /**
-           * Nếu đổi ngôn ngữ thất bại thì giữ bài cũ.
-           * Nếu tải bài lần đầu thất bại thì xóa bài.
-           */
           if (!preserveContent) {
             this.post.set(null);
             this.commentsPostId = null;
-
             this.clearComments();
           }
 
-          this.postErrorKey.set(
-            this.resolvePostErrorKey(
-              error,
-            ),
-          );
+          this.postErrorKey.set(this.resolvePostErrorKey(error));
         },
       });
   }
 
   loadComments(): void {
-    const postId =
-      this.commentsPostId;
+    const postId = this.commentsPostId;
+    if (postId === null) return;
 
-    if (postId === null) {
-      return;
-    }
-
-    const requestVersion =
-      ++this.commentsRequestVersion;
-
+    const requestVersion = ++this.commentsRequestVersion;
     this.isLoadingComments.set(true);
-
     this.commentsErrorKey.set(null);
 
-    this.publicApiService
-      .getPostComments(postId, {
-        page:
-          this.commentsCurrentPage(),
-
-        limit:
-          this.commentsPerPage,
-
-        sortBy:
-          'createdAt',
-
-        sortOrder:
-          this.commentsSortOrder(),
-      })
-      .subscribe({
-        next: (response) => {
-          if (
-            requestVersion !==
-            this.commentsRequestVersion
-          ) {
-            return;
-          }
-
-          const data = response.data;
-
-          this.comments.set(
-            data.items,
-          );
-
-          this.commentsTotalItems.set(
-            data.meta.totalItems,
-          );
-
-          this.commentsTotalPages.set(
-            Math.max(
-              1,
-              data.meta.totalPages,
-            ),
-          );
-
-          this.commentsCurrentPage.set(
-            data.meta.currentPage,
-          );
-
-          this.isLoadingComments.set(
-            false,
-          );
-        },
-
-        error: (error: unknown) => {
-          if (
-            requestVersion !==
-            this.commentsRequestVersion
-          ) {
-            return;
-          }
-
-          this.clearComments();
-
-          this.isLoadingComments.set(
-            false,
-          );
-
-          this.commentsErrorKey.set(
-            this.resolveCommentsErrorKey(
-              error,
-            ),
-          );
-        },
-      });
-  }
-
-  retryPost(): void {
-    this.loadPost({
-      /**
-       * Nếu vẫn còn bài cũ thì giữ lại trong lúc retry.
-       */
-      preserveContent:
-        this.post() !== null,
+    this.publicApi.getPostComments(postId, {
+      page: this.commentsCurrentPage(),
+      limit: this.commentsPerPage,
+      sortBy: 'createdAt',
+      sortOrder: this.commentsSortOrder(),
+    }).subscribe({
+      next: ({ data }) => {
+        if (requestVersion !== this.commentsRequestVersion) return;
+        this.comments.set(data.items);
+        this.commentsTotalItems.set(data.meta.totalItems);
+        this.commentsTotalPages.set(Math.max(1, data.meta.totalPages));
+        this.commentsCurrentPage.set(data.meta.currentPage);
+        this.isLoadingComments.set(false);
+      },
+      error: (error: unknown) => {
+        if (requestVersion !== this.commentsRequestVersion) return;
+        this.clearComments();
+        this.isLoadingComments.set(false);
+        this.commentsErrorKey.set(this.resolveCommentsErrorKey(error));
+      },
     });
   }
 
-  onCommentsPageChange(
-    page: number,
-  ): void {
-    if (
-      !Number.isInteger(page) ||
-      page < 1 ||
-      page >
-      this.commentsTotalPages() ||
-      page ===
-      this.commentsCurrentPage()
-    ) {
-      return;
-    }
+  retryPost(): void {
+    this.loadPost({ preserveContent: this.post() !== null });
+  }
 
+  onCommentsPageChange(page: number): void {
+    if (!Number.isInteger(page) || page < 1 || page > this.commentsTotalPages() || page === this.commentsCurrentPage()) return;
     this.commentsCurrentPage.set(page);
-
     this.loadComments();
-
-    if (
-      typeof window !== 'undefined'
-    ) {
-      const commentsSection =
-        document.getElementById(
-          'post-comments',
-        );
-
-      commentsSection?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
+    if (typeof window !== 'undefined') {
+      document.getElementById('post-comments')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
 
-  getAvatarInitial(
-    name?: string | null,
-  ): string {
-    return (
-      name
-        ?.trim()
-        .charAt(0)
-        .toUpperCase() || 'A'
-    );
-  }
-  onCommentsSortChange(
-    value: string,
-  ): void {
-    if (
-      value !== 'asc' &&
-      value !== 'desc'
-    ) {
-      return;
-    }
-
-    if (
-      value ===
-      this.commentsSortOrder()
-    ) {
-      return;
-    }
-
+  onCommentsSortChange(value: string): void {
+    if ((value !== 'asc' && value !== 'desc') || value === this.commentsSortOrder()) return;
     this.commentsSortOrder.set(value);
     this.commentsCurrentPage.set(1);
-
     this.loadComments();
   }
 
-  formatDate(
-    value?: string | null,
-  ): string {
-    if (!value) {
-      return '';
-    }
+  toggleLike(): void {
+    const currentPost = this.post();
+    if (!currentPost || !this.requireAuthentication() || this.isLikeBusy()) return;
 
-    const date = new Date(value);
+    this.isLikeBusy.set(true);
+    const wasLiked = this.isLiked();
+    const request: Observable<unknown> = wasLiked
+      ? this.userApi.unlikePost(currentPost.id)
+      : this.userApi.likePost(currentPost.id);
 
-    if (Number.isNaN(date.getTime())) {
-      return '';
-    }
-
-    return date.toLocaleDateString(
-      this.currentLanguageCode() ===
-        'en'
-        ? 'en-US'
-        : 'vi-VN',
-      {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
+    request.subscribe({
+      next: () => {
+        this.isLiked.set(!wasLiked);
+        this.post.update((post) => post ? {
+          ...post,
+          likeCount: Math.max(0, post.likeCount + (wasLiked ? -1 : 1)),
+        } : post);
+        this.isLikeBusy.set(false);
+        this.toast.success(wasLiked ? 'Đã bỏ thích bài viết.' : 'Đã thích bài viết.');
       },
+      error: (error: unknown) => {
+        this.isLikeBusy.set(false);
+        this.toast.error(getApiErrorMessage(error), 'Không thể cập nhật lượt thích');
+      },
+    });
+  }
+
+  toggleBookmark(): void {
+    const currentPost = this.post();
+    if (!currentPost || !this.requireAuthentication() || this.isBookmarkBusy()) return;
+
+    this.isBookmarkBusy.set(true);
+    const wasBookmarked = this.isBookmarked();
+    const request: Observable<unknown> = wasBookmarked
+      ? this.userApi.removeBookmark(currentPost.id)
+      : this.userApi.bookmarkPost(currentPost.id);
+
+    request.subscribe({
+      next: () => {
+        this.isBookmarked.set(!wasBookmarked);
+        this.isBookmarkBusy.set(false);
+        this.toast.success(wasBookmarked ? 'Đã bỏ lưu bài viết.' : 'Đã lưu bài viết.');
+      },
+      error: (error: unknown) => {
+        this.isBookmarkBusy.set(false);
+        this.toast.error(getApiErrorMessage(error), 'Không thể cập nhật bookmark');
+      },
+    });
+  }
+
+  beginReply(target: CommentActionTarget): void {
+    if (!this.requireAuthentication()) return;
+    this.editingComment.set(null);
+    this.replyTo.set(target);
+    this.commentDraft = '';
+  }
+
+  beginEdit(target: CommentActionTarget): void {
+    this.replyTo.set(null);
+    this.editingComment.set(target);
+    this.commentDraft = target.content;
+  }
+
+  cancelCommentMode(): void {
+    this.replyTo.set(null);
+    this.editingComment.set(null);
+    this.commentDraft = '';
+  }
+
+  submitComment(event: Event): void {
+    event.preventDefault();
+    const postId = this.commentsPostId;
+    if (postId === null || !this.requireAuthentication() || this.isSavingComment()) return;
+
+    const content = this.commentDraft.trim();
+    if (!content) {
+      this.toast.warning('Nội dung bình luận không được để trống.');
+      return;
+    }
+
+    if (content.length > 1000) {
+      this.toast.warning('Bình luận tối đa 1000 ký tự.');
+      return;
+    }
+
+    this.isSavingComment.set(true);
+    const editing = this.editingComment();
+    const request = editing
+      ? this.userApi.updateComment(editing.id, { content })
+      : this.userApi.createComment(postId, {
+          content,
+          parentId: this.replyTo()?.id ?? null,
+        });
+
+    request.subscribe({
+      next: () => {
+        this.isSavingComment.set(false);
+        this.cancelCommentMode();
+        this.commentsCurrentPage.set(1);
+        this.loadComments();
+        this.toast.success(editing ? 'Đã sửa bình luận.' : 'Đã gửi bình luận.');
+      },
+      error: (error: unknown) => {
+        this.isSavingComment.set(false);
+        this.toast.error(getApiErrorMessage(error), editing ? 'Sửa bình luận thất bại' : 'Gửi bình luận thất bại');
+      },
+    });
+  }
+
+  deleteComment(target: CommentActionTarget): void {
+    if (typeof window !== 'undefined' && !window.confirm('Xóa bình luận này?')) return;
+
+    this.userApi.deleteComment(target.id).subscribe({
+      next: () => {
+        this.loadComments();
+        this.toast.success('Đã xóa bình luận.');
+      },
+      error: (error: unknown) => this.toast.error(getApiErrorMessage(error), 'Xóa bình luận thất bại'),
+    });
+  }
+
+  openPostReport(): void {
+    const currentPost = this.post();
+    if (!currentPost || !this.requireAuthentication()) return;
+    this.openReport({ type: 'POST', id: currentPost.id, label: currentPost.title });
+  }
+
+  openCommentReport(target: CommentActionTarget): void {
+    if (!this.requireAuthentication()) return;
+    this.openReport({ type: 'COMMENT', id: target.id, label: target.content });
+  }
+
+  closeReport(): void {
+    this.reportTarget.set(null);
+    this.reportReason = 'SPAM';
+    this.reportDescription = '';
+  }
+
+  submitReport(event: Event): void {
+    event.preventDefault();
+    const target = this.reportTarget();
+    if (!target || this.isSubmittingReport()) return;
+
+    const description = this.reportDescription.trim();
+    if (description.length > 1000) {
+      this.toast.warning('Mô tả báo cáo tối đa 1000 ký tự.');
+      return;
+    }
+
+    this.isSubmittingReport.set(true);
+    const body = {
+      reason: this.reportReason,
+      ...(description ? { description } : {}),
+    };
+    const request = target.type === 'POST'
+      ? this.userApi.reportPost(target.id, body)
+      : this.userApi.reportComment(target.id, body);
+
+    request.subscribe({
+      next: () => {
+        this.isSubmittingReport.set(false);
+        this.closeReport();
+        this.toast.success('Đã gửi báo cáo tới bộ phận kiểm duyệt.');
+      },
+      error: (error: unknown) => {
+        this.isSubmittingReport.set(false);
+        this.toast.error(getApiErrorMessage(error), 'Gửi báo cáo thất bại');
+      },
+    });
+  }
+
+  getAvatarInitial(name?: string | null): string {
+    return name?.trim().charAt(0).toUpperCase() || 'A';
+  }
+
+  formatDate(value?: string | null): string {
+    if (!value) return '';
+    const date = new Date(value);
+    return Number.isNaN(date.getTime())
+      ? ''
+      : date.toLocaleDateString(this.currentLanguageCode() === 'en' ? 'en-US' : 'vi-VN', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+        });
+  }
+
+  private loadInteractionState(postId: number): void {
+    if (!this.isAuthenticated()) {
+      this.isLiked.set(false);
+      this.isBookmarked.set(false);
+      return;
+    }
+
+    this.isLoadingInteractions.set(true);
+
+    forkJoin({
+      liked: this.collectionContainsPost(
+        (page) => this.userApi.getLikedPosts({ page, limit: 50 }),
+        postId,
+      ).pipe(catchError(() => of(false))),
+      bookmarked: this.collectionContainsPost(
+        (page) => this.userApi.getBookmarkedPosts({ page, limit: 50 }),
+        postId,
+      ).pipe(catchError(() => of(false))),
+    }).subscribe(({ liked, bookmarked }) => {
+      this.isLiked.set(liked);
+      this.isBookmarked.set(bookmarked);
+      this.isLoadingInteractions.set(false);
+    });
+  }
+
+  private collectionContainsPost(
+    loader: (page: number) => Observable<ApiResponse<PaginatedUserPosts>>,
+    postId: number,
+    page = 1,
+  ): Observable<boolean> {
+    return loader(page).pipe(
+      switchMap((response: ApiResponse<PaginatedUserPosts>) => {
+        const data = response.data;
+        if (data.items.some((item) => item.id === postId)) return of(true);
+        if (page >= data.meta.totalPages) return of(false);
+        return this.collectionContainsPost(loader, postId, page + 1);
+      }),
     );
+  }
+
+  private openReport(target: ReportTarget): void {
+    this.reportTarget.set(target);
+    this.reportReason = 'SPAM';
+    this.reportDescription = '';
+  }
+
+  private requireAuthentication(): boolean {
+    if (this.isAuthenticated()) return true;
+
+    this.toast.warning('Vui lòng đăng nhập để thực hiện thao tác này.');
+    this.router.navigate(['/auth'], {
+      queryParams: { redirect: this.router.url },
+    });
+    return false;
   }
 
   private clearComments(): void {
     this.comments.set([]);
-
     this.commentsTotalItems.set(0);
-
     this.commentsTotalPages.set(1);
   }
 
   private currentLanguageCode(): string {
-    return this.translationService
-      .currentLang()
-      .toLowerCase();
+    return this.translationService.currentLang().toLowerCase();
   }
 
-  private resolvePostErrorKey(
-    error: unknown,
-  ): PostErrorKey {
-    if (
-      error instanceof HttpErrorResponse
-    ) {
-      if (error.status === 0) {
-        return 'common.backend_unreachable';
-      }
-
-      if (error.status === 404) {
-        return 'post.not_found';
-      }
+  private resolvePostErrorKey(error: unknown): PostErrorKey {
+    if (error instanceof HttpErrorResponse) {
+      if (error.status === 0) return 'common.backend_unreachable';
+      if (error.status === 404) return 'post.not_found';
     }
-
     return 'post.load_error';
   }
 
-  private resolveCommentsErrorKey(
-    error: unknown,
-  ): CommentsErrorKey {
-    if (
-      error instanceof
-      HttpErrorResponse &&
-      error.status === 0
-    ) {
-      return 'common.backend_unreachable';
-    }
-
+  private resolveCommentsErrorKey(error: unknown): CommentsErrorKey {
+    if (error instanceof HttpErrorResponse && error.status === 0) return 'common.backend_unreachable';
     return 'comments.load_error';
   }
 }

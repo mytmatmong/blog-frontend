@@ -10,6 +10,7 @@ import {
 
 import {
   ActivatedRoute,
+  Router,
   RouterLink,
 } from '@angular/router';
 
@@ -20,7 +21,10 @@ import {
 
 import {
   distinctUntilChanged,
+  Observable,
+  of,
   skip,
+  switchMap,
 } from 'rxjs';
 
 import { PublicSidebarRight } from '../../../shared/components/public-sidebar-right/public-sidebar-right';
@@ -42,11 +46,17 @@ import {
 import { PublicApiService } from '../../../core/services/public-api.service';
 
 import { TranslationService } from '../../../core/services/translation.service';
+import { UserApiService } from '../../../core/services/user-api.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { ToastService } from '../../../core/services/toast.service';
+import { getApiErrorMessage } from '../../../core/utils/api-error.util';
 
 import {
   AuthorDetail as AuthorDetailModel,
   PublicPost,
 } from '../../../core/models/post.model';
+import { ApiResponse, UserSummary } from '../../../core/models/auth.model';
+import { PaginatedFollowUsers } from '../../../core/models/user-api.model';
 
 @Component({
   selector: 'app-author-detail',
@@ -66,11 +76,17 @@ export class AuthorDetailComponent {
   private readonly route =
     inject(ActivatedRoute);
 
+  private readonly router = inject(Router);
+
   private readonly publicApiService =
     inject(PublicApiService);
 
   private readonly translationService =
     inject(TranslationService);
+
+  private readonly userApi = inject(UserApiService);
+  private readonly toast = inject(ToastService);
+  protected readonly auth = inject(AuthService);
 
   private authorId: number | null =
     null;
@@ -104,6 +120,16 @@ export class AuthorDetailComponent {
     signal<string | null>(null);
 
   readonly itemsPerPage = 10;
+
+  readonly isFollowing = signal(false);
+  readonly isFollowBusy = signal(false);
+  readonly connectionsMode = signal<'followers' | 'following' | null>(null);
+  readonly connectionUsers = signal<UserSummary[]>([]);
+  readonly isLoadingConnections = signal(false);
+  readonly connectionsPage = signal(1);
+  readonly connectionsTotalItems = signal(0);
+  readonly connectionsTotalPages = signal(1);
+  readonly connectionsPerPage = 10;
 
   constructor() {
     this.route.paramMap
@@ -227,6 +253,7 @@ export class AuthorDetailComponent {
           );
 
           this.isLoading.set(false);
+          this.refreshFollowingState(authorId);
         },
 
         error: (error: unknown) => {
@@ -285,6 +312,109 @@ export class AuthorDetailComponent {
         behavior: 'smooth',
       });
     }
+  }
+
+  toggleFollow(): void {
+    const authorId = this.authorId;
+    if (authorId === null || this.isFollowBusy()) return;
+
+    if (!this.requireAuthentication()) return;
+
+    if (this.auth.currentUser()?.id === authorId) {
+      this.toast.warning('Bạn không thể follow chính mình.');
+      return;
+    }
+
+    this.isFollowBusy.set(true);
+    const wasFollowing = this.isFollowing();
+    const request: Observable<unknown> = wasFollowing
+      ? this.userApi.unfollowUser(authorId)
+      : this.userApi.followUser(authorId);
+
+    request.subscribe({
+      next: () => {
+        this.isFollowing.set(!wasFollowing);
+        this.isFollowBusy.set(false);
+        this.toast.success(wasFollowing ? 'Đã bỏ follow.' : 'Đã follow tác giả.');
+      },
+      error: (error: unknown) => {
+        this.isFollowBusy.set(false);
+        this.toast.error(getApiErrorMessage(error), 'Không thể cập nhật follow');
+      },
+    });
+  }
+
+  openConnections(mode: 'followers' | 'following'): void {
+    if (!this.requireAuthentication()) return;
+    this.connectionsMode.set(mode);
+    this.connectionsPage.set(1);
+    this.loadConnections();
+  }
+
+  closeConnections(): void {
+    this.connectionsMode.set(null);
+    this.connectionUsers.set([]);
+  }
+
+  onConnectionsPageChange(page: number): void {
+    if (page < 1 || page > this.connectionsTotalPages() || page === this.connectionsPage()) return;
+    this.connectionsPage.set(page);
+    this.loadConnections();
+  }
+
+  loadConnections(): void {
+    const authorId = this.authorId;
+    const mode = this.connectionsMode();
+    if (authorId === null || mode === null) return;
+
+    this.isLoadingConnections.set(true);
+    const query = { page: this.connectionsPage(), limit: this.connectionsPerPage };
+    const request = mode === 'followers'
+      ? this.userApi.getUserFollowers(authorId, query)
+      : this.userApi.getUserFollowing(authorId, query);
+
+    request.subscribe({
+      next: ({ data }) => {
+        this.connectionUsers.set(data.items);
+        this.connectionsTotalItems.set(data.meta.totalItems);
+        this.connectionsTotalPages.set(Math.max(1, data.meta.totalPages));
+        this.connectionsPage.set(data.meta.currentPage);
+        this.isLoadingConnections.set(false);
+      },
+      error: (error: unknown) => {
+        this.isLoadingConnections.set(false);
+        this.toast.error(getApiErrorMessage(error), 'Không tải được danh sách follow');
+      },
+    });
+  }
+
+  private refreshFollowingState(authorId: number): void {
+    if (this.auth.currentRole() === 'guest' || this.auth.currentUser()?.id === authorId) {
+      this.isFollowing.set(false);
+      return;
+    }
+
+    this.followingContains(authorId).subscribe({
+      next: (isFollowing) => this.isFollowing.set(isFollowing),
+      error: () => this.isFollowing.set(false),
+    });
+  }
+
+  private followingContains(authorId: number, page = 1): Observable<boolean> {
+    return this.userApi.getMyFollowing({ page, limit: 50 }).pipe(
+      switchMap(({ data }: ApiResponse<PaginatedFollowUsers>) => {
+        if (data.items.some((user) => user.id === authorId)) return of(true);
+        if (page >= data.meta.totalPages) return of(false);
+        return this.followingContains(authorId, page + 1);
+      }),
+    );
+  }
+
+  private requireAuthentication(): boolean {
+    if (this.auth.currentRole() !== 'guest') return true;
+    this.toast.warning('Vui lòng đăng nhập để thực hiện thao tác này.');
+    this.router.navigate(['/auth'], { queryParams: { redirect: this.router.url } });
+    return false;
   }
 
   getAvatarInitial(
