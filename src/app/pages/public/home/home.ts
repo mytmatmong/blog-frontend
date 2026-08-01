@@ -6,7 +6,7 @@ import {
   signal,
 } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   takeUntilDestroyed,
   toObservable,
@@ -15,6 +15,7 @@ import {
 import {
   debounceTime,
   distinctUntilChanged,
+  map,
   skip,
   Subject,
 } from 'rxjs';
@@ -22,7 +23,6 @@ import {
 import {
   FilterSortOption,
   getPostSortQuery,
-  PublicSidebarLeft,
 } from '../../../shared/components/public-sidebar-left/public-sidebar-left';
 
 import { PublicSidebarRight } from '../../../shared/components/public-sidebar-right/public-sidebar-right';
@@ -41,13 +41,13 @@ import { TranslationService } from '../../../core/services/translation.service';
 import {
   CategoryItem,
   PublicPost,
+  TopTagItem,
 } from '../../../core/models/post.model';
 
 @Component({
   selector: 'app-home',
   imports: [
     RouterLink,
-    PublicSidebarLeft,
     PublicSidebarRight,
     PostCard,
     Pagination,
@@ -63,11 +63,26 @@ export class Home implements OnInit {
   private readonly translationService =
     inject(TranslationService);
 
+  private readonly route =
+    inject(ActivatedRoute);
+
+  private readonly router =
+    inject(Router);
+
   private readonly searchChanges =
     new Subject<string>();
 
   readonly posts = signal<PostItem[]>([]);
   readonly categories = signal<CategoryItem[]>([]);
+  readonly topTags = signal<TopTagItem[]>([]);
+
+  readonly featuredPost = computed(() =>
+    this.posts()[0] ?? null,
+  );
+
+  readonly latestPosts = computed(() =>
+    this.posts().slice(1),
+  );
 
   readonly totalItems = signal(0);
   readonly totalPages = signal(1);
@@ -79,9 +94,12 @@ export class Home implements OnInit {
 
   readonly isLoading = signal(false);
   readonly isLoadingCategories = signal(false);
+  readonly isLoadingTags = signal(false);
   readonly errorMessage = signal<string | null>(null);
 
   readonly itemsPerPage = 10;
+
+  private initialized = false;
 
   /**
    * Backend không có query sort.
@@ -91,6 +109,21 @@ export class Home implements OnInit {
 
 
   constructor() {
+    this.route.queryParamMap
+      .pipe(
+        map((params) => params.get('search') ?? ''),
+        distinctUntilChanged(),
+        takeUntilDestroyed(),
+      )
+      .subscribe((value) => {
+        this.searchTerm.set(value);
+        this.currentPage.set(1);
+
+        if (this.initialized) {
+          this.loadPosts();
+        }
+      });
+
     this.searchChanges
       .pipe(
         debounceTime(350),
@@ -113,12 +146,15 @@ export class Home implements OnInit {
       .subscribe(() => {
         this.currentPage.set(1);
         this.loadCategories();
+        this.loadTopTags();
         this.loadPosts();
       });
   }
 
   ngOnInit(): void {
+    this.initialized = true;
     this.loadCategories();
+    this.loadTopTags();
     this.loadPosts();
   }
 
@@ -224,13 +260,46 @@ export class Home implements OnInit {
       });
   }
 
+  loadTopTags(): void {
+    this.isLoadingTags.set(true);
+
+    this.publicApiService
+      .getTopTags(
+        6,
+        this.currentLanguageCode(),
+      )
+      .subscribe({
+        next: (response) => {
+          this.topTags.set(response.data);
+          this.isLoadingTags.set(false);
+        },
+        error: () => {
+          this.topTags.set([]);
+          this.isLoadingTags.set(false);
+        },
+      });
+  }
+
   onSearchChange(value: string): void {
     this.searchChanges.next(value);
   }
 
   clearSearch(): void {
+    const hasSearchQuery =
+      this.route.snapshot.queryParamMap.has('search');
+
     this.searchTerm.set('');
     this.currentPage.set(1);
+
+    if (hasSearchQuery) {
+      void this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { search: null },
+        queryParamsHandling: 'merge',
+      });
+      return;
+    }
+
     this.searchChanges.next('');
   }
 

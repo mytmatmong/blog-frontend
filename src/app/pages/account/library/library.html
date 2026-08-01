@@ -1,61 +1,214 @@
-<main class="container mx-auto px-4 max-w-7xl py-6">
-  <section
-    class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-    <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+<main class="page-shell library-page">
+  <div class="library-shell">
+    <!-- Header -->
+    <section class="library-header">
+      <div class="library-header__content">
+        <span class="library-header__icon">
+          <i class="bi bi-collection"></i>
+        </span>
+
+        <div>
+          <h1>
+            {{ 'library.title' | translate }}
+          </h1>
+
+          <p>
+            {{ 'library.subtitle' | translate }}
+          </p>
+        </div>
+      </div>
+
+      <div class="library-tabs" role="tablist" aria-label="Library">
+
+        <button type="button" role="tab" class="library-tab" [class.is-active]="activeTab() === 'bookmarks'"
+          [attr.aria-selected]="activeTab() === 'bookmarks'" (click)="selectTab('bookmarks')">
+
+          <span class="library-tab__icon">
+            <i class="bi" [class.bi-bookmark-fill]="activeTab() === 'bookmarks'"
+              [class.bi-bookmark]="activeTab() !== 'bookmarks'">
+            </i>
+          </span>
+
+          <span>
+            {{ 'library.bookmarks' | translate }}
+          </span>
+
+          @if (
+          activeTab() === 'bookmarks' &&
+          !isLoading()
+          ) {
+          <small>
+            {{ totalItems() }}
+          </small>
+          }
+        </button>
+
+        <button type="button" role="tab" class="library-tab" [class.is-active]="activeTab() === 'likes'"
+          [attr.aria-selected]="activeTab() === 'likes'" (click)="selectTab('likes')">
+
+          <span class="library-tab__icon">
+            <i class="bi" [class.bi-heart-fill]="activeTab() === 'likes'" [class.bi-heart]="activeTab() !== 'likes'">
+            </i>
+          </span>
+
+          <span>
+            {{ 'library.likes' | translate }}
+          </span>
+
+          @if (
+          activeTab() === 'likes' &&
+          !isLoading()
+          ) {
+          <small>
+            {{ totalItems() }}
+          </small>
+          }
+        </button>
+      </div>
+    </section>
+
+    <!-- Tiêu đề danh sách -->
+    <header class="library-feed-header">
       <div>
-        <h1 class="font-bold text-xl text-aquamarine-950 dark:text-aquamarine-50">{{ 'library.title' | translate }}</h1>
-        <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ 'library.subtitle' | translate }}</p>
+        <span class="library-feed-header__eyebrow">
+          @if (activeTab() === 'bookmarks') {
+          <i class="bi bi-bookmark"></i>
+          {{ 'library.bookmarks' | translate }}
+          } @else {
+          <i class="bi bi-heart"></i>
+          {{ 'library.likes' | translate }}
+          }
+        </span>
+
+        <h2>
+          @if (activeTab() === 'bookmarks') {
+          {{ 'library.bookmarks' | translate }}
+          } @else {
+          {{ 'library.likes' | translate }}
+          }
+        </h2>
+
+        @if (!isLoading() && !errorMessage()) {
+        <p>
+          {{ totalItems() }}
+          {{ 'nav.posts' | translate }}
+        </p>
+        }
       </div>
 
-      <div class="flex gap-2">
-        <button type="button" class="btn btn-secondary" [class.active]="activeTab() === 'bookmarks'"
-          (click)="selectTab('bookmarks')">
-          <i class="bi bi-bookmark-fill me-2"></i>{{ 'library.bookmarks' | translate }}
-        </button>
-        <button type="button" class="btn btn-secondary" [class.active]="activeTab() === 'likes'"
-          (click)="selectTab('likes')">
-          <i class="bi bi-heart-fill me-2"></i>{{ 'library.likes' | translate }}
-        </button>
-      </div>
-    </div>
+      @if (!isLoading() && !errorMessage()) {
+      <span class="library-feed-header__count">
+        {{ totalItems() }}
+      </span>
+      }
+    </header>
 
+    <!-- Loading -->
     @if (isLoading()) {
-    <div class="space-y-4 animate-pulse">
-      <div class="h-28 rounded-2xl bg-aquamarine-100 dark:bg-aquamarine-800"></div>
-      <div class="h-28 rounded-2xl bg-aquamarine-100 dark:bg-aquamarine-800"></div>
+    <div class="library-post-list">
+      @for (item of [1, 2, 3]; track item) {
+      <div class="library-post-skeleton">
+        <div class="library-post-skeleton__media skeleton"></div>
+
+        <div class="library-post-skeleton__content">
+          <div class="h-4 w-28 rounded skeleton"></div>
+          <div class="h-6 w-4/5 rounded skeleton"></div>
+          <div class="h-3 w-full rounded skeleton"></div>
+          <div class="h-3 w-3/4 rounded skeleton"></div>
+
+          <div class="library-post-skeleton__footer">
+            <div class="h-8 w-32 rounded skeleton"></div>
+            <div class="h-5 w-20 rounded skeleton"></div>
+          </div>
+        </div>
+      </div>
+      }
     </div>
-    } @else if (errorMessage()) {
-    <div class="p-4 rounded-xl border border-red-200 bg-red-50 text-red-700">
-      {{ errorMessage() }}
-      <button type="button" class="ms-2 underline" (click)="load()">{{ 'common.retry' | translate }}</button>
-    </div>
-    } @else if (posts().length > 0) {
-    @for (post of posts(); track post.id) {
-    <app-post-card [post]="post" [showUserActions]="true" [liked]="isLiked(post.id)"
-      [bookmarked]="isBookmarked(post.id)" [likeBusy]="
-      isInteractionBusy(
-        post.id,
-        'like'
-      )
-    " [bookmarkBusy]="
-      isInteractionBusy(
-        post.id,
-        'bookmark'
-      )
-    " (interactionRequested)="
-      handleInteraction($event)
-    "></app-post-card>
     }
+
+    <!-- Error -->
+    @else if (errorMessage()) {
+    <div class="library-error">
+      <span class="library-error__icon">
+        <i class="bi bi-exclamation-circle"></i>
+      </span>
+
+      <div class="library-error__content">
+        <strong>
+          {{ 'posts.load_error' | translate }}
+        </strong>
+
+        <p>
+          {{ errorMessage() }}
+        </p>
+      </div>
+
+      <button type="button" class="btn btn-secondary" (click)="load()">
+        <i class="bi bi-arrow-clockwise"></i>
+        {{ 'common.retry' | translate }}
+      </button>
+    </div>
+    }
+
+    <!-- Danh sách -->
+    @else if (posts().length > 0) {
+    <section class="library-post-list">
+      @for (post of posts(); track post.id) {
+      <app-post-card [post]="post" variant="list" [showUserActions]="true" [liked]="isLiked(post.id)"
+        [bookmarked]="isBookmarked(post.id)" [likeBusy]="
+              isInteractionBusy(
+                post.id,
+                'like'
+              )
+            " [bookmarkBusy]="
+              isInteractionBusy(
+                post.id,
+                'bookmark'
+              )
+            " (interactionRequested)="
+              handleInteraction($event)
+            ">
+      </app-post-card>
+      }
+    </section>
 
     @if (totalPages() > 1) {
-    <app-pagination [totalItems]="totalItems()" [itemsPerPage]="itemsPerPage" [currentPage]="currentPage()"
-      (currentPageChange)="onPageChange($event)">
-    </app-pagination>
+    <div class="library-pagination">
+      <app-pagination [totalItems]="totalItems()" [itemsPerPage]="itemsPerPage" [currentPage]="currentPage()"
+        (currentPageChange)="onPageChange($event)">
+      </app-pagination>
+    </div>
     }
-    } @else {
-    <p class="py-10 text-center text-sm text-aquamarine-600 dark:text-aquamarine-400">
-      {{ activeTab() === 'bookmarks' ? ('library.empty_bookmarks' | translate) : ('library.empty_likes' | translate) }}
-    </p>
     }
-  </section>
+
+    <!-- Empty -->
+    @else {
+    <section class="library-empty">
+      <span class="library-empty__icon">
+        @if (activeTab() === 'bookmarks') {
+        <i class="bi bi-bookmark-x"></i>
+        } @else {
+        <i class="bi bi-heart"></i>
+        }
+      </span>
+
+      <h2>
+        @if (activeTab() === 'bookmarks') {
+        {{ 'library.empty_bookmarks' | translate }}
+        } @else {
+        {{ 'library.empty_likes' | translate }}
+        }
+      </h2>
+
+      <p>
+        {{ 'library.subtitle' | translate }}
+      </p>
+
+      <a routerLink="/" class="btn btn-primary">
+        <i class="bi bi-arrow-left"></i>
+        {{ 'common.back_home' | translate }}
+      </a>
+    </section>
+    }
+  </div>
 </main>

@@ -1,189 +1,241 @@
-<main class="container mx-auto px-4 max-w-7xl py-6">
-  <section class="p-6 mb-6 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 card-box shadow-sm">
-    @if (isTagSelected()) {
-    <button type="button"
-      class="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-aquamarine-600 dark:text-aquamarine-300 hover:underline"
-      (click)="showAllTags()">
-      <i class="bi bi-arrow-left" aria-hidden="true"></i>
+<main class="page-shell hashtag-page">
+  <!-- Header hashtag -->
+  <section class="hashtag-hero" [class.hashtag-hero--selected]="isTagSelected()">
 
-      {{
-      'hashtag.back_to_all'
-      | translate
-      }}
-    </button>
-    }
-
-    <h1 class="font-bold text-2xl text-aquamarine-950 dark:text-aquamarine-50 mb-2">
+    <div class="hashtag-hero__content">
       @if (isTagSelected()) {
-      #{{
-      selectedTagName() ||
-      selectedTagId()
-      }}
+      <button type="button" class="hashtag-back" (click)="showAllTags()">
+        <i class="bi bi-arrow-left"></i>
+        {{ 'hashtag.back_to_all' | translate }}
+      </button>
       } @else {
-      {{
-      'hashtag.title'
-      | translate
-      }}
+      <span class="hashtag-hero__eyebrow">
+        <i class="bi bi-hash"></i>
+        {{ 'nav.hashtags' | translate }}
+      </span>
       }
-    </h1>
 
-    <p class="text-sm text-aquamarine-600 dark:text-aquamarine-400">
-      {{
-      (
-      isTagSelected()
-      ? 'hashtag.selected_subtitle'
-      : 'hashtag.list_subtitle'
-      ) | translate
-      }}
-    </p>
+      <div class="hashtag-hero__heading">
+        <div>
+          <h1>
+            @if (isTagSelected()) {
+            <span class="hashtag-symbol">#</span>{{ selectedTagName() || selectedTagId() }}
+            } @else {
+            {{ 'hashtag.title' | translate }}
+            }
+          </h1>
+
+          <p>
+            {{
+            (
+            isTagSelected()
+            ? 'hashtag.selected_subtitle'
+            : 'hashtag.list_subtitle'
+            ) | translate
+            }}
+          </p>
+        </div>
+
+        @if (isTagSelected() && !isLoading()) {
+        <div class="hashtag-stat">
+          <span class="hashtag-stat__icon">
+            <i class="bi bi-journal-text"></i>
+          </span>
+
+          <span class="hashtag-stat__copy">
+            <strong>{{ totalItems() }}</strong>
+            <small>{{ 'nav.posts' | translate }}</small>
+          </span>
+        </div>
+        }
+      </div>
+    </div>
+
+    <span class="hashtag-hero__decoration">#</span>
   </section>
 
-  <div class="lg:hidden mb-4">
-    <div class="relative">
-      <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-aquamarine-500" aria-hidden="true"></i>
+  <!-- Search mobile -->
+  <div class="hashtag-mobile-search">
+    <i class="bi bi-search"></i>
 
-      <input type="search"
-        class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 py-3 ps-10 pe-4"
-        [placeholder]="searchPlaceholder()" [value]="searchTerm()" (input)="
-          onSearchChange(
-            $any($event.target).value
-          )
-        " />
-    </div>
+    <input type="search" [placeholder]="searchPlaceholder()" [value]="searchTerm()"
+      (input)="onSearchChange($any($event.target).value)" />
   </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-    <app-public-sidebar-left class="hidden lg:block lg:col-span-3" [showFilters]="isTagSelected()"
-      [activeFilter]="activeFilter()" [searchPlaceholder]="
-        searchPlaceholder()
-      " [searchTerm]="searchTerm()" (filterChange)="
-        onFilterChange($event)
-      " (searchChange)="
-        onSearchChange($event)
-      ">
+  <div class="hashtag-layout">
+    <!-- Sidebar trái -->
+    <app-public-sidebar-left [showFilters]="isTagSelected()" [activeFilter]="activeFilter()"
+      [searchPlaceholder]="searchPlaceholder()" [searchTerm]="searchTerm()" (filterChange)="onFilterChange($event)"
+      (searchChange)="onSearchChange($event)">
     </app-public-sidebar-left>
 
-    <section class="lg:col-span-6">
+    <!-- Nội dung chính -->
+    <section class="hashtag-feed">
+      <header class="hashtag-feed__header">
+        <div>
+          <span class="hashtag-feed__eyebrow">
+            <i class="bi" [class.bi-hash]="!isTagSelected()" [class.bi-journal-text]="isTagSelected()">
+            </i>
+
+            @if (isTagSelected()) {
+            {{ 'nav.posts' | translate }}
+            } @else {
+            {{ 'nav.hashtags' | translate }}
+            }
+          </span>
+
+          <h2>
+            @if (isTagSelected()) {
+            #{{ selectedTagName() || selectedTagId() }}
+            } @else {
+            {{ 'hashtag.title' | translate }}
+            }
+          </h2>
+
+          @if (!isLoading()) {
+          <p>
+            {{ totalItems() }}
+
+            {{
+            (
+            isTagSelected()
+            ? 'nav.posts'
+            : 'nav.hashtags'
+            ) | translate
+            }}
+          </p>
+          }
+        </div>
+
+        @if (!isLoading()) {
+        <span class="hashtag-feed__counter">
+          {{ totalItems() }}
+        </span>
+        }
+      </header>
+
+      <!-- Loading -->
       @if (isLoading()) {
-      <div class="space-y-4">
-        <div class="h-36 rounded-2xl bg-aquamarine-100 dark:bg-aquamarine-800 animate-pulse"></div>
+      <div class="hashtag-feed-list">
+        @for (item of [1, 2, 3]; track item) {
+        <div class="hashtag-post-skeleton">
+          <span class="hashtag-post-skeleton__media skeleton"></span>
 
-        <div class="h-36 rounded-2xl bg-aquamarine-100 dark:bg-aquamarine-800 animate-pulse"></div>
+          <span class="hashtag-post-skeleton__content">
+            <span class="h-4 w-28 rounded skeleton"></span>
+            <span class="h-6 w-4/5 rounded skeleton"></span>
+            <span class="h-3 w-full rounded skeleton"></span>
+            <span class="h-3 w-3/4 rounded skeleton"></span>
 
-        <div class="h-36 rounded-2xl bg-aquamarine-100 dark:bg-aquamarine-800 animate-pulse"></div>
+            <span class="hashtag-post-skeleton__footer">
+              <span class="h-8 w-28 rounded skeleton"></span>
+              <span class="h-4 w-16 rounded skeleton"></span>
+            </span>
+          </span>
+        </div>
+        }
       </div>
-      } @else if (errorMessage()) {
-      <div
-        class="p-6 rounded-2xl border border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300">
-        <p class="font-semibold">
-          {{
-          'hashtag.load_error'
-          | translate
-          }}
-        </p>
+      }
 
-        <p class="text-sm mt-1">
-          {{ errorMessage() }}
-        </p>
+      <!-- Error -->
+      @else if (errorMessage()) {
+      <div class="alert-box">
+        <i class="bi bi-exclamation-circle-fill"></i>
 
-        <button type="button" class="mt-4 px-3 py-1.5 rounded-lg border border-red-300 dark:border-red-800"
-          (click)="loadCurrentMode()">
-          {{
-          'common.retry'
-          | translate
-          }}
+        <div class="flex-1">
+          <strong class="block">
+            {{ 'hashtag.load_error' | translate }}
+          </strong>
+
+          <span class="block mt-1">
+            {{ errorMessage() }}
+          </span>
+        </div>
+
+        <button type="button" class="btn btn-secondary" (click)="loadCurrentMode()">
+          {{ 'common.retry' | translate }}
         </button>
       </div>
-      } @else if (!isTagSelected()) {
+      }
+
+      <!-- Danh sách hashtag -->
+      @else if (!isTagSelected()) {
       @if (tags().length > 0) {
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        @for (
-        tag of tags();
-        track tag.id
-        ) {
-        <button type="button"
-          class="group p-4 text-left rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 hover:border-aquamarine-500 hover:shadow-md transition-all"
-          (click)="selectTag(tag)">
-          <div class="flex items-center justify-between gap-3">
-            <div class="min-w-0">
-              <p class="font-bold text-aquamarine-900 dark:text-aquamarine-100 truncate">
-                #{{ tag.name }}
-              </p>
+      <div class="hashtag-directory">
+        @for (tag of tags(); track tag.id) {
+        <button type="button" class="hashtag-directory__item" (click)="selectTag(tag)">
 
-              <p class="mt-1 text-xs text-aquamarine-500 dark:text-aquamarine-400">
-                {{
-                'hashtag.related_posts'
-                | translate
-                }}
-              </p>
-            </div>
+          <span class="hashtag-directory__icon">
+            #
+          </span>
 
-            <i class="bi bi-chevron-right text-aquamarine-400 group-hover:translate-x-1 transition-transform"
-              aria-hidden="true"></i>
-          </div>
+          <span class="hashtag-directory__copy">
+            <strong>#{{ tag.name }}</strong>
+
+            <small>
+              {{ 'hashtag.related_posts' | translate }}
+            </small>
+          </span>
+
+          <span class="hashtag-directory__arrow">
+            <i class="bi bi-arrow-up-right"></i>
+          </span>
         </button>
         }
       </div>
 
       @if (totalPages() > 1) {
-      <app-pagination [totalItems]="totalItems()" [itemsPerPage]="itemsPerPage" [currentPage]="currentPage()"
-        (currentPageChange)="
-                onPageChange($event)
-              ">
-      </app-pagination>
+      <div class="hashtag-pagination">
+        <app-pagination [totalItems]="totalItems()" [itemsPerPage]="itemsPerPage" [currentPage]="currentPage()"
+          (currentPageChange)="onPageChange($event)">
+        </app-pagination>
+      </div>
       }
       } @else {
-      <div
-        class="p-8 text-center rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900">
-        <p class="text-aquamarine-600 dark:text-aquamarine-400">
-          {{
-          'hashtag.empty_tags'
-          | translate
-          }}
-        </p>
+      <div class="empty-state hashtag-empty">
+        <span class="empty-state__icon">
+          <i class="bi bi-hash"></i>
+        </span>
+
+        <p>{{ 'hashtag.empty_tags' | translate }}</p>
 
         @if (searchTerm()) {
-        <button type="button" class="mt-4 px-4 py-2 rounded-xl bg-aquamarine-600 text-white" (click)="clearSearch()">
-          {{
-          'common.clear_search'
-          | translate
-          }}
+        <button type="button" class="btn btn-primary mt-4" (click)="clearSearch()">
+          {{ 'common.clear_search' | translate }}
         </button>
         }
       </div>
       }
-      } @else {
+      }
+
+      <!-- Danh sách bài viết -->
+      @else {
       @if (posts().length > 0) {
-      @for (
-      post of posts();
-      track post.id
-      ) {
-      <app-post-card [post]="post"></app-post-card>
-      }
+      <div class="hashtag-feed-list">
+        @for (post of posts(); track post.id) {
+        <app-post-card [post]="post" variant="list">
+        </app-post-card>
+        }
+      </div>
 
       @if (totalPages() > 1) {
-      <app-pagination [totalItems]="totalItems()" [itemsPerPage]="itemsPerPage" [currentPage]="currentPage()"
-        (currentPageChange)="
-                onPageChange($event)
-              ">
-      </app-pagination>
+      <div class="hashtag-pagination">
+        <app-pagination [totalItems]="totalItems()" [itemsPerPage]="itemsPerPage" [currentPage]="currentPage()"
+          (currentPageChange)="onPageChange($event)">
+        </app-pagination>
+      </div>
       }
       } @else {
-      <div
-        class="p-8 text-center rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900">
-        <p class="text-aquamarine-600 dark:text-aquamarine-400">
-          {{
-          'hashtag.empty_posts'
-          | translate
-          }}
-        </p>
+      <div class="empty-state hashtag-empty">
+        <span class="empty-state__icon">
+          <i class="bi bi-journal-x"></i>
+        </span>
+
+        <p>{{ 'hashtag.empty_posts' | translate }}</p>
 
         @if (searchTerm()) {
-        <button type="button" class="mt-4 px-4 py-2 rounded-xl bg-aquamarine-600 text-white" (click)="clearSearch()">
-          {{
-          'common.clear_search'
-          | translate
-          }}
+        <button type="button" class="btn btn-primary mt-4" (click)="clearSearch()">
+          {{ 'common.clear_search' | translate }}
         </button>
         }
       </div>
@@ -191,6 +243,7 @@
       }
     </section>
 
-    <app-public-sidebar-right class="lg:col-span-3"></app-public-sidebar-right>
+    <!-- Sidebar phải -->
+    <app-public-sidebar-right></app-public-sidebar-right>
   </div>
 </main>

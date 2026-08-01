@@ -1,189 +1,85 @@
-<article
-  class="p-5 mb-4 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 card-box shadow-sm hover:shadow-md transition-shadow">
-  <div class="flex gap-4">
-    <!-- Tương tác desktop -->
-    <div class="hidden sm:flex flex-col items-center justify-center gap-2 w-12 flex-shrink-0">
-      @if (showUserActions) {
-      <button type="button"
-        class="w-9 h-9 rounded-full inline-flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        [class.text-red-500]="isLiked()" [class.text-aquamarine-500]="!isLiked()" [class.hover:bg-red-50]="isLiked()"
-        [class.dark:hover:bg-red-950/30]="isLiked()" [class.hover:bg-aquamarine-100]="!isLiked()"
-        [class.dark:hover:bg-aquamarine-800]="!isLiked()" [disabled]="isLikeBusy()" [title]="
-            isLiked()
-              ? ('post.unlike' | translate)
-              : ('post.like' | translate)
-          " (click)="requestLikeAction()">
-        @if (isLikeBusy()) {
-        <span class="w-4 h-4 rounded-full border-2 border-aquamarine-200 border-t-aquamarine-600 animate-spin"></span>
-        } @else {
-        <i class="bi" [class.bi-heart-fill]="isLiked()" [class.bi-heart]="!isLiked()"></i>
-        }
-      </button>
+<article class="post-card" [class.post-card--list]="variant === 'list'"> <a [routerLink]="['/post', post.id]"
+    class="post-card__media" [attr.aria-label]="post.title">
+    @if (post.thumbnailUrl) {
+    <img [src]="post.thumbnailUrl" [alt]="post.title" loading="lazy" width="520" height="300" />
+    } @else {
+    <span class="post-card__placeholder">
+      <i class="bi bi-code-square"></i>
+      <small>Blogy.</small>
+    </span>
+    }
+  </a>
 
-      <div class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-100">
-        {{ displayedLikes() }}
-      </div>
-
-      <button type="button"
-        class="w-9 h-9 rounded-full inline-flex items-center justify-center text-aquamarine-600 dark:text-aquamarine-300 hover:bg-aquamarine-100 dark:hover:bg-aquamarine-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        [disabled]="isBookmarkBusy()" [title]="
-            isBookmarked()
-              ? ('post.unsave' | translate)
-              : ('post.save' | translate)
-          " (click)="requestBookmarkAction()">
-        @if (isBookmarkBusy()) {
-        <span class="w-4 h-4 rounded-full border-2 border-aquamarine-200 border-t-aquamarine-600 animate-spin"></span>
-        } @else {
-        <i class="bi" [class.bi-bookmark-fill]="isBookmarked()" [class.bi-bookmark]="!isBookmarked()"></i>
-        }
-      </button>
+  <div class="post-card__floating-actions">
+    @if (showUserActions) {
+    <button type="button" class="action-button" [class.is-liked]="isLiked()" [disabled]="isLikeBusy()"
+      [title]="isLiked() ? ('post.unlike' | translate) : ('post.like' | translate)" (click)="requestLikeAction()">
+      @if (isLikeBusy()) {
+      <span class="w-3.5 h-3.5 rounded-full border-2 border-current/25 border-t-current animate-spin"></span>
       } @else {
-      <span class="p-1 text-aquamarine-600 dark:text-aquamarine-300">
-        <i class="bi bi-heart-fill"></i>
-      </span>
-
-      <div class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-100">
-        {{ displayedLikes() }}
-      </div>
-
-      <span class="p-1 text-aquamarine-500 dark:text-aquamarine-400">
-        <i class="bi bi-bookmark"></i>
-      </span>
+      <i class="bi" [class.bi-heart-fill]="isLiked()" [class.bi-heart]="!isLiked()"></i>
       }
-    </div>
-
-    <!-- Thumbnail -->
-    <div
-      class="hidden md:flex w-28 h-20 rounded-xl bg-aquamarine-100 dark:bg-aquamarine-800 items-center justify-center flex-shrink-0 overflow-hidden">
-      @if (post.thumbnailUrl) {
-      <img [src]="post.thumbnailUrl" [alt]="post.title" class="w-full h-full object-cover" loading="lazy" width="112"
-        height="80" />
+      <span>{{ displayedLikes() }}</span>
+    </button>
+    <button type="button" class="action-button action-button--icon" [class.is-saved]="isBookmarked()"
+      [disabled]="isBookmarkBusy()" [title]="isBookmarked() ? ('post.unsave' | translate) : ('post.save' | translate)"
+      (click)="requestBookmarkAction()">
+      @if (isBookmarkBusy()) {
+      <span class="w-3.5 h-3.5 rounded-full border-2 border-current/25 border-t-current animate-spin"></span>
       } @else {
-      <i class="bi bi-code-slash text-2xl text-aquamarine-600 dark:text-aquamarine-300"></i>
+      <i class="bi" [class.bi-bookmark-fill]="isBookmarked()" [class.bi-bookmark]="!isBookmarked()"></i>
+      }
+    </button>
+    } @else {
+    <span class="action-button is-liked"><i class="bi bi-heart-fill"></i>{{ displayedLikes() }}</span>
+    }
+  </div>
+
+  <div class="post-card__body">
+    @if (post.categories.length > 0) {
+    <div class="post-card__categories">
+      @for (category of post.categories.slice(0, 2); track category.id) {
+      <a routerLink="/category" [queryParams]="{ categoryId: category.id }" class="category-badge">
+        {{ category.name }}
+      </a>
+      }
+    </div>
+    }
+
+    <h2 class="post-card__title">
+      <a [routerLink]="['/post', post.id]">{{ post.title }}</a>
+    </h2>
+
+    <p class="post-card__excerpt">{{ post.excerpt }}</p>
+
+    <div class="post-card__tags">
+      @for (tag of post.tags.slice(0, 3); track tag.id) {
+      <a class="tag" routerLink="/hashtag" [queryParams]="{ tagId: tag.id, tagName: tag.name }">
+        #{{ tag.name }}
+      </a>
       }
     </div>
 
-    <!-- Nội dung -->
-    <div class="flex-grow min-w-0">
-      <div class="flex flex-wrap items-center gap-2 mb-2">
-        <a [routerLink]="[
-            '/author',
-            post.authorId
-          ]" class="flex items-center gap-2 group hover:opacity-80 transition-opacity">
-          @if (post.authorAvatarUrl) {
-          <img [src]="post.authorAvatarUrl" [alt]="post.authorName"
-            class="w-7 h-7 rounded-full object-cover border border-aquamarine-200 dark:border-aquamarine-700"
-            loading="lazy" width="28" height="28" />
-          } @else {
-          <span class="avatar-sm">
-            {{ post.authorAvatar }}
-          </span>
-          }
+    <footer class="post-card__footer">
+      <a [routerLink]="['/author', post.authorId]" class="post-card__author">
+        @if (post.authorAvatarUrl) {
+        <img [src]="post.authorAvatarUrl" [alt]="post.authorName" class="avatar-sm object-cover" loading="lazy"
+          width="32" height="32" />
+        } @else {
+        <span class="avatar-sm">{{ post.authorAvatar }}</span>
+        }
+        <span class="post-card__author-info">
+          <span class="post-card__author-name">{{ post.authorName }}</span>
+          <span class="post-card__meta">{{ post.timeAgo }} · {{ post.readTime }}</span>
+        </span>
+      </a>
 
-          <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400 group-hover:underline font-semibold">
-            {{ post.authorName }}
-          </small>
-        </a>
-
-        <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400">
-          • {{ post.timeAgo }}
-          • {{ post.readTime }}
-        </small>
-      </div>
-
-      @if (post.categories.length > 0) {
-      <div class="mb-2 flex flex-wrap gap-1">
-        @for (
-        category of post.categories;
-        track category.id
-        ) {
-        <a routerLink="/category" [queryParams]="{
-                categoryId:
-                  category.id
-              }" class="category-badge">
-          {{ category.name }}
-        </a>
+      <div class="post-card__stats">
+        <span><i class="bi bi-eye"></i>{{ post.views }}</span>
+        @if (post.showCommentCount ?? true) {
+        <span><i class="bi bi-chat"></i>{{ post.comments }}</span>
         }
       </div>
-      }
-
-      <h2 class="font-bold text-lg mb-2">
-        <a [routerLink]="[
-            '/post',
-            post.id
-          ]" class="card-text transition-colors">
-          {{ post.title }}
-        </a>
-      </h2>
-
-      <p class="text-sm opacity-90 mb-3 line-clamp-2">
-        {{ post.excerpt }}
-      </p>
-
-      <div class="flex flex-wrap justify-between items-center gap-3">
-        <div class="flex flex-wrap gap-2">
-          @for (
-          tag of post.tags;
-          track tag.id
-          ) {
-          <a class="tag" routerLink="/hashtag" [queryParams]="{
-                tagId: tag.id,
-                tagName: tag.name
-              }">
-            #{{ tag.name }}
-          </a>
-          }
-        </div>
-
-        <div class="flex items-center gap-3">
-          <!-- Tương tác mobile -->
-          @if (showUserActions) {
-          <div class="sm:hidden flex items-center gap-2">
-            <button type="button"
-              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-aquamarine-200 dark:border-aquamarine-700 text-xs font-semibold transition-colors disabled:opacity-50"
-              [class.text-red-500]="isLiked()" [class.text-aquamarine-700]="!isLiked()" [disabled]="isLikeBusy()"
-              (click)="requestLikeAction()">
-              @if (isLikeBusy()) {
-              <span
-                class="w-3.5 h-3.5 rounded-full border-2 border-aquamarine-200 border-t-aquamarine-600 animate-spin"></span>
-              } @else {
-              <i class="bi" [class.bi-heart-fill]="isLiked()" [class.bi-heart]="!isLiked()"></i>
-              }
-
-              {{ displayedLikes() }}
-            </button>
-
-            <button type="button"
-              class="inline-flex items-center justify-center w-9 h-8 rounded-lg border border-aquamarine-200 dark:border-aquamarine-700 text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-200 transition-colors disabled:opacity-50"
-              [disabled]="isBookmarkBusy()" (click)="requestBookmarkAction()">
-              @if (isBookmarkBusy()) {
-              <span
-                class="w-3.5 h-3.5 rounded-full border-2 border-aquamarine-200 border-t-aquamarine-600 animate-spin"></span>
-              } @else {
-              <i class="bi" [class.bi-bookmark-fill]="isBookmarked()" [class.bi-bookmark]="!isBookmarked()"></i>
-              }
-            </button>
-          </div>
-          }
-
-          <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400 flex items-center gap-2">
-            <span>
-              <i class="bi bi-eye me-1"></i>
-              {{ post.views }}
-            </span>
-
-            @if (
-            post.showCommentCount
-            ?? true
-            ) {
-            <span>
-              <i class="bi bi-chat me-1"></i>
-              {{ post.comments }}
-            </span>
-            }
-          </small>
-        </div>
-      </div>
-    </div>
+    </footer>
   </div>
 </article>

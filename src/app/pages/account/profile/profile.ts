@@ -1,4 +1,9 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import {
+  afterNextRender,
+  Component,
+  inject,
+  signal,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
@@ -12,11 +17,14 @@ import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-profile',
-  imports: [FormsModule, TranslatePipe],
+  imports: [
+    FormsModule,
+    TranslatePipe,
+  ],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })
-export class Profile implements OnInit {
+export class Profile {
   protected readonly auth = inject(AuthService);
 
   private readonly ts = inject(TranslationService);
@@ -28,23 +36,112 @@ export class Profile implements OnInit {
   readonly showPassword = signal(false);
   readonly isChangingPassword = signal(false);
 
-  confirmNewPassword = '';
   readonly user = signal<User | null>(null);
-  readonly isLoading = signal(false);
+
+  /*
+   * Bật loading ngay từ đầu để giao diện không nháy
+   * trước khi browser bắt đầu tải profile.
+   */
+  readonly isLoading = signal(true);
+
   readonly isSaving = signal(false);
   readonly isUploadingAvatar = signal(false);
   readonly isDeleting = signal(false);
   readonly avatarPreview = signal<string | null>(null);
 
+  confirmNewPassword = '';
   bio = '';
   newPassword = '';
   selectedAvatar: File | null = null;
 
-  ngOnInit(): void {
-    this.loadProfile();
+  constructor() {
+    /*
+     * afterNextRender chỉ chạy trên browser.
+     *
+     * Khi F5:
+     * - SSR không gọi API protected.
+     * - Browser hydrate xong mới kiểm tra token.
+     * - Không còn request GET profile thiếu Authorization.
+     */
+    afterNextRender(() => {
+      this.initializeProfile();
+    });
   }
 
+  /**
+   * Khởi tạo trang profile sau khi ứng dụng đã chạy trên browser.
+   *
+   * Trường hợp 1: Có access token -> gọi profile.
+   * Trường hợp 2: Chỉ có refresh token -> refresh trước.
+   * Trường hợp 3: Không có token -> quay về đăng nhập.
+   */
+  private initializeProfile(): void {
+    const accessToken = this.auth.accessToken();
+
+    if (accessToken) {
+      this.loadProfile();
+      return;
+    }
+
+    const refreshToken = this.auth.refreshToken();
+
+    if (!refreshToken) {
+      this.auth.logout();
+      this.redirectToLogin();
+      return;
+    }
+
+    this.isLoading.set(true);
+
+    this.auth.refreshAccessToken().subscribe({
+      next: (newAccessToken) => {
+        /*
+         * Đề phòng API refresh trả response rỗng.
+         */
+        if (!newAccessToken) {
+          this.auth.logout();
+          this.redirectToLogin();
+          return;
+        }
+
+        this.loadProfile();
+      },
+
+      error: () => {
+        this.auth.logout();
+        this.redirectToLogin();
+      },
+    });
+  }
+
+  /**
+   * Điều hướng về đăng nhập và lưu lại URL hiện tại
+   * để có thể quay lại profile sau khi đăng nhập.
+   */
+  private redirectToLogin(): void {
+    this.isLoading.set(false);
+
+    void this.router.navigate(
+      ['/auth'],
+      {
+        queryParams: {
+          redirect: this.router.url,
+        },
+      },
+    );
+  }
+
+  /**
+   * Tải đầy đủ thông tin người dùng.
+   *
+   * Hàm này chỉ gửi request khi access token đã tồn tại.
+   */
   loadProfile(): void {
+    if (!this.auth.accessToken()) {
+      this.initializeProfile();
+      return;
+    }
+
     this.isLoading.set(true);
 
     this.userApi.getProfile().subscribe({
@@ -52,11 +149,16 @@ export class Profile implements OnInit {
         this.applyUser(data);
         this.isLoading.set(false);
       },
+
       error: (error: unknown) => {
         this.isLoading.set(false);
 
         const cachedUser = this.auth.currentUser();
 
+        /*
+         * Nếu request lỗi nhưng localStorage còn user,
+         * vẫn giữ giao diện thay vì làm trống toàn bộ trang.
+         */
         if (cachedUser) {
           this.applyUser(cachedUser);
         }
@@ -78,14 +180,21 @@ export class Profile implements OnInit {
     }
 
     if (!file.type.startsWith('image/')) {
-      this.toast.warning(this.ts.translate('profile.only_image_allowed'));
+      this.toast.warning(
+        this.ts.translate(
+          'profile.only_image_allowed',
+        ),
+      );
+
       input.value = '';
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
       this.toast.warning(
-        this.ts.translate('profile.image_size_limit'),
+        this.ts.translate(
+          'profile.image_size_limit',
+        ),
       );
 
       input.value = '';
@@ -97,7 +206,9 @@ export class Profile implements OnInit {
     const reader = new FileReader();
 
     reader.onload = () => {
-      this.avatarPreview.set(String(reader.result));
+      this.avatarPreview.set(
+        String(reader.result),
+      );
     };
 
     reader.readAsDataURL(file);
@@ -117,8 +228,9 @@ export class Profile implements OnInit {
     this.userApi.updateProfile(body).subscribe({
       next: ({ data }) => {
         /*
-         * PATCH profile không trả followers.
-         * Phải merge với user cũ thay vì ghi đè toàn bộ.
+         * PATCH profile có thể không trả followers.
+         * Ghép response mới với user hiện tại để tránh
+         * mất danh sách follower trên giao diện.
          */
         this.applyUser(
           this.mergeUserData(data),
@@ -128,21 +240,25 @@ export class Profile implements OnInit {
         this.isSaving.set(false);
 
         this.toast.success(
-          this.ts.translate('profile.update_success'),
+          this.ts.translate(
+            'profile.update_success',
+          ),
         );
 
         /*
-         * Gọi lại GET profile để đồng bộ đầy đủ dữ liệu
-         * mà không cần người dùng F5.
+         * Đồng bộ lại profile đầy đủ sau khi cập nhật.
          */
         this.refreshProfileSilently();
       },
+
       error: (error: unknown) => {
         this.isSaving.set(false);
 
         this.toast.error(
           getApiErrorMessage(error),
-          this.ts.translate('profile.update_failed'),
+          this.ts.translate(
+            'profile.update_failed',
+          ),
         );
       },
     });
@@ -150,7 +266,12 @@ export class Profile implements OnInit {
 
   uploadAvatarOnly(): void {
     if (!this.selectedAvatar) {
-      this.toast.warning(this.ts.translate('profile.select_image_first'));
+      this.toast.warning(
+        this.ts.translate(
+          'profile.select_image_first',
+        ),
+      );
+
       return;
     }
 
@@ -161,8 +282,8 @@ export class Profile implements OnInit {
       .subscribe({
         next: ({ data }) => {
           /*
-           * Upload avatar cũng không trả followers,
-           * nên không được ghi đè trực tiếp.
+           * Response upload avatar có thể không chứa
+           * toàn bộ followers nên phải merge.
            */
           this.applyUser(
             this.mergeUserData(data),
@@ -172,38 +293,56 @@ export class Profile implements OnInit {
           this.isUploadingAvatar.set(false);
 
           this.toast.success(
-            this.ts.translate('profile.avatar_update_success'),
+            this.ts.translate(
+              'profile.avatar_update_success',
+            ),
           );
 
           this.refreshProfileSilently();
         },
+
         error: (error: unknown) => {
           this.isUploadingAvatar.set(false);
 
           this.toast.error(
             getApiErrorMessage(error),
-            this.ts.translate('profile.avatar_upload_failed'),
+            this.ts.translate(
+              'profile.avatar_upload_failed',
+            ),
           );
         },
       });
+  }
+
+  clearAvatarSelection(
+    input: HTMLInputElement,
+  ): void {
+    this.selectedAvatar = null;
+    this.avatarPreview.set(null);
+    input.value = '';
   }
 
   logoutAll(): void {
     this.auth.logoutAllApi().subscribe({
       next: () => {
         this.toast.success(
-          this.ts.translate('profile.logout_all_success'),
+          this.ts.translate(
+            'profile.logout_all_success',
+          ),
         );
 
-        this.router.navigate(['/auth']);
+        void this.router.navigate(['/auth']);
       },
+
       error: (error: unknown) => {
         this.toast.error(
           getApiErrorMessage(error),
-          this.ts.translate('profile.logout_failed'),
+          this.ts.translate(
+            'profile.logout_failed',
+          ),
         );
 
-        this.router.navigate(['/auth']);
+        void this.router.navigate(['/auth']);
       },
     });
   }
@@ -212,7 +351,9 @@ export class Profile implements OnInit {
     if (
       typeof window !== 'undefined'
       && !window.confirm(
-        this.ts.translate('profile.delete_confirm'),
+        this.ts.translate(
+          'profile.delete_confirm',
+        ),
       )
     ) {
       return;
@@ -223,30 +364,103 @@ export class Profile implements OnInit {
     this.userApi.deleteProfile().subscribe({
       next: () => {
         this.isDeleting.set(false);
+
         this.auth.logout();
 
         this.toast.success(
-          this.ts.translate('profile.delete_success'),
+          this.ts.translate(
+            'profile.delete_success',
+          ),
         );
 
-        this.router.navigate(['/']);
+        void this.router.navigate(['/']);
       },
+
       error: (error: unknown) => {
         this.isDeleting.set(false);
 
         this.toast.error(
           getApiErrorMessage(error),
-          this.ts.translate('profile.delete_failed'),
+          this.ts.translate(
+            'profile.delete_failed',
+          ),
         );
       },
     });
   }
-  clearAvatarSelection(
-    input: HTMLInputElement,
-  ): void {
-    this.selectedAvatar = null;
-    this.avatarPreview.set(null);
-    input.value = '';
+
+  togglePasswordForm(): void {
+    if (this.showPasswordForm()) {
+      this.resetPasswordForm();
+      return;
+    }
+
+    this.showPasswordForm.set(true);
+  }
+
+  cancelPasswordChange(): void {
+    this.resetPasswordForm();
+  }
+
+  changePassword(event: Event): void {
+    event.preventDefault();
+
+    if (this.newPassword.length < 6) {
+      this.toast.warning(
+        this.ts.translate(
+          'profile.password_min_length',
+        ),
+      );
+
+      return;
+    }
+
+    if (
+      this.newPassword
+      !== this.confirmNewPassword
+    ) {
+      this.toast.warning(
+        this.ts.translate(
+          'profile.passwords_not_match',
+        ),
+      );
+
+      return;
+    }
+
+    this.isChangingPassword.set(true);
+
+    this.userApi
+      .updateProfile({
+        password: this.newPassword,
+      })
+      .subscribe({
+        next: ({ data }) => {
+          this.applyUser(
+            this.mergeUserData(data),
+          );
+
+          this.isChangingPassword.set(false);
+          this.resetPasswordForm();
+
+          this.toast.success(
+            this.ts.translate(
+              'profile.change_password_success',
+            ),
+          );
+        },
+
+        error: (error: unknown) => {
+          this.isChangingPassword.set(false);
+
+          this.toast.error(
+            getApiErrorMessage(error),
+            this.ts.translate(
+              'profile.change_password_failed',
+            ),
+          );
+        },
+      });
   }
 
   formatFileSize(size: number): string {
@@ -263,6 +477,7 @@ export class Profile implements OnInit {
       / (1024 * 1024)
     ).toFixed(1)} MB`;
   }
+
   getAvatarInitial(
     name?: string | null,
   ): string {
@@ -308,10 +523,8 @@ export class Profile implements OnInit {
   }
 
   /**
-   * Ghép response PATCH/POST với dữ liệu profile hiện tại.
-   *
-   * Response cập nhật profile không chứa followers,
-   * nên phải giữ followers cũ.
+   * Ghép response PATCH hoặc upload avatar
+   * với dữ liệu profile hiện tại.
    */
   private mergeUserData(
     updatedUser: User,
@@ -336,20 +549,25 @@ export class Profile implements OnInit {
   }
 
   /**
-   * Đồng bộ lại response đầy đủ từ GET /user/profile,
-   * nhưng không bật màn hình loading để tránh giao diện nháy/mất dữ liệu.
+   * Đồng bộ lại profile đầy đủ nhưng không bật
+   * loading để giao diện không bị nháy.
    */
   private refreshProfileSilently(): void {
+    if (!this.auth.accessToken()) {
+      return;
+    }
+
     this.userApi.getProfile().subscribe({
       next: ({ data }) => {
         this.applyUser(
           this.mergeUserData(data),
         );
       },
+
       error: () => {
         /*
-         * PATCH đã thành công nên không hiện lỗi tại đây.
-         * Giao diện vẫn giữ dữ liệu vừa merge.
+         * Lệnh cập nhật trước đó đã thành công.
+         * Không hiện thêm lỗi đồng bộ phụ.
          */
       },
     });
@@ -360,7 +578,8 @@ export class Profile implements OnInit {
     this.bio = user.bio ?? '';
 
     /*
-     * Cập nhật signal toàn ứng dụng và localStorage.
+     * Đồng bộ user cho header, localStorage
+     * và các component khác trong ứng dụng.
      */
     this.auth.syncUser(user);
   }
@@ -369,74 +588,11 @@ export class Profile implements OnInit {
     this.selectedAvatar = null;
     this.avatarPreview.set(null);
   }
-  togglePasswordForm(): void {
-    if (this.showPasswordForm()) {
-      this.resetPasswordForm();
-      return;
-    }
-
-    this.showPasswordForm.set(true);
-  }
-
-  cancelPasswordChange(): void {
-    this.resetPasswordForm();
-  }
-
-  changePassword(event: Event): void {
-    event.preventDefault();
-
-    if (this.newPassword.length < 6) {
-      this.toast.warning(
-        this.ts.translate('profile.password_min_length'),
-      );
-
-      return;
-    }
-
-    if (
-      this.newPassword
-      !== this.confirmNewPassword
-    ) {
-      this.toast.warning(
-        this.ts.translate('profile.passwords_not_match'),
-      );
-
-      return;
-    }
-
-    this.isChangingPassword.set(true);
-
-    this.userApi
-      .updateProfile({
-        password: this.newPassword,
-      })
-      .subscribe({
-        next: ({ data }) => {
-          this.applyUser(
-            this.mergeUserData(data),
-          );
-
-          this.isChangingPassword.set(false);
-          this.resetPasswordForm();
-
-          this.toast.success(
-            this.ts.translate('profile.change_password_success'),
-          );
-        },
-        error: (error: unknown) => {
-          this.isChangingPassword.set(false);
-
-          this.toast.error(
-            getApiErrorMessage(error),
-            this.ts.translate('profile.change_password_failed'),
-          );
-        },
-      });
-  }
 
   private resetPasswordForm(): void {
     this.newPassword = '';
     this.confirmNewPassword = '';
+
     this.showPassword.set(false);
     this.showPasswordForm.set(false);
   }

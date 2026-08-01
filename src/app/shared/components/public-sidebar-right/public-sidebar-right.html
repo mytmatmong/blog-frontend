@@ -1,132 +1,68 @@
-<div
-  class="p-4 mb-4 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-  <h2 class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-50 mb-3">
-    {{ 'sidebar.top_authors' | translate }}
-  </h2>
-
-  @if (isLoadingAuthors()) {
-  <div class="space-y-3">
-    <div class="h-10 rounded-xl bg-aquamarine-100 dark:bg-aquamarine-800 animate-pulse"></div>
-
-    <div class="h-10 rounded-xl bg-aquamarine-100 dark:bg-aquamarine-800 animate-pulse"></div>
-  </div>
-  } @else if (topAuthors().length > 0) {
-  <div class="space-y-3">
-    @for (
-    author of topAuthors();
-    track author.id
-    ) {
-    <a [routerLink]="[
-            '/author',
-            author.id
-          ]" class="flex items-center gap-2 group hover:opacity-80 transition-opacity">
-      @if (author.avatarUrl) {
-      <img [src]="author.avatarUrl" [alt]="author.username"
-        class="w-8 h-8 rounded-full object-cover border border-aquamarine-300" />
-      } @else {
-      <span
-        class="w-8 h-8 rounded-full bg-aquamarine-600 text-white font-bold flex items-center justify-center text-xs">
-        {{
-        getAvatarInitial(
-        author.username
-        )
-        }}
-      </span>
+<div class="sidebar-stack">
+  <section class="sidebar-card authors-card">
+    <div class="sidebar-card__header">
+      <h2 class="sidebar-card__title">{{ 'sidebar.top_authors' | translate }}</h2>
+    </div>
+    <div class="sidebar-card__body">
+      @if (isLoadingAuthors()) {
+      <div class="space-y-3">
+        <div class="h-14 rounded-xl skeleton"></div>
+        <div class="h-14 rounded-xl skeleton"></div>
+        <div class="h-14 rounded-xl skeleton"></div>
+      </div>
+      } @else if (topAuthors().length > 0) {
+      @for (author of topAuthors().slice(0, 4); track author.id) {
+      <a [routerLink]="['/author', author.id]" class="author-row">
+        @if (author.avatarUrl) {
+        <img [src]="author.avatarUrl" [alt]="author.username" class="avatar-md object-cover" />
+        } @else {
+        <span class="avatar-md">{{ getAvatarInitial(author.username) }}</span>
+        }
+        <span class="author-row__copy">
+          <span class="author-row__name">{{ author.username }}</span>
+          <span class="author-row__meta">{{ author.followerCount }} {{ 'author.followers' | translate }}</span>
+        </span>
+        <span class="author-row__button"><i class="bi bi-arrow-up-right"></i></span>
+      </a>
       }
+      } @else {
+      <p class="px-2 py-3 text-xs text-aquamarine-500">{{ 'sidebar.no_authors' | translate }}</p>
+      }
+    </div>
+  </section>
 
-      <div class="overflow-hidden">
-        <div class="font-semibold text-sm text-aquamarine-900 dark:text-aquamarine-100 truncate">
-          {{ author.username }}
-        </div>
-
-        <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400">
-          {{ author.followerCount }}
-          {{ 'author.followers' | translate }}
-        </small>
+  <section class="sidebar-card trending-card">
+    <div class="sidebar-card__header">
+      <h2 class="sidebar-card__title">{{ 'sidebar.trending_posts' | translate }}</h2>
+    </div>
+    <div class="sidebar-card__body">
+      @if (isLoadingPosts()) {
+      <div class="space-y-3">
+        <div class="h-16 rounded-xl skeleton"></div>
+        <div class="h-16 rounded-xl skeleton"></div>
+        <div class="h-16 rounded-xl skeleton"></div>
       </div>
-    </a>
-    }
-  </div>
-  } @else {
-  <p class="text-xs text-aquamarine-500">
-    {{ 'sidebar.no_authors' | translate }}
-  </p>
-  }
-</div>
-
-<div
-  class="p-4 mb-4 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-  <h2 class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-50 mb-3">
-    {{
-    'sidebar.trending_posts'
-    | translate
-    }}
-  </h2>
-
-  @if (isLoadingPosts()) {
-  <div class="space-y-3">
-    <div class="h-14 rounded-xl bg-aquamarine-100 dark:bg-aquamarine-800 animate-pulse"></div>
-
-    <div class="h-14 rounded-xl bg-aquamarine-100 dark:bg-aquamarine-800 animate-pulse"></div>
-  </div>
-  } @else if (topPosts().length > 0) {
-  <div class="space-y-3">
-    @for (
-    post of topPosts();
-    track post.id
-    ) {
-    <a [routerLink]="[
-            '/post',
-            post.id
-          ]" class="block group">
-      <div
-        class="text-sm font-semibold text-aquamarine-900 dark:text-aquamarine-100 line-clamp-2 group-hover:text-aquamarine-600">
-        {{ post.title }}
-      </div>
-
-      <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400">
-        <i class="bi bi-eye me-1"></i>
-        {{ post.viewCount }}
-
-        <i class="bi bi-heart ms-2 me-1"></i>
-
-        {{ post.likeCount }}
-      </small>
-    </a>
-    }
-  </div>
-  } @else {
-  <p class="text-xs text-aquamarine-500">
-    {{ 'sidebar.no_trending' | translate }}
-  </p>
-  }
-</div>
-
-<div
-  class="p-4 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-  <h2 class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-50 mb-3">
-    {{ 'sidebar.popular_tags' | translate }}
-  </h2>
-
-  @if (isLoadingTags()) {
-  <div class="h-10 rounded-xl bg-aquamarine-100 dark:bg-aquamarine-800 animate-pulse"></div>
-  } @else if (topTags().length > 0) {
-  <div class="flex flex-wrap gap-2">
-    @for (
-    tag of topTags();
-    track tag.id
-    ) {
-    <a class="tag" routerLink="/hashtag" [queryParams]="{
-            tagId: tag.id,
-            tagName: tag.name
-          }">
-      #{{ tag.name }}
-    </a>
-    }
-  </div>
-  } @else {
-  <p class="text-xs text-aquamarine-500">
-    {{ 'sidebar.no_tags' | translate }}
-  </p>
-  }
+      } @else if (topPosts().length > 0) {
+      @for (post of topPosts().slice(0, 4); track post.id) {
+      <a [routerLink]="['/post', post.id]" class="trending-row">
+        <span class="trending-row__media">
+          @if (post.thumbnailUrl) {
+          <img [src]="post.thumbnailUrl" [alt]="post.title" loading="lazy" />
+          } @else {
+          <i class="bi bi-journal-code"></i>
+          }
+        </span>
+        <span class="trending-row__copy">
+          <span class="trending-row__title">{{ post.title }}</span>
+          <span class="trending-row__meta">
+            {{ post.viewCount }} {{ 'post.views' | translate }}
+          </span>
+        </span>
+      </a>
+      }
+      } @else {
+      <p class="px-2 py-3 text-xs text-aquamarine-500">{{ 'sidebar.no_trending' | translate }}</p>
+      }
+    </div>
+  </section>
 </div>

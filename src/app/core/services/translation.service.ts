@@ -33,6 +33,13 @@ export class TranslationService {
       'nav.moderator_dashboard': 'Moderator Dashboard',
       'nav.admin_dashboard': 'Admin Dashboard',
       'nav.toggle_theme': 'Chuyển chế độ Sáng/Tối',
+      'nav.language': 'Ngôn ngữ',
+      'ui.community_label': 'Cộng đồng lập trình',
+      'auth.showcase_title': 'Viết, chia sẻ và cùng nhau học hỏi.',
+      'auth.showcase_desc': 'Một không gian gọn gàng cho bài viết kỹ thuật, thảo luận hữu ích và những ý tưởng đáng lưu lại.',
+      'auth.feature_stories': 'Bài viết kỹ thuật',
+      'auth.feature_community': 'Cộng đồng tác giả',
+      'auth.feature_library': 'Thư viện cá nhân',
       'header.demo_role': 'Demo trạng thái header:',
 
       // Sidebar Filter & Search
@@ -141,10 +148,12 @@ export class TranslationService {
       // Pagination
       'pagination.prev': 'Trước',
       'pagination.next': 'Sau',
+      'pagination.current_page': 'Trang hiện tại: ',
+      'pagination.go_to_page': 'Đi đến trang: ',
 
       // Footer
-      'footer.copyright': '© 2026 DevBlog UI Prototype',
-      'footer.inspired_by': 'Inspired by Viblo layout',
+      'footer.copyright': '© 2026 Blogy. — Cộng đồng chia sẻ kiến thức',
+      'footer.inspired_by': 'Tối giản · Tinh tế · Dễ đọc',
 
       // Request Blog Owner
       'request_owner.title': 'Yêu cầu trở thành Blog Owner',
@@ -228,6 +237,8 @@ export class TranslationService {
       'table.likes': 'Lượt thích',
       'table.actions': 'Thao tác',
       'table.user_name': 'Người dùng',
+      'table.user': 'Người dùng',
+      'table.default': 'Mặc định',
       'table.email': 'Email',
       'table.role': 'Vai trò',
       'table.comment_content': 'Nội dung bình luận',
@@ -254,11 +265,12 @@ export class TranslationService {
       'modal.category_slug': 'Đường dẫn (Slug)',
       'modal.add_user_title': 'Thêm người dùng mới',
       'modal.add_lang_title': 'Thêm ngôn ngữ hệ thống',
+      'modal.add_language_title': 'Thêm ngôn ngữ hệ thống',
       'modal.delete_confirm': 'Bạn có chắc chắn muốn xóa bản ghi này không?',
       'modal.preview_blog_p1': 'Đây là nội dung mô phỏng của bài viết để Moderator có thể đọc và đánh giá trước khi duyệt.',
       'modal.preview_blog_p2': 'Kiểm tra kỹ lưỡng nội dung trước khi quyết định duyệt hoặc từ chối bài viết.',
       'modal.preview_blog_h1': '1. Tại sao tính năng này quan trọng?',
-      'modal.preview_blog_p3': 'Việc kiểm duyệt bài viết giúp đảm bảo nền tảng DevBlog luôn giữ được chất lượng nội dung tốt nhất.',
+      'modal.preview_blog_p3': 'Việc kiểm duyệt bài viết giúp đảm bảo nền tảng Blogy. luôn giữ được chất lượng nội dung tốt nhất.',
       'modal.preview_blog_h2': '2. Yêu cầu định dạng bài viết',
       'modal.preview_blog_li1': 'Tiêu đề phải rõ ràng, không giật tít câu view (clickbait).',
       'modal.preview_blog_li2': 'Nội dung không chứa ngôn từ kích động, thù địch hoặc spam.',
@@ -266,6 +278,8 @@ export class TranslationService {
       'modal.preview_cat_post': 'Bài viết demo cho danh mục',
       'modal.preview_comment_p1': 'Đây là nội dung mô phỏng của bài viết liên kết với bình luận này. Moderator có thể đọc nhanh nội dung bài viết ngay tại đây để có ngữ cảnh tốt hơn khi xử lý bình luận.',
       'modal.preview_comment_p2': 'Ví dụ: một bình luận có thể trông không rõ ràng, nhưng khi đặt vào ngữ cảnh của bài viết thì lại hoàn toàn hợp lệ.',
+
+      'categories.load_error': 'Không tải được danh mục.',
 
       'posts.load_error':
         'Không tải được bài viết',
@@ -552,6 +566,8 @@ export class TranslationService {
 
       'comments.oldest_first':
         'Oldest first',
+      'categories.load_error': 'Unable to load categories.',
+
       'posts.load_error':
         'Unable to load posts',
 
@@ -570,6 +586,13 @@ export class TranslationService {
       'nav.moderator_dashboard': 'Moderator Dashboard',
       'nav.admin_dashboard': 'Admin Dashboard',
       'nav.toggle_theme': 'Toggle Theme',
+      'nav.language': 'Language',
+      'ui.community_label': 'Developer community',
+      'auth.showcase_title': 'Write, share and learn together.',
+      'auth.showcase_desc': 'A calmer place for technical writing, useful discussions and ideas worth saving.',
+      'auth.feature_stories': 'Technical stories',
+      'auth.feature_community': 'Author community',
+      'auth.feature_library': 'Personal library',
       'header.demo_role': 'Header Role Demo:',
 
       // Sidebar Filter & Search
@@ -681,10 +704,12 @@ export class TranslationService {
       // Pagination
       'pagination.prev': 'Previous',
       'pagination.next': 'Next',
+      'pagination.current_page': 'Current page: ',
+      'pagination.go_to_page': 'Go to page: ',
 
       // Footer
-      'footer.copyright': '© 2026 DevBlog UI Prototype',
-      'footer.inspired_by': 'Inspired by Viblo layout',
+      'footer.copyright': '© 2026 Blogy. — Knowledge sharing community',
+      'footer.inspired_by': 'Minimal · Refined · Readable',
 
       // Request Blog Owner
       'request_owner.title': 'Request Blog Owner Access',
@@ -768,6 +793,8 @@ export class TranslationService {
       'table.likes': 'Likes',
       'table.actions': 'Actions',
       'table.user_name': 'User',
+      'table.user': 'User',
+      'table.default': 'Default',
       'table.email': 'Email',
       'table.role': 'Role',
       'table.comment_content': 'Comment Content',
@@ -794,11 +821,12 @@ export class TranslationService {
       'modal.category_slug': 'Slug',
       'modal.add_user_title': 'Add new user',
       'modal.add_lang_title': 'Add system language',
+      'modal.add_language_title': 'Add system language',
       'modal.delete_confirm': 'Are you sure you want to delete this record?',
       'modal.preview_blog_p1': 'This is sample article content for the Moderator to read and evaluate before approving.',
       'modal.preview_blog_p2': 'Carefully review content before deciding to approve or reject the post.',
       'modal.preview_blog_h1': '1. Why is this feature important?',
-      'modal.preview_blog_p3': 'Moderation ensures that the DevBlog platform always maintains the highest content quality.',
+      'modal.preview_blog_p3': 'Moderation ensures that the Blogy. platform always maintains the highest content quality.',
       'modal.preview_blog_h2': '2. Article formatting requirements',
       'modal.preview_blog_li1': 'Title must be clear and not clickbait.',
       'modal.preview_blog_li2': 'Content must not contain hate speech or spam.',

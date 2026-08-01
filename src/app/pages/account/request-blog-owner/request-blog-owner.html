@@ -1,94 +1,385 @@
-<main class="container mx-auto px-4 max-w-7xl py-6">
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-    <section class="lg:col-span-5 p-6 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-      <h1 class="font-bold text-xl text-aquamarine-950 dark:text-aquamarine-50 mb-2">{{ 'request_owner.title' | translate }}</h1>
-      <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400 mb-6">{{ 'request_owner.subtitle' | translate }}</p>
+<main class="page-shell owner-request-page">
+  <!-- Phần giới thiệu -->
+  <section class="owner-request-hero">
+    <div class="owner-request-hero__content">
+      <span class="owner-request-hero__icon">
+        <i class="bi bi-patch-check"></i>
+      </span>
 
-      @if (auth.currentUser()?.role === 'BLOG_OWNER') {
-        <div class="p-4 rounded-xl border border-green-200 dark:border-emerald-800 bg-green-50 dark:bg-emerald-950/40 text-green-700 dark:text-emerald-300 text-sm">
-          {{ 'request_owner.already_owner' | translate }}
+      <div>
+        <span class="owner-request-hero__eyebrow">
+          <i class="bi bi-stars"></i>
+          {{ 'request_owner.title' | translate }}
+        </span>
+
+        <h1>
+          {{ 'request_owner.title' | translate }}
+        </h1>
+
+        <p>
+          {{ 'request_owner.subtitle' | translate }}
+        </p>
+      </div>
+    </div>
+
+    <div class="owner-request-hero__visual" aria-hidden="true">
+      <span class="owner-request-hero__visual-ring"></span>
+
+      <span class="owner-request-hero__visual-icon">
+        <i class="bi bi-pencil-square"></i>
+      </span>
+    </div>
+  </section>
+
+  <div class="owner-request-layout">
+    <!-- Cột gửi yêu cầu -->
+    <aside class="owner-request-left">
+      <section class="request-card request-form-card">
+        <header class="request-card__header">
+          <span class="request-card__header-icon">
+            <i class="bi bi-send"></i>
+          </span>
+
+          <div>
+            <h2>
+              {{ 'request_owner.title' | translate }}
+            </h2>
+
+            <p>
+              {{ 'request_owner.subtitle' | translate }}
+            </p>
+          </div>
+        </header>
+
+        @if (auth.currentUser()?.role === 'BLOG_OWNER') {
+        <div class="owner-status-message">
+          <span class="owner-status-message__icon">
+            <i class="bi bi-patch-check-fill"></i>
+          </span>
+
+          <div>
+            <strong>
+              {{ 'request_owner.already_owner' | translate }}
+            </strong>
+
+            <p>
+              {{ 'request_owner.subtitle' | translate }}
+            </p>
+          </div>
         </div>
-      } @else {
-        <form class="space-y-4" (submit)="submit($event)">
-          <div>
-            <label class="block text-xs font-semibold text-aquamarine-950 dark:text-aquamarine-50 mb-1">{{ 'request_owner.reason_label' | translate }}</label>
-            <textarea [(ngModel)]="reason" name="reason" maxlength="1000" required rows="5" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 p-3 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" [placeholder]="ts.translate('request_owner.reason_placeholder')"></textarea>
-            <div class="text-right text-[11px] text-aquamarine-500 dark:text-aquamarine-400">{{ reason.length }}/1000</div>
+        } @else {
+        <form class="owner-request-form" (submit)="submit($event)">
+
+          <div class="request-field">
+            <div class="request-field__label-row">
+              <label for="owner-request-reason">
+                {{ 'request_owner.reason_label' | translate }}
+              </label>
+
+              <span>
+                {{ reason.length }}/1000
+              </span>
+            </div>
+
+            <textarea id="owner-request-reason" [(ngModel)]="reason" name="reason" maxlength="1000" required rows="6"
+              class="request-textarea" [placeholder]="
+                  ts.translate(
+                    'request_owner.reason_placeholder'
+                  )
+                ">
+              </textarea>
+
+            <small class="request-field__hint">
+              <i class="bi bi-info-circle"></i>
+              {{ 'request_owner.reason_placeholder' | translate }}
+            </small>
           </div>
 
-          <div>
-            <label class="block text-xs font-semibold text-aquamarine-950 dark:text-aquamarine-50 mb-1">{{ 'request_owner.topics_label' | translate }}</label>
-            <textarea [(ngModel)]="topics" name="topics" maxlength="500" rows="3" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 p-3 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" [placeholder]="'request_owner.topics_placeholder' | translate"></textarea>
-            <div class="text-right text-[11px] text-aquamarine-500 dark:text-aquamarine-400">{{ topics.length }}/500</div>
+          <div class="request-field">
+            <div class="request-field__label-row">
+              <label for="owner-request-topics">
+                {{ 'request_owner.topics_label' | translate }}
+              </label>
+
+              <span>
+                {{ topics.length }}/500
+              </span>
+            </div>
+
+            <textarea id="owner-request-topics" [(ngModel)]="topics" name="topics" maxlength="500" rows="4"
+              class="request-textarea request-textarea--small" [placeholder]="
+                  'request_owner.topics_placeholder'
+                  | translate
+                ">
+              </textarea>
           </div>
 
-          <button type="submit" class="btn btn-primary w-full" [disabled]="isSubmitting()">
-            <i class="bi bi-send me-2"></i>{{ isSubmitting() ? ('common.sending' | translate) : ('request_owner.submit_btn' | translate) }}
+          <button type="submit" class="btn btn-primary owner-request-submit" [disabled]="isSubmitting()">
+
+            @if (isSubmitting()) {
+            <span class="request-spinner"></span>
+            {{ 'common.sending' | translate }}
+            } @else {
+            <i class="bi bi-send"></i>
+            {{ 'request_owner.submit_btn' | translate }}
+            }
           </button>
         </form>
-      }
+        }
+      </section>
 
+      <!-- Chi tiết yêu cầu -->
       @if (selectedRequest(); as detail) {
-        <div class="mt-6 p-4 rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950/40 text-sm text-aquamarine-900 dark:text-aquamarine-100 space-y-2">
-          <div class="flex justify-between gap-3">
-            <strong>#{{ detail.id }}</strong>
-            <span class="px-2 py-1 rounded-full text-xs font-semibold" [class]="statusClass(detail.status)">{{ detail.status }}</span>
+      <section class="request-card request-detail-card">
+        <header class="request-detail-card__header">
+          <div>
+            <span class="request-section-label">
+              <i class="bi bi-file-earmark-text"></i>
+              {{ 'common.detail' | translate }}
+            </span>
+
+            <h2>
+              #{{ detail.id }}
+            </h2>
           </div>
-          <p><strong>{{ 'table.reason' | translate }}:</strong> {{ detail.reason }}</p>
-          <p><strong>{{ 'request_owner.topics_label' | translate }}:</strong> {{ detail.topics || '—' }}</p>
-          <p><strong>{{ 'request_owner.reviewed_at' | translate }}:</strong> {{ formatDate(detail.reviewedAt) }}</p>
+
+          <span class="request-status" [class.request-status--pending]="detail.status === 'PENDING'"
+            [class.request-status--approved]="detail.status === 'APPROVED'"
+            [class.request-status--rejected]="detail.status === 'REJECTED'">
+            <span></span>
+            {{ detail.status }}
+          </span>
+        </header>
+
+        <div class="request-detail-list">
+          <div class="request-detail-item">
+            <span class="request-detail-item__icon">
+              <i class="bi bi-chat-left-text"></i>
+            </span>
+
+            <div>
+              <small>
+                {{ 'table.reason' | translate }}
+              </small>
+
+              <p>
+                {{ detail.reason }}
+              </p>
+            </div>
+          </div>
+
+          <div class="request-detail-item">
+            <span class="request-detail-item__icon">
+              <i class="bi bi-tags"></i>
+            </span>
+
+            <div>
+              <small>
+                {{ 'request_owner.topics_label' | translate }}
+              </small>
+
+              <p>
+                {{ detail.topics || '—' }}
+              </p>
+            </div>
+          </div>
+
+          <div class="request-detail-item">
+            <span class="request-detail-item__icon">
+              <i class="bi bi-calendar-check"></i>
+            </span>
+
+            <div>
+              <small>
+                {{ 'request_owner.reviewed_at' | translate }}
+              </small>
+
+              <p>
+                {{ formatDate(detail.reviewedAt) || '—' }}
+              </p>
+            </div>
+          </div>
+
           @if (detail.rejectionReason) {
-            <p class="text-red-600 dark:text-red-400"><strong>{{ 'request_owner.rejection_reason' | translate }}:</strong> {{ detail.rejectionReason }}</p>
+          <div class="request-rejection">
+            <span class="request-rejection__icon">
+              <i class="bi bi-exclamation-triangle"></i>
+            </span>
+
+            <div>
+              <strong>
+                {{ 'request_owner.rejection_reason' | translate }}
+              </strong>
+
+              <p>
+                {{ detail.rejectionReason }}
+              </p>
+            </div>
+          </div>
           }
         </div>
+      </section>
       }
-    </section>
+    </aside>
 
-    <section class="lg:col-span-7 p-6 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-      <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-        <h2 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">{{ 'request_owner.history' | translate }}</h2>
-        <select [(ngModel)]="statusFilter" (ngModelChange)="onFilterChange()" class="rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 text-aquamarine-950 dark:text-aquamarine-50 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-aquamarine-500">
-          <option value="" class="bg-white dark:bg-aquamarine-900">{{ 'request_owner.all_statuses' | translate }}</option>
-          <option value="PENDING" class="bg-white dark:bg-aquamarine-900">PENDING</option>
-          <option value="APPROVED" class="bg-white dark:bg-aquamarine-900">APPROVED</option>
-          <option value="REJECTED" class="bg-white dark:bg-aquamarine-900">REJECTED</option>
-        </select>
-      </div>
+    <!-- Lịch sử yêu cầu -->
+    <section class="request-card request-history-card">
+      <header class="request-history-header">
+        <div>
+          <span class="request-section-label">
+            <i class="bi bi-clock-history"></i>
+            {{ 'request_owner.history' | translate }}
+          </span>
+
+          <h2>
+            {{ 'request_owner.history' | translate }}
+          </h2>
+
+          @if (!isLoading()) {
+          <p>
+            {{ totalItems() }}
+            {{ 'request_owner.title' | translate }}
+          </p>
+          }
+        </div>
+
+        <div class="request-filter">
+          <i class="bi bi-funnel"></i>
+
+          <select [(ngModel)]="statusFilter" (ngModelChange)="onFilterChange()">
+
+            <option value="">
+              {{ 'request_owner.all_statuses' | translate }}
+            </option>
+
+            <option value="PENDING">
+              PENDING
+            </option>
+
+            <option value="APPROVED">
+              APPROVED
+            </option>
+
+            <option value="REJECTED">
+              REJECTED
+            </option>
+          </select>
+        </div>
+      </header>
 
       @if (isLoading()) {
-        <div class="space-y-3 animate-pulse">
-          <div class="h-20 rounded-xl bg-aquamarine-100 dark:bg-aquamarine-800"></div>
-          <div class="h-20 rounded-xl bg-aquamarine-100 dark:bg-aquamarine-800"></div>
-        </div>
+      <div class="request-history-list" aria-busy="true">
+
+        @for (item of [1, 2, 3, 4]; track item) {
+        <article class="request-history-skeleton">
+          <div class="request-history-skeleton__top">
+            <div class="h-4 w-20 rounded skeleton"></div>
+            <div class="h-6 w-20 rounded-full skeleton"></div>
+          </div>
+
+          <div class="h-4 w-full rounded skeleton"></div>
+          <div class="h-4 w-4/5 rounded skeleton"></div>
+
+          <div class="request-history-skeleton__bottom">
+            <div class="h-3 w-24 rounded skeleton"></div>
+            <div class="h-8 w-28 rounded-lg skeleton"></div>
+          </div>
+        </article>
+        }
+      </div>
       } @else if (requests().length > 0) {
-        <div class="space-y-3">
-          @for (request of requests(); track request.id) {
-            <article class="p-4 rounded-xl border border-aquamarine-200 dark:border-aquamarine-800">
-              <div class="flex flex-wrap items-start justify-between gap-3">
-                <div class="min-w-0">
-                  <div class="flex items-center gap-2 mb-1">
-                    <strong class="text-sm text-aquamarine-950 dark:text-aquamarine-50">#{{ request.id }}</strong>
-                    <span class="px-2 py-1 rounded-full text-[11px] font-semibold" [class]="statusClass(request.status)">{{ request.status }}</span>
-                  </div>
-                  <p class="text-sm text-aquamarine-900 dark:text-aquamarine-200 line-clamp-2">{{ request.reason }}</p>
-                  <p class="mt-1 text-xs text-aquamarine-500 dark:text-aquamarine-400">{{ formatDate(request.createdAt) }}</p>
-                </div>
-                <div class="flex gap-2">
-                  <button type="button" class="btn-tertiary" (click)="viewDetail(request.id)">{{ 'common.detail' | translate }}</button>
-                  @if (request.status === 'PENDING') {
-                    <button type="button" class="btn-tertiary !text-red-600 dark:!text-red-400" (click)="cancelRequest(request)">{{ 'modal.cancel' | translate }}</button>
+      <div class="request-history-list">
+        @for (request of requests(); track request.id) {
+        <article class="request-history-item" [class.request-history-item--pending]="request.status === 'PENDING'"
+          [class.request-history-item--approved]="request.status === 'APPROVED'"
+          [class.request-history-item--rejected]="request.status === 'REJECTED'">
+
+          <div class="request-history-item__indicator"></div>
+
+          <div class="request-history-item__content">
+            <header class="request-history-item__header">
+              <div class="request-history-item__identity">
+                <span class="request-history-item__icon">
+                  @if (request.status === 'APPROVED') {
+                  <i class="bi bi-check-lg"></i>
+                  } @else if (request.status === 'REJECTED') {
+                  <i class="bi bi-x-lg"></i>
+                  } @else {
+                  <i class="bi bi-hourglass-split"></i>
                   }
+                </span>
+
+                <div>
+                  <strong>
+                    #{{ request.id }}
+                  </strong>
+
+                  <small>
+                    {{ formatDate(request.createdAt) }}
+                  </small>
                 </div>
               </div>
-            </article>
-          }
-        </div>
 
-        @if (totalPages() > 1) {
-          <app-pagination [totalItems]="totalItems()" [itemsPerPage]="itemsPerPage" [currentPage]="currentPage()" (currentPageChange)="onPageChange($event)"></app-pagination>
+              <span class="request-status" [class.request-status--pending]="request.status === 'PENDING'"
+                [class.request-status--approved]="request.status === 'APPROVED'"
+                [class.request-status--rejected]="request.status === 'REJECTED'">
+                <span></span>
+                {{ request.status }}
+              </span>
+            </header>
+
+            <p class="request-history-item__reason">
+              {{ request.reason }}
+            </p>
+
+            @if (request.topics) {
+            <div class="request-history-item__topics">
+              <i class="bi bi-tags"></i>
+              <span>
+                {{ request.topics }}
+              </span>
+            </div>
+            }
+
+            <footer class="request-history-item__footer">
+              <button type="button" class="request-action request-action--detail" (click)="viewDetail(request.id)">
+                <i class="bi bi-eye"></i>
+                {{ 'common.detail' | translate }}
+              </button>
+
+              @if (request.status === 'PENDING') {
+              <button type="button" class="request-action request-action--cancel" (click)="cancelRequest(request)">
+                <i class="bi bi-x-circle"></i>
+                {{ 'modal.cancel' | translate }}
+              </button>
+              }
+            </footer>
+          </div>
+        </article>
         }
+      </div>
+
+      @if (totalPages() > 1) {
+      <div class="request-pagination">
+        <app-pagination [totalItems]="totalItems()" [itemsPerPage]="itemsPerPage" [currentPage]="currentPage()"
+          (currentPageChange)="onPageChange($event)">
+        </app-pagination>
+      </div>
+      }
       } @else {
-        <p class="py-10 text-center text-sm text-aquamarine-500 dark:text-aquamarine-400">{{ 'request_owner.empty' | translate }}</p>
+      <div class="request-empty">
+        <span class="request-empty__icon">
+          <i class="bi bi-inbox"></i>
+        </span>
+
+        <h3>
+          {{ 'request_owner.empty' | translate }}
+        </h3>
+
+        <p>
+          {{ 'request_owner.subtitle' | translate }}
+        </p>
+      </div>
       }
     </section>
   </div>

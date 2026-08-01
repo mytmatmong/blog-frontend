@@ -1,75 +1,44 @@
-<div class="space-y-4">
-  @if (showFilters) {
-  <div
-    class="p-4 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-    <h6
-      class="font-bold text-xs uppercase tracking-wider text-aquamarine-600 dark:text-aquamarine-400 mb-3 flex items-center gap-1.5">
-      <i class="bi bi-funnel-fill" aria-hidden="true"></i>
-
-      {{
-      'sidebar.filter_title'
-      | translate
-      }}
-    </h6>
-
-    <div class="space-y-1">
-      @for (
-      option of filterOptions;
-      track option.key
-      ) {
-      <button type="button"
-        class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium transition-all text-left"
-        [class.!bg-aquamarine-600]="
-              activeFilter === option.key
-            " [class.!text-white]="
-              activeFilter === option.key
-            " [class.dark:!bg-aquamarine-400]="
-              activeFilter === option.key
-            " [class.dark:!text-black]="
-              activeFilter === option.key
-            " [class.font-semibold]="
-              activeFilter === option.key
-            " [class.shadow-sm]="
-              activeFilter === option.key
-            " [class.text-aquamarine-800]="
-              activeFilter !== option.key
-            " [class.dark:text-aquamarine-200]="
-              activeFilter !== option.key
-            " [class.hover:bg-aquamarine-50]="
-              activeFilter !== option.key
-            " [class.dark:hover:bg-aquamarine-950/60]="
-              activeFilter !== option.key
-            " (click)="
-              selectFilter(option.key)
-            ">
-        <i [class]="option.icon" class="text-sm" aria-hidden="true"></i>
-
-        <span>
-          {{
-          option.translationKey
-          | translate
-          }}
-        </span>
-      </button>
-      }
+<div class="sidebar-stack">
+  <section class="sidebar-card sidebar-filter-card">
+    @if (showFilters) {
+    <div class="sidebar-card__header">
+      <h2 class="sidebar-card__title">
+        <i class="bi bi-funnel-fill"></i>
+        {{ 'sidebar.filter_title' | translate }}
+      </h2>
     </div>
-  </div>
-  }
 
-  <div
-    class="p-4 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-    <h6
-      class="font-bold text-xs uppercase tracking-wider text-aquamarine-600 dark:text-aquamarine-400 mb-3 flex items-center gap-1.5">
-      <i class="bi bi-search" aria-hidden="true"></i>
+    <div class="sidebar-card__body">
+      <div class="filter-list">
+        @for (option of filterOptions; track option.key) {
+        <button type="button" class="filter-button" [class.is-active]="activeFilter === option.key"
+          (click)="selectFilter(option.key)">
+          <span class="filter-button__icon">
+            <i [class]="option.icon"></i>
+          </span>
 
-      {{
-      'sidebar.search_title'
-      | translate
-      }}
-    </h6>
+          <span class="filter-button__label">
+            {{ option.translationKey | translate }}
+          </span>
 
-    <app-input type="text" icon="bi bi-search" [placeholder]="computedPlaceholder" [value]="searchTerm"
-      (valueChange)="onSearch($event)">
-    </app-input>
-  </div>
+          @if (activeFilter === option.key) {
+          <i class="bi bi-check2 filter-button__check"></i>
+          }
+        </button>
+        }
+      </div>
+    </div>
+    }
+
+    <div class="sidebar-search" [class.sidebar-search--standalone]="!showFilters">
+      <div class="sidebar-search__label">
+        <i class="bi bi-search"></i>
+        {{ 'sidebar.search_title' | translate }}
+      </div>
+
+      <app-input type="text" icon="bi bi-search" [placeholder]="computedPlaceholder" [value]="searchTerm"
+        (valueChange)="onSearch($event)">
+      </app-input>
+    </div>
+  </section>
 </div>

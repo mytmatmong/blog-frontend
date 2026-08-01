@@ -21,7 +21,6 @@ import {
 import {
   PublicPost,
   TopAuthor,
-  TopTagItem,
 } from '../../../core/models/post.model';
 
 import { TranslatePipe } from '../../pipes/translate.pipe';
@@ -51,22 +50,15 @@ export class PublicSidebarRight
   readonly topPosts =
     signal<PublicPost[]>([]);
 
-  readonly topTags =
-    signal<TopTagItem[]>([]);
-
   readonly isLoadingAuthors =
     signal(false);
 
   readonly isLoadingPosts =
     signal(false);
 
-  readonly isLoadingTags =
-    signal(false);
-
   ngOnInit(): void {
     this.loadTopAuthors();
     this.loadTopPosts();
-    this.loadTopTags();
   }
 
   constructor() {
@@ -80,7 +72,6 @@ export class PublicSidebarRight
       )
       .subscribe(() => {
         this.loadTopPosts();
-        this.loadTopTags();
       });
   }
 
@@ -128,30 +119,6 @@ export class PublicSidebarRight
         error: () => {
           this.topPosts.set([]);
           this.isLoadingPosts.set(false);
-        },
-      });
-  }
-
-  loadTopTags(): void {
-    this.isLoadingTags.set(true);
-
-    this.publicApiService
-      .getTopTags(
-        6,
-        this.currentLanguageCode(),
-      )
-      .subscribe({
-        next: (response) => {
-          this.topTags.set(
-            response.data,
-          );
-
-          this.isLoadingTags.set(false);
-        },
-
-        error: () => {
-          this.topTags.set([]);
-          this.isLoadingTags.set(false);
         },
       });
   }

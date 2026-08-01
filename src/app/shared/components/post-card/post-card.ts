@@ -62,6 +62,10 @@ export interface PostCardInteractionEvent {
   action: PostCardInteractionAction;
 }
 
+export type PostCardVariant =
+  | 'grid'
+  | 'list';
+
 @Component({
   selector: 'app-post-card',
   imports: [
@@ -78,6 +82,8 @@ export class PostCard
 
   @Input({ required: true })
   post!: PostItem;
+  @Input()
+  variant: PostCardVariant = 'grid';
 
   /**
    * Mặc định bật cho mọi PostCard:
