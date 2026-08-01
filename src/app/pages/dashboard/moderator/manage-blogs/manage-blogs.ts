@@ -1,5 +1,6 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslationService } from '../../../../core/services/translation.service';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 interface BlogItem {
@@ -18,6 +19,7 @@ interface BlogItem {
   styleUrl: './manage-blogs.css',
 })
 export class ManageBlogs {
+  protected readonly ts = inject(TranslationService);
   blogsMockData: BlogItem[] = [];
   currentPage = signal<number>(1);
   itemsPerPage = 8;
@@ -80,8 +82,7 @@ export class ManageBlogs {
   }
 
   approveBlog(blog: BlogItem) {
-    if (confirm('Xác nhận duyệt bài viết này?')) {
-      alert('Đã duyệt bài viết thành công!');
+    if (confirm(this.ts.translate('modal.confirm'))) {
       this.blogsMockData = this.blogsMockData.filter(b => b.id !== blog.id);
       this.adjustCurrentPage();
     }
@@ -91,7 +92,6 @@ export class ManageBlogs {
     if (!this.rejectReason.trim()) return;
     const blog = this.activeRejectBlog();
     if (blog) {
-      alert('Mock: Đã từ chối bài viết với lý do:\n' + this.rejectReason);
       this.blogsMockData = this.blogsMockData.filter(b => b.id !== blog.id);
       this.adjustCurrentPage();
       this.activeRejectBlog.set(null);

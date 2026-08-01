@@ -26,12 +26,12 @@
           <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
             <a [routerLink]="['/author', currentPost.authorId]" class="flex items-center gap-3 group hover:opacity-80">
               @if (currentPost.author.avatarUrl) {
-                <img [src]="currentPost.author.avatarUrl" [alt]="currentPost.author.username" class="w-10 h-10 rounded-full object-cover border border-aquamarine-300" />
+                <img [src]="currentPost.author.avatarUrl" [alt]="currentPost.author.username" class="w-10 h-10 rounded-full object-cover border border-aquamarine-300 dark:border-aquamarine-700" />
               } @else {
                 <span class="w-10 h-10 rounded-full bg-aquamarine-600 text-white font-bold flex items-center justify-center text-sm">{{ getAvatarInitial(currentPost.author.username) }}</span>
               }
               <div>
-                <div class="font-semibold text-sm">{{ currentPost.author.username }}</div>
+                <div class="font-semibold text-sm text-aquamarine-950 dark:text-aquamarine-50">{{ currentPost.author.username }}</div>
                 <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400">
                   {{ formatDate(currentPost.publishedAt ?? currentPost.createdAt) }} • {{ currentPost.viewCount }} {{ 'post.views' | translate }}
                 </small>
@@ -39,7 +39,7 @@
             </a>
 
             @if (isAuthenticated() && currentUserId() !== currentPost.authorId) {
-              <button type="button" class="btn-tertiary text-amber-700" (click)="openPostReport()">
+              <button type="button" class="btn-tertiary text-amber-700 dark:text-amber-400" (click)="openPostReport()">
                 <i class="bi bi-flag me-1"></i>{{ 'post.report' | translate }}
               </button>
             }
@@ -102,36 +102,36 @@
           </div>
         </article>
       } @else {
-        <div class="p-8 text-center rounded-2xl border border-red-200 bg-red-50 text-red-700">
+        <div class="p-8 text-center rounded-2xl border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-300">
           <p class="font-semibold">{{ errorMessage() || ('post.not_found' | translate) }}</p>
-          <button type="button" class="mt-4 px-4 py-2 rounded-lg border border-red-300" (click)="retryPost()">{{ 'common.retry' | translate }}</button>
+          <button type="button" class="mt-4 px-4 py-2 rounded-lg border border-red-300 dark:border-red-800" (click)="retryPost()">{{ 'common.retry' | translate }}</button>
         </div>
       }
 
       @if (post()) {
         <section id="post-comments" class="p-6 mt-6 scroll-mt-24 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
           <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <h2 class="font-bold text-lg">
+            <h2 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">
               {{ 'comments.title' | translate }}
-              @if (commentsTotalItems() > 0) { <span class="ms-1 text-sm font-normal text-aquamarine-500">({{ commentsTotalItems() }})</span> }
+              @if (commentsTotalItems() > 0) { <span class="ms-1 text-sm font-normal text-aquamarine-500 dark:text-aquamarine-400">({{ commentsTotalItems() }})</span> }
             </h2>
-            <select class="rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 px-3 py-2 text-xs" [value]="commentsSortOrder()" (change)="onCommentsSortChange($any($event.target).value)">
-              <option value="desc">{{ 'comments.newest_first' | translate }}</option>
-              <option value="asc">{{ 'comments.oldest_first' | translate }}</option>
+            <select class="rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 text-aquamarine-950 dark:text-aquamarine-50 px-3 py-2 text-xs focus:outline-none" [value]="commentsSortOrder()" (change)="onCommentsSortChange($any($event.target).value)">
+              <option value="desc" class="bg-white dark:bg-aquamarine-900">{{ 'comments.newest_first' | translate }}</option>
+              <option value="asc" class="bg-white dark:bg-aquamarine-900">{{ 'comments.oldest_first' | translate }}</option>
             </select>
           </div>
 
           @if (isAuthenticated()) {
             <form class="mb-6 p-4 rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/40 dark:bg-aquamarine-950/30" (submit)="submitComment($event)">
               @if (replyTo(); as target) {
-                <div class="mb-2 text-xs text-aquamarine-600">{{ 'comments.replying_to' | translate }} <strong>{{ target.username }}</strong></div>
+                <div class="mb-2 text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ 'comments.replying_to' | translate }} <strong>{{ target.username }}</strong></div>
               }
               @if (editingComment()) {
-                <div class="mb-2 text-xs text-aquamarine-600">{{ 'comments.editing' | translate }}</div>
+                <div class="mb-2 text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ 'comments.editing' | translate }}</div>
               }
-              <textarea [(ngModel)]="commentDraft" name="commentDraft" maxlength="1000" rows="3" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 p-3 text-sm" [placeholder]="'comments.placeholder' | translate"></textarea>
+              <textarea [(ngModel)]="commentDraft" name="commentDraft" maxlength="1000" rows="3" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-aquamarine-500" [placeholder]="'comments.placeholder' | translate"></textarea>
               <div class="mt-2 flex flex-wrap items-center justify-between gap-3">
-                <span class="text-[11px] text-aquamarine-500">{{ commentDraft.length }}/1000</span>
+                <span class="text-[11px] text-aquamarine-500 dark:text-aquamarine-400">{{ commentDraft.length }}/1000</span>
                 <div class="flex gap-2">
                   @if (replyTo() || editingComment()) {
                     <button type="button" class="btn btn-secondary" (click)="cancelCommentMode()">{{ 'modal.cancel' | translate }}</button>

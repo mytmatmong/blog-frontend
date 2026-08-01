@@ -1,6 +1,7 @@
-import { Component, AfterViewInit, signal } from '@angular/core';
+import { Component, AfterViewInit, signal, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { TranslationService } from '../../../../core/services/translation.service';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 declare var Quill: any;
@@ -17,6 +18,9 @@ interface LangData {
   styleUrl: './edit-post.css',
 })
 export class EditPost implements AfterViewInit {
+  protected readonly ts = inject(TranslationService);
+  private router = inject(Router);
+
   quill: any;
 
   originalLanguage = signal<'VI' | 'EN'>('VI');
@@ -56,7 +60,7 @@ export class EditPost implements AfterViewInit {
   toastType = signal<'success' | 'danger' | 'secondary'>('success');
   showToast = signal<boolean>(false);
 
-  constructor(private router: Router) {
+  constructor() {
     this.titleModel = this.postLangData[this.currentEditLang()].title;
   }
 
@@ -68,7 +72,7 @@ export class EditPost implements AfterViewInit {
     if (typeof Quill !== 'undefined') {
       this.quill = new Quill('#editor-container', {
         theme: 'snow',
-        placeholder: 'Bắt đầu viết nội dung...',
+        placeholder: this.ts.translate('post_form.editor_placeholder'),
         modules: {
           toolbar: [
             [{ 'header': [1, 2, 3, false] }],
@@ -128,11 +132,11 @@ export class EditPost implements AfterViewInit {
     const mainContent = this.postLangData[origLang].content.trim();
 
     if (!mainTitle) {
-      this.triggerToast('Vui lòng nhập tiêu đề bài gốc!', 'danger');
+      this.triggerToast(this.ts.translate('post_form.enter_title_error'), 'danger');
       return;
     }
     if (mainContent === '<p><br></p>' || mainContent === '') {
-      this.triggerToast('Vui lòng nhập nội dung bài gốc!', 'danger');
+      this.triggerToast(this.ts.translate('post_form.enter_content_error'), 'danger');
       return;
     }
 
@@ -148,11 +152,11 @@ export class EditPost implements AfterViewInit {
     };
 
     console.log("🚀 Dữ liệu CẬP NHẬT chuẩn bị gửi đi:", updatedData);
-    this.triggerToast('✅ Đã cập nhật bài viết thành công!', 'success');
+    this.triggerToast(this.ts.translate('post_form.update_success'), 'success');
   }
 
   cancelChanges() {
-    if (confirm('Bạn có chắc muốn hủy các thay đổi? Giao diện sẽ quay lại Danh sách bài viết.')) {
+    if (confirm(this.ts.translate('post_form.cancel_confirm'))) {
       this.router.navigate(['/dashboard/owner/posts']);
     }
   }

@@ -49,12 +49,12 @@ export class RequestBlogOwner {
     const topics = this.topics.trim();
 
     if (!reason) {
-      this.toast.warning('Vui lòng nhập lý do.');
+      this.toast.warning(this.ts.translate('request_owner.enter_reason_warning'));
       return;
     }
 
     if (reason.length > 1000 || topics.length > 500) {
-      this.toast.warning('Lý do tối đa 1000 ký tự và chủ đề tối đa 500 ký tự.');
+      this.toast.warning(this.ts.translate('request_owner.length_limit_warning'));
       return;
     }
 
@@ -70,12 +70,12 @@ export class RequestBlogOwner {
         this.isSubmitting.set(false);
         this.selectedRequest.set(data);
         this.currentPage.set(1);
-        this.toast.success('Đã gửi yêu cầu Blog Owner.');
+        this.toast.success(this.ts.translate('request_owner.submit_success'));
         this.loadRequests();
       },
       error: (error: unknown) => {
         this.isSubmitting.set(false);
-        this.toast.error(getApiErrorMessage(error), 'Gửi yêu cầu thất bại');
+        this.toast.error(getApiErrorMessage(error), this.ts.translate('request_owner.submit_error'));
       },
     });
   }
@@ -98,7 +98,7 @@ export class RequestBlogOwner {
       error: (error: unknown) => {
         this.requests.set([]);
         this.isLoading.set(false);
-        this.toast.error(getApiErrorMessage(error), 'Không tải được danh sách yêu cầu');
+        this.toast.error(getApiErrorMessage(error), this.ts.translate('request_owner.load_list_error'));
       },
     });
   }
@@ -117,22 +117,22 @@ export class RequestBlogOwner {
   viewDetail(id: number): void {
     this.userApi.getBlogOwnerRequestById(id).subscribe({
       next: ({ data }) => this.selectedRequest.set(data),
-      error: (error: unknown) => this.toast.error(getApiErrorMessage(error), 'Không tải được chi tiết'),
+      error: (error: unknown) => this.toast.error(getApiErrorMessage(error), this.ts.translate('request_owner.load_detail_error')),
     });
   }
 
   cancelRequest(request: UserBlogOwnerRequest): void {
     if (request.status !== 'PENDING') return;
 
-    if (typeof window !== 'undefined' && !window.confirm('Hủy yêu cầu đang chờ duyệt này?')) return;
+    if (typeof window !== 'undefined' && !window.confirm(this.ts.translate('request_owner.cancel_confirm'))) return;
 
     this.userApi.cancelBlogOwnerRequest(request.id).subscribe({
       next: () => {
         if (this.selectedRequest()?.id === request.id) this.selectedRequest.set(null);
-        this.toast.success('Đã hủy yêu cầu.');
+        this.toast.success(this.ts.translate('request_owner.cancel_success'));
         this.loadRequests();
       },
-      error: (error: unknown) => this.toast.error(getApiErrorMessage(error), 'Hủy yêu cầu thất bại'),
+      error: (error: unknown) => this.toast.error(getApiErrorMessage(error), this.ts.translate('request_owner.cancel_error')),
     });
   }
 

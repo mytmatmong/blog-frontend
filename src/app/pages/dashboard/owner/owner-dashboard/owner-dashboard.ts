@@ -1,6 +1,7 @@
-import { Component, AfterViewInit, signal } from '@angular/core';
+import { Component, AfterViewInit, signal, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
+import { TranslationService } from '../../../../core/services/translation.service';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 declare var Chart: any;
@@ -22,6 +23,7 @@ interface Post {
   styleUrl: './owner-dashboard.css',
 })
 export class OwnerDashboard implements AfterViewInit {
+  protected readonly ts = inject(TranslationService);
   postsData: Post[] = [
     { id: 1, title: "Angular Guard theo role", status: "PUBLISHED", statusClass: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300", views: 1200, likes: 345, 
       content: "<p>Trong bài viết này, chúng ta sẽ tìm hiểu cách sử dụng <strong>CanActivate</strong> để bảo vệ các routes trong Angular. Điều này rất quan trọng để đảm bảo rằng chỉ những người dùng có vai trò (role) thích hợp mới có thể truy cập vào các trang như Admin Dashboard hay Moderator Panel.</p><p>Hãy tạo một guard đơn giản:</p><pre class='bg-gray-100 dark:bg-gray-800 p-3 rounded-lg my-3 border dark:border-gray-700 text-gray-900 dark:text-gray-100'><code>ng generate guard auth</code></pre>" },
@@ -124,7 +126,7 @@ export class OwnerDashboard implements AfterViewInit {
   }
 
   deletePost(post: Post) {
-    if (confirm('Bạn có chắc chắn muốn xóa bản ghi này không?')) {
+    if (confirm(this.ts.translate('modal.delete_confirm'))) {
       this.postsData = this.postsData.filter(p => p.id !== post.id);
     }
   }

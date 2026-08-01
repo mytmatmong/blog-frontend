@@ -321,7 +321,7 @@ export class AuthorDetailComponent {
     if (!this.requireAuthentication()) return;
 
     if (this.auth.currentUser()?.id === authorId) {
-      this.toast.warning('Bạn không thể follow chính mình.');
+      this.toast.warning(this.translationService.translate('author.cannot_follow_self'));
       return;
     }
 
@@ -335,11 +335,11 @@ export class AuthorDetailComponent {
       next: () => {
         this.isFollowing.set(!wasFollowing);
         this.isFollowBusy.set(false);
-        this.toast.success(wasFollowing ? 'Đã bỏ follow.' : 'Đã follow tác giả.');
+        this.toast.success(this.translationService.translate(wasFollowing ? 'author.unfollowed_success' : 'author.followed_success'));
       },
       error: (error: unknown) => {
         this.isFollowBusy.set(false);
-        this.toast.error(getApiErrorMessage(error), 'Không thể cập nhật follow');
+        this.toast.error(getApiErrorMessage(error), this.translationService.translate('author.follow_error'));
       },
     });
   }
@@ -383,7 +383,7 @@ export class AuthorDetailComponent {
       },
       error: (error: unknown) => {
         this.isLoadingConnections.set(false);
-        this.toast.error(getApiErrorMessage(error), 'Không tải được danh sách follow');
+        this.toast.error(getApiErrorMessage(error), this.translationService.translate('author.load_connections_error'));
       },
     });
   }
@@ -412,7 +412,7 @@ export class AuthorDetailComponent {
 
   private requireAuthentication(): boolean {
     if (this.auth.currentRole() !== 'guest') return true;
-    this.toast.warning('Vui lòng đăng nhập để thực hiện thao tác này.');
+    this.toast.warning(this.translationService.translate('auth.login_required_toast'));
     this.router.navigate(['/auth'], { queryParams: { redirect: this.router.url } });
     return false;
   }

@@ -1,5 +1,6 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslationService } from '../../../../core/services/translation.service';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 interface CategoryItem {
@@ -17,6 +18,7 @@ interface CategoryItem {
   styleUrl: './manage-categories.css',
 })
 export class ManageCategories {
+  protected readonly ts = inject(TranslationService);
   categoriesMockData: CategoryItem[] = [];
   currentPage = signal<number>(1);
   itemsPerPage = 8;
@@ -128,8 +130,7 @@ export class ManageCategories {
   }
 
   deleteCategory(cat: CategoryItem) {
-    if (confirm('Bạn có chắc chắn muốn xóa category này không?')) {
-      alert('Đã xóa!');
+    if (confirm(this.ts.translate('modal.delete_confirm'))) {
       this.categoriesMockData = this.categoriesMockData.filter(c => c.id !== cat.id);
       const maxPages = Math.ceil(this.categoriesMockData.length / this.itemsPerPage);
       if (this.currentPage() > maxPages && maxPages >= 1) {

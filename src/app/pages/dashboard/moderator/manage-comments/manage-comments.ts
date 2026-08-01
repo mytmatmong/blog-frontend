@@ -1,4 +1,5 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, inject } from '@angular/core';
+import { TranslationService } from '../../../../core/services/translation.service';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 interface CommentItem {
@@ -15,6 +16,7 @@ interface CommentItem {
   styleUrl: './manage-comments.css',
 })
 export class ManageComments {
+  protected readonly ts = inject(TranslationService);
   commentsMockData: CommentItem[] = [];
   currentPage = signal<number>(1);
   itemsPerPage = 8;
@@ -66,8 +68,7 @@ export class ManageComments {
   }
 
   deleteComment(comment: CommentItem) {
-    if (confirm('Bạn có chắc chắn muốn xóa bình luận này không?')) {
-      alert('Đã xóa bình luận thành công!');
+    if (confirm(this.ts.translate('comments.delete_confirm'))) {
       this.commentsMockData = this.commentsMockData.filter(c => c.id !== comment.id);
       const maxPages = Math.ceil(this.commentsMockData.length / this.itemsPerPage);
       if (this.currentPage() > maxPages && maxPages >= 1) {

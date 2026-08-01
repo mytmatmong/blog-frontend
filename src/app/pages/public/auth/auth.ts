@@ -67,7 +67,7 @@ export class Auth implements OnInit {
     const password = this.loginPassword();
 
     if (!identifier || !password) {
-      this.toastService.warning('Vui lòng điền đầy đủ thông tin đăng nhập.');
+      this.toastService.warning(this.ts.translate('auth.login_fill_fields'));
       return;
     }
 
@@ -75,7 +75,7 @@ export class Auth implements OnInit {
     this.authService.login({ identifier, password }).subscribe({
       next: (res) => {
         this.isLoading.set(false);
-        this.toastService.success('Đăng nhập thành công!', 'Thành công');
+        this.toastService.success(this.ts.translate('auth.login_success'), this.ts.translate('common.success'));
         
         const redirect = this.route.snapshot.queryParamMap.get('redirect');
         if (redirect?.startsWith('/')) {
@@ -109,7 +109,7 @@ export class Auth implements OnInit {
     const password = this.registerPassword();
 
     if (!username || !email || !password) {
-      this.toastService.warning('Vui lòng điền đầy đủ thông tin đăng ký.');
+      this.toastService.warning(this.ts.translate('auth.register_fill_fields'));
       return;
     }
 
@@ -117,7 +117,7 @@ export class Auth implements OnInit {
     this.authService.register({ username, email, password }).subscribe({
       next: () => {
         this.isLoading.set(false);
-        this.toastService.success('Tạo tài khoản thành công! Vui lòng đăng nhập.', 'Thành công');
+        this.toastService.success(this.ts.translate('auth.register_success'), this.ts.translate('common.success'));
         this.loginIdentifier.set(username);
         this.registerUsername.set('');
         this.registerEmail.set('');
@@ -136,7 +136,7 @@ export class Auth implements OnInit {
     const email = this.forgotEmail().trim();
 
     if (!email) {
-      this.toastService.warning('Vui lòng nhập email khôi phục.');
+      this.toastService.warning(this.ts.translate('auth.forgot_enter_email'));
       return;
     }
 
@@ -145,7 +145,7 @@ export class Auth implements OnInit {
       next: (res) => {
         this.isLoading.set(false);
         const msg = res.data?.message || 'Nếu email hợp lệ, một liên kết khôi phục đã được gửi đi.';
-        this.toastService.info(msg, 'Thông báo');
+        this.toastService.info(msg, this.ts.translate('common.notice'));
         this.forgotStep.set('reset');
       },
       error: (err: HttpErrorResponse) => {
@@ -161,7 +161,7 @@ export class Auth implements OnInit {
     const newPassword = this.resetPassword();
 
     if (!token || !newPassword) {
-      this.toastService.warning('Vui lòng điền đầy đủ mã token và mật khẩu mới.');
+      this.toastService.warning(this.ts.translate('auth.reset_fill_fields'));
       return;
     }
 
@@ -170,7 +170,7 @@ export class Auth implements OnInit {
       next: (res) => {
         this.isLoading.set(false);
         const msg = res.data?.message || 'Đổi mật khẩu thành công. Vui lòng đăng nhập lại.';
-        this.toastService.success(msg, 'Thành công');
+        this.toastService.success(msg, this.ts.translate('common.success'));
         this.resetToken.set('');
         this.resetPassword.set('');
         this.activeTab.set('login');

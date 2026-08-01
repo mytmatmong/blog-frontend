@@ -1,5 +1,6 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslationService } from '../../../../core/services/translation.service';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 interface PostItem {
@@ -20,6 +21,7 @@ interface PostItem {
   styleUrl: './posts.css',
 })
 export class Posts {
+  protected readonly ts = inject(TranslationService);
   postsMockData: PostItem[] = [];
   currentPage = signal<number>(1);
   itemsPerPage = 8;
@@ -150,7 +152,7 @@ export class AuthInterceptor implements HttpInterceptor {
   }
 
   deletePost(post: PostItem) {
-    if (confirm('Bạn có chắc chắn muốn xóa bài viết này?')) {
+    if (confirm(this.ts.translate('post.delete_confirm'))) {
       this.postsMockData = this.postsMockData.filter(p => p.id !== post.id);
       const maxPages = Math.ceil(this.postsMockData.length / this.itemsPerPage);
       if (this.currentPage() > maxPages && maxPages >= 1) {

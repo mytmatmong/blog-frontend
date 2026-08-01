@@ -302,11 +302,11 @@ export class PostDetail {
           likeCount: Math.max(0, post.likeCount + (wasLiked ? -1 : 1)),
         } : post);
         this.isLikeBusy.set(false);
-        this.toast.success(wasLiked ? 'Đã bỏ thích bài viết.' : 'Đã thích bài viết.');
+        this.toast.success(this.translationService.translate(wasLiked ? 'post.unliked_success' : 'post.liked_success'));
       },
       error: (error: unknown) => {
         this.isLikeBusy.set(false);
-        this.toast.error(getApiErrorMessage(error), 'Không thể cập nhật lượt thích');
+        this.toast.error(getApiErrorMessage(error), this.translationService.translate('post.like_error'));
       },
     });
   }
@@ -325,11 +325,11 @@ export class PostDetail {
       next: () => {
         this.isBookmarked.set(!wasBookmarked);
         this.isBookmarkBusy.set(false);
-        this.toast.success(wasBookmarked ? 'Đã bỏ lưu bài viết.' : 'Đã lưu bài viết.');
+        this.toast.success(this.translationService.translate(wasBookmarked ? 'post.unbookmarked_success' : 'post.bookmarked_success'));
       },
       error: (error: unknown) => {
         this.isBookmarkBusy.set(false);
-        this.toast.error(getApiErrorMessage(error), 'Không thể cập nhật bookmark');
+        this.toast.error(getApiErrorMessage(error), this.translationService.translate('post.bookmark_error'));
       },
     });
   }
@@ -360,12 +360,12 @@ export class PostDetail {
 
     const content = this.commentDraft.trim();
     if (!content) {
-      this.toast.warning('Nội dung bình luận không được để trống.');
+      this.toast.warning(this.translationService.translate('comments.empty_warning'));
       return;
     }
 
     if (content.length > 1000) {
-      this.toast.warning('Bình luận tối đa 1000 ký tự.');
+      this.toast.warning(this.translationService.translate('comments.max_length_warning'));
       return;
     }
 
@@ -384,24 +384,24 @@ export class PostDetail {
         this.cancelCommentMode();
         this.commentsCurrentPage.set(1);
         this.loadComments();
-        this.toast.success(editing ? 'Đã sửa bình luận.' : 'Đã gửi bình luận.');
+        this.toast.success(this.translationService.translate(editing ? 'comments.edit_success' : 'comments.submit_success'));
       },
       error: (error: unknown) => {
         this.isSavingComment.set(false);
-        this.toast.error(getApiErrorMessage(error), editing ? 'Sửa bình luận thất bại' : 'Gửi bình luận thất bại');
+        this.toast.error(getApiErrorMessage(error), this.translationService.translate(editing ? 'comments.edit_error' : 'comments.submit_error'));
       },
     });
   }
 
   deleteComment(target: CommentActionTarget): void {
-    if (typeof window !== 'undefined' && !window.confirm('Xóa bình luận này?')) return;
+    if (typeof window !== 'undefined' && !window.confirm(this.translationService.translate('comments.delete_confirm'))) return;
 
     this.userApi.deleteComment(target.id).subscribe({
       next: () => {
         this.loadComments();
-        this.toast.success('Đã xóa bình luận.');
+        this.toast.success(this.translationService.translate('comments.delete_success'));
       },
-      error: (error: unknown) => this.toast.error(getApiErrorMessage(error), 'Xóa bình luận thất bại'),
+      error: (error: unknown) => this.toast.error(getApiErrorMessage(error), this.translationService.translate('comments.delete_error')),
     });
   }
 
@@ -429,7 +429,7 @@ export class PostDetail {
 
     const description = this.reportDescription.trim();
     if (description.length > 1000) {
-      this.toast.warning('Mô tả báo cáo tối đa 1000 ký tự.');
+      this.toast.warning(this.translationService.translate('report.max_length_warning'));
       return;
     }
 
@@ -446,11 +446,11 @@ export class PostDetail {
       next: () => {
         this.isSubmittingReport.set(false);
         this.closeReport();
-        this.toast.success('Đã gửi báo cáo tới bộ phận kiểm duyệt.');
+        this.toast.success(this.translationService.translate('report.submit_success'));
       },
       error: (error: unknown) => {
         this.isSubmittingReport.set(false);
-        this.toast.error(getApiErrorMessage(error), 'Gửi báo cáo thất bại');
+        this.toast.error(getApiErrorMessage(error), this.translationService.translate('report.submit_error'));
       },
     });
   }
@@ -520,7 +520,7 @@ export class PostDetail {
   private requireAuthentication(): boolean {
     if (this.isAuthenticated()) return true;
 
-    this.toast.warning('Vui lòng đăng nhập để thực hiện thao tác này.');
+    this.toast.warning(this.translationService.translate('auth.login_required_toast'));
     this.router.navigate(['/auth'], {
       queryParams: { redirect: this.router.url },
     });

@@ -1,5 +1,6 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslationService } from '../../../../core/services/translation.service';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 interface LanguageItem {
@@ -18,6 +19,7 @@ interface LanguageItem {
   styleUrl: './manage-languages.css',
 })
 export class ManageLanguages {
+  protected readonly ts = inject(TranslationService);
   languagesMockData: LanguageItem[] = [];
   currentPage = signal<number>(1);
   itemsPerPage = 6;
@@ -135,7 +137,6 @@ export class ManageLanguages {
 
   submitAddLanguage() {
     if (!this.addCode.trim() || !this.addName.trim()) return;
-    alert('Mock: Đã thêm Ngôn ngữ thành công!');
 
     if (this.addIsDefault) {
       this.clearDefaults();
@@ -159,8 +160,6 @@ export class ManageLanguages {
     if (!this.editCode.trim() || !this.editName.trim()) return;
     const lang = this.activeEditLanguage();
     if (lang) {
-      alert('Mock: Cập nhật Ngôn ngữ thành công!');
-      
       if (this.editIsDefault) {
         this.clearDefaults();
       }
@@ -178,8 +177,7 @@ export class ManageLanguages {
   }
 
   deleteLanguage(lang: LanguageItem) {
-    if (confirm('Xóa ngôn ngữ này?')) {
-      alert('Đã xóa');
+    if (confirm(this.ts.translate('modal.delete_confirm'))) {
       this.languagesMockData = this.languagesMockData.filter(l => l.id !== lang.id);
       const maxPages = Math.ceil(this.languagesMockData.length / this.itemsPerPage);
       if (this.currentPage() > maxPages && maxPages >= 1) {

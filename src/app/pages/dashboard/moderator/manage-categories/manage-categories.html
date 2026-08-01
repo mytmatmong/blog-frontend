@@ -75,7 +75,7 @@
         @for (i of [1, 2, 3]; track i) {
           <a href="#" (click)="$event.preventDefault()" class="p-4 rounded-xl border border-aquamarine-100 dark:border-aquamarine-800 flex justify-between items-center hover:bg-aquamarine-50/50 dark:hover:bg-aquamarine-950/50 transition-colors">
             <div>
-              <h6 class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-50 mb-1">Bài viết demo số {{ i }} cho danh mục {{ activeCategoryPosts() }}</h6>
+              <h6 class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-50 mb-1">{{ 'modal.preview_cat_post' | translate }} #{{ i }} ({{ activeCategoryPosts() }})</h6>
               <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ 'table.author' | translate }}: DevMaster | {{ 'post.published' | translate }}: 20/07/2026</small>
             </div>
             <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-aquamarine-100 text-aquamarine-800 dark:bg-aquamarine-800 dark:text-aquamarine-100">14 views</span>

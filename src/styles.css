@@ -396,5 +396,39 @@ body.dark-mode .app-input-field::placeholder {
 }
 
 
+/* ==========================================================================
+   QUILL RICH TEXT EDITOR DARK MODE
+   ========================================================================== */
+.dark .ql-toolbar.ql-snow,
+.dark-mode .ql-toolbar.ql-snow {
+  background-color: var(--color-aquamarine-900);
+  border-color: var(--color-aquamarine-800) !important;
+}
 
+.dark .ql-container.ql-snow,
+.dark-mode .ql-container.ql-snow {
+  border-color: var(--color-aquamarine-800) !important;
+  background-color: var(--color-aquamarine-950);
+  color: var(--color-aquamarine-50) !important;
+}
 
+.dark .ql-stroke,
+.dark-mode .ql-stroke {
+  stroke: #99FFF1 !important;
+}
+
+.dark .ql-fill,
+.dark-mode .ql-fill {
+  fill: #99FFF1 !important;
+}
+
+.dark .ql-picker,
+.dark-mode .ql-picker {
+  color: #99FFF1 !important;
+}
+
+.dark .ql-picker-options,
+.dark-mode .ql-picker-options {
+  background-color: var(--color-aquamarine-900) !important;
+  border-color: var(--color-aquamarine-800) !important;
+}

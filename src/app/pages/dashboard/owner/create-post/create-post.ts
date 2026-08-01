@@ -1,6 +1,7 @@
 import { Component, AfterViewInit, signal, effect, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../../../core/services/toast.service';
+import { TranslationService } from '../../../../core/services/translation.service';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 declare var Quill: any;
@@ -38,16 +39,13 @@ export class CreatePost implements AfterViewInit {
     { id: 'catNodeJS', label: 'NodeJS', checked: false },
   ];
 
-
-
   private toastService = inject(ToastService);
+  protected readonly ts = inject(TranslationService);
 
   constructor() {
     // Listen for language switch to preserve and load content
     effect(() => {
       const lang = this.currentEditLang();
-      // Since effect runs in reactive context, we want to update the inputs when edit language changes
-      // This is handled in changeEditLang() instead to keep it deterministic.
     });
   }
 
@@ -59,7 +57,7 @@ export class CreatePost implements AfterViewInit {
     if (typeof Quill !== 'undefined') {
       this.quill = new Quill('#editor-container', {
         theme: 'snow',
-        placeholder: 'Bắt đầu viết nội dung tuyệt vời của bạn tại đây...',
+        placeholder: this.ts.translate('post_form.editor_placeholder'),
         modules: {
           toolbar: [
             [{ 'header': [1, 2, 3, false] }],
@@ -98,8 +96,6 @@ export class CreatePost implements AfterViewInit {
     this.originalLanguage.set(lang);
   }
 
-
-
   handleSave(status: 'PUBLISHED' | 'DRAFT') {
     // Save current active tab data
     const activeLang = this.currentEditLang();
@@ -113,11 +109,11 @@ export class CreatePost implements AfterViewInit {
     const mainContent = this.postLangData[origLang].content.trim();
 
     if (!mainTitle) {
-      this.toastService.error('Vui lòng nhập tiêu đề bài gốc!', 'Lỗi');
+      this.toastService.error(this.ts.translate('post_form.enter_title_error'), this.ts.translate('common.error'));
       return;
     }
     if (mainContent === '<p><br></p>' || mainContent === '') {
-      this.toastService.error('Vui lòng nhập nội dung bài gốc!', 'Lỗi');
+      this.toastService.error(this.ts.translate('post_form.enter_content_error'), this.ts.translate('common.error'));
       return;
     }
 
@@ -134,9 +130,9 @@ export class CreatePost implements AfterViewInit {
     console.log("🚀 Dữ liệu bài viết mới:", postData);
 
     if (status === 'PUBLISHED') {
-      this.toastService.success('Đã xuất bản bài viết thành công!', 'Thành công');
+      this.toastService.success(this.ts.translate('post_form.publish_success'), this.ts.translate('common.success'));
     } else {
-      this.toastService.info('Đã lưu bản nháp thành công!', 'Lưu nháp');
+      this.toastService.info(this.ts.translate('post_form.draft_success'), this.ts.translate('common.draft_saved'));
     }
   }
 }

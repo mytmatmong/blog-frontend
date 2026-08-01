@@ -1,5 +1,6 @@
 <main class="container mx-auto px-4 max-w-7xl py-6">
-  <section class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
+  <section
+    class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
     <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
       <div>
         <h1 class="font-bold text-xl text-aquamarine-950 dark:text-aquamarine-50">{{ 'library.title' | translate }}</h1>
@@ -7,42 +8,54 @@
       </div>
 
       <div class="flex gap-2">
-        <button type="button" class="btn btn-secondary" [class.active]="activeTab() === 'bookmarks'" (click)="selectTab('bookmarks')">
+        <button type="button" class="btn btn-secondary" [class.active]="activeTab() === 'bookmarks'"
+          (click)="selectTab('bookmarks')">
           <i class="bi bi-bookmark-fill me-2"></i>{{ 'library.bookmarks' | translate }}
         </button>
-        <button type="button" class="btn btn-secondary" [class.active]="activeTab() === 'likes'" (click)="selectTab('likes')">
+        <button type="button" class="btn btn-secondary" [class.active]="activeTab() === 'likes'"
+          (click)="selectTab('likes')">
           <i class="bi bi-heart-fill me-2"></i>{{ 'library.likes' | translate }}
         </button>
       </div>
     </div>
 
     @if (isLoading()) {
-      <div class="space-y-4 animate-pulse">
-        <div class="h-28 rounded-2xl bg-aquamarine-100 dark:bg-aquamarine-800"></div>
-        <div class="h-28 rounded-2xl bg-aquamarine-100 dark:bg-aquamarine-800"></div>
-      </div>
+    <div class="space-y-4 animate-pulse">
+      <div class="h-28 rounded-2xl bg-aquamarine-100 dark:bg-aquamarine-800"></div>
+      <div class="h-28 rounded-2xl bg-aquamarine-100 dark:bg-aquamarine-800"></div>
+    </div>
     } @else if (errorMessage()) {
-      <div class="p-4 rounded-xl border border-red-200 bg-red-50 text-red-700">
-        {{ errorMessage() }}
-        <button type="button" class="ms-2 underline" (click)="load()">{{ 'common.retry' | translate }}</button>
-      </div>
+    <div class="p-4 rounded-xl border border-red-200 bg-red-50 text-red-700">
+      {{ errorMessage() }}
+      <button type="button" class="ms-2 underline" (click)="load()">{{ 'common.retry' | translate }}</button>
+    </div>
     } @else if (posts().length > 0) {
-      @for (post of posts(); track post.id) {
-        <app-post-card [post]="post"></app-post-card>
-      }
+    @for (post of posts(); track post.id) {
+    <app-post-card [post]="post" [showUserActions]="true" [liked]="isLiked(post.id)"
+      [bookmarked]="isBookmarked(post.id)" [likeBusy]="
+      isInteractionBusy(
+        post.id,
+        'like'
+      )
+    " [bookmarkBusy]="
+      isInteractionBusy(
+        post.id,
+        'bookmark'
+      )
+    " (interactionRequested)="
+      handleInteraction($event)
+    "></app-post-card>
+    }
 
-      @if (totalPages() > 1) {
-        <app-pagination
-          [totalItems]="totalItems()"
-          [itemsPerPage]="itemsPerPage"
-          [currentPage]="currentPage()"
-          (currentPageChange)="onPageChange($event)">
-        </app-pagination>
-      }
+    @if (totalPages() > 1) {
+    <app-pagination [totalItems]="totalItems()" [itemsPerPage]="itemsPerPage" [currentPage]="currentPage()"
+      (currentPageChange)="onPageChange($event)">
+    </app-pagination>
+    }
     } @else {
-      <p class="py-10 text-center text-sm text-aquamarine-600 dark:text-aquamarine-400">
-        {{ activeTab() === 'bookmarks' ? ('library.empty_bookmarks' | translate) : ('library.empty_likes' | translate) }}
-      </p>
+    <p class="py-10 text-center text-sm text-aquamarine-600 dark:text-aquamarine-400">
+      {{ activeTab() === 'bookmarks' ? ('library.empty_bookmarks' | translate) : ('library.empty_likes' | translate) }}
+    </p>
     }
   </section>
 </main>

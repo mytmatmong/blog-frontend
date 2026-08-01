@@ -5,21 +5,21 @@
       <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400 mb-6">{{ 'request_owner.subtitle' | translate }}</p>
 
       @if (auth.currentUser()?.role === 'BLOG_OWNER') {
-        <div class="p-4 rounded-xl border border-green-200 bg-green-50 text-green-700 text-sm">
+        <div class="p-4 rounded-xl border border-green-200 dark:border-emerald-800 bg-green-50 dark:bg-emerald-950/40 text-green-700 dark:text-emerald-300 text-sm">
           {{ 'request_owner.already_owner' | translate }}
         </div>
       } @else {
         <form class="space-y-4" (submit)="submit($event)">
           <div>
-            <label class="block text-xs font-semibold mb-1">{{ 'request_owner.reason_label' | translate }}</label>
-            <textarea [(ngModel)]="reason" name="reason" maxlength="1000" required rows="5" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-aquamarine-500" [placeholder]="ts.translate('request_owner.reason_placeholder')"></textarea>
-            <div class="text-right text-[11px] text-aquamarine-500">{{ reason.length }}/1000</div>
+            <label class="block text-xs font-semibold text-aquamarine-950 dark:text-aquamarine-50 mb-1">{{ 'request_owner.reason_label' | translate }}</label>
+            <textarea [(ngModel)]="reason" name="reason" maxlength="1000" required rows="5" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 p-3 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" [placeholder]="ts.translate('request_owner.reason_placeholder')"></textarea>
+            <div class="text-right text-[11px] text-aquamarine-500 dark:text-aquamarine-400">{{ reason.length }}/1000</div>
           </div>
 
           <div>
-            <label class="block text-xs font-semibold mb-1">{{ 'request_owner.topics_label' | translate }}</label>
-            <textarea [(ngModel)]="topics" name="topics" maxlength="500" rows="3" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-aquamarine-500" [placeholder]="'request_owner.topics_placeholder' | translate"></textarea>
-            <div class="text-right text-[11px] text-aquamarine-500">{{ topics.length }}/500</div>
+            <label class="block text-xs font-semibold text-aquamarine-950 dark:text-aquamarine-50 mb-1">{{ 'request_owner.topics_label' | translate }}</label>
+            <textarea [(ngModel)]="topics" name="topics" maxlength="500" rows="3" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 p-3 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" [placeholder]="'request_owner.topics_placeholder' | translate"></textarea>
+            <div class="text-right text-[11px] text-aquamarine-500 dark:text-aquamarine-400">{{ topics.length }}/500</div>
           </div>
 
           <button type="submit" class="btn btn-primary w-full" [disabled]="isSubmitting()">
@@ -29,7 +29,7 @@
       }
 
       @if (selectedRequest(); as detail) {
-        <div class="mt-6 p-4 rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950/40 text-sm space-y-2">
+        <div class="mt-6 p-4 rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950/40 text-sm text-aquamarine-900 dark:text-aquamarine-100 space-y-2">
           <div class="flex justify-between gap-3">
             <strong>#{{ detail.id }}</strong>
             <span class="px-2 py-1 rounded-full text-xs font-semibold" [class]="statusClass(detail.status)">{{ detail.status }}</span>
@@ -38,7 +38,7 @@
           <p><strong>{{ 'request_owner.topics_label' | translate }}:</strong> {{ detail.topics || '—' }}</p>
           <p><strong>{{ 'request_owner.reviewed_at' | translate }}:</strong> {{ formatDate(detail.reviewedAt) }}</p>
           @if (detail.rejectionReason) {
-            <p class="text-red-600"><strong>{{ 'request_owner.rejection_reason' | translate }}:</strong> {{ detail.rejectionReason }}</p>
+            <p class="text-red-600 dark:text-red-400"><strong>{{ 'request_owner.rejection_reason' | translate }}:</strong> {{ detail.rejectionReason }}</p>
           }
         </div>
       }
@@ -46,12 +46,12 @@
 
     <section class="lg:col-span-7 p-6 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
       <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-        <h2 class="font-bold text-lg">{{ 'request_owner.history' | translate }}</h2>
-        <select [(ngModel)]="statusFilter" (ngModelChange)="onFilterChange()" class="rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 px-3 py-2 text-xs">
-          <option value="">{{ 'request_owner.all_statuses' | translate }}</option>
-          <option value="PENDING">PENDING</option>
-          <option value="APPROVED">APPROVED</option>
-          <option value="REJECTED">REJECTED</option>
+        <h2 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">{{ 'request_owner.history' | translate }}</h2>
+        <select [(ngModel)]="statusFilter" (ngModelChange)="onFilterChange()" class="rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 text-aquamarine-950 dark:text-aquamarine-50 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-aquamarine-500">
+          <option value="" class="bg-white dark:bg-aquamarine-900">{{ 'request_owner.all_statuses' | translate }}</option>
+          <option value="PENDING" class="bg-white dark:bg-aquamarine-900">PENDING</option>
+          <option value="APPROVED" class="bg-white dark:bg-aquamarine-900">APPROVED</option>
+          <option value="REJECTED" class="bg-white dark:bg-aquamarine-900">REJECTED</option>
         </select>
       </div>
 
@@ -67,16 +67,16 @@
               <div class="flex flex-wrap items-start justify-between gap-3">
                 <div class="min-w-0">
                   <div class="flex items-center gap-2 mb-1">
-                    <strong class="text-sm">#{{ request.id }}</strong>
+                    <strong class="text-sm text-aquamarine-950 dark:text-aquamarine-50">#{{ request.id }}</strong>
                     <span class="px-2 py-1 rounded-full text-[11px] font-semibold" [class]="statusClass(request.status)">{{ request.status }}</span>
                   </div>
-                  <p class="text-sm line-clamp-2">{{ request.reason }}</p>
-                  <p class="mt-1 text-xs text-aquamarine-500">{{ formatDate(request.createdAt) }}</p>
+                  <p class="text-sm text-aquamarine-900 dark:text-aquamarine-200 line-clamp-2">{{ request.reason }}</p>
+                  <p class="mt-1 text-xs text-aquamarine-500 dark:text-aquamarine-400">{{ formatDate(request.createdAt) }}</p>
                 </div>
                 <div class="flex gap-2">
                   <button type="button" class="btn-tertiary" (click)="viewDetail(request.id)">{{ 'common.detail' | translate }}</button>
                   @if (request.status === 'PENDING') {
-                    <button type="button" class="btn-tertiary !text-red-600" (click)="cancelRequest(request)">{{ 'modal.cancel' | translate }}</button>
+                    <button type="button" class="btn-tertiary !text-red-600 dark:!text-red-400" (click)="cancelRequest(request)">{{ 'modal.cancel' | translate }}</button>
                   }
                 </div>
               </div>
@@ -88,7 +88,7 @@
           <app-pagination [totalItems]="totalItems()" [itemsPerPage]="itemsPerPage" [currentPage]="currentPage()" (currentPageChange)="onPageChange($event)"></app-pagination>
         }
       } @else {
-        <p class="py-10 text-center text-sm text-aquamarine-500">{{ 'request_owner.empty' | translate }}</p>
+        <p class="py-10 text-center text-sm text-aquamarine-500 dark:text-aquamarine-400">{{ 'request_owner.empty' | translate }}</p>
       }
     </section>
   </div>

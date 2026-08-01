@@ -104,8 +104,8 @@
         @if (connectionsMode()) {
           <div class="mt-5 pt-5 border-t border-aquamarine-200 dark:border-aquamarine-800">
             <div class="flex items-center justify-between gap-3 mb-3">
-              <h3 class="font-bold text-sm">{{ connectionsMode() === 'followers' ? ('connections.followers' | translate) : ('connections.following' | translate) }}</h3>
-              <button type="button" class="text-sm text-aquamarine-600 hover:underline" (click)="closeConnections()">{{ 'modal.close' | translate }}</button>
+              <h3 class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-50">{{ connectionsMode() === 'followers' ? ('connections.followers' | translate) : ('connections.following' | translate) }}</h3>
+              <button type="button" class="text-sm text-aquamarine-600 dark:text-aquamarine-400 hover:underline" (click)="closeConnections()">{{ 'modal.close' | translate }}</button>
             </div>
             @if (isLoadingConnections()) {
               <div class="h-16 rounded-xl bg-aquamarine-100 dark:bg-aquamarine-800 animate-pulse"></div>
@@ -118,7 +118,7 @@
                     } @else {
                       <span class="w-9 h-9 rounded-full bg-aquamarine-600 text-white font-bold flex items-center justify-center text-xs">{{ getAvatarInitial(user.username) }}</span>
                     }
-                    <div class="min-w-0"><div class="text-sm font-semibold">{{ user.username }}</div><div class="text-xs text-aquamarine-500 truncate">{{ user.bio || ('profile.no_bio' | translate) }}</div></div>
+                    <div class="min-w-0"><div class="text-sm font-semibold text-aquamarine-950 dark:text-aquamarine-50">{{ user.username }}</div><div class="text-xs text-aquamarine-500 dark:text-aquamarine-400 truncate">{{ user.bio || ('profile.no_bio' | translate) }}</div></div>
                   </div>
                 }
               </div>
@@ -126,7 +126,7 @@
                 <app-pagination [totalItems]="connectionsTotalItems()" [itemsPerPage]="connectionsPerPage" [currentPage]="connectionsPage()" (currentPageChange)="onConnectionsPageChange($event)"></app-pagination>
               }
             } @else {
-              <p class="text-sm text-aquamarine-500">{{ 'connections.empty' | translate }}</p>
+              <p class="text-sm text-aquamarine-500 dark:text-aquamarine-400">{{ 'connections.empty' | translate }}</p>
             }
           </div>
         }

@@ -29,13 +29,13 @@
 
         <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ currentUser.bio || ('profile.no_bio' |
           translate) }}</p>
-        <p class="text-xs text-aquamarine-500">{{ 'author.joined' | translate }}: {{ formatDate(currentUser.createdAt)
+        <p class="text-xs text-aquamarine-500 dark:text-aquamarine-400">{{ 'author.joined' | translate }}: {{ formatDate(currentUser.createdAt)
           }}</p>
       </div>
 
       <div
         class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-        <h2 class="font-bold text-sm mb-3">{{ 'profile.followers' | translate }} ({{ currentUser.followers?.length || 0
+        <h2 class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-50 mb-3">{{ 'profile.followers' | translate }} ({{ currentUser.followers?.length || 0
           }})</h2>
         @if (currentUser.followers?.length) {
         <div class="space-y-3">
@@ -49,15 +49,15 @@
               getAvatarInitial(follower.username) }}</span>
             }
             <div class="min-w-0">
-              <div class="text-sm font-semibold">{{ follower.username }}</div>
-              <div class="text-xs text-aquamarine-500 truncate">{{ follower.bio || ('profile.no_bio' | translate) }}
+              <div class="text-sm font-semibold text-aquamarine-950 dark:text-aquamarine-50">{{ follower.username }}</div>
+              <div class="text-xs text-aquamarine-500 dark:text-aquamarine-400 truncate">{{ follower.bio || ('profile.no_bio' | translate) }}
               </div>
             </div>
           </div>
           }
         </div>
         } @else {
-        <p class="text-xs text-aquamarine-500">{{ 'connections.empty' | translate }}</p>
+        <p class="text-xs text-aquamarine-500 dark:text-aquamarine-400">{{ 'connections.empty' | translate }}</p>
         }
       </div>
     </aside>
@@ -74,61 +74,305 @@
 
         <div class="grid sm:grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs font-semibold mb-1">{{ 'profile.username_label' | translate }}</label>
+            <label class="block text-xs font-semibold text-aquamarine-950 dark:text-aquamarine-50 mb-1">{{ 'profile.username_label' | translate }}</label>
             <input type="text" [value]="currentUser.username" readonly
-              class="w-full rounded-xl border border-aquamarine-200 bg-aquamarine-100/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm cursor-not-allowed" />
+              class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-100/50 dark:bg-aquamarine-950 text-aquamarine-950 dark:text-aquamarine-50 px-4 py-2.5 text-sm cursor-not-allowed" />
           </div>
           <div>
-            <label class="block text-xs font-semibold mb-1">{{ 'table.email' | translate }}</label>
+            <label class="block text-xs font-semibold text-aquamarine-950 dark:text-aquamarine-50 mb-1">{{ 'table.email' | translate }}</label>
             <input type="email" [value]="currentUser.email" readonly
-              class="w-full rounded-xl border border-aquamarine-200 bg-aquamarine-100/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm cursor-not-allowed" />
+              class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-100/50 dark:bg-aquamarine-950 text-aquamarine-950 dark:text-aquamarine-50 px-4 py-2.5 text-sm cursor-not-allowed" />
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-semibold mb-1">{{ 'profile.bio_label' | translate }}</label>
+          <label class="block text-xs font-semibold text-aquamarine-950 dark:text-aquamarine-50 mb-1">{{ 'profile.bio_label' | translate }}</label>
           <textarea [(ngModel)]="bio" name="bio" rows="4"
-            class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-aquamarine-500"></textarea>
+            class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-aquamarine-500"></textarea>
         </div>
 
         <div>
-          <label class="block text-xs font-semibold mb-1">{{ 'profile.new_password' | translate }}</label>
-          <input [(ngModel)]="newPassword" name="newPassword" type="password" minlength="6"
-            class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 px-4 py-2.5 text-sm"
-            [placeholder]="'profile.password_placeholder' | translate" />
+          <label class="block mb-2 text-sm font-semibold text-aquamarine-950 dark:text-aquamarine-50">
+            {{ 'profile.avatar' | translate }}
+          </label>
+
+          <div
+            class="flex flex-col sm:flex-row sm:items-center gap-4 p-4 rounded-2xl border border-dashed border-aquamarine-300 dark:border-aquamarine-700 bg-aquamarine-50/60 dark:bg-aquamarine-950/40">
+            <!-- Preview ảnh -->
+            <div class="shrink-0">
+              @if (avatarPreview() || currentUser.avatarUrl) {
+              <img [src]="avatarPreview() || currentUser.avatarUrl" [alt]="currentUser.username"
+                class="w-20 h-20 rounded-2xl object-cover border border-aquamarine-200 dark:border-aquamarine-700 shadow-sm" />
+              } @else {
+              <div
+                class="w-20 h-20 rounded-2xl flex items-center justify-center bg-gradient-to-br from-aquamarine-500 to-emerald-500 text-white text-2xl font-bold shadow-sm">
+                {{ getAvatarInitial(currentUser.username) }}
+              </div>
+              }
+            </div>
+
+            <!-- Thông tin file -->
+            <div class="flex-1 min-w-0">
+              @if (selectedAvatar) {
+              <div class="mb-1 text-sm font-semibold text-aquamarine-950 dark:text-aquamarine-50 truncate"
+                [title]="selectedAvatar.name">
+                {{ selectedAvatar.name }}
+              </div>
+
+              <div class="mb-3 text-xs text-aquamarine-600 dark:text-aquamarine-400">
+                {{ formatFileSize(selectedAvatar.size) }}
+              </div>
+              } @else {
+              <div class="mb-1 text-sm font-semibold text-aquamarine-950 dark:text-aquamarine-50">
+                {{ 'profile.new_avatar_title' | translate }}
+              </div>
+
+              <div class="mb-3 text-xs text-aquamarine-600 dark:text-aquamarine-400">
+                {{ 'profile.avatar_limit_hint' | translate }}
+              </div>
+              }
+
+              <div class="flex flex-wrap items-center gap-2">
+                <!-- Input thật bị ẩn -->
+                <input #avatarInput type="file" accept="image/jpeg,image/png,image/webp" class="hidden"
+                  (change)="onAvatarSelected($event)" />
+
+                <!-- Nút mở hộp chọn file -->
+                <button type="button"
+                  class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-aquamarine-600 hover:bg-aquamarine-700 text-white text-sm font-semibold transition-colors"
+                  (click)="avatarInput.click()">
+                  <i class="bi bi-image"></i>
+
+                  {{
+                  selectedAvatar
+                  ? ('profile.choose_other_avatar' | translate)
+                  : ('profile.choose_avatar' | translate)
+                  }}
+                </button>
+
+                @if (selectedAvatar) {
+                <button type="button"
+                  class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-red-200 dark:border-red-900 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 text-sm font-semibold transition-colors"
+                  (click)="clearAvatarSelection(avatarInput)">
+                  <i class="bi bi-x-lg"></i>
+                  {{ 'profile.deselect_avatar' | translate }}
+                </button>
+                }
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div>
-          <label class="block text-xs font-semibold mb-1">{{ 'profile.avatar' | translate }}</label>
-          <input type="file" accept="image/*" (change)="onAvatarSelected($event)" class="block w-full text-sm" />
-          <p class="mt-1 text-xs text-aquamarine-500">{{ 'profile.avatar_hint' | translate }}</p>
-        </div>
+        <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-3 pt-2">
+          @if (selectedAvatar) {
+          <button type="button"
+            class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border border-aquamarine-200 dark:border-aquamarine-700 text-aquamarine-700 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            [disabled]="isUploadingAvatar() || isSaving()" (click)="uploadAvatarOnly()">
+            @if (isUploadingAvatar()) {
+            <span
+              class="w-4 h-4 rounded-full border-2 border-aquamarine-300 border-t-aquamarine-600 animate-spin"></span>
 
-        <div class="flex flex-wrap gap-3">
-          <button type="submit" class="btn btn-primary" [disabled]="isSaving()">
-            <i class="bi bi-save me-2"></i>{{ isSaving() ? ('common.saving' | translate) : ('common.save' | translate)
-            }}
+            {{ 'profile.uploading_avatar' | translate }}
+            } @else {
+            <i class="bi bi-cloud-arrow-up"></i>
+            {{ 'profile.update_avatar_only' | translate }}
+            }
           </button>
-          <button type="button" class="btn btn-secondary" [disabled]="!selectedAvatar || isUploadingAvatar()"
-            (click)="uploadAvatarOnly()">
-            <i class="bi bi-cloud-arrow-up me-2"></i>{{ 'profile.upload_avatar_only' | translate }}
+          }
+
+          <button type="submit"
+            class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-aquamarine-600 hover:bg-aquamarine-700 text-white text-sm font-semibold shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            [disabled]="isSaving() || isUploadingAvatar()">
+            @if (isSaving()) {
+            <span class="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin"></span>
+
+            {{ 'common.saving' | translate }}
+            } @else {
+            <i class="bi bi-check-lg"></i>
+            {{ 'common.save' | translate }}
+            }
           </button>
         </div>
       </form>
 
-      <div
-        class="p-6 rounded-2xl border border-amber-200 dark:border-amber-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-        <h2 class="font-bold text-lg mb-2">{{ 'profile.security' | translate }}</h2>
-        <div class="flex flex-wrap gap-3">
-          <button type="button" class="btn btn-secondary" (click)="logoutAll()">
-            <i class="bi bi-box-arrow-right me-2"></i>{{ 'profile.logout_all' | translate }}
-          </button>
-          <button type="button" class="btn border-red-500 text-red-600" [disabled]="isDeleting()"
-            (click)="deleteAccount()">
-            <i class="bi bi-trash me-2"></i>{{ 'profile.delete_account' | translate }}
-          </button>
+      <section
+        class="rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm overflow-hidden">
+        <!-- Tiêu đề -->
+        <div
+          class="flex items-center justify-between gap-4 p-6 border-b border-aquamarine-100 dark:border-aquamarine-800">
+          <div class="flex items-center gap-3">
+            <div
+              class="w-10 h-10 rounded-xl flex items-center justify-center bg-aquamarine-100 dark:bg-aquamarine-800 text-aquamarine-700 dark:text-aquamarine-300">
+              <i class="bi bi-shield-lock text-lg"></i>
+            </div>
+
+            <div>
+              <h2 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">
+                {{ 'profile.security' | translate }}
+              </h2>
+
+              <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">
+                {{ 'profile.security_desc' | translate }}
+              </p>
+            </div>
+          </div>
         </div>
-      </div>
+
+        <!-- Đổi mật khẩu -->
+        <div class="p-6 border-b border-aquamarine-100 dark:border-aquamarine-800">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h3 class="font-semibold text-sm text-aquamarine-950 dark:text-aquamarine-50">
+                {{ 'profile.login_password' | translate }}
+              </h3>
+
+              <p class="mt-1 text-xs text-aquamarine-600 dark:text-aquamarine-400">
+                {{ 'profile.password_advice' | translate }}
+              </p>
+            </div>
+
+            <button type="button"
+              class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-aquamarine-200 dark:border-aquamarine-700 text-aquamarine-700 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 text-sm font-semibold transition-colors"
+              (click)="togglePasswordForm()">
+              <i class="bi" [class.bi-key]="!showPasswordForm()" [class.bi-x-lg]="showPasswordForm()"></i>
+
+              {{
+              showPasswordForm()
+              ? ('modal.close' | translate)
+              : ('profile.change_password' | translate)
+              }}
+            </button>
+          </div>
+
+          @if (showPasswordForm()) {
+          <form
+            class="mt-5 p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-700 bg-aquamarine-50/60 dark:bg-aquamarine-950/40"
+            (submit)="changePassword($event)">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Mật khẩu mới -->
+              <div>
+                <label for="new-password"
+                  class="block mb-1.5 text-xs font-semibold text-aquamarine-950 dark:text-aquamarine-50">
+                  {{ 'profile.new_password' | translate }}
+                </label>
+
+                <div class="relative">
+                  <input id="new-password" [(ngModel)]="newPassword" name="newPassword"
+                    [type]="showPassword() ? 'text' : 'password'" minlength="6" autocomplete="new-password" required
+                    class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-700 bg-white dark:bg-aquamarine-950 px-4 py-2.5 pr-11 text-sm focus:outline-none focus:ring-2 focus:ring-aquamarine-500"
+                    [placeholder]="'profile.new_password_placeholder' | translate" />
+
+                  <button type="button"
+                    class="absolute inset-y-0 right-0 w-11 flex items-center justify-center text-aquamarine-500 hover:text-aquamarine-700"
+                    (click)="showPassword.update(value => !value)" [attr.aria-label]="
+                  showPassword()
+                    ? ('profile.hide_password' | translate)
+                    : ('profile.show_password' | translate)
+                ">
+                    <i class="bi" [class.bi-eye]="!showPassword()" [class.bi-eye-slash]="showPassword()"></i>
+                  </button>
+                </div>
+
+                <p class="mt-1 text-[11px] text-aquamarine-500">
+                  {{ 'profile.min_6_chars' | translate }}
+                </p>
+              </div>
+
+              <!-- Xác nhận mật khẩu -->
+              <div>
+                <label for="confirm-password"
+                  class="block mb-1.5 text-xs font-semibold text-aquamarine-950 dark:text-aquamarine-50">
+                  {{ 'profile.confirm_new_password' | translate }}
+                </label>
+
+                <input id="confirm-password" [(ngModel)]="confirmNewPassword" name="confirmNewPassword"
+                  [type]="showPassword() ? 'text' : 'password'" minlength="6" autocomplete="new-password" required
+                  class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-700 bg-white dark:bg-aquamarine-950 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-aquamarine-500"
+                  [placeholder]="'profile.confirm_new_password_placeholder' | translate" />
+
+                @if (
+                confirmNewPassword
+                && newPassword !== confirmNewPassword
+                ) {
+                <p class="mt-1 text-[11px] text-red-600">
+                  {{ 'profile.passwords_do_not_match' | translate }}
+                </p>
+                }
+              </div>
+            </div>
+
+            <div class="flex flex-wrap justify-end gap-3 mt-5">
+              <button type="button"
+                class="inline-flex items-center justify-center px-4 py-2.5 rounded-xl border border-aquamarine-200 dark:border-aquamarine-700 text-sm font-semibold text-aquamarine-700 dark:text-aquamarine-200 hover:bg-aquamarine-100 dark:hover:bg-aquamarine-800 transition-colors"
+                (click)="cancelPasswordChange()">
+                {{ 'modal.cancel' | translate }}
+              </button>
+
+              <button type="submit"
+                class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-aquamarine-600 hover:bg-aquamarine-700 text-white text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                [disabled]="
+              isChangingPassword()
+              || newPassword.length < 6
+              || newPassword !== confirmNewPassword
+            ">
+                @if (isChangingPassword()) {
+                <span class="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin"></span>
+
+                {{ 'profile.updating_password' | translate }}
+                } @else {
+                <i class="bi bi-check-lg"></i>
+                {{ 'profile.update_password_btn' | translate }}
+                }
+              </button>
+            </div>
+          </form>
+          }
+        </div>
+
+        <!-- Phiên đăng nhập -->
+        <div class="p-6 border-b border-aquamarine-100 dark:border-aquamarine-800">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h3 class="font-semibold text-sm text-aquamarine-950 dark:text-aquamarine-50">
+                {{ 'profile.login_sessions' | translate }}
+              </h3>
+
+              <p class="mt-1 text-xs text-aquamarine-600 dark:text-aquamarine-400">
+                {{ 'profile.login_sessions_desc' | translate }}
+              </p>
+            </div>
+
+            <button type="button"
+              class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-aquamarine-200 dark:border-aquamarine-700 text-aquamarine-700 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 text-sm font-semibold transition-colors"
+              (click)="logoutAll()">
+              <i class="bi bi-box-arrow-right"></i>
+              {{ 'profile.logout_all' | translate }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Xóa tài khoản -->
+        <div class="p-6 bg-red-50/50 dark:bg-red-950/10">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h3 class="font-semibold text-sm text-red-700 dark:text-red-400">
+                {{ 'profile.delete_account' | translate }}
+              </h3>
+
+              <p class="mt-1 text-xs text-red-600/80 dark:text-red-400/80">
+                {{ 'profile.delete_account_desc' | translate }}
+              </p>
+            </div>
+
+            <button type="button"
+              class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl border border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/40 text-sm font-semibold transition-colors disabled:opacity-50"
+              [disabled]="isDeleting()" (click)="deleteAccount()">
+              <i class="bi bi-trash"></i>
+              {{ 'profile.delete_account' | translate }}
+            </button>
+          </div>
+        </div>
+      </section>
     </section>
   </div>
   }

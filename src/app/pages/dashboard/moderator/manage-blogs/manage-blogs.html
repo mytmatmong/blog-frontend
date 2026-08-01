@@ -72,17 +72,17 @@
         <h2 class="font-bold text-2xl text-aquamarine-950 dark:text-aquamarine-50">{{ activePreviewBlog()?.title }}</h2>
         <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ 'table.author' | translate }}: <span class="font-medium text-aquamarine-950 dark:text-aquamarine-50">{{ activePreviewBlog()?.author }}</span></div>
         <div class="space-y-3 text-aquamarine-800 dark:text-aquamarine-200 text-sm">
-          <p>Đây là nội dung mô phỏng của bài viết để Moderator có thể đọc và đánh giá trước khi duyệt. Trong thực tế, nội dung này sẽ được load từ database dựa vào ID của bài viết.</p>
-          <p>Dưới đây là một ví dụ về nội dung bài viết dài hơn để kiểm tra khả năng cuộn trang (scroll) của Modal. Khi một bài viết có nhiều chi tiết, hình ảnh hoặc các đoạn mã nguồn, Moderator cần phải kiểm tra kỹ lưỡng trước khi quyết định duyệt (Approve) hoặc từ chối (Reject).</p>
+          <p>{{ 'modal.preview_blog_p1' | translate }}</p>
+          <p>{{ 'modal.preview_blog_p2' | translate }}</p>
           
-          <h4 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50 pt-2">1. Tại sao tính năng này quan trọng?</h4>
-          <p>Việc kiểm duyệt bài viết giúp đảm bảo nền tảng DevBlog luôn giữ được chất lượng nội dung tốt nhất. Các bài viết rác (spam) hoặc copy từ nguồn khác mà không ghi nguồn sẽ bị loại bỏ.</p>
+          <h4 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50 pt-2">{{ 'modal.preview_blog_h1' | translate }}</h4>
+          <p>{{ 'modal.preview_blog_p3' | translate }}</p>
           
-          <h4 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50 pt-2">2. Yêu cầu định dạng bài viết</h4>
+          <h4 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50 pt-2">{{ 'modal.preview_blog_h2' | translate }}</h4>
           <ul class="list-disc list-inside space-y-1 pl-2">
-            <li>Tiêu đề phải rõ ràng, không giật tít câu view (clickbait).</li>
-            <li>Nội dung không chứa ngôn từ kích động, thù địch hoặc spam.</li>
-            <li>Các đoạn code cần được đặt trong thẻ Code block (pre/code) một cách hợp lệ.</li>
+            <li>{{ 'modal.preview_blog_li1' | translate }}</li>
+            <li>{{ 'modal.preview_blog_li2' | translate }}</li>
+            <li>{{ 'modal.preview_blog_li3' | translate }}</li>
           </ul>
         </div>
       </div>

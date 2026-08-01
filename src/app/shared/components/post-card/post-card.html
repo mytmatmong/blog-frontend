@@ -1,22 +1,58 @@
 <article
   class="p-5 mb-4 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 card-box shadow-sm hover:shadow-md transition-shadow">
   <div class="flex gap-4">
-    <!-- Public hiện chưa gọi User API like/bookmark,
-         nên không dùng button giả có thể click -->
+    <!-- Tương tác desktop -->
     <div class="hidden sm:flex flex-col items-center justify-center gap-2 w-12 flex-shrink-0">
-      <span class="p-1 text-aquamarine-600 dark:text-aquamarine-300" [title]="'post.likes' | translate">
+      @if (showUserActions) {
+      <button type="button"
+        class="w-9 h-9 rounded-full inline-flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        [class.text-red-500]="isLiked()" [class.text-aquamarine-500]="!isLiked()" [class.hover:bg-red-50]="isLiked()"
+        [class.dark:hover:bg-red-950/30]="isLiked()" [class.hover:bg-aquamarine-100]="!isLiked()"
+        [class.dark:hover:bg-aquamarine-800]="!isLiked()" [disabled]="isLikeBusy()" [title]="
+            isLiked()
+              ? ('post.unlike' | translate)
+              : ('post.like' | translate)
+          " (click)="requestLikeAction()">
+        @if (isLikeBusy()) {
+        <span class="w-4 h-4 rounded-full border-2 border-aquamarine-200 border-t-aquamarine-600 animate-spin"></span>
+        } @else {
+        <i class="bi" [class.bi-heart-fill]="isLiked()" [class.bi-heart]="!isLiked()"></i>
+        }
+      </button>
+
+      <div class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-100">
+        {{ displayedLikes() }}
+      </div>
+
+      <button type="button"
+        class="w-9 h-9 rounded-full inline-flex items-center justify-center text-aquamarine-600 dark:text-aquamarine-300 hover:bg-aquamarine-100 dark:hover:bg-aquamarine-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        [disabled]="isBookmarkBusy()" [title]="
+            isBookmarked()
+              ? ('post.unsave' | translate)
+              : ('post.save' | translate)
+          " (click)="requestBookmarkAction()">
+        @if (isBookmarkBusy()) {
+        <span class="w-4 h-4 rounded-full border-2 border-aquamarine-200 border-t-aquamarine-600 animate-spin"></span>
+        } @else {
+        <i class="bi" [class.bi-bookmark-fill]="isBookmarked()" [class.bi-bookmark]="!isBookmarked()"></i>
+        }
+      </button>
+      } @else {
+      <span class="p-1 text-aquamarine-600 dark:text-aquamarine-300">
         <i class="bi bi-heart-fill"></i>
       </span>
 
       <div class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-100">
-        {{ post.likes }}
+        {{ displayedLikes() }}
       </div>
 
-      <span class="p-1 text-aquamarine-500 dark:text-aquamarine-400" [title]="'post.save_hint' | translate">
+      <span class="p-1 text-aquamarine-500 dark:text-aquamarine-400">
         <i class="bi bi-bookmark"></i>
       </span>
+      }
     </div>
 
+    <!-- Thumbnail -->
     <div
       class="hidden md:flex w-28 h-20 rounded-xl bg-aquamarine-100 dark:bg-aquamarine-800 items-center justify-center flex-shrink-0 overflow-hidden">
       @if (post.thumbnailUrl) {
@@ -27,10 +63,13 @@
       }
     </div>
 
+    <!-- Nội dung -->
     <div class="flex-grow min-w-0">
       <div class="flex flex-wrap items-center gap-2 mb-2">
-        <a [routerLink]="['/author', post.authorId]"
-          class="flex items-center gap-2 group hover:opacity-80 transition-opacity">
+        <a [routerLink]="[
+            '/author',
+            post.authorId
+          ]" class="flex items-center gap-2 group hover:opacity-80 transition-opacity">
           @if (post.authorAvatarUrl) {
           <img [src]="post.authorAvatarUrl" [alt]="post.authorName"
             class="w-7 h-7 rounded-full object-cover border border-aquamarine-200 dark:border-aquamarine-700"
@@ -47,7 +86,8 @@
         </a>
 
         <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400">
-          • {{ post.timeAgo }} • {{ post.readTime }}
+          • {{ post.timeAgo }}
+          • {{ post.readTime }}
         </small>
       </div>
 
@@ -58,7 +98,8 @@
         track category.id
         ) {
         <a routerLink="/category" [queryParams]="{
-                categoryId: category.id
+                categoryId:
+                  category.id
               }" class="category-badge">
           {{ category.name }}
         </a>
@@ -67,7 +108,10 @@
       }
 
       <h2 class="font-bold text-lg mb-2">
-        <a [routerLink]="['/post', post.id]" class="card-text transition-colors">
+        <a [routerLink]="[
+            '/post',
+            post.id
+          ]" class="card-text transition-colors">
           {{ post.title }}
         </a>
       </h2>
@@ -76,9 +120,12 @@
         {{ post.excerpt }}
       </p>
 
-      <div class="flex flex-wrap justify-between items-center gap-2">
+      <div class="flex flex-wrap justify-between items-center gap-3">
         <div class="flex flex-wrap gap-2">
-          @for (tag of post.tags; track tag.id) {
+          @for (
+          tag of post.tags;
+          track tag.id
+          ) {
           <a class="tag" routerLink="/hashtag" [queryParams]="{
                 tagId: tag.id,
                 tagName: tag.name
@@ -88,19 +135,54 @@
           }
         </div>
 
-        <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400 flex items-center gap-2">
-          <span>
-            <i class="bi bi-eye me-1"></i>
-            {{ post.views }}
-          </span>
+        <div class="flex items-center gap-3">
+          <!-- Tương tác mobile -->
+          @if (showUserActions) {
+          <div class="sm:hidden flex items-center gap-2">
+            <button type="button"
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-aquamarine-200 dark:border-aquamarine-700 text-xs font-semibold transition-colors disabled:opacity-50"
+              [class.text-red-500]="isLiked()" [class.text-aquamarine-700]="!isLiked()" [disabled]="isLikeBusy()"
+              (click)="requestLikeAction()">
+              @if (isLikeBusy()) {
+              <span
+                class="w-3.5 h-3.5 rounded-full border-2 border-aquamarine-200 border-t-aquamarine-600 animate-spin"></span>
+              } @else {
+              <i class="bi" [class.bi-heart-fill]="isLiked()" [class.bi-heart]="!isLiked()"></i>
+              }
 
-          @if (post.showCommentCount ?? true) {
-          <span>
-            <i class="bi bi-chat me-1"></i>
-            {{ post.comments }}
-          </span>
+              {{ displayedLikes() }}
+            </button>
+
+            <button type="button"
+              class="inline-flex items-center justify-center w-9 h-8 rounded-lg border border-aquamarine-200 dark:border-aquamarine-700 text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-200 transition-colors disabled:opacity-50"
+              [disabled]="isBookmarkBusy()" (click)="requestBookmarkAction()">
+              @if (isBookmarkBusy()) {
+              <span
+                class="w-3.5 h-3.5 rounded-full border-2 border-aquamarine-200 border-t-aquamarine-600 animate-spin"></span>
+              } @else {
+              <i class="bi" [class.bi-bookmark-fill]="isBookmarked()" [class.bi-bookmark]="!isBookmarked()"></i>
+              }
+            </button>
+          </div>
           }
-        </small>
+
+          <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400 flex items-center gap-2">
+            <span>
+              <i class="bi bi-eye me-1"></i>
+              {{ post.views }}
+            </span>
+
+            @if (
+            post.showCommentCount
+            ?? true
+            ) {
+            <span>
+              <i class="bi bi-chat me-1"></i>
+              {{ post.comments }}
+            </span>
+            }
+          </small>
+        </div>
       </div>
     </div>
   </div>
