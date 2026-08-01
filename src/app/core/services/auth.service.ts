@@ -1,240 +1,475 @@
-import { Injectable, signal, effect, inject } from '@angular/core';
+import {
+  effect,
+  inject,
+  Injectable,
+  signal,
+} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap, catchError, throwError } from 'rxjs';
+import {
+  catchError,
+  finalize,
+  map,
+  Observable,
+  of,
+  shareReplay,
+  tap,
+  throwError,
+} from 'rxjs';
+
 import { environment } from '../../../environments/environment';
 import {
-  User,
+  ApiResponse,
   AuthTokens,
-  LoginResponseData,
-  RegisterRequest,
-  LoginRequest,
+  BackendUserRole,
   ForgotPasswordRequest,
+  FrontendRole,
+  LoginRequest,
+  LoginResponseData,
+  RefreshTokenResponseData,
+  RegisterRequest,
   ResetPasswordRequest,
-  ApiResponse
+  User,
 } from '../models/auth.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = environment.apiUrl;
 
-  currentUser = signal<User | null>(null);
-  currentRole = signal<string>('guest');
-  accessToken = signal<string | null>(null);
-  refreshToken = signal<string | null>(null);
-  isDarkMode = signal<boolean>(false);
+  /**
+   * Dùng chung một request refresh khi nhiều API cùng trả 401.
+   * Tránh gửi 4-5 request refresh token cùng lúc.
+   */
+  private refreshRequest$: Observable<string> | null = null;
+
+  readonly currentUser = signal<User | null>(null);
+  readonly currentRole = signal<FrontendRole>('guest');
+  readonly accessToken = signal<string | null>(null);
+  readonly refreshToken = signal<string | null>(null);
+  readonly isDarkMode = signal<boolean>(false);
 
   constructor() {
-    if (typeof window !== 'undefined') {
-      // Load saved user state & tokens
-      const savedUserStr = localStorage.getItem('auth_user');
-      const savedAccess = localStorage.getItem('access_token');
-      const savedRefresh = localStorage.getItem('refresh_token');
-
-      if (savedAccess) this.accessToken.set(savedAccess);
-      if (savedRefresh) this.refreshToken.set(savedRefresh);
-
-      if (savedUserStr) {
-        try {
-          const user: User = JSON.parse(savedUserStr);
-          this.currentUser.set(user);
-          this.currentRole.set(this.normalizeRole(user.role));
-        } catch {
-          const savedRole = localStorage.getItem('demoRole');
-          if (savedRole) this.currentRole.set(savedRole);
-        }
-      } else {
-        const savedRole = localStorage.getItem('demoRole');
-        if (savedRole) this.currentRole.set(savedRole);
-      }
-
-      // Dark Mode theme setup
-      const savedTheme = localStorage.getItem('demoTheme');
-      if (savedTheme === 'dark') {
-        this.isDarkMode.set(true);
-        document.documentElement.classList.add('dark', 'dark-mode');
-        document.body.classList.add('dark', 'dark-mode');
-      }
-
-      effect(() => {
-        const role = this.currentRole();
-        localStorage.setItem('demoRole', role);
-      });
-
-      effect(() => {
-        const dark = this.isDarkMode();
-        localStorage.setItem('demoTheme', dark ? 'dark' : 'light');
-        if (dark) {
-          document.documentElement.classList.add('dark', 'dark-mode');
-          document.body.classList.add('dark', 'dark-mode');
-        } else {
-          document.documentElement.classList.remove('dark', 'dark-mode');
-          document.body.classList.remove('dark', 'dark-mode');
-        }
-      });
+    if (typeof window === 'undefined') {
+      return;
     }
+
+    this.restoreSession();
+    this.restoreTheme();
+
+    effect(() => {
+      const darkMode = this.isDarkMode();
+
+      localStorage.setItem(
+        'demoTheme',
+        darkMode ? 'dark' : 'light',
+      );
+
+      this.applyTheme(darkMode);
+    });
   }
 
   /**
-   * 1. Register API: POST /api/v1/register
+   * P01 — POST /register
    */
-  register(data: RegisterRequest): Observable<ApiResponse<User>> {
-    return this.http.post<ApiResponse<User>>(`${this.apiUrl}/register`, data);
-  }
-
-  /**
-   * 2. Login API: POST /api/v1/login
-   */
-  login(data: LoginRequest): Observable<ApiResponse<LoginResponseData>> {
-    return this.http.post<ApiResponse<LoginResponseData>>(`${this.apiUrl}/login`, data).pipe(
-      tap((res) => {
-        if (res.success && res.data) {
-          const { user, tokens } = res.data;
-          this.handleAuthSuccess(user, tokens);
-        }
-      })
+  register(
+    request: RegisterRequest,
+  ): Observable<ApiResponse<User>> {
+    return this.http.post<ApiResponse<User>>(
+      `${this.apiUrl}/register`,
+      request,
     );
   }
 
   /**
-   * 3. Forgot Password API: POST /api/v1/forgot-password
+   * P02 — POST /login
    */
-  forgotPassword(data: ForgotPasswordRequest): Observable<ApiResponse<{ message: string }>> {
-    return this.http.post<ApiResponse<{ message: string }>>(`${this.apiUrl}/forgot-password`, data);
+  login(
+    request: LoginRequest,
+  ): Observable<ApiResponse<LoginResponseData>> {
+    return this.http
+      .post<ApiResponse<LoginResponseData>>(
+        `${this.apiUrl}/login`,
+        request,
+      )
+      .pipe(
+        tap((response) => {
+          this.handleLoginSuccess(
+            response.data.user,
+            response.data.tokens,
+          );
+        }),
+      );
   }
 
   /**
-   * 4. Reset Password API: POST /api/v1/reset-password
+   * P03 — POST /forgot-password
    */
-  resetPassword(data: ResetPasswordRequest): Observable<ApiResponse<{ message: string }>> {
-    return this.http.post<ApiResponse<{ message: string }>>(`${this.apiUrl}/reset-password`, data);
+  forgotPassword(
+    request: ForgotPasswordRequest,
+  ): Observable<ApiResponse<{ message: string }>> {
+    return this.http.post<
+      ApiResponse<{ message: string }>
+    >(
+      `${this.apiUrl}/forgot-password`,
+      request,
+    );
   }
 
   /**
-   * 5. Refresh Token API: POST /api/v1/auth/refresh-token
+   * P04 — POST /reset-password
    */
-  refreshTokenApi(): Observable<ApiResponse<AuthTokens>> {
-    const token = this.refreshToken();
-    if (!token) {
+  resetPassword(
+    request: ResetPasswordRequest,
+  ): Observable<ApiResponse<{ message: string }>> {
+    return this.http.post<
+      ApiResponse<{ message: string }>
+    >(
+      `${this.apiUrl}/reset-password`,
+      request,
+    );
+  }
+
+  /**
+   * U01 — POST /auth/refresh-token
+   *
+   * Backend chỉ trả:
+   * {
+   *   data: {
+   *     accessToken: "..."
+   *   }
+   * }
+   *
+   * Refresh token cũ vẫn phải được giữ nguyên.
+   */
+  refreshAccessToken(): Observable<string> {
+    if (this.refreshRequest$) {
+      return this.refreshRequest$;
+    }
+
+    const currentRefreshToken = this.refreshToken();
+
+    if (!currentRefreshToken) {
       this.logout();
-      return throwError(() => new Error('No refresh token available'));
+
+      return throwError(
+        () => new Error('Không có refresh token'),
+      );
     }
 
-    return this.http.post<ApiResponse<AuthTokens>>(`${this.apiUrl}/auth/refresh-token`, { refreshToken: token }).pipe(
-      tap((res) => {
-        if (res.success && res.data) {
-          this.accessToken.set(res.data.accessToken);
-          this.refreshToken.set(res.data.refreshToken);
-          if (typeof window !== 'undefined') {
-            localStorage.setItem('access_token', res.data.accessToken);
-            localStorage.setItem('refresh_token', res.data.refreshToken);
+    const request$ = this.http
+      .post<ApiResponse<RefreshTokenResponseData>>(
+        `${this.apiUrl}/auth/refresh-token`,
+        {
+          refreshToken: currentRefreshToken,
+        },
+      )
+      .pipe(
+        map((response) => {
+          const newAccessToken =
+            response.data?.accessToken;
+
+          if (!newAccessToken) {
+            throw new Error(
+              'Backend không trả accessToken mới',
+            );
           }
-        }
-      }),
-      catchError((err) => {
-        this.logout();
-        return throwError(() => err);
-      })
-    );
+
+          return newAccessToken;
+        }),
+
+        tap((newAccessToken) => {
+          this.accessToken.set(newAccessToken);
+
+          if (typeof window !== 'undefined') {
+            localStorage.setItem(
+              'access_token',
+              newAccessToken,
+            );
+          }
+        }),
+
+        catchError((error: unknown) => {
+          this.logout();
+          return throwError(() => error);
+        }),
+
+        finalize(() => {
+          this.refreshRequest$ = null;
+        }),
+
+        shareReplay({
+          bufferSize: 1,
+          refCount: false,
+        }),
+      );
+
+    this.refreshRequest$ = request$;
+
+    return request$;
   }
 
   /**
-   * 6. Logout API: POST /api/v1/auth/logout
+   * U02 — POST /auth/logout
    */
-  logoutApi(): Observable<ApiResponse<{ message: string }>> {
-    const token = this.refreshToken();
-    return this.http.post<ApiResponse<{ message: string }>>(`${this.apiUrl}/auth/logout`, { refreshToken: token }).pipe(
-      tap(() => this.logout()),
-      catchError((err) => {
-        this.logout();
-        return throwError(() => err);
-      })
-    );
+  logoutApi(): Observable<
+    ApiResponse<{ message: string }>
+  > {
+    const currentRefreshToken = this.refreshToken();
+
+    if (!currentRefreshToken) {
+      this.logout();
+
+      return of({
+        success: true,
+        statusCode: 200,
+        data: {
+          message: 'Đã xóa phiên đăng nhập phía frontend',
+        },
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    return this.http
+      .post<ApiResponse<{ message: string }>>(
+        `${this.apiUrl}/auth/logout`,
+        {
+          refreshToken: currentRefreshToken,
+        },
+      )
+      .pipe(
+        tap(() => {
+          this.logout();
+        }),
+
+        catchError((error: unknown) => {
+          /**
+           * Backend lỗi thì frontend vẫn phải xóa token.
+           */
+          this.logout();
+          return throwError(() => error);
+        }),
+      );
   }
 
   /**
-   * 7. Logout All API: POST /api/v1/auth/logout-all
+   * U03 — POST /auth/logout-all
    */
-  logoutAllApi(): Observable<ApiResponse<{ message: string }>> {
-    return this.http.post<ApiResponse<{ message: string }>>(`${this.apiUrl}/auth/logout-all`, {}).pipe(
-      tap(() => this.logout()),
-      catchError((err) => {
-        this.logout();
-        return throwError(() => err);
-      })
-    );
+  logoutAllApi(): Observable<
+    ApiResponse<{ message: string }>
+  > {
+    return this.http
+      .post<ApiResponse<{ message: string }>>(
+        `${this.apiUrl}/auth/logout-all`,
+        {},
+      )
+      .pipe(
+        tap(() => {
+          this.logout();
+        }),
+
+        catchError((error: unknown) => {
+          this.logout();
+          return throwError(() => error);
+        }),
+      );
   }
 
   /**
-   * 8. Get Profile API: GET /api/v1/user/profile
+   * U23 — GET /user/profile
    */
   getUserProfile(): Observable<ApiResponse<User>> {
-    return this.http.get<ApiResponse<User>>(`${this.apiUrl}/user/profile`).pipe(
-      tap((res) => {
-        if (res.success && res.data) {
-          this.currentUser.set(res.data);
-          this.currentRole.set(this.normalizeRole(res.data.role));
-          if (typeof window !== 'undefined') {
-            localStorage.setItem('auth_user', JSON.stringify(res.data));
-          }
-        }
-      })
-    );
+    return this.http
+      .get<ApiResponse<User>>(
+        `${this.apiUrl}/user/profile`,
+      )
+      .pipe(
+        tap((response) => {
+          this.saveUser(response.data);
+        }),
+      );
   }
 
-  /**
-   * Helper: Handle auth state updates after login
-   */
-  private handleAuthSuccess(user: User, tokens: AuthTokens) {
-    this.currentUser.set(user);
-    const normalizedRole = this.normalizeRole(user.role);
-    this.currentRole.set(normalizedRole);
-    this.accessToken.set(tokens.accessToken);
-    this.refreshToken.set(tokens.refreshToken);
+  normalizeRole(
+    role: BackendUserRole | string | null | undefined,
+  ): FrontendRole {
+    switch (role) {
+      case 'NORMAL':
+        return 'user';
 
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('auth_user', JSON.stringify(user));
-      localStorage.setItem('access_token', tokens.accessToken);
-      localStorage.setItem('refresh_token', tokens.refreshToken);
-      localStorage.setItem('demoRole', normalizedRole);
+      case 'BLOG_OWNER':
+        return 'owner';
+
+      case 'CONTENT_MODERATOR':
+        return 'moderator';
+
+      case 'SUPER_ADMIN':
+        return 'admin';
+
+      default:
+        return 'guest';
     }
   }
 
   /**
-   * Helper: Normalize backend roles ('ADMIN', 'MODERATOR', 'BLOG_OWNER', 'USER')
-   * to frontend role keys ('admin', 'moderator', 'owner', 'user', 'guest')
+   * Giữ tạm để những template cũ chưa lỗi compile.
+   *
+   * Không còn cho phép bấm nút demo để tự nâng role.
    */
-  normalizeRole(role: string): string {
-    if (!role) return 'guest';
-    const r = role.toUpperCase();
-    if (r === 'ADMIN') return 'admin';
-    if (r === 'MODERATOR') return 'moderator';
-    if (r === 'BLOG_OWNER' || r === 'OWNER') return 'owner';
-    if (r === 'USER') return 'user';
-    return role.toLowerCase();
+  setRole(role: FrontendRole): void {
+    if (role === 'guest') {
+      this.logout();
+    }
   }
 
-  setRole(role: string) {
-    this.currentRole.set(role);
-  }
-
-  logout() {
+  logout(): void {
     this.currentUser.set(null);
     this.currentRole.set('guest');
     this.accessToken.set(null);
     this.refreshToken.set(null);
+    this.refreshRequest$ = null;
+
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    localStorage.removeItem('auth_user');
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('demoRole');
+  }
+
+  toggleTheme(): void {
+    this.isDarkMode.update((current) => !current);
+  }
+
+  private handleLoginSuccess(
+    user: User,
+    tokens: AuthTokens,
+  ): void {
+    this.currentUser.set(user);
+    this.currentRole.set(
+      this.normalizeRole(user.role),
+    );
+    this.accessToken.set(tokens.accessToken);
+    this.refreshToken.set(tokens.refreshToken);
+
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    localStorage.setItem(
+      'auth_user',
+      JSON.stringify(user),
+    );
+    localStorage.setItem(
+      'access_token',
+      tokens.accessToken,
+    );
+    localStorage.setItem(
+      'refresh_token',
+      tokens.refreshToken,
+    );
+
+    /**
+     * Xóa dữ liệu demo của bản frontend cũ.
+     */
+    localStorage.removeItem('demoRole');
+  }
+
+  private saveUser(user: User): void {
+    this.currentUser.set(user);
+    this.currentRole.set(
+      this.normalizeRole(user.role),
+    );
 
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('auth_user');
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-      localStorage.setItem('demoRole', 'guest');
+      localStorage.setItem(
+        'auth_user',
+        JSON.stringify(user),
+      );
     }
   }
 
-  toggleTheme() {
-    this.isDarkMode.update(v => !v);
+  private restoreSession(): void {
+    const savedUser =
+      localStorage.getItem('auth_user');
+    const savedAccessToken =
+      localStorage.getItem('access_token');
+    const savedRefreshToken =
+      localStorage.getItem('refresh_token');
+
+    /**
+     * Không có cả access token lẫn refresh token
+     * thì không coi là đang đăng nhập.
+     */
+    if (!savedAccessToken && !savedRefreshToken) {
+      this.clearStoredSession();
+      return;
+    }
+
+    if (savedAccessToken) {
+      this.accessToken.set(savedAccessToken);
+    }
+
+    if (savedRefreshToken) {
+      this.refreshToken.set(savedRefreshToken);
+    }
+
+    if (!savedUser) {
+      return;
+    }
+
+    try {
+      const user = JSON.parse(savedUser) as User;
+
+      this.currentUser.set(user);
+      this.currentRole.set(
+        this.normalizeRole(user.role),
+      );
+    } catch {
+      this.clearStoredSession();
+    }
+  }
+
+  private clearStoredSession(): void {
+    localStorage.removeItem('auth_user');
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('demoRole');
+
+    this.currentUser.set(null);
+    this.currentRole.set('guest');
+    this.accessToken.set(null);
+    this.refreshToken.set(null);
+  }
+
+  private restoreTheme(): void {
+    const savedTheme =
+      localStorage.getItem('demoTheme');
+
+    const darkMode = savedTheme === 'dark';
+
+    this.isDarkMode.set(darkMode);
+    this.applyTheme(darkMode);
+  }
+
+  private applyTheme(darkMode: boolean): void {
+    if (typeof document === 'undefined') {
+      return;
+    }
+
+    const operation = darkMode ? 'add' : 'remove';
+
+    document.documentElement.classList[operation](
+      'dark',
+      'dark-mode',
+    );
+
+    document.body.classList[operation](
+      'dark',
+      'dark-mode',
+    );
   }
 }

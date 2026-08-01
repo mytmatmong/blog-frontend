@@ -1,67 +1,132 @@
 <main class="container mx-auto px-4 max-w-7xl py-6">
-  <!-- Page Header & Category Chips -->
-  <section class="p-6 mb-6 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 card-box shadow-sm space-y-4">
+  <section
+    class="p-6 mb-6 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 card-box shadow-sm space-y-4">
     <div>
-      <h3 class="font-bold text-2xl text-aquamarine-950 dark:text-aquamarine-50 mb-2">{{ 'category.title' | translate }}</h3>
-      <p class="text-sm text-aquamarine-600 dark:text-aquamarine-400">{{ 'category.subtitle' | translate }}</p>
+      <h1 class="font-bold text-2xl text-aquamarine-950 dark:text-aquamarine-50 mb-2">
+        {{ 'category.title' | translate }}
+      </h1>
+
+      <p class="text-sm text-aquamarine-600 dark:text-aquamarine-400">
+        {{ 'category.subtitle' | translate }}
+      </p>
     </div>
 
-    <!-- Dynamic Category Pills from GET /api/v1/categories -->
     <div class="flex flex-wrap items-center gap-2 pt-2 border-t border-aquamarine-100 dark:border-aquamarine-800">
-      <button (click)="selectCategory(null)" class="category-pill text-xs font-semibold px-3 py-1.5 rounded-full transition-colors"
-        [class.bg-aquamarine-600]="selectedCategoryId() === null" [class.text-white]="selectedCategoryId() === null">
+      <button type="button" class="category-pill text-xs font-semibold px-3 py-1.5 rounded-full transition-colors"
+        [class.bg-aquamarine-600]="
+          selectedCategoryId() === null
+        " [class.text-white]="
+          selectedCategoryId() === null
+        " (click)="selectCategory(null)">
         {{ 'category.all' | translate }}
       </button>
 
       @if (isLoadingCategories()) {
-        <div class="flex items-center gap-2 animate-pulse">
-          <div class="h-7 w-20 bg-aquamarine-200 dark:bg-aquamarine-800 rounded-full"></div>
-          <div class="h-7 w-24 bg-aquamarine-200 dark:bg-aquamarine-800 rounded-full"></div>
-        </div>
-      } @else if (categories().length > 0) {
-        @for (cat of categories(); track cat.id) {
-          <button (click)="selectCategory(cat.id)" class="category-pill text-xs font-semibold px-3 py-1.5 rounded-full border border-aquamarine-200 dark:border-aquamarine-800 transition-colors"
-            [class.bg-aquamarine-600]="selectedCategoryId() === cat.id" [class.text-white]="selectedCategoryId() === cat.id">
-            {{ cat.name }}
-          </button>
-        }
+      <div class="flex items-center gap-2 animate-pulse">
+        <div class="h-7 w-20 bg-aquamarine-200 dark:bg-aquamarine-800 rounded-full"></div>
+
+        <div class="h-7 w-24 bg-aquamarine-200 dark:bg-aquamarine-800 rounded-full"></div>
+
+        <div class="h-7 w-16 bg-aquamarine-200 dark:bg-aquamarine-800 rounded-full"></div>
+      </div>
       } @else {
-        <!-- Fallback static chips -->
-        <button class="category-pill">Backend</button>
-        <button class="category-pill">Frontend</button>
-        <button class="category-pill">Angular</button>
+      @for (
+      category of categories();
+      track category.id
+      ) {
+      <button type="button"
+        class="category-pill text-xs font-semibold px-3 py-1.5 rounded-full border border-aquamarine-200 dark:border-aquamarine-800 transition-colors"
+        [class.bg-aquamarine-600]="
+              selectedCategoryId() ===
+              category.id
+            " [class.text-white]="
+              selectedCategoryId() ===
+              category.id
+            " (click)="
+              selectCategory(category.id)
+            ">
+        {{ category.name }}
+      </button>
+      }
       }
     </div>
+
+    @if (categoriesErrorMessage()) {
+    <div class="text-sm text-red-600 dark:text-red-400">
+      {{ categoriesErrorMessage() }}
+
+      <button type="button" class="ms-2 underline" (click)="loadCategories()">
+        Thử lại
+      </button>
+    </div>
+    }
   </section>
 
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-    <app-public-sidebar-left 
-      class="hidden lg:block lg:col-span-3"
-      [activeFilter]="activeFilter()"
-      (filterChange)="activeFilter.set($event); currentPage.set(1)"
-      [searchTerm]="searchTerm()"
-      (searchChange)="searchTerm.set($event); currentPage.set(1)">
+    <app-public-sidebar-left class="hidden lg:block lg:col-span-3" [activeFilter]="activeFilter()" (filterChange)="
+        onFilterChange($event)
+      " [searchTerm]="searchTerm()" (searchChange)="
+        onSidebarSearchChange($event)
+      ">
     </app-public-sidebar-left>
-    
+
     <section class="lg:col-span-6">
       @if (isLoading()) {
-        <div class="animate-pulse space-y-4">
-          <div class="h-32 bg-aquamarine-200 dark:bg-aquamarine-800 rounded-2xl"></div>
-          <div class="h-32 bg-aquamarine-200 dark:bg-aquamarine-800 rounded-2xl"></div>
-        </div>
-      } @else if (visiblePosts().length > 0) {
-        @for (post of visiblePosts(); track post.id) {
-          <app-post-card [post]="post"></app-post-card>
-        }
-        <app-pagination 
-          [totalItems]="totalItems()" 
-          [itemsPerPage]="itemsPerPage" 
-          [(currentPage)]="currentPage">
-        </app-pagination>
+      <div class="animate-pulse space-y-4">
+        <div class="h-36 bg-aquamarine-200 dark:bg-aquamarine-800 rounded-2xl"></div>
+
+        <div class="h-36 bg-aquamarine-200 dark:bg-aquamarine-800 rounded-2xl"></div>
+
+        <div class="h-36 bg-aquamarine-200 dark:bg-aquamarine-800 rounded-2xl"></div>
+      </div>
+      } @else if (errorMessage()) {
+      <div
+        class="p-6 rounded-2xl border border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300">
+        <p class="font-semibold">
+          Không tải được bài viết
+        </p>
+
+        <p class="text-sm mt-1">
+          {{ errorMessage() }}
+        </p>
+
+        <button type="button" class="mt-4 px-3 py-1.5 rounded-lg border border-red-300 dark:border-red-800"
+          (click)="loadPosts()">
+          Thử lại
+        </button>
+      </div>
+      } @else if (
+      visiblePosts().length > 0
+      ) {
+      @for (
+      post of visiblePosts();
+      track post.id
+      ) {
+      <app-post-card [post]="post"></app-post-card>
+      }
+
+      @if (totalPages() > 1) {
+      <app-pagination [totalItems]="totalItems()" [itemsPerPage]="itemsPerPage" [currentPage]="currentPage()"
+        (currentPageChange)="
+              onPageChange($event)
+            ">
+      </app-pagination>
+      }
       } @else {
-        <div class="p-8 text-center rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900">
-          <p class="text-aquamarine-600 dark:text-aquamarine-400">Không tìm thấy bài viết nào thuộc danh mục này.</p>
-        </div>
+      <div
+        class="p-8 text-center rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900">
+        <i class="bi bi-folder2-open text-4xl text-aquamarine-400"></i>
+
+        <p class="mt-3 text-aquamarine-600 dark:text-aquamarine-400">
+          Không tìm thấy bài viết nào thuộc danh mục này.
+        </p>
+
+        @if (searchTerm()) {
+        <button type="button" class="mt-4 px-4 py-2 rounded-xl bg-aquamarine-600 text-white" (click)="clearSearch()">
+          Xóa tìm kiếm
+        </button>
+        }
+      </div>
       }
     </section>
 

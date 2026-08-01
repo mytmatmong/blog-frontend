@@ -1,84 +1,100 @@
-export interface PublicAuthorSummary {
-  id: number;
-  username: string;
-  bio?: string | null;
-  avatarUrl?: string | null;
+export type PostStatus =
+  | 'DRAFT'
+  | 'PENDING_REVIEW'
+  | 'PUBLISH'
+  | 'REJECT';
+
+export type MediaType = 'IMAGE' | 'VIDEO';
+
+export interface PaginationMeta {
+  totalItems: number;
+  itemCount: number;
+  itemsPerPage: number;
+  totalPages: number;
+  currentPage: number;
 }
 
-export interface PostCategorySummary {
+export interface PaginatedResponse<T> {
+  items: T[];
+  meta: PaginationMeta;
+}
+
+// ======================================================
+// LANGUAGE
+// ======================================================
+
+export interface PublicLanguage {
+  id: number;
+  code: string;
+  name: string;
+  flag: string | null;
+  isDefault: boolean;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+}
+
+// ======================================================
+// CATEGORY
+// ======================================================
+
+export interface CategoryGroup {
+  id: number;
+  code: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+}
+
+export interface CategoryItem {
   id: number;
   name: string;
-  slug?: string;
-}
-
-export interface PostTagSummary {
-  id: number;
-  name: string;
-}
-
-export interface PostMediaSummary {
-  id: number;
-  postId: number;
-  mediaType: string;
-  mediaUrl: string;
+  categoryGroupId: number;
+  languageId: number;
   createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+
+  language?: PublicLanguage;
+  categoryGroup?: CategoryGroup;
 }
 
-export interface PublicPost {
-  id: number;
-  title: string;
-  slug?: string;
-  summary?: string | null;
-  content: string;
-  status: string;
-  viewCount: number;
-  likeCount: number;
-  thumbnailUrl?: string | null;
-  videoUrl?: string | null;
-  publishedAt?: string | null;
-  createdAt: string;
-  updatedAt?: string;
-  author: PublicAuthorSummary;
-  categories?: PostCategorySummary[];
-  tags?: PostTagSummary[];
-  media?: PostMediaSummary[];
-}
-
-export interface GetPostsQueryParams {
+export interface GetCategoriesQueryParams {
   search?: string;
-  categoryId?: number;
   languageId?: number;
-  authorId?: number;
-  tagId?: number;
-  tagName?: string;
+  lang?: string;
   page?: number;
   limit?: number;
 }
 
-export interface PaginatedPostsResponse {
-  items: PublicPost[];
-  meta: {
-    totalItems: number;
-    itemCount: number;
-    itemsPerPage: number;
-    totalPages: number;
-    currentPage: number;
-  };
+export type PaginatedCategoriesResponse =
+  PaginatedResponse<CategoryItem>;
+
+// ======================================================
+// AUTHOR
+// ======================================================
+
+export interface PublicAuthorSummary {
+  id: number;
+  username: string;
+  bio: string | null;
+  avatarUrl: string | null;
 }
 
 export interface TopAuthor {
   id: number;
   username: string;
-  avatarUrl?: string | null;
-  bio?: string | null;
+  avatarUrl: string | null;
+  bio: string | null;
   followerCount: number;
 }
 
 export interface AuthorDetail {
   id: number;
   username: string;
-  bio?: string | null;
-  avatarUrl?: string | null;
+  bio: string | null;
+  avatarUrl: string | null;
   createdAt: string;
   postCount: number;
 }
@@ -88,53 +104,123 @@ export interface AuthorInfoResponse {
   posts: PaginatedPostsResponse;
 }
 
-// CATEGORY MODELS
-export interface CategoryItem {
+// ======================================================
+// TAG
+// ======================================================
+
+export interface PostTagSummary {
   id: number;
   name: string;
-  slug?: string;
-  description?: string | null;
-  languageId?: number;
-  categoryGroupId?: number;
-  createdAt?: string;
-  updatedAt?: string;
 }
 
-export interface GetCategoriesQueryParams {
+export interface TagItem {
+  id: number;
+  name: string;
+  createdAt: string;
+  deletedAt: string | null;
+}
+
+export interface TopTagItem {
+  id: number;
+  name: string;
+  postCount: number;
+  tagScore: number;
+}
+
+export interface GetTagsQueryParams {
   search?: string;
-  categoryGroupId?: number;
-  languageId?: number;
+
+  /**
+   * Backend nhận field này nhưng P13 hiện chưa dùng để lọc.
+   */
   lang?: string;
+
   page?: number;
   limit?: number;
 }
 
-export interface PaginatedCategoriesResponse {
-  items: CategoryItem[];
-  meta: {
-    totalItems: number;
-    itemCount: number;
-    itemsPerPage: number;
-    totalPages: number;
-    currentPage: number;
-  };
+export type PaginatedTagsResponse =
+  PaginatedResponse<TagItem>;
+
+// ======================================================
+// MEDIA
+// ======================================================
+
+export interface PostMediaSummary {
+  id: number;
+  postId: number;
+  mediaType: MediaType;
+  mediaUrl: string;
+  createdAt: string;
 }
 
-// COMMENT MODELS
+// ======================================================
+// POST
+// ======================================================
+
+export interface PublicPost {
+  id: number;
+  title: string;
+  thumbnailUrl: string | null;
+  content: string;
+  status: PostStatus;
+  viewCount: number;
+  publishedAt: string | null;
+  parentPostId: number | null;
+  authorId: number;
+  languageId: number;
+  createdAt: string;
+  updatedAt: string;
+
+  author: PublicAuthorSummary;
+  language: PublicLanguage;
+  categories: CategoryItem[];
+  tags: PostTagSummary[];
+  likeCount: number;
+  media: PostMediaSummary[];
+}
+
+export interface GetPostsQueryParams {
+  search?: string;
+  categoryId?: number;
+  languageId?: number;
+  lang?: string;
+  authorId?: number;
+  parentPostId?: number;
+
+  /**
+   * Public service backend luôn ép thành PUBLISH.
+   */
+  status?: PostStatus;
+
+  tagId?: number;
+  tagName?: string;
+  bookmarkedByUserId?: number;
+  page?: number;
+  limit?: number;
+}
+
+export type PaginatedPostsResponse =
+  PaginatedResponse<PublicPost>;
+
+// ======================================================
+// COMMENT
+// ======================================================
+
 export interface CommentUser {
   id: number;
   username: string;
-  avatarUrl?: string | null;
+  avatarUrl: string | null;
 }
 
 export interface CommentReply {
   id: number;
   postId: number;
   userId: number;
-  parentId?: number | null;
+  parentId: number;
   content: string;
   createdAt: string;
-  updatedAt?: string;
+  updatedAt: string;
   user: CommentUser;
 }
 
@@ -142,53 +228,13 @@ export interface PublicComment {
   id: number;
   postId: number;
   userId: number;
-  parentId?: number | null;
+  parentId: null;
   content: string;
   createdAt: string;
-  updatedAt?: string;
+  updatedAt: string;
   user: CommentUser;
-  replies?: CommentReply[];
+  replies: CommentReply[];
 }
 
-export interface PaginatedCommentsResponse {
-  items: PublicComment[];
-  meta: {
-    totalItems: number;
-    itemCount: number;
-    itemsPerPage: number;
-    totalPages: number;
-    currentPage: number;
-  };
-}
-
-// TAG MODELS
-export interface TagItem {
-  id: number;
-  name: string;
-  postCount?: number;
-  createdAt?: string;
-}
-
-export interface TopTagItem {
-  id: number;
-  name: string;
-  postCount: number;
-  tagScore?: number;
-}
-
-export interface GetTagsQueryParams {
-  search?: string;
-  page?: number;
-  limit?: number;
-}
-
-export interface PaginatedTagsResponse {
-  items: TagItem[];
-  meta: {
-    totalItems: number;
-    itemCount: number;
-    itemsPerPage: number;
-    totalPages: number;
-    currentPage: number;
-  };
-}
+export type PaginatedCommentsResponse =
+  PaginatedResponse<PublicComment>;

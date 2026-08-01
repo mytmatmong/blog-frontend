@@ -1,135 +1,382 @@
-import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
+import {
+  HttpClient,
+  HttpParams,
+} from '@angular/common/http';
 import { Observable } from 'rxjs';
+
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/auth.model';
+
 import {
-  PublicPost,
-  GetPostsQueryParams,
-  PaginatedPostsResponse,
-  TopAuthor,
   AuthorInfoResponse,
   GetCategoriesQueryParams,
+  GetPostsQueryParams,
+  GetTagsQueryParams,
   PaginatedCategoriesResponse,
   PaginatedCommentsResponse,
+  PaginatedPostsResponse,
+  PaginatedTagsResponse,
+  PublicPost,
+  TopAuthor,
   TopTagItem,
-  GetTagsQueryParams,
-  PaginatedTagsResponse
 } from '../models/post.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PublicApiService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = environment.apiUrl;
 
   /**
-   * 1. GET /api/v1/posts
-   * Lấy danh sách bài viết public (có phân trang, tìm kiếm, lọc danh mục/tag)
+   * P05 — GET /posts
    */
-  getPosts(params?: GetPostsQueryParams): Observable<ApiResponse<PaginatedPostsResponse>> {
-    let httpParams = new HttpParams();
-    if (params) {
-      if (params.search) httpParams = httpParams.set('search', params.search);
-      if (params.categoryId) httpParams = httpParams.set('categoryId', params.categoryId.toString());
-      if (params.languageId) httpParams = httpParams.set('languageId', params.languageId.toString());
-      if (params.authorId) httpParams = httpParams.set('authorId', params.authorId.toString());
-      if (params.tagId) httpParams = httpParams.set('tagId', params.tagId.toString());
-      if (params.tagName) httpParams = httpParams.set('tagName', params.tagName);
-      if (params.page) httpParams = httpParams.set('page', params.page.toString());
-      if (params.limit) httpParams = httpParams.set('limit', params.limit.toString());
-    }
-    return this.http.get<ApiResponse<PaginatedPostsResponse>>(`${this.apiUrl}/posts`, { params: httpParams });
+  getPosts(
+    query: GetPostsQueryParams = {},
+  ): Observable<ApiResponse<PaginatedPostsResponse>> {
+    const params = this.buildPostParams(query);
+
+    return this.http.get<
+      ApiResponse<PaginatedPostsResponse>
+    >(
+      `${this.apiUrl}/posts`,
+      { params },
+    );
   }
 
   /**
-   * 2. GET /api/v1/posts/top
-   * Lấy danh sách bài viết nổi bật / xem nhiều / tương tác cao
+   * P06 — GET /posts/top
+   *
+   * data là mảng trực tiếp, không có meta.
    */
-  getTopPosts(limit: number = 10): Observable<ApiResponse<PublicPost[]>> {
-    const params = new HttpParams().set('limit', limit.toString());
-    return this.http.get<ApiResponse<PublicPost[]>>(`${this.apiUrl}/posts/top`, { params });
+  getTopPosts(
+    limit = 10,
+    lang?: string,
+  ): Observable<ApiResponse<PublicPost[]>> {
+    let params = new HttpParams().set(
+      'limit',
+      limit.toString(),
+    );
+
+    params = this.setString(
+      params,
+      'lang',
+      lang,
+    );
+
+    return this.http.get<ApiResponse<PublicPost[]>>(
+      `${this.apiUrl}/posts/top`,
+      { params },
+    );
   }
 
   /**
-   * 3. GET /api/v1/posts/:id
-   * Lấy thông tin chi tiết một bài viết public theo ID
+   * P07 — GET /posts/:id
    */
-  getPostById(id: number): Observable<ApiResponse<PublicPost>> {
-    return this.http.get<ApiResponse<PublicPost>>(`${this.apiUrl}/posts/${id}`);
+  getPostById(
+    id: number,
+    lang?: string,
+  ): Observable<ApiResponse<PublicPost>> {
+    let params = new HttpParams();
+
+    params = this.setString(
+      params,
+      'lang',
+      lang,
+    );
+
+    return this.http.get<ApiResponse<PublicPost>>(
+      `${this.apiUrl}/posts/${id}`,
+      { params },
+    );
   }
 
   /**
-   * 4. GET /api/v1/authors/top
-   * Lấy danh sách tác giả hàng đầu (theo lượng followers / tương tác)
+   * P08 — GET /authors/top
    */
-  getTopAuthors(limit: number = 10): Observable<ApiResponse<TopAuthor[]>> {
-    const params = new HttpParams().set('limit', limit.toString());
-    return this.http.get<ApiResponse<TopAuthor[]>>(`${this.apiUrl}/authors/top`, { params });
+  getTopAuthors(
+    limit = 10,
+  ): Observable<ApiResponse<TopAuthor[]>> {
+    const params = new HttpParams().set(
+      'limit',
+      limit.toString(),
+    );
+
+    return this.http.get<ApiResponse<TopAuthor[]>>(
+      `${this.apiUrl}/authors/top`,
+      { params },
+    );
   }
 
   /**
-   * 5. GET /api/v1/authors/:id
-   * Lấy thông tin tác giả và danh sách bài viết public của tác giả đó
+   * P09 — GET /authors/:id
+   *
+   * Các bộ lọc bài viết giống GET /posts.
+   * authorId frontend gửi sẽ bị backend ghi đè bằng ID trên URL.
    */
-  getAuthorById(id: number, params?: GetPostsQueryParams): Observable<ApiResponse<AuthorInfoResponse>> {
-    let httpParams = new HttpParams();
-    if (params) {
-      if (params.page) httpParams = httpParams.set('page', params.page.toString());
-      if (params.limit) httpParams = httpParams.set('limit', params.limit.toString());
-    }
-    return this.http.get<ApiResponse<AuthorInfoResponse>>(`${this.apiUrl}/authors/${id}`, { params: httpParams });
+  getAuthorById(
+    id: number,
+    query: GetPostsQueryParams = {},
+  ): Observable<ApiResponse<AuthorInfoResponse>> {
+    const params = this.buildPostParams(query);
+
+    return this.http.get<
+      ApiResponse<AuthorInfoResponse>
+    >(
+      `${this.apiUrl}/authors/${id}`,
+      { params },
+    );
   }
 
   /**
-   * 6. GET /api/v1/categories
-   * Lấy danh sách danh mục public (phân trang, tìm kiếm, nhóm danh mục, ngôn ngữ)
+   * P10 — GET /categories
+   *
+   * API này không nhận categoryGroupId.
    */
-  getCategories(params?: GetCategoriesQueryParams): Observable<ApiResponse<PaginatedCategoriesResponse>> {
-    let httpParams = new HttpParams();
-    if (params) {
-      if (params.search) httpParams = httpParams.set('search', params.search);
-      if (params.categoryGroupId) httpParams = httpParams.set('categoryGroupId', params.categoryGroupId.toString());
-      if (params.languageId) httpParams = httpParams.set('languageId', params.languageId.toString());
-      if (params.lang) httpParams = httpParams.set('lang', params.lang);
-      if (params.page) httpParams = httpParams.set('page', params.page.toString());
-      if (params.limit) httpParams = httpParams.set('limit', params.limit.toString());
-    }
-    return this.http.get<ApiResponse<PaginatedCategoriesResponse>>(`${this.apiUrl}/categories`, { params: httpParams });
+  getCategories(
+    query: GetCategoriesQueryParams = {},
+  ): Observable<
+    ApiResponse<PaginatedCategoriesResponse>
+  > {
+    let params = new HttpParams();
+
+    params = this.setString(
+      params,
+      'search',
+      query.search,
+    );
+
+    params = this.setNumber(
+      params,
+      'languageId',
+      query.languageId,
+    );
+
+    params = this.setString(
+      params,
+      'lang',
+      query.lang,
+    );
+
+    params = this.setNumber(
+      params,
+      'page',
+      query.page,
+    );
+
+    params = this.setNumber(
+      params,
+      'limit',
+      query.limit,
+    );
+
+    return this.http.get<
+      ApiResponse<PaginatedCategoriesResponse>
+    >(
+      `${this.apiUrl}/categories`,
+      { params },
+    );
   }
 
   /**
-   * 7. GET /api/v1/posts/:postId/comments
-   * Lấy danh sách bình luận (có reply lồng nhau) của bài viết
+   * P11 — GET /posts/:postId/comments
+   *
+   * Chỉ comment gốc được phân trang.
+   * Replies nằm trong từng comment.
    */
-  getPostComments(postId: number, page: number = 1, limit: number = 10): Observable<ApiResponse<PaginatedCommentsResponse>> {
+  getPostComments(
+    postId: number,
+    page = 1,
+    limit = 10,
+  ): Observable<
+    ApiResponse<PaginatedCommentsResponse>
+  > {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('limit', limit.toString());
-    return this.http.get<ApiResponse<PaginatedCommentsResponse>>(`${this.apiUrl}/posts/${postId}/comments`, { params });
+
+    return this.http.get<
+      ApiResponse<PaginatedCommentsResponse>
+    >(
+      `${this.apiUrl}/posts/${postId}/comments`,
+      { params },
+    );
   }
 
   /**
-   * 8. GET /api/v1/tags/top
-   * Lấy danh sách thẻ (tag) hot / phổ biến nhất
+   * P12 — GET /tags/top
    */
-  getTopTags(limit: number = 10): Observable<ApiResponse<TopTagItem[]>> {
-    const params = new HttpParams().set('limit', limit.toString());
-    return this.http.get<ApiResponse<TopTagItem[]>>(`${this.apiUrl}/tags/top`, { params });
+  getTopTags(
+    limit = 10,
+    lang?: string,
+  ): Observable<ApiResponse<TopTagItem[]>> {
+    let params = new HttpParams().set(
+      'limit',
+      limit.toString(),
+    );
+
+    params = this.setString(
+      params,
+      'lang',
+      lang,
+    );
+
+    return this.http.get<ApiResponse<TopTagItem[]>>(
+      `${this.apiUrl}/tags/top`,
+      { params },
+    );
   }
 
   /**
-   * 9. GET /api/v1/tags
-   * Lấy danh sách tất cả thẻ (tag) public (có phân trang & tìm kiếm)
+   * P13 — GET /tags
    */
-  getTags(params?: GetTagsQueryParams): Observable<ApiResponse<PaginatedTagsResponse>> {
-    let httpParams = new HttpParams();
-    if (params) {
-      if (params.search) httpParams = httpParams.set('search', params.search);
-      if (params.page) httpParams = httpParams.set('page', params.page.toString());
-      if (params.limit) httpParams = httpParams.set('limit', params.limit.toString());
+  getTags(
+    query: GetTagsQueryParams = {},
+  ): Observable<ApiResponse<PaginatedTagsResponse>> {
+    let params = new HttpParams();
+
+    params = this.setString(
+      params,
+      'search',
+      query.search,
+    );
+
+    params = this.setString(
+      params,
+      'lang',
+      query.lang,
+    );
+
+    params = this.setNumber(
+      params,
+      'page',
+      query.page,
+    );
+
+    params = this.setNumber(
+      params,
+      'limit',
+      query.limit,
+    );
+
+    return this.http.get<
+      ApiResponse<PaginatedTagsResponse>
+    >(
+      `${this.apiUrl}/tags`,
+      { params },
+    );
+  }
+
+  private buildPostParams(
+    query: GetPostsQueryParams,
+  ): HttpParams {
+    let params = new HttpParams();
+
+    params = this.setString(
+      params,
+      'search',
+      query.search,
+    );
+
+    params = this.setNumber(
+      params,
+      'categoryId',
+      query.categoryId,
+    );
+
+    params = this.setNumber(
+      params,
+      'languageId',
+      query.languageId,
+    );
+
+    params = this.setString(
+      params,
+      'lang',
+      query.lang,
+    );
+
+    params = this.setNumber(
+      params,
+      'authorId',
+      query.authorId,
+    );
+
+    params = this.setNumber(
+      params,
+      'parentPostId',
+      query.parentPostId,
+    );
+
+    params = this.setString(
+      params,
+      'status',
+      query.status,
+    );
+
+    params = this.setNumber(
+      params,
+      'tagId',
+      query.tagId,
+    );
+
+    params = this.setString(
+      params,
+      'tagName',
+      query.tagName,
+    );
+
+    params = this.setNumber(
+      params,
+      'bookmarkedByUserId',
+      query.bookmarkedByUserId,
+    );
+
+    params = this.setNumber(
+      params,
+      'page',
+      query.page,
+    );
+
+    params = this.setNumber(
+      params,
+      'limit',
+      query.limit,
+    );
+
+    return params;
+  }
+
+  private setString(
+    params: HttpParams,
+    key: string,
+    value: string | undefined,
+  ): HttpParams {
+    const normalizedValue = value?.trim();
+
+    if (!normalizedValue) {
+      return params;
     }
-    return this.http.get<ApiResponse<PaginatedTagsResponse>>(`${this.apiUrl}/tags`, { params: httpParams });
+
+    return params.set(key, normalizedValue);
+  }
+
+  private setNumber(
+    params: HttpParams,
+    key: string,
+    value: number | undefined,
+  ): HttpParams {
+    if (
+      value === undefined ||
+      value === null
+    ) {
+      return params;
+    }
+
+    return params.set(
+      key,
+      value.toString(),
+    );
   }
 }

@@ -1,30 +1,88 @@
 <main class="container mx-auto px-4 max-w-7xl py-6">
-  <!-- Category Pills -->
   <section class="p-4 mb-6 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 card-box shadow-sm">
     <div class="flex flex-wrap items-center gap-2">
-      <a routerLink="/" class="category-pill active">{{ 'category.all' | translate }}</a>
-      <a routerLink="/category" class="category-pill">Backend</a>
-      <a routerLink="/category" class="category-pill">Frontend</a>
-      <a routerLink="/category" class="category-pill">Angular</a>
-      <a routerLink="/category" class="category-pill">NodeJS</a>
-      <a routerLink="/category" class="category-pill">Database</a>
-      <a routerLink="/category" class="category-pill">DevOps</a>
-      <a routerLink="/category" class="category-pill">AI</a>
+      <a routerLink="/" class="category-pill active">
+        {{ 'category.all' | translate }}
+      </a>
+
+      @if (isLoadingCategories()) {
+      <div class="h-7 w-20 rounded-full bg-aquamarine-200 dark:bg-aquamarine-800 animate-pulse"></div>
+      <div class="h-7 w-24 rounded-full bg-aquamarine-200 dark:bg-aquamarine-800 animate-pulse"></div>
+      <div class="h-7 w-16 rounded-full bg-aquamarine-200 dark:bg-aquamarine-800 animate-pulse"></div>
+      } @else {
+      @for (category of categories(); track category.id) {
+      <a routerLink="/category" [queryParams]="{
+              categoryId: category.id
+            }" class="category-pill">
+        {{ category.name }}
+      </a>
+      }
+      }
     </div>
   </section>
 
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
     <app-public-sidebar-left class="hidden lg:block lg:col-span-3" [activeFilter]="activeFilter()"
-      (filterChange)="activeFilter.set($event); currentPage.set(1)" [searchTerm]="searchTerm()"
-      (searchChange)="searchTerm.set($event); currentPage.set(1)">
+      (filterChange)="onFilterChange($event)" [searchTerm]="searchTerm()" (searchChange)="onSearchChange($event)">
     </app-public-sidebar-left>
 
     <section class="lg:col-span-6">
+      @if (isLoading()) {
+      <div class="space-y-4">
+        <div class="h-40 rounded-2xl bg-aquamarine-100 dark:bg-aquamarine-800 animate-pulse"></div>
+
+        <div class="h-40 rounded-2xl bg-aquamarine-100 dark:bg-aquamarine-800 animate-pulse"></div>
+
+        <div class="h-40 rounded-2xl bg-aquamarine-100 dark:bg-aquamarine-800 animate-pulse"></div>
+      </div>
+      } @else if (errorMessage()) {
+      <div
+        class="p-6 rounded-2xl border border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300">
+        <div class="flex items-start gap-3">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+
+          <div class="flex-grow">
+            <p class="font-semibold">
+              Không tải được bài viết
+            </p>
+
+            <p class="text-sm mt-1">
+              {{ errorMessage() }}
+            </p>
+          </div>
+
+          <button type="button"
+            class="px-3 py-1.5 rounded-lg border border-red-300 hover:bg-red-100 dark:border-red-800 dark:hover:bg-red-900"
+            (click)="loadPosts()">
+            Thử lại
+          </button>
+        </div>
+      </div>
+      } @else if (visiblePosts().length === 0) {
+      <div class="p-8 text-center rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 card-box">
+        <i class="bi bi-file-earmark-text text-4xl text-aquamarine-400"></i>
+
+        <p class="mt-3 text-aquamarine-700 dark:text-aquamarine-300">
+          Không tìm thấy bài viết phù hợp.
+        </p>
+
+        @if (searchTerm()) {
+        <button type="button" class="mt-4 px-4 py-2 rounded-xl bg-aquamarine-600 text-white" (click)="clearSearch()">
+          Xóa tìm kiếm
+        </button>
+        }
+      </div>
+      } @else {
       @for (post of visiblePosts(); track post.id) {
       <app-post-card [post]="post"></app-post-card>
       }
-      <app-pagination [totalItems]="filteredPosts().length" [itemsPerPage]="itemsPerPage" [(currentPage)]="currentPage">
+
+      @if (totalPages() > 1) {
+      <app-pagination [totalItems]="totalItems()" [itemsPerPage]="itemsPerPage" [currentPage]="currentPage()"
+        (currentPageChange)="onPageChange($event)">
       </app-pagination>
+      }
+      }
     </section>
 
     <app-public-sidebar-right class="lg:col-span-3"></app-public-sidebar-right>

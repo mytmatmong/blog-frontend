@@ -1,140 +1,414 @@
-import { Component, signal, computed, inject, OnInit } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
-import { PublicSidebarLeft, FilterSortOption } from '../../../shared/components/public-sidebar-left/public-sidebar-left';
+import {
+  takeUntilDestroyed,
+  toObservable,
+} from '@angular/core/rxjs-interop';
+
+import {
+  debounceTime,
+  distinctUntilChanged,
+  skip,
+  Subject,
+} from 'rxjs';
+
+import {
+  FilterSortOption,
+  PublicSidebarLeft,
+} from '../../../shared/components/public-sidebar-left/public-sidebar-left';
+
 import { PublicSidebarRight } from '../../../shared/components/public-sidebar-right/public-sidebar-right';
-import { PostCard, PostItem } from '../../../shared/components/post-card/post-card';
+
+import {
+  PostCard,
+  PostItem,
+} from '../../../shared/components/post-card/post-card';
+
 import { Pagination } from '../../../shared/components/pagination/pagination';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+
 import { PublicApiService } from '../../../core/services/public-api.service';
-import { PublicPost } from '../../../core/models/post.model';
+import { TranslationService } from '../../../core/services/translation.service';
+
+import {
+  CategoryItem,
+  PublicPost,
+} from '../../../core/models/post.model';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, PublicSidebarLeft, PublicSidebarRight, PostCard, Pagination, TranslatePipe],
+  imports: [
+    RouterLink,
+    PublicSidebarLeft,
+    PublicSidebarRight,
+    PostCard,
+    Pagination,
+    TranslatePipe,
+  ],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
 export class Home implements OnInit {
-  private readonly publicApiService = inject(PublicApiService);
+  private readonly publicApiService =
+    inject(PublicApiService);
 
-  posts = signal<PostItem[]>([]);
-  totalItems = signal<number>(0);
-  totalPages = signal<number>(1);
-  currentPage = signal<number>(1);
-  itemsPerPage = 10;
-  searchTerm = signal<string>('');
-  activeFilter = signal<FilterSortOption>('latest');
-  isLoading = signal<boolean>(false);
+  private readonly translationService =
+    inject(TranslationService);
 
-  visiblePosts = computed(() => this.posts());
-  filteredPosts = computed(() => this.posts());
+  private readonly searchChanges =
+    new Subject<string>();
 
-  ngOnInit() {
+  readonly posts = signal<PostItem[]>([]);
+  readonly categories = signal<CategoryItem[]>([]);
+
+  readonly totalItems = signal(0);
+  readonly totalPages = signal(1);
+  readonly currentPage = signal(1);
+
+  readonly searchTerm = signal('');
+  readonly activeFilter =
+    signal<FilterSortOption>('latest');
+
+  readonly isLoading = signal(false);
+  readonly isLoadingCategories = signal(false);
+  readonly errorMessage = signal<string | null>(null);
+
+  readonly itemsPerPage = 10;
+
+  /**
+   * Backend không có query sort.
+   * mostViewed và mostLiked chỉ sắp xếp các item
+   * của trang hiện tại.
+   */
+  readonly visiblePosts = computed(() => {
+    const result = [...this.posts()];
+
+    switch (this.activeFilter()) {
+      case 'mostViewed':
+        return result.sort(
+          (first, second) =>
+            second.views - first.views,
+        );
+
+      case 'mostLiked':
+        return result.sort(
+          (first, second) =>
+            second.likes - first.likes,
+        );
+
+      case 'mostCommented':
+        /**
+         * PublicPost không trả commentCount.
+         * Giữ nguyên thứ tự backend.
+         */
+        return result;
+
+      case 'latest':
+      default:
+        return result;
+    }
+  });
+
+  constructor() {
+    this.searchChanges
+      .pipe(
+        debounceTime(350),
+        distinctUntilChanged(),
+        takeUntilDestroyed(),
+      )
+      .subscribe((value) => {
+        this.searchTerm.set(value);
+        this.currentPage.set(1);
+        this.loadPosts();
+      });
+    toObservable(
+      this.translationService.currentLang,
+    )
+      .pipe(
+        skip(1),
+        distinctUntilChanged(),
+        takeUntilDestroyed(),
+      )
+      .subscribe(() => {
+        this.currentPage.set(1);
+
+        /**
+         * Gọi lại:
+         * GET /categories?lang=vi|en
+         * GET /posts?lang=vi|en
+         */
+        this.loadCategories();
+        this.loadPosts();
+      });
+  }
+
+  ngOnInit(): void {
+    this.loadCategories();
     this.loadPosts();
   }
 
-  loadPosts() {
+  loadPosts(): void {
     this.isLoading.set(true);
-    const search = this.searchTerm().trim();
-    
-    this.publicApiService.getPosts({
-      search: search || undefined,
-      page: this.currentPage(),
-      limit: this.itemsPerPage
-    }).subscribe({
-      next: (res) => {
-        this.isLoading.set(false);
-        if (res.success && res.data) {
-          const mapped = res.data.items.map((p) => this.mapToPostItem(p));
-          this.posts.set(mapped);
-          this.totalItems.set(res.data.meta.totalItems);
-          this.totalPages.set(res.data.meta.totalPages);
-        }
-      },
-      error: () => {
-        this.isLoading.set(false);
-        this.loadMockPosts();
-      }
-    });
+    this.errorMessage.set(null);
+
+    const search =
+      this.searchTerm().trim();
+
+    this.publicApiService
+      .getPosts({
+        search: search || undefined,
+        lang: this.currentLanguageCode(),
+        page: this.currentPage(),
+        limit: this.itemsPerPage,
+      })
+      .subscribe({
+        next: (response) => {
+          const data = response.data;
+
+          this.posts.set(
+            data.items.map((post) =>
+              this.mapToPostItem(post),
+            ),
+          );
+
+          this.totalItems.set(
+            data.meta.totalItems,
+          );
+
+          this.totalPages.set(
+            data.meta.totalPages,
+          );
+
+          this.currentPage.set(
+            data.meta.currentPage,
+          );
+
+          this.isLoading.set(false);
+        },
+
+        error: (error: unknown) => {
+          this.posts.set([]);
+          this.totalItems.set(0);
+          this.totalPages.set(1);
+          this.isLoading.set(false);
+
+          this.errorMessage.set(
+            this.getErrorMessage(error),
+          );
+        },
+      });
   }
 
-  onSearchChange(event: Event) {
-    const input = event.target as HTMLInputElement;
-    this.searchTerm.set(input.value);
-    this.currentPage.set(1);
-    this.loadPosts();
+  loadCategories(): void {
+    this.isLoadingCategories.set(true);
+
+    this.publicApiService
+      .getCategories({
+        lang: this.currentLanguageCode(),
+        page: 1,
+        limit: 20,
+      })
+      .subscribe({
+        next: (response) => {
+          this.categories.set(
+            response.data.items,
+          );
+
+          this.isLoadingCategories.set(false);
+        },
+
+        error: () => {
+          /**
+           * Không hiển thị category giả.
+           */
+          this.categories.set([]);
+          this.isLoadingCategories.set(false);
+        },
+      });
   }
 
-  clearSearch() {
+  onSearchChange(value: string): void {
+    this.searchChanges.next(value);
+  }
+
+  clearSearch(): void {
     this.searchTerm.set('');
     this.currentPage.set(1);
-    this.loadPosts();
+    this.searchChanges.next('');
   }
 
-  onPageChange(page: number) {
+  onFilterChange(
+    filter: FilterSortOption,
+  ): void {
+    this.activeFilter.set(filter);
+  }
+
+  onPageChange(page: number): void {
+    if (
+      page < 1 ||
+      page > this.totalPages() ||
+      page === this.currentPage()
+    ) {
+      return;
+    }
+
     this.currentPage.set(page);
     this.loadPosts();
+
+    if (typeof window !== 'undefined') {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+    }
   }
 
-  private mapToPostItem(p: PublicPost): PostItem {
+  private mapToPostItem(
+    post: PublicPost,
+  ): PostItem {
+    const plainContent =
+      this.stripHtml(post.content);
+
     return {
-      id: p.id,
-      authorId: p.author?.id || 1,
-      title: p.title,
-      excerpt: p.summary || (p.content ? (p.content.length > 150 ? p.content.substring(0, 150) + '...' : p.content) : ''),
-      authorName: p.author?.username || 'Tác giả',
-      authorAvatar: p.author?.username ? p.author.username.charAt(0).toUpperCase() : 'A',
-      timeAgo: p.createdAt ? new Date(p.createdAt).toLocaleDateString('vi-VN') : 'Gần đây',
-      readTime: '5 phút đọc',
-      categories: p.categories?.map(c => c.name) || [],
-      tags: p.tags?.map(t => t.name.startsWith('#') ? t.name : '#' + t.name) || [],
-      likes: p.likeCount || 0,
-      views: p.viewCount || 0,
-      comments: 0
+      id: post.id,
+      authorId: post.authorId,
+      title: post.title,
+
+      excerpt:
+        plainContent.length > 160
+          ? `${plainContent.slice(0, 160)}...`
+          : plainContent,
+
+      authorName:
+        post.author.username,
+
+      authorAvatar:
+        post.author.username
+          .charAt(0)
+          .toUpperCase(),
+
+      timeAgo:
+        this.formatDate(
+          post.publishedAt ??
+          post.createdAt,
+        ),
+
+      readTime:
+        this.calculateReadTime(
+          plainContent,
+        ),
+
+      categories:
+        post.categories.map(
+          (category) => category.name,
+        ),
+
+      tags:
+        post.tags.map((tag) =>
+          tag.name.startsWith('#')
+            ? tag.name
+            : `#${tag.name}`,
+        ),
+
+      likes: post.likeCount,
+      views: post.viewCount,
+
+      /**
+       * Public Post response không trả commentCount.
+       */
+      comments: 0,
+      showCommentCount: false,
+
+      thumbnailUrl:
+        post.thumbnailUrl,
     };
   }
 
-  private loadMockPosts() {
-    const basePosts: Omit<PostItem, 'id'>[] = [
-      {
-        title: 'Thiết kế Blog đa ngôn ngữ với ExpressJS và Sequelize',
-        excerpt: 'Hướng dẫn cách xây dựng blog từ database, backend ExpressJS đến frontend Angular theo hướng module.',
-        authorId: 1,
-        authorName: 'Sơn Dev',
-        authorAvatar: 'S',
-        timeAgo: '1 giờ trước',
-        readTime: '5 phút đọc',
-        categories: ['Backend', 'ExpressJS'],
-        tags: ['#expressjs', '#angular', '#sequelize'],
-        likes: 43,
-        views: 1311,
-        comments: 4
-      },
-      {
-        title: 'Tối ưu hiệu suất cho ứng dụng Angular lớn',
-        excerpt: 'Các mẹo tối ưu OnPush, Signals và lazy loading route trong Angular 19.',
-        authorId: 2,
-        authorName: 'Hải Frontend',
-        authorAvatar: 'H',
-        timeAgo: '3 giờ trước',
-        readTime: '8 phút đọc',
-        categories: ['Frontend', 'Angular'],
-        tags: ['#angular19', '#signals', '#performance'],
-        likes: 128,
-        views: 4050,
-        comments: 12
-      }
-    ];
+  private currentLanguageCode(): string {
+    return this.translationService
+      .currentLang()
+      .toLowerCase();
+  }
 
-    const mocks: PostItem[] = [];
-    for (let i = 0; i < 10; i++) {
-      const post = { ...basePosts[i % basePosts.length] } as PostItem;
-      post.id = i + 1;
-      post.title = `${post.title} (Phần ${i + 1})`;
-      mocks.push(post);
+  private stripHtml(content: string): string {
+    return content
+      .replace(/<[^>]*>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  private calculateReadTime(
+    content: string,
+  ): string {
+    const wordCount = content
+      .split(/\s+/)
+      .filter(Boolean)
+      .length;
+
+    const minutes = Math.max(
+      1,
+      Math.ceil(wordCount / 200),
+    );
+
+    return `${minutes} phút đọc`;
+  }
+
+  private formatDate(
+    value: string,
+  ): string {
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return 'Gần đây';
     }
-    this.posts.set(mocks);
-    this.totalItems.set(mocks.length);
-    this.totalPages.set(1);
+
+    return date.toLocaleDateString(
+      this.currentLanguageCode() === 'en'
+        ? 'en-US'
+        : 'vi-VN',
+      {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      },
+    );
+  }
+
+  private getErrorMessage(
+    error: unknown,
+  ): string {
+    if (
+      error instanceof HttpErrorResponse
+    ) {
+      const backendMessage: unknown =
+        error.error?.message;
+
+      if (
+        Array.isArray(backendMessage)
+      ) {
+        return backendMessage.join(', ');
+      }
+
+      if (
+        typeof backendMessage === 'string'
+      ) {
+        return backendMessage;
+      }
+
+      if (error.status === 0) {
+        return 'Không kết nối được tới backend.';
+      }
+
+      return `Không tải được bài viết. HTTP ${error.status}.`;
+    }
+
+    return 'Có lỗi xảy ra khi tải bài viết.';
   }
 }

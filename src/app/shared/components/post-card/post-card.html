@@ -1,31 +1,42 @@
-<article class="p-5 mb-4 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 card-box shadow-sm hover:shadow-md transition-shadow">
+<article
+  class="p-5 mb-4 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 card-box shadow-sm hover:shadow-md transition-shadow">
   <div class="flex gap-4">
     <div class="hidden sm:flex flex-col items-center justify-center gap-1 w-12 flex-shrink-0">
-      <button class="p-1 rounded-lg text-aquamarine-600 dark:text-aquamarine-300 hover:bg-aquamarine-100 dark:hover:bg-aquamarine-800 transition-colors">
+      <button
+        class="p-1 rounded-lg text-aquamarine-600 dark:text-aquamarine-300 hover:bg-aquamarine-100 dark:hover:bg-aquamarine-800 transition-colors">
         <i class="bi bi-caret-up-fill"></i>
       </button>
       <div class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-100">{{ post.likes }}</div>
-      <button class="p-1 rounded-lg text-aquamarine-600 dark:text-aquamarine-300 hover:bg-aquamarine-100 dark:hover:bg-aquamarine-800 transition-colors">
+      <button
+        class="p-1 rounded-lg text-aquamarine-600 dark:text-aquamarine-300 hover:bg-aquamarine-100 dark:hover:bg-aquamarine-800 transition-colors">
         <i class="bi bi-bookmark"></i>
       </button>
     </div>
 
-    <div class="hidden md:flex w-28 h-20 rounded-xl bg-aquamarine-100 dark:bg-aquamarine-800 items-center justify-center flex-shrink-0">
+    <div
+      class="hidden md:flex w-28 h-20 rounded-xl bg-aquamarine-100 dark:bg-aquamarine-800 items-center justify-center flex-shrink-0 overflow-hidden">
+      @if (post.thumbnailUrl) {
+      <img [src]="post.thumbnailUrl" [alt]="post.title" class="w-full h-full object-cover" loading="lazy" />
+      } @else {
       <i class="bi bi-code-slash text-2xl text-aquamarine-600 dark:text-aquamarine-300"></i>
+      }
     </div>
 
     <div class="flex-grow">
       <div class="flex items-center gap-2 mb-2">
-        <a [routerLink]="['/author', post.authorId || 1]" class="flex items-center gap-2 group hover:opacity-80 transition-opacity">
+        <a [routerLink]="['/author', post.authorId || 1]"
+          class="flex items-center gap-2 group hover:opacity-80 transition-opacity">
           <span class="avatar-sm">{{ post.authorAvatar }}</span>
-          <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400 group-hover:underline font-semibold">{{ post.authorName }}</small>
+          <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400 group-hover:underline font-semibold">{{
+            post.authorName }}</small>
         </a>
-        <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400">• {{ post.timeAgo }} • {{ post.readTime }}</small>
+        <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400">• {{ post.timeAgo }} • {{ post.readTime
+          }}</small>
       </div>
 
       <div class="mb-2">
         @for (cat of post.categories; track cat) {
-          <a routerLink="/category" class="category-badge me-1">{{ cat }}</a>
+        <a routerLink="/category" class="category-badge me-1">{{ cat }}</a>
         }
       </div>
 
@@ -42,16 +53,17 @@
       <div class="flex flex-wrap justify-between items-center gap-2">
         <div class="flex flex-wrap gap-2">
           @for (tag of post.tags; track tag) {
-            <a class="tag" routerLink="/hashtag">{{ tag }}</a>
+          <a class="tag" routerLink="/hashtag">{{ tag }}</a>
           }
         </div>
 
         <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400 flex items-center gap-2">
           <span><i class="bi bi-eye me-1"></i>{{ post.views }}</span>
+          @if (post.showCommentCount ?? true) {
           <span><i class="bi bi-chat me-1"></i>{{ post.comments }}</span>
+          }
         </small>
       </div>
     </div>
   </div>
 </article>
-

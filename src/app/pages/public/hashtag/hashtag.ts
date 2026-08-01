@@ -1,100 +1,393 @@
-import { Component, signal, computed } from '@angular/core';
-import { PublicSidebarLeft, FilterSortOption } from '../../../shared/components/public-sidebar-left/public-sidebar-left';
+import {
+  Component,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
+import {
+  debounceTime,
+  distinctUntilChanged,
+  Subject,
+} from 'rxjs';
+
+import {
+  FilterSortOption,
+  PublicSidebarLeft,
+} from '../../../shared/components/public-sidebar-left/public-sidebar-left';
+
 import { PublicSidebarRight } from '../../../shared/components/public-sidebar-right/public-sidebar-right';
-import { PostCard, PostItem } from '../../../shared/components/post-card/post-card';
+
+import {
+  PostCard,
+  PostItem,
+} from '../../../shared/components/post-card/post-card';
+
 import { Pagination } from '../../../shared/components/pagination/pagination';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 
+import { PublicApiService } from '../../../core/services/public-api.service';
+import { TranslationService } from '../../../core/services/translation.service';
+import { PublicPost } from '../../../core/models/post.model';
+
 @Component({
   selector: 'app-hashtag',
-  imports: [PublicSidebarLeft, PublicSidebarRight, PostCard, Pagination, TranslatePipe],
+  imports: [
+    PublicSidebarLeft,
+    PublicSidebarRight,
+    PostCard,
+    Pagination,
+    TranslatePipe,
+  ],
   templateUrl: './hashtag.html',
   styleUrl: './hashtag.css',
 })
 export class Hashtag {
-  mockPosts: PostItem[] = [];
-  currentPage = signal(1);
-  itemsPerPage = 10;
-  searchTerm = signal('');
-  activeFilter = signal<FilterSortOption>('latest');
+  private readonly route = inject(ActivatedRoute);
 
-  filteredPosts = computed(() => {
-    const term = this.searchTerm().toLowerCase().trim();
-    let posts = [...this.mockPosts];
-    if (term) {
-      posts = posts.filter(post => 
-        post.tags.some(tag => tag.toLowerCase().includes(term))
-      );
+  private readonly publicApiService =
+    inject(PublicApiService);
+
+  private readonly translationService =
+    inject(TranslationService);
+
+  private readonly searchChanges =
+    new Subject<string>();
+
+  readonly posts = signal<PostItem[]>([]);
+
+  readonly selectedTagId =
+    signal<number | null>(null);
+
+  readonly selectedTagName =
+    signal<string | null>(null);
+
+  readonly currentPage = signal(1);
+  readonly totalItems = signal(0);
+  readonly totalPages = signal(1);
+
+  readonly searchTerm = signal('');
+
+  readonly activeFilter =
+    signal<FilterSortOption>('latest');
+
+  readonly isLoading = signal(false);
+
+  readonly errorMessage =
+    signal<string | null>(null);
+
+  readonly itemsPerPage = 10;
+
+  /**
+   * Backend hiện chưa hỗ trợ query sort.
+   * Hai bộ lọc này chỉ sắp xếp các bài trong trang hiện tại.
+   */
+  readonly visiblePosts = computed(() => {
+    const posts = [...this.posts()];
+
+    switch (this.activeFilter()) {
+      case 'mostViewed':
+        return posts.sort(
+          (first, second) =>
+            second.views - first.views,
+        );
+
+      case 'mostLiked':
+        return posts.sort(
+          (first, second) =>
+            second.likes - first.likes,
+        );
+
+      case 'latest':
+      default:
+        return posts;
     }
-    const filter = this.activeFilter();
-    if (filter === 'mostViewed') {
-      posts.sort((a, b) => b.views - a.views);
-    } else if (filter === 'mostLiked') {
-      posts.sort((a, b) => b.likes - a.likes);
-    } else if (filter === 'mostCommented') {
-      posts.sort((a, b) => b.comments - a.comments);
-    } else {
-      posts.sort((a, b) => b.id - a.id);
-    }
-    return posts;
   });
-
-  visiblePosts = computed(() => {
-    const startIndex = (this.currentPage() - 1) * this.itemsPerPage;
-    return this.filteredPosts().slice(startIndex, startIndex + this.itemsPerPage);
-  });
-
-  onSearchChange(event: Event) {
-    const input = event.target as HTMLInputElement;
-    this.searchTerm.set(input.value);
-    this.currentPage.set(1);
-  }
-
-  clearSearch() {
-    this.searchTerm.set('');
-    this.currentPage.set(1);
-  }
 
   constructor() {
-    const basePosts: Omit<PostItem, 'id'>[] = [
-      {
-        title: 'Microservices vs Monolithic: Cuộc chiến kiến trúc',
-        excerpt: 'Phân tích điểm mạnh, điểm yếu và khi nào nên chuyển đổi hệ thống sang Microservices.',
-        authorId: 1,
-        authorName: 'Kiên Architect',
-        authorAvatar: 'K',
-        timeAgo: '5 giờ trước',
-        readTime: '15 phút đọc',
-        categories: ['Architecture', 'System Design'],
-        tags: ['#microservices', '#monolithic', '#backend'],
-        likes: 540,
-        views: 12500,
-        comments: 67
-      },
-      {
-        title: 'Bảo mật dữ liệu nhạy cảm trong hệ thống phân tán',
-        excerpt: 'Cách sử dụng Vault, mã hóa dữ liệu tại chỗ (at-rest) và trên đường truyền (in-transit).',
-        authorId: 2,
-        authorName: 'Nam Security',
-        authorAvatar: 'N',
-        timeAgo: '1 ngày trước',
-        readTime: '10 phút đọc',
-        categories: ['Security', 'DevOps'],
-        tags: ['#security', '#devops', '#vault'],
-        likes: 380,
-        views: 4500,
-        comments: 18
-      }
-    ];
+    this.searchChanges
+      .pipe(
+        debounceTime(350),
+        distinctUntilChanged(),
+        takeUntilDestroyed(),
+      )
+      .subscribe((value) => {
+        this.searchTerm.set(value);
+        this.currentPage.set(1);
+        this.loadPosts();
+      });
 
-    for (let i = 0; i < 20; i++) {
-      const post = { ...basePosts[i % basePosts.length] } as PostItem;
-      post.id = i + 1;
-      post.title = `${post.title} (Phần ${i + 1})`;
-      post.likes = Math.floor(Math.random() * 500) + 10;
-      post.views = post.likes * 15;
-      post.comments = Math.floor(post.likes / 8);
-      this.mockPosts.push(post);
+    this.route.queryParamMap
+      .pipe(takeUntilDestroyed())
+      .subscribe((params) => {
+        const rawTagId =
+          params.get('tagId');
+
+        const parsedTagId = rawTagId
+          ? Number(rawTagId)
+          : null;
+
+        const tagName =
+          params.get('tagName')?.trim() ||
+          null;
+
+        const validTagId =
+          parsedTagId !== null &&
+            Number.isInteger(parsedTagId) &&
+            parsedTagId > 0
+            ? parsedTagId
+            : null;
+
+        this.selectedTagId.set(validTagId);
+        this.selectedTagName.set(tagName);
+
+        this.currentPage.set(1);
+        this.loadPosts();
+      });
+  }
+
+  loadPosts(): void {
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+
+    const tagId =
+      this.selectedTagId();
+
+    const tagName =
+      this.selectedTagName();
+
+    this.publicApiService
+      .getPosts({
+        search:
+          this.searchTerm().trim() ||
+          undefined,
+
+        tagId:
+          tagId ?? undefined,
+
+        /**
+         * Nếu có tagId thì ưu tiên tagId,
+         * không gửi thêm tagName.
+         */
+        tagName:
+          tagId === null
+            ? tagName ?? undefined
+            : undefined,
+
+        lang: this.currentLanguageCode(),
+        page: this.currentPage(),
+        limit: this.itemsPerPage,
+      })
+      .subscribe({
+        next: (response) => {
+          const data = response.data;
+
+          this.posts.set(
+            data.items.map((post) =>
+              this.mapToPostItem(post),
+            ),
+          );
+
+          this.totalItems.set(
+            data.meta.totalItems,
+          );
+
+          this.totalPages.set(
+            data.meta.totalPages,
+          );
+
+          this.currentPage.set(
+            data.meta.currentPage,
+          );
+
+          this.isLoading.set(false);
+        },
+
+        error: (error: unknown) => {
+          this.posts.set([]);
+          this.totalItems.set(0);
+          this.totalPages.set(1);
+          this.isLoading.set(false);
+
+          this.errorMessage.set(
+            this.getErrorMessage(error),
+          );
+        },
+      });
+  }
+
+  onSearchChange(value: string): void {
+    this.searchChanges.next(value);
+  }
+
+  clearSearch(): void {
+    this.searchTerm.set('');
+    this.currentPage.set(1);
+    this.searchChanges.next('');
+  }
+
+  onFilterChange(
+    filter: FilterSortOption,
+  ): void {
+    this.activeFilter.set(filter);
+  }
+
+  onPageChange(page: number): void {
+    if (
+      page < 1 ||
+      page > this.totalPages() ||
+      page === this.currentPage()
+    ) {
+      return;
     }
+
+    this.currentPage.set(page);
+    this.loadPosts();
+
+    if (typeof window !== 'undefined') {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+    }
+  }
+
+  private mapToPostItem(
+    post: PublicPost,
+  ): PostItem {
+    const plainContent =
+      this.stripHtml(post.content);
+
+    return {
+      id: post.id,
+      authorId: post.authorId,
+      title: post.title,
+
+      excerpt:
+        plainContent.length > 150
+          ? `${plainContent.slice(0, 150)}...`
+          : plainContent,
+
+      authorName:
+        post.author.username,
+
+      authorAvatar:
+        post.author.username
+          .charAt(0)
+          .toUpperCase(),
+
+      timeAgo:
+        this.formatDate(
+          post.publishedAt ??
+          post.createdAt,
+        ),
+
+      readTime:
+        this.calculateReadTime(
+          plainContent,
+        ),
+
+      categories:
+        post.categories.map(
+          (category) => category.name,
+        ),
+
+      tags:
+        post.tags.map((tag) =>
+          tag.name.startsWith('#')
+            ? tag.name
+            : `#${tag.name}`,
+        ),
+
+      likes: post.likeCount,
+      views: post.viewCount,
+
+      /**
+       * PublicPost không trả commentCount.
+       */
+      comments: 0,
+      showCommentCount: false,
+
+      thumbnailUrl:
+        post.thumbnailUrl,
+    };
+  }
+
+  private stripHtml(content: string): string {
+    return content
+      .replace(/<[^>]*>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  private calculateReadTime(
+    content: string,
+  ): string {
+    const wordCount = content
+      .split(/\s+/)
+      .filter(Boolean)
+      .length;
+
+    const minutes = Math.max(
+      1,
+      Math.ceil(wordCount / 200),
+    );
+
+    return `${minutes} phút đọc`;
+  }
+
+  private formatDate(value: string): string {
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return 'Gần đây';
+    }
+
+    return date.toLocaleDateString(
+      this.currentLanguageCode() === 'en'
+        ? 'en-US'
+        : 'vi-VN',
+      {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      },
+    );
+  }
+
+  private currentLanguageCode(): string {
+    return this.translationService
+      .currentLang()
+      .toLowerCase();
+  }
+
+  private getErrorMessage(
+    error: unknown,
+  ): string {
+    if (
+      error instanceof HttpErrorResponse
+    ) {
+      const message: unknown =
+        error.error?.message;
+
+      if (Array.isArray(message)) {
+        return message.join(', ');
+      }
+
+      if (typeof message === 'string') {
+        return message;
+      }
+
+      if (error.status === 0) {
+        return 'Không kết nối được tới backend.';
+      }
+
+      return `Không tải được bài viết. HTTP ${error.status}.`;
+    }
+
+    return 'Không thể tải bài viết theo hashtag.';
   }
 }

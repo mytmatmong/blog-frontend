@@ -1,18 +1,60 @@
+export type BackendUserRole =
+  | 'NORMAL'
+  | 'BLOG_OWNER'
+  | 'CONTENT_MODERATOR'
+  | 'SUPER_ADMIN';
+
+export type UserStatus = 'ACTIVE' | 'LOCKED';
+
+export type FrontendRole =
+  | 'guest'
+  | 'user'
+  | 'owner'
+  | 'moderator'
+  | 'admin';
+
+export interface UserSummary {
+  id: number;
+  username: string;
+  avatarUrl: string | null;
+  bio: string | null;
+}
+
 export interface User {
   id: number;
   username: string;
   email: string;
-  role: 'ADMIN' | 'MODERATOR' | 'BLOG_OWNER' | 'USER' | string;
-  status: 'ACTIVE' | 'LOCKED' | 'PENDING' | string;
-  bio?: string | null;
-  avatarUrl?: string | null;
-  createdAt?: string;
-  updatedAt?: string;
+  role: BackendUserRole;
+  status: UserStatus;
+
+  bio: string | null;
+  avatarUrl: string | null;
+
+  lockedAt?: string | null;
+  lockedById?: number | null;
+  lockReason?: string | null;
+
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string | null;
+
+  /**
+   * Có trong response GET /user/profile.
+   */
+  followers?: UserSummary[];
 }
 
 export interface AuthTokens {
   accessToken: string;
   refreshToken: string;
+}
+
+/**
+ * POST /auth/refresh-token chỉ trả accessToken mới.
+ * Không có refreshToken trong response.
+ */
+export interface RefreshTokenResponseData {
+  accessToken: string;
 }
 
 export interface LoginResponseData {
@@ -27,7 +69,7 @@ export interface RegisterRequest {
 }
 
 export interface LoginRequest {
-  identifier: string; // username or email
+  identifier: string;
   password: string;
 }
 
@@ -40,11 +82,17 @@ export interface ResetPasswordRequest {
   newPassword: string;
 }
 
-export interface ApiResponse<T = any> {
-  success: boolean;
+export interface ApiResponse<T> {
+  success: true;
   statusCode: number;
   data: T;
-  message?: string | string[];
+  timestamp: string;
+}
+
+export interface ApiErrorResponse {
+  success: false;
+  statusCode: number;
+  message: string | string[];
   path?: string;
-  timestamp?: string;
+  timestamp: string;
 }

@@ -69,24 +69,96 @@ export class AuthorDetailComponent implements OnInit {
   }
 
   getAvatarInitial(name?: string): string {
-    return name ? name.charAt(0).toUpperCase() : 'A';
+    return name
+      ? name.charAt(0).toUpperCase()
+      : 'A';
   }
 
-  private mapToPostItem(p: PublicPost): PostItem {
+  private mapToPostItem(post: PublicPost): PostItem {
+    const plainContent = this.stripHtml(post.content);
+
     return {
-      id: p.id,
-      authorId: p.author?.id || this.author()?.id || 1,
-      title: p.title,
-      excerpt: p.summary || (p.content ? (p.content.length > 150 ? p.content.substring(0, 150) + '...' : p.content) : ''),
-      authorName: p.author?.username || 'Tác giả',
-      authorAvatar: p.author?.username ? p.author.username.charAt(0).toUpperCase() : 'A',
-      timeAgo: p.createdAt ? new Date(p.createdAt).toLocaleDateString('vi-VN') : 'Gần đây',
-      readTime: '5 phút đọc',
-      categories: p.categories?.map(c => c.name) || [],
-      tags: p.tags?.map(t => t.name.startsWith('#') ? t.name : '#' + t.name) || [],
-      likes: p.likeCount || 0,
-      views: p.viewCount || 0,
-      comments: 0
+      id: post.id,
+      authorId: post.authorId,
+      title: post.title,
+
+      excerpt:
+        plainContent.length > 150
+          ? `${plainContent.slice(0, 150)}...`
+          : plainContent,
+
+      authorName:
+        post.author?.username ??
+        this.author()?.username ??
+        'Tác giả',
+
+      authorAvatar:
+        (
+          post.author?.username ??
+          this.author()?.username ??
+          'A'
+        )
+          .charAt(0)
+          .toUpperCase(),
+
+      timeAgo: this.formatDate(
+        post.publishedAt ?? post.createdAt,
+      ),
+
+      readTime: this.calculateReadTime(
+        plainContent,
+      ),
+
+      categories: post.categories.map(
+        (category) => category.name,
+      ),
+
+      tags: post.tags.map((tag) =>
+        tag.name.startsWith('#')
+          ? tag.name
+          : `#${tag.name}`,
+      ),
+
+      likes: post.likeCount,
+      views: post.viewCount,
+      comments: 0,
+      showCommentCount: false,
+      thumbnailUrl: post.thumbnailUrl,
     };
+  }
+
+  private stripHtml(content: string): string {
+    return content
+      .replace(/<[^>]*>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  private calculateReadTime(content: string): string {
+    const wordCount = content
+      .split(/\s+/)
+      .filter(Boolean)
+      .length;
+
+    const minutes = Math.max(
+      1,
+      Math.ceil(wordCount / 200),
+    );
+
+    return `${minutes} phút đọc`;
+  }
+
+  private formatDate(value: string): string {
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return 'Gần đây';
+    }
+
+    return date.toLocaleDateString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    });
   }
 }

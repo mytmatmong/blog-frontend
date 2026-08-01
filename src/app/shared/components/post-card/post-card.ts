@@ -15,6 +15,14 @@ export interface PostItem {
   likes: number;
   views: number;
   comments: number;
+
+  thumbnailUrl?: string | null;
+
+  /**
+   * PublicPost không trả commentCount.
+   * Đặt false để không hiện số 0 giả.
+   */
+  showCommentCount?: boolean;
 }
 
 @Component({
