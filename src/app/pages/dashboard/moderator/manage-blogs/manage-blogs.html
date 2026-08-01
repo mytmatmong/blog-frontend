@@ -19,14 +19,14 @@
             </td>
             <td class="p-4 text-aquamarine-800 dark:text-aquamarine-200">{{ blog.author }}</td>
             <td class="p-4 text-center">
-              <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-300">Chờ duyệt</span>
+              <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-300">{{ 'status.pending' | translate }}</span>
             </td>
             <td class="p-4 text-center">
               <div class="flex items-center justify-center gap-2">
-                <button (click)="approveBlog(blog)" class="p-1.5 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-lg transition-colors" title="Duyệt bài">
+                <button (click)="approveBlog(blog)" class="p-1.5 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-lg transition-colors" [title]="'action.approve' | translate">
                   <i class="bi bi-check-circle-fill text-lg"></i>
                 </button>
-                <button (click)="setRejectBlog(blog)" class="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors" title="Từ chối">
+                <button (click)="setRejectBlog(blog)" class="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors" [title]="'action.reject' | translate">
                   <i class="bi bi-x-circle-fill text-lg"></i>
                 </button>
               </div>
@@ -67,10 +67,10 @@
       <div class="p-6 overflow-y-auto space-y-4">
         <div class="flex items-center gap-2">
           <span class="inline-block px-2.5 py-1 text-xs font-semibold rounded-md bg-aquamarine-100 text-aquamarine-800 dark:bg-aquamarine-800 dark:text-aquamarine-100">{{ activePreviewBlog()?.category }}</span>
-          <span class="text-xs text-aquamarine-600 dark:text-aquamarine-400">Ngôn ngữ gốc: {{ activePreviewBlog()?.lang }} | Chờ duyệt</span>
+          <span class="text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ 'post_form.original_lang' | translate }} {{ activePreviewBlog()?.lang }} | {{ 'status.pending' | translate }}</span>
         </div>
         <h2 class="font-bold text-2xl text-aquamarine-950 dark:text-aquamarine-50">{{ activePreviewBlog()?.title }}</h2>
-        <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400">Tác giả: <span class="font-medium text-aquamarine-950 dark:text-aquamarine-50">{{ activePreviewBlog()?.author }}</span></div>
+        <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ 'table.author' | translate }}: <span class="font-medium text-aquamarine-950 dark:text-aquamarine-50">{{ activePreviewBlog()?.author }}</span></div>
         <div class="space-y-3 text-aquamarine-800 dark:text-aquamarine-200 text-sm">
           <p>Đây là nội dung mô phỏng của bài viết để Moderator có thể đọc và đánh giá trước khi duyệt. Trong thực tế, nội dung này sẽ được load từ database dựa vào ID của bài viết.</p>
           <p>Dưới đây là một ví dụ về nội dung bài viết dài hơn để kiểm tra khả năng cuộn trang (scroll) của Modal. Khi một bài viết có nhiều chi tiết, hình ảnh hoặc các đoạn mã nguồn, Moderator cần phải kiểm tra kỹ lưỡng trước khi quyết định duyệt (Approve) hoặc từ chối (Reject).</p>

@@ -14,20 +14,20 @@
 
         <div>
           <h4 class="font-bold text-xl text-aquamarine-950 dark:text-aquamarine-50 mb-1">
-            {{ user()?.username || 'Người dùng' }}
+            {{ user()?.username || ('profile.default_user' | translate) }}
           </h4>
           <span class="inline-block text-xs font-semibold px-3 py-1 rounded-full bg-aquamarine-100 dark:bg-aquamarine-800 text-aquamarine-700 dark:text-aquamarine-300">
-            Role: {{ user()?.role || 'USER' }}
+            {{ 'profile.role' | translate }}: {{ user()?.role || 'USER' }}
           </span>
         </div>
 
         <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">
-          {{ user()?.bio || 'Chưa có thông tin giới thiệu' }}
+          {{ user()?.bio || ('profile.no_bio' | translate) }}
         </p>
 
         @if (user()?.createdAt) {
           <div class="text-xs text-aquamarine-500 pt-2 border-t border-aquamarine-100 dark:border-aquamarine-800">
-            Tham gia từ: {{ user()?.createdAt }}
+            {{ 'author.joined' | translate }}: {{ user()?.createdAt }}
           </div>
         }
       </div>
@@ -35,18 +35,18 @@
 
     <div class="lg:col-span-8">
       <div class="p-6 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50 mb-4">Thông tin cá nhân</h5>
+        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50 mb-4">{{ 'profile.personal_info' | translate }}</h5>
         <form class="space-y-4">
           <div>
-            <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">Tên tài khoản / Username</label>
+            <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'profile.username_label' | translate }}</label>
             <input type="text" [value]="username()" readonly class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-100/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none cursor-not-allowed">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">Email</label>
+            <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'table.email' | translate }}</label>
             <input type="email" [value]="email()" readonly class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-100/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 cursor-not-allowed">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">Bio / Giới thiệu</label>
+            <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'profile.bio_label' | translate }}</label>
             <textarea [value]="bio()" readonly class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-100/50 dark:bg-aquamarine-950 p-3 text-sm text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none cursor-not-allowed" rows="3"></textarea>
           </div>
         </form>

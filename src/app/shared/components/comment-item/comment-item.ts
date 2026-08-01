@@ -4,10 +4,11 @@ import {
 } from '@angular/core';
 
 import { PublicComment } from '../../../core/models/post.model';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-comment-item',
-  imports: [],
+  imports: [TranslatePipe],
   templateUrl: './comment-item.html',
   styleUrl: './comment-item.css',
 })

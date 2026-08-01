@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 export interface PostItemCategory {
   id: number;
@@ -42,7 +43,7 @@ export interface PostItem {
 
 @Component({
   selector: 'app-post-card',
-  imports: [RouterLink],
+  imports: [RouterLink, TranslatePipe],
   templateUrl: './post-card.html',
   styleUrl: './post-card.css',
 })

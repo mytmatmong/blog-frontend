@@ -4,16 +4,19 @@ import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { TranslationService } from '../../../core/services/translation.service';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-dashboard-auth',
-  imports: [FormsModule],
+  imports: [FormsModule, TranslatePipe],
   templateUrl: './dashboard-auth.html',
   styleUrl: './dashboard-auth.css',
 })
 export class DashboardAuth {
   protected readonly authService = inject(AuthService);
   protected readonly toastService = inject(ToastService);
+  protected readonly ts = inject(TranslationService);
   private readonly router = inject(Router);
 
   identifier = signal<string>('');

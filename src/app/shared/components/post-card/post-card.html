@@ -4,7 +4,7 @@
     <!-- Public hiện chưa gọi User API like/bookmark,
          nên không dùng button giả có thể click -->
     <div class="hidden sm:flex flex-col items-center justify-center gap-2 w-12 flex-shrink-0">
-      <span class="p-1 text-aquamarine-600 dark:text-aquamarine-300" title="Lượt thích">
+      <span class="p-1 text-aquamarine-600 dark:text-aquamarine-300" [title]="'post.likes' | translate">
         <i class="bi bi-heart-fill"></i>
       </span>
 
@@ -12,7 +12,7 @@
         {{ post.likes }}
       </div>
 
-      <span class="p-1 text-aquamarine-500 dark:text-aquamarine-400" title="Lưu bài viết yêu cầu đăng nhập">
+      <span class="p-1 text-aquamarine-500 dark:text-aquamarine-400" [title]="'post.save_hint' | translate">
         <i class="bi bi-bookmark"></i>
       </span>
     </div>

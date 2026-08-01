@@ -4,10 +4,11 @@ import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { User } from '../../../core/models/auth.model';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-profile',
-  imports: [FormsModule],
+  imports: [FormsModule, TranslatePipe],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })

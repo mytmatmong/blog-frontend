@@ -90,7 +90,7 @@
               auth.currentUser()?.username?.charAt(0)?.toUpperCase() || 'U'
               }}
             </span>
-            <span class="lg:hidden">Tài khoản</span>
+            <span class="lg:hidden">{{ 'nav.account' | translate }}</span>
           </button>
 
           @if (isUserDropdownOpen()) {
@@ -98,7 +98,7 @@
             class="absolute right-0 mt-2 w-56 bg-white dark:bg-aquamarine-900 rounded-xl shadow-lg border border-aquamarine-200 dark:border-aquamarine-800 py-2 z-50">
             <li class="px-4 py-1 text-xs font-semibold text-aquamarine-400 uppercase tracking-wider">
               {{
-              auth.currentUser()?.username || 'Người dùng'
+              auth.currentUser()?.username || ('profile.default_user' | translate)
               }}
             </li>
             <li>

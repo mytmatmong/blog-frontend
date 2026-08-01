@@ -1,8 +1,8 @@
-<nav class="mt-6" aria-label="Điều hướng phân trang">
+<nav class="mt-6" [attr.aria-label]="'pagination.nav_label' | translate">
   <div class="flex flex-col items-center justify-center gap-3">
     <!-- Thông tin trang hiện tại -->
     <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">
-      Trang
+      {{ 'pagination.page' | translate }}
       <strong>
         {{ normalizedCurrentPage() }}
       </strong>
@@ -21,7 +21,7 @@
             [disabled]="
               normalizedCurrentPage() === 1
             " [attr.aria-label]="
-              'Chuyển đến trang trước'
+              'pagination.prev_aria' | translate
             " (click)="
               goToPage(
                 normalizedCurrentPage() - 1
@@ -84,10 +84,8 @@
                 " [attr.aria-label]="
                   normalizedCurrentPage() ===
                   item.value
-                    ? 'Trang hiện tại, trang ' +
-                      item.value
-                    : 'Chuyển đến trang ' +
-                      item.value
+                    ? ('pagination.current_page' | translate) + item.value
+                    : ('pagination.go_to_page' | translate) + item.value
                 " (click)="goToItem(item)">
             {{ item.value }}
           </button>
@@ -111,7 +109,7 @@
               normalizedCurrentPage() ===
               totalPages()
             " [attr.aria-label]="
-              'Chuyển đến trang sau'
+              'pagination.next_aria' | translate
             " (click)="
               goToPage(
                 normalizedCurrentPage() + 1

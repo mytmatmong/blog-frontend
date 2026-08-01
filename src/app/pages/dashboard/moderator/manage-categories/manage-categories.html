@@ -30,10 +30,10 @@
             <td class="p-4 text-center text-aquamarine-800 dark:text-aquamarine-200">{{ cat.postCount }}</td>
             <td class="p-4 text-center">
               <div class="flex items-center justify-center gap-2">
-                <button (click)="setEditCategory(cat)" class="p-1.5 text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-950/30 rounded-lg transition-colors" title="Chỉnh sửa">
+                <button (click)="setEditCategory(cat)" class="p-1.5 text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-950/30 rounded-lg transition-colors" [title]="'comments.edit' | translate">
                   <i class="bi bi-pencil-square text-lg"></i>
                 </button>
-                <button (click)="deleteCategory(cat)" class="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors" title="Xóa">
+                <button (click)="deleteCategory(cat)" class="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors" [title]="'comments.delete' | translate">
                   <i class="bi bi-trash3-fill text-lg"></i>
                 </button>
               </div>
@@ -66,7 +66,7 @@
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
     <div class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-2xl max-h-[85vh] flex flex-col">
       <div class="flex justify-between items-center p-5 border-b border-aquamarine-200 dark:border-aquamarine-800">
-        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">Danh sách bài viết: <span class="text-aquamarine-600 dark:text-aquamarine-400">{{ activeCategoryPosts() }}</span></h5>
+        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">{{ 'category.post_list_title' | translate }}: <span class="text-aquamarine-600 dark:text-aquamarine-400">{{ activeCategoryPosts() }}</span></h5>
         <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" (click)="closeCategoryPostsModal()">
           <i class="bi bi-x-lg text-lg"></i>
         </button>
@@ -76,7 +76,7 @@
           <a href="#" (click)="$event.preventDefault()" class="p-4 rounded-xl border border-aquamarine-100 dark:border-aquamarine-800 flex justify-between items-center hover:bg-aquamarine-50/50 dark:hover:bg-aquamarine-950/50 transition-colors">
             <div>
               <h6 class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-50 mb-1">Bài viết demo số {{ i }} cho danh mục {{ activeCategoryPosts() }}</h6>
-              <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400">Tác giả: DevMaster | Xuất bản: 20/07/2026</small>
+              <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ 'table.author' | translate }}: DevMaster | {{ 'post.published' | translate }}: 20/07/2026</small>
             </div>
             <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-aquamarine-100 text-aquamarine-800 dark:bg-aquamarine-800 dark:text-aquamarine-100">14 views</span>
           </a>
@@ -94,7 +94,7 @@
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
     <div class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-md p-6">
       <div class="flex justify-between items-center mb-4">
-        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">Chỉnh sửa Category</h5>
+        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">{{ 'modal.edit_category_title' | translate }}</h5>
         <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" (click)="closeEditCategoryModal()">
           <i class="bi bi-x-lg text-lg"></i>
         </button>
@@ -107,8 +107,8 @@
         <div>
           <label for="editCategoryLang" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'table.lang_name' | translate }}</label>
           <select class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-3 py-2 text-sm text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" id="editCategoryLang" name="editLang" [(ngModel)]="editCatLang">
-            <option value="VI">Tiếng Việt (VI)</option>
-            <option value="EN">English (EN)</option>
+            <option value="VI">{{ 'lang.vietnamese' | translate }} (VI)</option>
+            <option value="EN">{{ 'lang.english' | translate }} (EN)</option>
           </select>
         </div>
         <div class="flex justify-end gap-3 pt-2">
@@ -133,13 +133,13 @@
       <form (submit)="$event.preventDefault(); submitAddCategory()" class="space-y-4">
         <div>
           <label for="categoryName" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'modal.category_name' | translate }}</label>
-          <input type="text" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" id="categoryName" name="newName" [(ngModel)]="newCatName" placeholder="VD: Backend, Frontend..." required>
+          <input type="text" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" id="categoryName" name="newName" [(ngModel)]="newCatName" [placeholder]="'modal.category_name_placeholder' | translate" required>
         </div>
         <div>
           <label for="categoryLang" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'table.lang_name' | translate }}</label>
           <select class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-3 py-2 text-sm text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" id="categoryLang" name="newLang" [(ngModel)]="newCatLang">
-            <option value="VI">Tiếng Việt (VI)</option>
-            <option value="EN">English (EN)</option>
+            <option value="VI">{{ 'lang.vietnamese' | translate }} (VI)</option>
+            <option value="EN">{{ 'lang.english' | translate }} (EN)</option>
           </select>
         </div>
         <div class="flex justify-end gap-3 pt-2">

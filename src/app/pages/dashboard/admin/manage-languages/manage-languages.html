@@ -45,10 +45,10 @@
             </td>
             <td class="p-4 text-center">
               <div class="flex items-center justify-center gap-2">
-                <button (click)="setEditLanguage(lang)" class="p-1.5 text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-950/30 rounded-lg transition-colors" title="Chỉnh sửa">
+                <button (click)="setEditLanguage(lang)" class="p-1.5 text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-950/30 rounded-lg transition-colors" [title]="'comments.edit' | translate">
                   <i class="bi bi-pencil-square text-lg"></i>
                 </button>
-                <button (click)="deleteLanguage(lang)" class="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors" title="Xóa">
+                <button (click)="deleteLanguage(lang)" class="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors" [title]="'comments.delete' | translate">
                   <i class="bi bi-trash3-fill text-lg"></i>
                 </button>
               </div>
@@ -88,7 +88,7 @@
       </div>
       <form (submit)="$event.preventDefault(); submitAddLanguage()" class="space-y-4">
         <div>
-          <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">Quốc gia (Cờ)</label>
+          <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'languages.country_flag' | translate }}</label>
           <div class="relative">
             <button type="button" (click)="isAddFlagDropdownOpen.set(!isAddFlagDropdownOpen())" class="w-full flex items-center justify-between rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50">
               <span class="flex items-center gap-2">
@@ -111,20 +111,20 @@
         </div>
 
         <div>
-          <label for="langCode" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">Mã ngôn ngữ (Code)</label>
-          <input type="text" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" id="langCode" name="code" [(ngModel)]="addCode" placeholder="VD: vi, en, fr..." required>
+          <label for="langCode" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'table.lang_code' | translate }}</label>
+          <input type="text" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" id="langCode" name="code" [(ngModel)]="addCode" [placeholder]="'languages.code_placeholder' | translate" required>
         </div>
         <div>
-          <label for="langName" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">Tên hiển thị</label>
-          <input type="text" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" id="langName" name="name" [(ngModel)]="addName" placeholder="VD: Tiếng Việt" required>
+          <label for="langName" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'languages.display_name' | translate }}</label>
+          <input type="text" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" id="langName" name="name" [(ngModel)]="addName" [placeholder]="'languages.name_placeholder' | translate" required>
         </div>
         <div class="flex items-center gap-2">
           <input type="checkbox" id="isDefaultLang" name="isDefault" [(ngModel)]="addIsDefault" class="rounded border-aquamarine-300 text-aquamarine-600 focus:ring-aquamarine-500">
-          <label class="text-xs text-aquamarine-800 dark:text-aquamarine-200 cursor-pointer" for="isDefaultLang">Đặt làm ngôn ngữ mặc định (Default)</label>
+          <label class="text-xs text-aquamarine-800 dark:text-aquamarine-200 cursor-pointer" for="isDefaultLang">{{ 'languages.set_default' | translate }}</label>
         </div>
         <div class="flex items-center gap-2">
           <input type="checkbox" id="isActiveLang" name="isActive" [(ngModel)]="addIsActive" class="rounded border-aquamarine-300 text-aquamarine-600 focus:ring-aquamarine-500">
-          <label class="text-xs text-aquamarine-800 dark:text-aquamarine-200 cursor-pointer" for="isActiveLang">Kích hoạt ngay (Active)</label>
+          <label class="text-xs text-aquamarine-800 dark:text-aquamarine-200 cursor-pointer" for="isActiveLang">{{ 'languages.activate_now' | translate }}</label>
         </div>
         <div class="flex justify-end gap-3 pt-2">
           <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="closeAddModal()">{{ 'modal.cancel' | translate }}</button>
@@ -140,14 +140,14 @@
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
     <div class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-md p-6">
       <div class="flex justify-between items-center mb-4">
-        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">Chỉnh sửa Ngôn ngữ</h5>
+        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">{{ 'modal.edit_lang_title' | translate }}</h5>
         <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" (click)="closeEditModal()">
           <i class="bi bi-x-lg text-lg"></i>
         </button>
       </div>
       <form (submit)="$event.preventDefault(); submitEditLanguage()" class="space-y-4">
         <div>
-          <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">Quốc gia (Cờ)</label>
+          <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'languages.country_flag' | translate }}</label>
           <div class="relative">
             <button type="button" (click)="isEditFlagDropdownOpen.set(!isEditFlagDropdownOpen())" class="w-full flex items-center justify-between rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50">
               <span class="flex items-center gap-2">
@@ -170,20 +170,20 @@
         </div>
 
         <div>
-          <label for="editLangCode" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">Mã ngôn ngữ (Code)</label>
+          <label for="editLangCode" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'table.lang_code' | translate }}</label>
           <input type="text" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" id="editLangCode" name="editCode" [(ngModel)]="editCode" required>
         </div>
         <div>
-          <label for="editLangName" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">Tên hiển thị</label>
+          <label for="editLangName" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'languages.display_name' | translate }}</label>
           <input type="text" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" id="editLangName" name="editName" [(ngModel)]="editName" required>
         </div>
         <div class="flex items-center gap-2">
           <input type="checkbox" id="editIsDefaultLang" name="editIsDefault" [(ngModel)]="editIsDefault" class="rounded border-aquamarine-300 text-aquamarine-600 focus:ring-aquamarine-500">
-          <label class="text-xs text-aquamarine-800 dark:text-aquamarine-200 cursor-pointer" for="editIsDefaultLang">Đặt làm ngôn ngữ mặc định (Default)</label>
+          <label class="text-xs text-aquamarine-800 dark:text-aquamarine-200 cursor-pointer" for="editIsDefaultLang">{{ 'languages.set_default' | translate }}</label>
         </div>
         <div class="flex items-center gap-2">
           <input type="checkbox" id="editIsActiveLang" name="editIsActive" [(ngModel)]="editIsActive" class="rounded border-aquamarine-300 text-aquamarine-600 focus:ring-aquamarine-500">
-          <label class="text-xs text-aquamarine-800 dark:text-aquamarine-200 cursor-pointer" for="editIsActiveLang">Kích hoạt ngay (Active)</label>
+          <label class="text-xs text-aquamarine-800 dark:text-aquamarine-200 cursor-pointer" for="editIsActiveLang">{{ 'languages.activate_now' | translate }}</label>
         </div>
         <div class="flex justify-end gap-3 pt-2">
           <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="closeEditModal()">{{ 'modal.cancel' | translate }}</button>

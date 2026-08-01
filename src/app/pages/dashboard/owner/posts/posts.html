@@ -30,13 +30,13 @@
             </td>
             <td class="p-4 text-center">
               <div class="flex items-center justify-center gap-1">
-                <button (click)="setPreviewPost(post)" class="p-1.5 text-cyan-600 hover:bg-cyan-50 dark:hover:bg-cyan-950/30 rounded-lg transition-colors" title="Xem">
+                <button (click)="setPreviewPost(post)" class="p-1.5 text-cyan-600 hover:bg-cyan-50 dark:hover:bg-cyan-950/30 rounded-lg transition-colors" [title]="'common.view' | translate">
                   <i class="bi bi-eye"></i>
                 </button>
-                <a routerLink="/dashboard/owner/edit-post" class="p-1.5 text-aquamarine-600 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 rounded-lg transition-colors" title="Chỉnh sửa">
+                <a routerLink="/dashboard/owner/edit-post" class="p-1.5 text-aquamarine-600 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 rounded-lg transition-colors" [title]="'comments.edit' | translate">
                   <i class="bi bi-pencil-square"></i>
                 </a>
-                <button (click)="deletePost(post)" class="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors" title="Xóa">
+                <button (click)="deletePost(post)" class="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors" [title]="'comments.delete' | translate">
                   <i class="bi bi-trash3-fill"></i>
                 </button>
               </div>

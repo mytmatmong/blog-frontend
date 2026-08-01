@@ -80,7 +80,7 @@
           [class.text-aquamarine-800]="forgotStep() !== 'request'"
           [class.dark:text-aquamarine-300]="forgotStep() !== 'request'"
           [class.opacity-60]="forgotStep() !== 'request'">
-          1. Yêu cầu khôi phục
+          {{ 'auth.step_request' | translate }}
         </button>
         <button type="button"
           (click)="setForgotStep('reset')"
@@ -92,7 +92,7 @@
           [class.text-aquamarine-800]="forgotStep() !== 'reset'"
           [class.dark:text-aquamarine-300]="forgotStep() !== 'reset'"
           [class.opacity-60]="forgotStep() !== 'reset'">
-          2. Đặt lại mật khẩu
+          {{ 'auth.step_reset' | translate }}
         </button>
       </div>
 
@@ -100,7 +100,7 @@
       @if (forgotStep() === 'request') {
       <form (submit)="onForgotPassword($event)" class="flex flex-col gap-4">
         <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">
-          Nhập địa chỉ email đã đăng ký. Hệ thống sẽ gửi liên kết/mã khôi phục cho bạn.
+          {{ 'auth.request_desc' | translate }}
         </p>
         <app-input type="email" [placeholder]="ts.translate('auth.email_placeholder')" icon="bi bi-envelope" [required]="true"
           [value]="forgotEmail()" (valueChange)="forgotEmail.set($event)"></app-input>
@@ -113,7 +113,7 @@
         </button>
         <div class="text-center mt-1">
           <button type="button" (click)="setForgotStep('reset')" class="text-xs text-aquamarine-600 hover:underline dark:text-aquamarine-400">
-            Đã có mã token? Đặt lại mật khẩu ngay &rarr;
+            {{ 'auth.has_token_link' | translate }}
           </button>
         </div>
       </form>
@@ -123,7 +123,7 @@
       @if (forgotStep() === 'reset') {
       <form (submit)="onResetPassword($event)" class="flex flex-col gap-4">
         <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">
-          Nhập mã token nhận được và mật khẩu mới để tiến hành khôi phục.
+          {{ 'auth.reset_desc' | translate }}
         </p>
         <app-input type="text" [placeholder]="ts.translate('auth.token_placeholder')" icon="bi bi-key" [required]="true"
           [value]="resetToken()" (valueChange)="resetToken.set($event)"></app-input>
@@ -138,7 +138,7 @@
         </button>
         <div class="text-center mt-1">
           <button type="button" (click)="setForgotStep('request')" class="text-xs text-aquamarine-600 hover:underline dark:text-aquamarine-400">
-            &larr; Chưa nhận được email? Gửi lại yêu cầu
+            {{ 'auth.resend_request_link' | translate }}
           </button>
         </div>
       </form>

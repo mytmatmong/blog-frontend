@@ -5,7 +5,7 @@
       <h3 class="font-bold text-2xl text-aquamarine-600 dark:text-aquamarine-400 mt-1">320</h3>
     </div>
     <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-      <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400">Blog Owners</div>
+      <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ 'dashboard.blog_owners' | translate }}</div>
       <h3 class="font-bold text-2xl text-cyan-500 mt-1">42</h3>
     </div>
     <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
@@ -22,7 +22,7 @@
     <div class="lg:col-span-8">
       <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm h-full flex flex-col justify-between">
         <h6 class="font-bold text-base text-aquamarine-950 dark:text-aquamarine-50 mb-4">
-          Tăng trưởng người dùng (7 ngày qua)
+          {{ 'dashboard.user_growth_chart' | translate }}
         </h6>
         <div>
           <canvas id="userGrowthChart" height="100"></canvas>
@@ -33,14 +33,14 @@
     <div class="lg:col-span-4">
       <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm h-full">
         <h6 class="font-bold text-base text-aquamarine-950 dark:text-aquamarine-50 mb-4">
-          Thao tác nhanh
+          {{ 'dashboard.quick_actions' | translate }}
         </h6>
         <div class="flex flex-col gap-3">
           <a routerLink="/dashboard/admin/manage-users" class="flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 transition-colors">
-            <i class="bi bi-journal-check"></i>Duyệt yêu cầu (5)
+            <i class="bi bi-journal-check"></i>{{ 'dashboard.approve_requests_count' | translate }}
           </a>
           <a routerLink="/dashboard/admin/manage-languages" class="flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors">
-            <i class="bi bi-folder-plus"></i>Thêm Language
+            <i class="bi bi-folder-plus"></i>{{ 'dashboard.add_language_btn' | translate }}
           </a>
         </div>
       </div>
@@ -51,7 +51,7 @@
     <div class="lg:col-span-4">
       <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
         <h6 class="font-bold text-base text-aquamarine-950 dark:text-aquamarine-50 mb-4">
-          Phân bổ Blog theo ngôn ngữ
+          {{ 'dashboard.blog_lang_dist_chart' | translate }}
         </h6>
         <div>
           <canvas id="langPieChart"></canvas>
