@@ -1,5 +1,13 @@
-:host-context(.dark-mode) footer {
-    background: var(--card) !important;
-    color: var(--text) !important;
-    border-color: var(--border) !important;
+@import "tailwindcss";
+
+:host {
+  display: block;
+}
+
+.site-footer {
+  @apply mt-12 py-4 border-t border-[var(--border-color)] bg-[var(--card-bg)] text-[var(--text-muted)] transition-colors duration-200;
+}
+
+.site-footer__inner {
+  @apply flex flex-wrap items-center justify-between gap-3 text-sm;
 }

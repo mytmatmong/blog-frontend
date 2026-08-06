@@ -448,38 +448,15 @@ export class PublicApiService {
   }
   private applySortParams(
     params: HttpParams,
-    query: {
+    _query: {
       sortBy?: string;
       sortOrder?: 'asc' | 'desc';
       order?: 'asc' | 'desc';
     },
   ): HttpParams {
-    params = this.setString(
-      params,
-      'sortBy',
-      query.sortBy,
-    );
-
-    /**
-     * Không gửi đồng thời sortOrder và order.
-     * Nếu có sortOrder thì ưu tiên sortOrder.
-     */
-    if (query.sortOrder) {
-      return this.setString(
-        params,
-        'sortOrder',
-        query.sortOrder,
-      );
-    }
-
-    if (query.order) {
-      return this.setString(
-        params,
-        'order',
-        query.order,
-      );
-    }
-
+    // Backend ValidationPipe đang bật `forbidNonWhitelisted: true`.
+    // Các DTO Backend hiện tại không nhận sortBy / sortOrder / order.
+    // Loại bỏ việc append các tham số này để tránh lỗi 400 Bad Request ở Frontend.
     return params;
   }
 }

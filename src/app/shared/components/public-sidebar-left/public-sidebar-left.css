@@ -1,133 +1,75 @@
+@import "tailwindcss";
+
 :host {
-    display: block;
+  display: block;
 }
 
 .sidebar-stack {
-    gap: 12px;
+  @apply grid gap-[12px];
 }
 
 .sidebar-filter-card {
-    overflow: hidden;
-    border-radius: 14px;
+  @apply overflow-hidden rounded-[14px];
 }
 
 .sidebar-card__header {
-    padding: 17px 15px 10px;
+  @apply flex items-center justify-between gap-[10px] pt-[17px] px-[15px] pb-[10px];
 }
 
 .sidebar-card__title,
 .sidebar-search__label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 0;
-    color: var(--card-text-default);
-    font-size: 13.5px;
-    font-weight: 800;
-    line-height: 1.3;
-    letter-spacing: -0.01em;
-    text-transform: none;
+  @apply flex items-center gap-2 m-0 text-[var(--card-text-default)] text-[13.5px] font-[800] leading-[1.3] tracking-[-0.01em] normal-case;
 }
 
 .sidebar-search__label {
-    margin-bottom: 10px;
+  @apply mb-[10px];
 }
 
 .sidebar-card__title i,
 .sidebar-search__label i {
-    color: var(--brand);
-    font-size: 12px;
+  @apply text-[var(--brand)] text-[12px];
 }
 
 .sidebar-card__body {
-    padding: 3px 9px 11px;
+  @apply pt-[3px] px-[9px] pb-[11px];
 }
 
 .filter-list {
-    display: grid;
-    gap: 4px;
+  @apply grid gap-1;
 }
 
 .filter-button {
-    width: 100%;
-    min-height: 39px;
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    padding: 7px 9px;
-    border: 1px solid transparent;
-    border-radius: 10px;
-    background: transparent;
-    color: var(--text-muted);
-    font-size: 13px;
-    font-weight: 650;
-    text-align: left;
-    cursor: pointer;
-    transition:
-        color 150ms ease,
-        border-color 150ms ease,
-        background 150ms ease,
-        transform 150ms ease,
-        box-shadow 150ms ease;
-}
-
-.filter-button:hover {
-    color: var(--card-text-default);
-    background: var(--card-bg-muted);
+  @apply w-full min-h-[39px] flex items-center gap-[9px] px-[9px] py-[7px] border border-transparent rounded-[10px] bg-transparent text-[var(--text-muted)] hover:text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] text-[13px] font-[650] text-left cursor-pointer transition-all duration-150;
 }
 
 .filter-button.is-active {
-    color: #ffffff;
-    border-color: var(--brand);
-    background:
-        linear-gradient(135deg,
-            color-mix(in srgb, var(--brand) 94%, #ffffff),
-            var(--brand));
-
-    box-shadow:
-        0 7px 16px color-mix(in srgb, var(--brand) 20%, transparent);
+  @apply text-white border-[var(--brand)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--brand)_94%,#ffffff),var(--brand))] shadow-[0_7px_16px_color-mix(in_srgb,var(--brand)_20%,transparent)];
 }
 
 .filter-button__icon {
-    width: 22px;
-    height: 22px;
-    display: grid;
-    place-items: center;
-    flex: 0 0 auto;
-    border-radius: 7px;
-    background:
-        color-mix(in srgb,
-            var(--card-bg-muted) 76%,
-            transparent);
+  @apply w-[22px] h-[22px] grid place-items-center shrink-0 rounded-[7px] bg-[color-mix(in_srgb,var(--card-bg-muted)_76%,transparent)];
 }
 
 .filter-button.is-active .filter-button__icon {
-    background: rgba(255, 255, 255, 0.16);
+  @apply bg-white/16;
 }
 
 .filter-button__label {
-    min-width: 0;
-    flex: 1;
+  @apply min-w-0 flex-1;
 }
 
 .filter-button__check {
-    flex: 0 0 auto;
-    font-size: 13px;
+  @apply shrink-0 text-[13px];
 }
 
 .sidebar-search {
-    padding: 14px;
-    border-top: 1px solid var(--border-color);
-    background: transparent;
+  @apply p-[14px] border-t border-[var(--border-color)] bg-transparent;
 }
 
 .sidebar-search--standalone {
-    border-top: 0;
+  @apply border-t-0;
 }
 
 :host ::ng-deep .sidebar-search .app-input-field {
-    min-height: 40px;
-    border-radius: 10px;
-    background: var(--card-bg);
-    font-size: 13px;
+  @apply min-h-[40px] rounded-[10px] bg-[var(--card-bg)] text-[13px];
 }
