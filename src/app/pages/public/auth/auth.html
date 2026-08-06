@@ -1,47 +1,58 @@
-<main class="auth-page">
-  <div class="auth-layout">
-    <section class="auth-showcase">
-      <a routerLink="/" class="brand">
-        <span class="brand__mark"><i class="bi bi-stars"></i></span>
-        <span class="brand__text">Blogy<span>.</span></span>
+<!-- auth-page -->
+<main class="w-[min(1180px,calc(100%-40px))] mx-auto py-[40px] pb-[64px] max-[900px]:w-[min(calc(100%-24px),560px)] max-[900px]:pt-6">
+  <!-- auth-layout -->
+  <div class="min-h-[min(720px,calc(100vh-var(--header-height)-104px))] grid grid-cols-[minmax(0,1.05fr)_minmax(380px,0.95fr)] overflow-hidden border border-[var(--border-color)] rounded-[26px] bg-[var(--card-bg)] shadow-[var(--shadow-lg)] max-[900px]:grid-cols-1 max-[900px]:min-h-0">
+    <!-- auth-showcase -->
+    <section class="relative flex flex-col justify-between overflow-hidden p-[42px] bg-[radial-gradient(circle_at_84%_18%,rgba(255,255,255,0.22),transparent_16rem),linear-gradient(145deg,#5b5bd6,#3f3fa5_62%,#29295e)] text-white after:content-[''] after:absolute after:-right-[120px] after:-bottom-[170px] after:w-[430px] after:h-[430px] after:border-[76px] after:border-white/10 after:rounded-full max-[900px]:hidden">
+      <a routerLink="/" class="brand text-white">
+        <span class="brand__mark text-[#5b5bd6] bg-white shadow-none"><i class="bi bi-stars"></i></span>
+        <span class="brand__text text-white">Blogy<span class="text-white">.</span></span>
       </a>
-      <div class="auth-showcase__copy">
-        <span class="page-intro__eyebrow"><i class="bi bi-stars"></i>{{ 'ui.community_label' | translate }}</span>
-        <h1>{{ 'auth.showcase_title' | translate }}</h1>
-        <p>{{ 'auth.showcase_desc' | translate }}</p>
+
+      <!-- auth-showcase__copy -->
+      <div class="relative z-[1] max-w-[520px]">
+        <span class="page-intro__eyebrow text-white/70"><i class="bi bi-stars"></i>{{ 'ui.community_label' | translate }}</span>
+        <h1 class="mt-[14px] mb-[16px] text-[clamp(40px,5vw,64px)] leading-[1.02] tracking-[-0.06em]">{{ 'auth.showcase_title' | translate }}</h1>
+        <p class="max-w-[460px] m-0 text-white/70 text-[15px] leading-[1.7]">{{ 'auth.showcase_desc' | translate }}</p>
       </div>
-      <div class="auth-showcase__features">
-        <span><i class="bi bi-journal-code"></i>{{ 'auth.feature_stories' | translate }}</span>
-        <span><i class="bi bi-people"></i>{{ 'auth.feature_community' | translate }}</span>
-        <span><i class="bi bi-bookmark-heart"></i>{{ 'auth.feature_library' | translate }}</span>
+
+      <!-- auth-showcase__features -->
+      <div class="relative z-[1] flex flex-wrap gap-[10px]">
+        <span class="inline-flex items-center gap-2 px-3 py-[9px] border border-white/20 rounded-full bg-white/10 text-white/80 text-[11px] font-[650] backdrop-blur-md"><i class="bi bi-journal-code"></i>{{ 'auth.feature_stories' | translate }}</span>
+        <span class="inline-flex items-center gap-2 px-3 py-[9px] border border-white/20 rounded-full bg-white/10 text-white/80 text-[11px] font-[650] backdrop-blur-md"><i class="bi bi-people"></i>{{ 'auth.feature_community' | translate }}</span>
+        <span class="inline-flex items-center gap-2 px-3 py-[9px] border border-white/20 rounded-full bg-white/10 text-white/80 text-[11px] font-[650] backdrop-blur-md"><i class="bi bi-bookmark-heart"></i>{{ 'auth.feature_library' | translate }}</span>
       </div>
     </section>
 
-    <section class="auth-panel">
-      <div class="auth-card">
-        <div class="auth-tabs">
-          <button type="button" class="auth-tab" [class.is-active]="activeTab() === 'login'" (click)="setTab('login')">
+    <!-- auth-panel -->
+    <section class="grid place-items-center p-[40px] bg-[var(--card-bg)] max-[900px]:p-[34px_24px]">
+      <!-- auth-card -->
+      <div class="w-[min(100%,430px)]">
+        <!-- auth-tabs -->
+        <div class="grid grid-cols-3 gap-[5px] mb-[30px] p-[5px] border border-[var(--border-color)] rounded-[14px] bg-[var(--card-bg-muted)]">
+          <button type="button" class="min-h-[38px] border-0 rounded-[10px] bg-transparent text-[var(--text-muted)] text-[12px] font-[700] cursor-pointer transition-colors duration-150" [class.bg-[var(--card-bg)]]="activeTab() === 'login'" [class.text-[var(--brand)]]="activeTab() === 'login'" [class.shadow-[var(--shadow-sm)]]="activeTab() === 'login'" (click)="setTab('login')">
             {{ 'auth.login_tab' | translate }}
           </button>
-          <button type="button" class="auth-tab" [class.is-active]="activeTab() === 'register'" (click)="setTab('register')">
+          <button type="button" class="min-h-[38px] border-0 rounded-[10px] bg-transparent text-[var(--text-muted)] text-[12px] font-[700] cursor-pointer transition-colors duration-150" [class.bg-[var(--card-bg)]]="activeTab() === 'register'" [class.text-[var(--brand)]]="activeTab() === 'register'" [class.shadow-[var(--shadow-sm)]]="activeTab() === 'register'" (click)="setTab('register')">
             {{ 'auth.register_tab' | translate }}
           </button>
-          <button type="button" class="auth-tab" [class.is-active]="activeTab() === 'forgot'" (click)="setTab('forgot')">
+          <button type="button" class="min-h-[38px] border-0 rounded-[10px] bg-transparent text-[var(--text-muted)] text-[12px] font-[700] cursor-pointer transition-colors duration-150" [class.bg-[var(--card-bg)]]="activeTab() === 'forgot'" [class.text-[var(--brand)]]="activeTab() === 'forgot'" [class.shadow-[var(--shadow-sm)]]="activeTab() === 'forgot'" (click)="setTab('forgot')">
             {{ 'auth.forgot_tab' | translate }}
           </button>
         </div>
 
         @if (activeTab() === 'login') {
         <div>
-          <div class="auth-card__heading">
+          <!-- auth-card__heading -->
+          <div class="mb-6">
             <span class="section-label"><i class="bi bi-box-arrow-in-right"></i>{{ 'auth.login_tab' | translate }}</span>
-            <h2>{{ 'auth.login_title' | translate }}</h2>
+            <h2 class="mt-[5px] mb-0 text-[var(--card-text-default)] text-[28px] leading-[1.2] tracking-[-0.04em]">{{ 'auth.login_title' | translate }}</h2>
           </div>
           <form (submit)="onLogin($event)" class="grid gap-4">
             <app-input type="text" [placeholder]="ts.translate('auth.email_placeholder')" icon="bi bi-person-badge" [required]="true" [value]="loginIdentifier()" (valueChange)="loginIdentifier.set($event)"></app-input>
             <app-input type="password" [placeholder]="ts.translate('auth.password_placeholder')" icon="bi bi-lock" [required]="true" [value]="loginPassword()" (valueChange)="loginPassword.set($event)"></app-input>
             <div class="text-right">
-              <button type="button" class="text-xs font-semibold text-aquamarine-600 hover:underline" (click)="setTab('forgot')">{{ 'auth.forgot_tab' | translate }}?</button>
+              <button type="button" class="text-xs font-semibold text-[var(--brand)] hover:underline" (click)="setTab('forgot')">{{ 'auth.forgot_tab' | translate }}?</button>
             </div>
             <button type="submit" class="btn btn-primary w-full" [disabled]="isLoading()">
               @if (isLoading()) { <span class="h-4 w-4 animate-spin rounded-full border-2 border-current/30 border-t-current"></span> }
@@ -53,9 +64,10 @@
 
         @if (activeTab() === 'register') {
         <div>
-          <div class="auth-card__heading">
+          <!-- auth-card__heading -->
+          <div class="mb-6">
             <span class="section-label"><i class="bi bi-person-plus"></i>{{ 'auth.register_tab' | translate }}</span>
-            <h2>{{ 'auth.register_title' | translate }}</h2>
+            <h2 class="mt-[5px] mb-0 text-[var(--card-text-default)] text-[28px] leading-[1.2] tracking-[-0.04em]">{{ 'auth.register_title' | translate }}</h2>
           </div>
           <form (submit)="onRegister($event)" class="grid gap-4">
             <app-input type="text" [placeholder]="ts.translate('auth.username_placeholder')" icon="bi bi-person" [required]="true" [value]="registerUsername()" (valueChange)="registerUsername.set($event)"></app-input>
@@ -71,42 +83,44 @@
 
         @if (activeTab() === 'forgot') {
         <div>
-          <div class="auth-card__heading">
+          <!-- auth-card__heading -->
+          <div class="mb-6">
             <span class="section-label"><i class="bi bi-shield-lock"></i>{{ 'auth.forgot_tab' | translate }}</span>
-            <h2>{{ 'auth.forgot_title' | translate }}</h2>
+            <h2 class="mt-[5px] mb-0 text-[var(--card-text-default)] text-[28px] leading-[1.2] tracking-[-0.04em]">{{ 'auth.forgot_title' | translate }}</h2>
           </div>
 
-          <div class="auth-stepper">
-            <button type="button" class="auth-step" [class.is-active]="forgotStep() === 'request'" (click)="setForgotStep('request')">
-              <span>1</span>{{ 'auth.step_request' | translate }}
+          <!-- auth-stepper -->
+          <div class="grid grid-cols-2 gap-2 mb-[22px]">
+            <button type="button" class="min-h-[42px] flex items-center justify-center gap-2 border rounded-[11px] text-[11px] font-[700] cursor-pointer transition-colors duration-150" [class.border-[var(--border-color)]]="forgotStep() !== 'request'" [class.bg-[var(--card-bg)]]="forgotStep() !== 'request'" [class.text-[var(--text-muted)]]="forgotStep() !== 'request'" [class.border-[color-mix(in_srgb,var(--brand)_36%,var(--border-color))]]="forgotStep() === 'request'" [class.bg-[var(--brand-soft)]]="forgotStep() === 'request'" [class.text-[var(--brand)]]="forgotStep() === 'request'" (click)="setForgotStep('request')">
+              <span class="w-5 h-5 grid place-items-center rounded-full text-[10px]" [class.bg-[var(--card-bg-muted)]]="forgotStep() !== 'request'" [class.bg-[var(--brand)]]="forgotStep() === 'request'" [class.text-white]="forgotStep() === 'request'">1</span>{{ 'auth.step_request' | translate }}
             </button>
-            <button type="button" class="auth-step" [class.is-active]="forgotStep() === 'reset'" (click)="setForgotStep('reset')">
-              <span>2</span>{{ 'auth.step_reset' | translate }}
+            <button type="button" class="min-h-[42px] flex items-center justify-center gap-2 border rounded-[11px] text-[11px] font-[700] cursor-pointer transition-colors duration-150" [class.border-[var(--border-color)]]="forgotStep() !== 'reset'" [class.bg-[var(--card-bg)]]="forgotStep() !== 'reset'" [class.text-[var(--text-muted)]]="forgotStep() !== 'reset'" [class.border-[color-mix(in_srgb,var(--brand)_36%,var(--border-color))]]="forgotStep() === 'reset'" [class.bg-[var(--brand-soft)]]="forgotStep() === 'reset'" [class.text-[var(--brand)]]="forgotStep() === 'reset'" (click)="setForgotStep('reset')">
+              <span class="w-5 h-5 grid place-items-center rounded-full text-[10px]" [class.bg-[var(--card-bg-muted)]]="forgotStep() !== 'reset'" [class.bg-[var(--brand)]]="forgotStep() === 'reset'" [class.text-white]="forgotStep() === 'reset'">2</span>{{ 'auth.step_reset' | translate }}
             </button>
           </div>
 
           @if (forgotStep() === 'request') {
           <form (submit)="onForgotPassword($event)" class="grid gap-4">
-            <p class="text-sm text-aquamarine-600 dark:text-aquamarine-300">{{ 'auth.request_desc' | translate }}</p>
+            <p class="text-sm text-[var(--text-muted)]">{{ 'auth.request_desc' | translate }}</p>
             <app-input type="email" [placeholder]="ts.translate('auth.email_placeholder')" icon="bi bi-envelope" [required]="true" [value]="forgotEmail()" (valueChange)="forgotEmail.set($event)"></app-input>
             <button type="submit" class="btn btn-primary w-full" [disabled]="isLoading()">
               @if (isLoading()) { <span class="h-4 w-4 animate-spin rounded-full border-2 border-current/30 border-t-current"></span> }
               {{ 'auth.submit_forgot' | translate }}
             </button>
-            <button type="button" class="text-xs font-semibold text-aquamarine-600 hover:underline" (click)="setForgotStep('reset')">{{ 'auth.has_token_link' | translate }}</button>
+            <button type="button" class="text-xs font-semibold text-[var(--brand)] hover:underline" (click)="setForgotStep('reset')">{{ 'auth.has_token_link' | translate }}</button>
           </form>
           }
 
           @if (forgotStep() === 'reset') {
           <form (submit)="onResetPassword($event)" class="grid gap-4">
-            <p class="text-sm text-aquamarine-600 dark:text-aquamarine-300">{{ 'auth.reset_desc' | translate }}</p>
+            <p class="text-sm text-[var(--text-muted)]">{{ 'auth.reset_desc' | translate }}</p>
             <app-input type="text" [placeholder]="ts.translate('auth.token_placeholder')" icon="bi bi-key" [required]="true" [value]="resetToken()" (valueChange)="resetToken.set($event)"></app-input>
             <app-input type="password" [placeholder]="ts.translate('auth.new_password_placeholder')" icon="bi bi-shield-lock" [required]="true" [value]="resetPassword()" (valueChange)="resetPassword.set($event)"></app-input>
             <button type="submit" class="btn btn-primary w-full" [disabled]="isLoading()">
               @if (isLoading()) { <span class="h-4 w-4 animate-spin rounded-full border-2 border-current/30 border-t-current"></span> }
               {{ 'auth.submit_reset' | translate }}
             </button>
-            <button type="button" class="text-xs font-semibold text-aquamarine-600 hover:underline" (click)="setForgotStep('request')">{{ 'auth.resend_request_link' | translate }}</button>
+            <button type="button" class="text-xs font-semibold text-[var(--brand)] hover:underline" (click)="setForgotStep('request')">{{ 'auth.resend_request_link' | translate }}</button>
           </form>
           }
         </div>
@@ -115,3 +129,4 @@
     </section>
   </div>
 </main>
+

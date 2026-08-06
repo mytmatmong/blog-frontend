@@ -1,9 +1,14 @@
-<div class="sidebar-stack">
-  <section class="sidebar-card authors-card">
-    <div class="sidebar-card__header">
-      <h2 class="sidebar-card__title">{{ 'sidebar.top_authors' | translate }}</h2>
+<!-- sidebar-stack -->
+<div class="grid gap-[12px]">
+  <!-- authors-card -->
+  <section class="overflow-hidden border border-[var(--border-color)] rounded-[12px] bg-[var(--card-bg)] shadow-[var(--shadow-sm)]">
+    <!-- sidebar-card__header -->
+    <div class="flex items-center justify-between gap-[10px] pt-[15px] px-[15px] pb-[9px]">
+      <!-- sidebar-card__title -->
+      <h2 class="flex items-center gap-[7px] m-0 text-[var(--card-text-default)] text-[12px] font-[790] tracking-[-0.01em]">{{ 'sidebar.top_authors' | translate }}</h2>
     </div>
-    <div class="sidebar-card__body">
+    <!-- sidebar-card__body -->
+    <div class="pt-1 px-[9px] pb-[11px]">
       @if (isLoadingAuthors()) {
       <div class="space-y-3">
         <div class="h-14 rounded-xl skeleton"></div>
@@ -12,17 +17,22 @@
       </div>
       } @else if (topAuthors().length > 0) {
       @for (author of topAuthors().slice(0, 4); track author.id) {
-      <a [routerLink]="['/author', author.id]" class="author-row">
+      <!-- author-row -->
+      <a [routerLink]="['/author', author.id]" class="group flex items-center gap-[10px] p-[7px] rounded-[11px] transition-colors duration-150 hover:bg-[var(--card-bg-muted)]">
         @if (author.avatarUrl) {
         <img [src]="author.avatarUrl" [alt]="author.username" class="avatar-md object-cover" />
         } @else {
         <span class="avatar-md">{{ getAvatarInitial(author.username) }}</span>
         }
-        <span class="author-row__copy">
-          <span class="author-row__name">{{ author.username }}</span>
-          <span class="author-row__meta">{{ author.followerCount }} {{ 'author.followers' | translate }}</span>
+        <!-- author-row__copy -->
+        <span class="min-w-0 flex-1">
+          <!-- author-row__name -->
+          <span class="block overflow-hidden text-[var(--card-text-default)] text-[12px] font-[700] truncate">{{ author.username }}</span>
+          <!-- author-row__meta -->
+          <span class="block mt-[2px] text-[var(--text-faint)] text-[10px]">{{ author.followerCount }} {{ 'author.followers' | translate }}</span>
         </span>
-        <span class="author-row__button"><i class="bi bi-arrow-up-right"></i></span>
+        <!-- author-row__button -->
+        <span class="w-[26px] h-[26px] grid place-items-center shrink-0 rounded-[8px] bg-[var(--brand-soft)] text-[var(--brand)] group-hover:bg-[var(--brand)] group-hover:text-white text-[11px] font-[800] transition-colors duration-150"><i class="bi bi-arrow-up-right"></i></span>
       </a>
       }
       } @else {
@@ -31,11 +41,15 @@
     </div>
   </section>
 
-  <section class="sidebar-card trending-card">
-    <div class="sidebar-card__header">
-      <h2 class="sidebar-card__title">{{ 'sidebar.trending_posts' | translate }}</h2>
+  <!-- trending-card -->
+  <section class="overflow-hidden border border-[var(--border-color)] rounded-[12px] bg-[var(--card-bg)] shadow-[var(--shadow-sm)]">
+    <!-- sidebar-card__header -->
+    <div class="flex items-center justify-between gap-[10px] pt-[15px] px-[15px] pb-[9px]">
+      <!-- sidebar-card__title -->
+      <h2 class="flex items-center gap-[7px] m-0 text-[var(--card-text-default)] text-[12px] font-[790] tracking-[-0.01em]">{{ 'sidebar.trending_posts' | translate }}</h2>
     </div>
-    <div class="sidebar-card__body">
+    <!-- sidebar-card__body -->
+    <div class="pt-1 px-[9px] pb-[11px]">
       @if (isLoadingPosts()) {
       <div class="space-y-3">
         <div class="h-16 rounded-xl skeleton"></div>
@@ -44,17 +58,22 @@
       </div>
       } @else if (topPosts().length > 0) {
       @for (post of topPosts().slice(0, 4); track post.id) {
-      <a [routerLink]="['/post', post.id]" class="trending-row">
-        <span class="trending-row__media">
+      <!-- trending-row -->
+      <a [routerLink]="['/post', post.id]" class="flex items-center gap-[10px] p-[7px] rounded-[11px] transition-colors duration-150 hover:bg-[var(--card-bg-muted)]">
+        <!-- trending-row__media -->
+        <span class="relative w-[42px] h-[42px] grid place-items-center shrink-0 overflow-hidden rounded-[8px] bg-[var(--card-bg-muted)] text-[var(--brand)] text-[14px]">
           @if (post.thumbnailUrl) {
-          <img [src]="post.thumbnailUrl" [alt]="post.title" loading="lazy" />
+          <img [src]="post.thumbnailUrl" [alt]="post.title" loading="lazy" class="w-full h-full object-cover" />
           } @else {
           <i class="bi bi-journal-code"></i>
           }
         </span>
-        <span class="trending-row__copy">
-          <span class="trending-row__title">{{ post.title }}</span>
-          <span class="trending-row__meta">
+        <!-- trending-row__copy -->
+        <span class="min-w-0 flex-1">
+          <!-- trending-row__title -->
+          <span class="block overflow-hidden text-[var(--card-text-default)] text-[12px] font-[700] line-clamp-2 leading-[1.45] whitespace-normal">{{ post.title }}</span>
+          <!-- trending-row__meta -->
+          <span class="block mt-[2px] text-[var(--text-faint)] text-[10px]">
             {{ post.viewCount }} {{ 'post.views' | translate }}
           </span>
         </span>
@@ -65,4 +84,4 @@
       }
     </div>
   </section>
-</div>
+</div>

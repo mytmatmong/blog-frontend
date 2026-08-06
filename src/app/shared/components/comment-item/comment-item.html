@@ -1,6 +1,9 @@
-<div class="comment-item">
-  <div class="comment-item__inner">
-    <div class="comment-item__author">
+<!-- comment-item -->
+<div class="mb-4 pb-4 border-b border-[var(--border-color)]">
+  <!-- comment-item__inner -->
+  <div class="border-l-2 border-[var(--brand)] pl-4 space-y-1">
+    <!-- comment-item__author -->
+    <div class="flex items-center gap-2">
       @if (comment.user.avatarUrl) {
         <img [src]="comment.user.avatarUrl" [alt]="comment.user.username" class="w-7 h-7 rounded-full object-cover" />
       } @else {
@@ -8,16 +11,20 @@
           {{ getAvatarInitial(comment.user.username) }}
         </span>
       }
-      <div class="comment-item__username">
+      <!-- comment-item__username -->
+      <div class="font-semibold text-sm text-[var(--card-text-default)]">
         {{ comment.user.username || ('profile.default_user' | translate) }}
       </div>
-      <span class="comment-item__date">• {{ formatDate(comment.createdAt) }}</span>
+      <!-- comment-item__date -->
+      <span class="text-xs text-[var(--text-faint)]">• {{ formatDate(comment.createdAt) }}</span>
     </div>
 
-    <p class="comment-item__content">{{ comment.content }}</p>
+    <!-- comment-item__content -->
+    <p class="text-sm text-[var(--card-text-default)] pt-1 whitespace-pre-line">{{ comment.content }}</p>
 
     @if (isAuthenticated) {
-      <div class="comment-item__actions">
+      <!-- comment-item__actions -->
+      <div class="flex flex-wrap gap-3 pt-1 text-xs">
         <button type="button" class="text-[var(--brand)] hover:underline cursor-pointer" (click)="replyRequested.emit(rootTarget())">
           {{ 'comments.reply' | translate }}
         </button>
@@ -31,7 +38,8 @@
     }
 
     @if (comment.replies.length > 0) {
-      <div class="comment-item__replies">
+      <!-- comment-item__replies -->
+      <div class="mt-3 space-y-3 pl-4 border-l border-[var(--border-color)]">
         @for (reply of comment.replies; track reply.id) {
           <div class="space-y-1">
             <div class="flex items-center gap-2">
@@ -40,14 +48,18 @@
               } @else {
                 <span class="w-6 h-6 rounded-full bg-[var(--brand)] text-white font-bold flex items-center justify-center text-[10px]">{{ getAvatarInitial(reply.user.username) }}</span>
               }
-              <div class="reply-item__username">{{ reply.user.username || ('profile.default_user' | translate) }}</div>
-              <span class="reply-item__date">• {{ formatDate(reply.createdAt) }}</span>
+              <!-- reply-item__username -->
+              <div class="font-semibold text-xs text-[var(--card-text-default)]">{{ reply.user.username || ('profile.default_user' | translate) }}</div>
+              <!-- reply-item__date -->
+              <span class="text-[10px] text-[var(--text-faint)]">• {{ formatDate(reply.createdAt) }}</span>
             </div>
 
-            <p class="reply-item__content">{{ reply.content }}</p>
+            <!-- reply-item__content -->
+            <p class="text-xs text-[var(--text-muted)] whitespace-pre-line">{{ reply.content }}</p>
 
             @if (isAuthenticated) {
-              <div class="reply-item__actions">
+              <!-- reply-item__actions -->
+              <div class="flex flex-wrap gap-3 text-[11px]">
                 <button type="button" class="text-[var(--brand)] hover:underline cursor-pointer" (click)="replyRequested.emit(replyTarget(reply))">{{ 'comments.reply' | translate }}</button>
                 @if (isOwner(reply.userId)) {
                   <button type="button" class="text-[var(--brand)] hover:underline cursor-pointer" (click)="editRequested.emit(replyTarget(reply))">{{ 'comments.edit' | translate }}</button>
@@ -63,3 +75,4 @@
     }
   </div>
 </div>
+

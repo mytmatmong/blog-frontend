@@ -1,19 +1,25 @@
-<main class="page-shell profile-page">
+<!-- profile-page -->
+<main class="page-shell pt-5 pb-[44px] max-[700px]:pt-3 max-[700px]:pb-[28px]">
   @if (isLoading()) {
-  <div class="profile-layout" aria-busy="true">
-    <aside class="profile-sidebar">
-      <section class="profile-card profile-summary-skeleton">
+  <!-- profile-layout -->
+  <div class="w-full max-w-[1240px] grid grid-cols-[310px_minmax(0,1fr)] items-start gap-[22px] mx-auto max-[980px]:grid-cols-1" aria-busy="true">
+    <!-- profile-sidebar -->
+    <aside class="sticky top-[86px] grid gap-4 self-start max-[980px]:static max-[980px]:grid-cols-[minmax(0,300px)_minmax(0,1fr)] max-[700px]:grid-cols-1">
+      <!-- profile-card profile-summary-skeleton -->
+      <section class="border border-[var(--border-color)] rounded-[16px] bg-[var(--card-bg)] shadow-[var(--shadow-sm)] min-h-[290px] grid place-items-center content-center gap-[14px]">
         <div class="h-24 w-24 rounded-full skeleton"></div>
         <div class="h-6 w-36 rounded skeleton"></div>
         <div class="h-4 w-48 rounded skeleton"></div>
         <div class="h-8 w-28 rounded-full skeleton"></div>
       </section>
 
-      <section class="profile-card followers-skeleton">
+      <!-- profile-card followers-skeleton -->
+      <section class="border border-[var(--border-color)] rounded-[16px] bg-[var(--card-bg)] shadow-[var(--shadow-sm)] grid gap-[13px] p-[18px]">
         <div class="h-5 w-44 rounded skeleton"></div>
 
         @for (item of [1, 2, 3, 4]; track item) {
-        <div class="follower-skeleton-row">
+        <!-- follower-skeleton-row -->
+        <div class="flex items-center gap-[10px]">
           <div class="h-9 w-9 rounded-full skeleton"></div>
 
           <div class="flex-1 space-y-2">
@@ -25,55 +31,63 @@
       </section>
     </aside>
 
-    <section class="profile-content">
-      <div class="profile-card h-96 skeleton"></div>
-      <div class="profile-card h-80 skeleton"></div>
+    <!-- profile-content -->
+    <section class="min-w-0 grid gap-5">
+      <div class="border border-[var(--border-color)] rounded-[16px] bg-[var(--card-bg)] shadow-[var(--shadow-sm)] h-96 skeleton"></div>
+      <div class="border border-[var(--border-color)] rounded-[16px] bg-[var(--card-bg)] shadow-[var(--shadow-sm)] h-80 skeleton"></div>
     </section>
   </div>
   }
 
   @else if (user(); as currentUser) {
-  <div class="profile-layout">
-    <!-- Cột trái -->
-    <aside class="profile-sidebar">
-      <!-- Hồ sơ tóm tắt -->
-      <section class="profile-card profile-summary-card">
-        <div class="profile-avatar-wrap">
+  <!-- profile-layout -->
+  <div class="w-full max-w-[1240px] grid grid-cols-[310px_minmax(0,1fr)] items-start gap-[22px] mx-auto max-[980px]:grid-cols-1">
+    <!-- profile-sidebar -->
+    <aside class="sticky top-[86px] grid gap-4 self-start max-[980px]:static max-[980px]:grid-cols-[minmax(0,300px)_minmax(0,1fr)] max-[700px]:grid-cols-1">
+      <!-- profile-card profile-summary-card -->
+      <section class="border border-[var(--border-color)] rounded-[16px] bg-[var(--card-bg)] shadow-[var(--shadow-sm)] p-[24px_20px] overflow-hidden bg-[radial-gradient(circle_at_50%_-10%,color-mix(in_srgb,var(--brand)_13%,transparent),transparent_175px),var(--card-bg)] text-center">
+        <!-- profile-avatar-wrap -->
+        <div class="relative w-[94px] h-[94px] mx-auto">
           @if (avatarPreview() || currentUser.avatarUrl) {
-          <img [src]="avatarPreview() || currentUser.avatarUrl" [alt]="currentUser.username" class="profile-avatar" />
+          <!-- profile-avatar -->
+          <img [src]="avatarPreview() || currentUser.avatarUrl" [alt]="currentUser.username" class="w-[94px] h-[94px] grid place-items-center border-4 border-[var(--card-bg)] rounded-full bg-[var(--brand)] text-white object-cover shadow-[0_0_0_2px_var(--brand),0_10px_24px_color-mix(in_srgb,var(--brand)_18%,transparent)]" />
           } @else {
-          <span class="profile-avatar profile-avatar--initial">
+          <!-- profile-avatar profile-avatar--initial -->
+          <span class="w-[94px] h-[94px] grid place-items-center border-4 border-[var(--card-bg)] rounded-full bg-[var(--brand)] text-white text-[27px] font-[850] shadow-[0_0_0_2px_var(--brand),0_10px_24px_color-mix(in_srgb,var(--brand)_18%,transparent)]">
             {{ getAvatarInitial(currentUser.username) }}
           </span>
           }
 
-          <span class="profile-online-dot" aria-hidden="true">
+          <!-- profile-online-dot -->
+          <span class="absolute right-[3px] bottom-[7px] w-4 h-4 border-3 border-[var(--card-bg)] rounded-full bg-[#22c55e]" aria-hidden="true">
           </span>
         </div>
 
-        <h1>{{ currentUser.username }}</h1>
+        <h1 class="mt-[17px] mb-0 text-[var(--card-text-default)] text-[22px] font-[850] leading-[1.25] tracking-[-0.035em]">{{ currentUser.username }}</h1>
 
-        <p class="profile-summary-email">
+        <!-- profile-summary-email -->
+        <p class="mt-1 overflow-hidden text-[var(--text-muted)] text-[13px] truncate">
           {{ currentUser.email }}
         </p>
 
-        <span class="profile-status">
-          <span class="profile-status__dot"></span>
+        <!-- profile-status -->
+        <span class="min-h-[27px] inline-flex items-center gap-[6px] mt-[10px] px-[9px] py-[5px] border border-[var(--border-color)] rounded-full bg-[var(--card-bg-muted)] text-[var(--text-muted)] text-[11.5px] font-[800] tracking-[0.035em] uppercase">
+          <!-- profile-status__dot -->
+          <span class="w-[6px] h-[6px] rounded-full bg-[#22c55e]"></span>
 
           {{ currentUser.role }}
           <span aria-hidden="true">·</span>
           {{ currentUser.status }}
         </span>
 
-        <p class="profile-summary-bio">
-          {{
-          currentUser.bio ||
-          ('profile.no_bio' | translate)
-          }}
+        <!-- profile-summary-bio -->
+        <p class="mt-[17px] mx-auto mb-0 text-[var(--text-muted)] text-[13.5px] leading-[1.6]">
+          {{ currentUser.bio || ('profile.no_bio' | translate) }}
         </p>
 
-        <div class="profile-summary-joined">
-          <i class="bi bi-calendar-check"></i>
+        <!-- profile-summary-joined -->
+        <div class="flex items-center justify-center gap-[7px] mt-[14px] pt-[14px] border-t border-[var(--border-color)] text-[var(--text-faint)] text-[12px]">
+          <i class="bi bi-calendar-check text-[var(--brand)]"></i>
 
           <span>
             {{ 'author.joined' | translate }}:
@@ -82,70 +96,74 @@
         </div>
       </section>
 
-      <!-- Follower gần đây -->
-      <section class="profile-card followers-card">
-        <header class="followers-card__header">
+      <!-- profile-card followers-card -->
+      <section class="border border-[var(--border-color)] rounded-[16px] bg-[var(--card-bg)] shadow-[var(--shadow-sm)] overflow-hidden">
+        <!-- followers-card__header -->
+        <header class="flex items-center justify-between gap-3 p-[17px_17px_12px]">
           <div>
-            <span class="profile-section-label">
+            <!-- profile-section-label -->
+            <span class="inline-flex items-center gap-[6px] text-[var(--brand)] text-[11px] font-[800] tracking-[0.075em] uppercase">
               <i class="bi bi-people"></i>
               {{ 'connections.followers' | translate }}
             </span>
 
-            <h2>
+            <h2 class="mt-1 mb-0 text-[var(--card-text-default)] text-[15px] font-[820] tracking-[-0.02em]">
               {{ 'profile.followers' | translate }}
             </h2>
           </div>
 
-          <span class="followers-count">
+          <!-- followers-count -->
+          <span class="min-w-[29px] h-[27px] grid place-items-center px-[7px] rounded-[8px] bg-[var(--brand-soft)] text-[var(--brand)] text-[12px] font-[800]">
             {{ currentUser.followers?.length || 0 }}
           </span>
         </header>
 
         @if (currentUser.followers?.length) {
-        <div class="followers-list">
-          @for (
-          follower of (currentUser.followers || []).slice(0, 6);
-          track follower.id
-          ) {
-          <div class="follower-item">
+        <!-- followers-list -->
+        <div class="grid gap-[2px] p-[0_9px_9px]">
+          @for (follower of (currentUser.followers || []).slice(0, 6); track follower.id) {
+          <!-- follower-item -->
+          <div class="min-w-0 flex items-center gap-[10px] p-2 rounded-[10px] transition-colors duration-150 hover:bg-[var(--card-bg-muted)]">
             @if (follower.avatarUrl) {
-            <img [src]="follower.avatarUrl" [alt]="follower.username" class="follower-avatar" />
+            <!-- follower-avatar -->
+            <img [src]="follower.avatarUrl" [alt]="follower.username" class="w-[37px] h-[37px] grid place-items-center shrink-0 rounded-full bg-[var(--brand)] text-white object-cover" />
             } @else {
-            <span class="follower-avatar follower-avatar--initial">
+            <!-- follower-avatar follower-avatar--initial -->
+            <span class="w-[37px] h-[37px] grid place-items-center shrink-0 rounded-full bg-[var(--brand)] text-white text-[12px] font-[800]">
               {{ getAvatarInitial(follower.username) }}
             </span>
             }
 
-            <div class="follower-copy">
-              <strong>
+            <!-- follower-copy -->
+            <div class="min-w-0 flex-1">
+              <strong class="block overflow-hidden truncate text-[var(--card-text-default)] text-[13px] font-[800]">
                 {{ follower.username }}
               </strong>
 
-              <small>
-                {{
-                follower.bio ||
-                ('profile.no_bio' | translate)
-                }}
+              <small class="block overflow-hidden truncate mt-[3px] text-[var(--text-muted)] text-[11.5px]">
+                {{ follower.bio || ('profile.no_bio' | translate) }}
               </small>
             </div>
           </div>
           }
         </div>
 
-        <a href="/connections" class="followers-view-all">
+        <!-- followers-view-all -->
+        <a href="/connections" class="group min-h-[41px] flex items-center justify-center gap-[7px] border-t border-[var(--border-color)] text-[var(--brand)] text-[12.5px] font-[750]">
           <span>
             {{ 'connections.followers' | translate }}
           </span>
 
-          <i class="bi bi-arrow-right"></i>
+          <i class="bi bi-arrow-right transition-transform duration-150 group-hover:translate-x-[3px]"></i>
         </a>
         } @else {
-        <div class="followers-empty">
-          <span>
+        <!-- followers-empty -->
+        <div class="min-h-[135px] grid place-items-center content-center gap-[9px] p-[18px] text-[var(--text-faint)] text-center">
+          <span class="w-[39px] h-[39px] grid place-items-center rounded-[11px] bg-[var(--brand-soft)] text-[var(--brand)]">
             <i class="bi bi-person-plus"></i>
           </span>
 
-          <p>
+          <p class="m-0 text-[12.5px]">
             {{ 'connections.empty' | translate }}
           </p>
         </div>
@@ -153,160 +171,140 @@
       </section>
     </aside>
 
-    <!-- Cột nội dung -->
-    <section class="profile-content">
-      <!-- Thông tin cá nhân -->
-      <form class="profile-card profile-form-card" (submit)="saveProfile($event)">
-
-        <header class="profile-card-header">
-          <div class="profile-card-heading">
-            <span class="profile-card-heading__icon">
+    <!-- profile-content -->
+    <section class="min-w-0 grid gap-5">
+      <!-- profile-card profile-form-card -->
+      <form class="border border-[var(--border-color)] rounded-[16px] bg-[var(--card-bg)] shadow-[var(--shadow-sm)] overflow-hidden" (submit)="saveProfile($event)">
+        <!-- profile-card-header -->
+        <header class="p-[22px_23px_17px] border-b border-[var(--border-color)] max-[700px]:px-4">
+          <!-- profile-card-heading -->
+          <div class="flex items-center gap-3">
+            <!-- profile-card-heading__icon -->
+            <span class="w-[39px] h-[39px] grid place-items-center shrink-0 rounded-[11px] bg-[var(--brand-soft)] text-[var(--brand)] text-[16px]">
               <i class="bi bi-person"></i>
             </span>
 
             <div>
-              <h2>
+              <h2 class="m-0 text-[var(--card-text-default)] text-[18px] font-[830] tracking-[-0.025em]">
                 {{ 'profile.personal_info' | translate }}
               </h2>
 
-              <p>
+              <p class="mt-1 mb-0 text-[var(--text-muted)] text-[12.5px]">
                 {{ 'profile.edit_hint' | translate }}
               </p>
             </div>
           </div>
         </header>
 
-        <div class="profile-form-body">
-          <div class="profile-form-grid">
-            <div class="profile-field">
-              <label for="profile-username">
+        <!-- profile-form-body -->
+        <div class="p-[20px_23px_22px] max-[700px]:px-4">
+          <!-- profile-form-grid -->
+          <div class="grid grid-cols-2 gap-[17px] max-[700px]:grid-cols-1">
+            <!-- profile-field -->
+            <div class="relative min-w-0 grid gap-[7px]">
+              <label for="profile-username" class="text-[var(--card-text-default)] text-[13px] font-[750]">
                 {{ 'profile.username_label' | translate }}
               </label>
 
-              <div class="profile-readonly-input">
-                <i class="bi bi-person"></i>
+              <!-- profile-readonly-input -->
+              <div class="relative">
+                <i class="bi bi-person absolute top-1/2 left-[13px] -translate-y-1/2 text-[var(--text-faint)] pointer-events-none"></i>
 
-                <input id="profile-username" type="text" [value]="currentUser.username" readonly />
+                <input id="profile-username" type="text" [value]="currentUser.username" readonly class="w-full min-h-[44px] pl-[38px] pr-[40px] py-[10px] border border-[var(--border-color)] rounded-[11px] bg-[var(--card-bg-muted)] text-[var(--text-muted)] text-[13.5px] outline-none cursor-not-allowed" />
 
-                <span>
+                <span class="absolute top-1/2 right-[12px] -translate-y-1/2 text-[var(--text-faint)] text-[11.5px]">
                   <i class="bi bi-lock"></i>
                 </span>
               </div>
             </div>
 
-            <div class="profile-field">
-              <label for="profile-email">
+            <!-- profile-field -->
+            <div class="relative min-w-0 grid gap-[7px]">
+              <label for="profile-email" class="text-[var(--card-text-default)] text-[13px] font-[750]">
                 {{ 'table.email' | translate }}
               </label>
 
-              <div class="profile-readonly-input">
-                <i class="bi bi-envelope"></i>
+              <!-- profile-readonly-input -->
+              <div class="relative">
+                <i class="bi bi-envelope absolute top-1/2 left-[13px] -translate-y-1/2 text-[var(--text-faint)] pointer-events-none"></i>
 
-                <input id="profile-email" type="email" [value]="currentUser.email" readonly />
+                <input id="profile-email" type="email" [value]="currentUser.email" readonly class="w-full min-h-[44px] pl-[38px] pr-[40px] py-[10px] border border-[var(--border-color)] rounded-[11px] bg-[var(--card-bg-muted)] text-[var(--text-muted)] text-[13.5px] outline-none cursor-not-allowed" />
 
-                <span>
+                <span class="absolute top-1/2 right-[12px] -translate-y-1/2 text-[var(--text-faint)] text-[11.5px]">
                   <i class="bi bi-lock"></i>
                 </span>
               </div>
             </div>
 
-            <div class="profile-field profile-field--full">
-              <label for="profile-bio">
+            <!-- profile-field profile-field--full -->
+            <div class="relative min-w-0 grid gap-[7px] col-span-full">
+              <label for="profile-bio" class="text-[var(--card-text-default)] text-[13px] font-[750]">
                 {{ 'profile.bio_label' | translate }}
               </label>
 
-              <textarea id="profile-bio" [(ngModel)]="bio" name="bio" rows="4" maxlength="500" class="profile-textarea">
-                </textarea>
+              <!-- profile-textarea -->
+              <textarea id="profile-bio" [(ngModel)]="bio" name="bio" rows="4" maxlength="500" class="w-full min-h-[112px] p-3 resize-y leading-[1.65] border border-[var(--border-color)] rounded-[11px] bg-[var(--card-bg)] text-[var(--card-text-default)] text-[13.5px] outline-none transition-all duration-150 focus:border-[var(--brand)] focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--brand)_11%,transparent)]"></textarea>
 
-              <small class="profile-field-hint">
+              <!-- profile-field-hint -->
+              <small class="justify-self-end text-[var(--text-faint)] text-[11.5px]">
                 {{ bio.length }}/500
               </small>
             </div>
 
-            <!-- Avatar -->
-            <div class="profile-field profile-field--full">
-              <label>
+            <!-- profile-field profile-field--full -->
+            <div class="relative min-w-0 grid gap-[7px] col-span-full">
+              <label class="text-[var(--card-text-default)] text-[13px] font-[750]">
                 {{ 'profile.avatar' | translate }}
               </label>
 
-              <div class="profile-avatar-upload">
-                <div class="profile-avatar-upload__preview">
-                  @if (
-                  avatarPreview() ||
-                  currentUser.avatarUrl
-                  ) {
-                  <img [src]="
-                          avatarPreview() ||
-                          currentUser.avatarUrl
-                        " [alt]="currentUser.username" />
+              <!-- profile-avatar-upload -->
+              <div class="min-h-[100px] flex items-center gap-4 p-[14px] border border-dashed border-[color-mix(in_srgb,var(--brand)_30%,var(--border-color))] rounded-[13px] bg-[color-mix(in_srgb,var(--brand-soft)_24%,var(--card-bg))] max-[700px]:items-start max-[480px]:flex-col">
+                <!-- profile-avatar-upload__preview -->
+                <div class="w-[70px] h-[70px] grid place-items-center shrink-0 overflow-hidden border border-[var(--border-color)] rounded-[13px] bg-[var(--brand)] text-white shadow-[var(--shadow-sm)]">
+                  @if (avatarPreview() || currentUser.avatarUrl) {
+                  <img [src]="avatarPreview() || currentUser.avatarUrl" [alt]="currentUser.username" class="w-full h-full object-cover" />
                   } @else {
-                  <span>
-                    {{
-                    getAvatarInitial(
-                    currentUser.username
-                    )
-                    }}
+                  <span class="text-[20px] font-[850]">
+                    {{ getAvatarInitial(currentUser.username) }}
                   </span>
                   }
                 </div>
 
-                <div class="profile-avatar-upload__content">
+                <!-- profile-avatar-upload__content -->
+                <div class="min-w-0 flex-1">
                   @if (selectedAvatar) {
-                  <strong class="profile-avatar-upload__filename" [title]="selectedAvatar.name">
+                  <!-- profile-avatar-upload__filename -->
+                  <strong class="block text-[var(--card-text-default)] text-[13px] font-[800] overflow-hidden truncate" [title]="selectedAvatar.name">
                     {{ selectedAvatar.name }}
                   </strong>
 
-                  <small>
+                  <small class="block mt-[4px] text-[var(--text-muted)] text-[12px]">
                     {{ formatFileSize(selectedAvatar.size) }}
                   </small>
                   } @else {
-                  <strong>
-                    {{
-                    'profile.new_avatar_title'
-                    | translate
-                    }}
+                  <strong class="block text-[var(--card-text-default)] text-[13px] font-[800]">
+                    {{ 'profile.new_avatar_title' | translate }}
                   </strong>
 
-                  <small>
-                    {{
-                    'profile.avatar_limit_hint'
-                    | translate
-                    }}
+                  <small class="block mt-[4px] text-[var(--text-muted)] text-[12px]">
+                    {{ 'profile.avatar_limit_hint' | translate }}
                   </small>
                   }
 
-                  <div class="profile-avatar-upload__actions">
-                    <input #avatarInput type="file" accept="image/jpeg,image/png,image/webp" hidden
-                      (change)="onAvatarSelected($event)" />
+                  <!-- profile-avatar-upload__actions -->
+                  <div class="flex flex-wrap gap-2 mt-[11px] max-[480px]:w-full">
+                    <input #avatarInput type="file" accept="image/jpeg,image/png,image/webp" hidden (change)="onAvatarSelected($event)" />
 
-                    <button type="button" class="btn btn-primary" (click)="avatarInput.click()">
+                    <button type="button" class="btn btn-primary max-[480px]:w-full max-[480px]:justify-center" (click)="avatarInput.click()">
                       <i class="bi bi-image"></i>
-
-                      {{
-                      selectedAvatar
-                      ? (
-                      'profile.choose_other_avatar'
-                      | translate
-                      )
-                      : (
-                      'profile.choose_avatar'
-                      | translate
-                      )
-                      }}
+                      {{ selectedAvatar ? ('profile.choose_other_avatar' | translate) : ('profile.choose_avatar' | translate) }}
                     </button>
 
                     @if (selectedAvatar) {
-                    <button type="button" class="btn profile-remove-avatar" (click)="
-                            clearAvatarSelection(
-                              avatarInput
-                            )
-                          ">
+                    <!-- profile-remove-avatar -->
+                    <button type="button" class="btn border border-[color-mix(in_srgb,var(--danger,#dc2626)_25%,var(--border-color))] bg-transparent text-[var(--danger,#dc2626)] transition-colors duration-150 hover:bg-[color-mix(in_srgb,var(--danger,#dc2626)_7%,transparent)] max-[480px]:w-full max-[480px]:justify-center" (click)="clearAvatarSelection(avatarInput)">
                       <i class="bi bi-x-lg"></i>
-
-                      {{
-                      'profile.deselect_avatar'
-                      | translate
-                      }}
+                      {{ 'profile.deselect_avatar' | translate }}
                     </button>
                     }
                   </div>
@@ -316,38 +314,26 @@
           </div>
         </div>
 
-        <footer class="profile-form-footer">
+        <!-- profile-form-footer -->
+        <footer class="flex items-center justify-end gap-[9px] p-[15px_23px] border-t border-[var(--border-color)] bg-[var(--card-bg-muted)] max-[700px]:items-stretch max-[700px]:flex-col-reverse max-[700px]:px-4">
           @if (selectedAvatar) {
-          <button type="button" class="btn btn-secondary" [disabled]="
-                  isUploadingAvatar() ||
-                  isSaving()
-                " (click)="uploadAvatarOnly()">
-
+          <button type="button" class="btn btn-secondary max-[700px]:w-full max-[700px]:justify-center" [disabled]="isUploadingAvatar() || isSaving()" (click)="uploadAvatarOnly()">
             @if (isUploadingAvatar()) {
-            <span class="button-spinner"></span>
-
-            {{
-            'profile.uploading_avatar'
-            | translate
-            }}
+            <!-- button-spinner -->
+            <span class="w-[14px] h-[14px] inline-block shrink-0 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
+            {{ 'profile.uploading_avatar' | translate }}
             } @else {
             <i class="bi bi-cloud-arrow-up"></i>
-
-            {{
-            'profile.update_avatar_only'
-            | translate
-            }}
+            {{ 'profile.update_avatar_only' | translate }}
             }
           </button>
           }
 
-          <button type="submit" class="btn btn-primary profile-save-button" [disabled]="
-                isSaving() ||
-                isUploadingAvatar()
-              ">
-
+          <!-- profile-save-button -->
+          <button type="submit" class="btn btn-primary min-w-[136px] max-[700px]:w-full max-[700px]:justify-center" [disabled]="isSaving() || isUploadingAvatar()">
             @if (isSaving()) {
-            <span class="button-spinner"></span>
+            <!-- button-spinner -->
+            <span class="w-[14px] h-[14px] inline-block shrink-0 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
             {{ 'common.saving' | translate }}
             } @else {
             <i class="bi bi-check-lg"></i>
@@ -357,220 +343,176 @@
         </footer>
       </form>
 
-      <!-- Bảo mật -->
-      <section class="profile-card security-card">
-        <header class="profile-card-header">
-          <div class="profile-card-heading">
-            <span class="profile-card-heading__icon">
+      <!-- profile-card security-card -->
+      <section class="border border-[var(--border-color)] rounded-[16px] bg-[var(--card-bg)] shadow-[var(--shadow-sm)] overflow-hidden">
+        <!-- profile-card-header -->
+        <header class="p-[22px_23px_17px] border-b border-[var(--border-color)] max-[700px]:px-4">
+          <!-- profile-card-heading -->
+          <div class="flex items-center gap-3">
+            <!-- profile-card-heading__icon -->
+            <span class="w-[39px] h-[39px] grid place-items-center shrink-0 rounded-[11px] bg-[var(--brand-soft)] text-[var(--brand)] text-[16px]">
               <i class="bi bi-shield-lock"></i>
             </span>
 
             <div>
-              <h2>
+              <h2 class="m-0 text-[var(--card-text-default)] text-[18px] font-[830] tracking-[-0.025em]">
                 {{ 'profile.security' | translate }}
               </h2>
 
-              <p>
+              <p class="mt-1 mb-0 text-[var(--text-muted)] text-[12.5px]">
                 {{ 'profile.security_desc' | translate }}
               </p>
             </div>
           </div>
         </header>
 
-        <!-- Mật khẩu -->
-        <div class="security-row security-row--expandable">
-          <div class="security-row__main">
-            <span class="security-row__icon">
+        <!-- security-row -->
+        <div class="flex items-center justify-between gap-[22px] p-[19px_23px] border-b border-[var(--border-color)] max-[700px]:items-start max-[700px]:flex-col max-[700px]:px-4">
+          <!-- security-row__main -->
+          <div class="min-w-0 flex items-center gap-3">
+            <!-- security-row__icon -->
+            <span class="w-[36px] h-[36px] grid place-items-center shrink-0 rounded-[10px] bg-[var(--card-bg-muted)] text-[var(--text-muted)] text-[14px]">
               <i class="bi bi-key"></i>
             </span>
 
-            <div class="security-row__copy">
-              <h3>
+            <!-- security-row__copy -->
+            <div class="min-w-0">
+              <h3 class="m-0 text-[var(--card-text-default)] text-[14px] font-[800]">
                 {{ 'profile.login_password' | translate }}
               </h3>
 
-              <p>
+              <p class="max-w-[590px] mt-1 mb-0 text-[var(--text-muted)] text-[12px] leading-[1.5]">
                 {{ 'profile.password_advice' | translate }}
               </p>
             </div>
           </div>
 
-          <button type="button" class="btn btn-secondary" (click)="togglePasswordForm()">
-
-            <i class="bi" [class.bi-key]="!showPasswordForm()" [class.bi-x-lg]="showPasswordForm()">
-            </i>
-
-            {{
-            showPasswordForm()
-            ? ('modal.close' | translate)
-            : ('profile.change_password' | translate)
-            }}
+          <button type="button" class="btn btn-secondary max-[700px]:w-full max-[700px]:justify-center" (click)="togglePasswordForm()">
+            <i class="bi" [class.bi-key]="!showPasswordForm()" [class.bi-x-lg]="showPasswordForm()"></i>
+            {{ showPasswordForm() ? ('modal.close' | translate) : ('profile.change_password' | translate) }}
           </button>
         </div>
 
         @if (showPasswordForm()) {
-        <form class="password-form" (submit)="changePassword($event)">
-
-          <div class="password-form-grid">
-            <div class="profile-field">
-              <label for="new-password">
+        <!-- password-form -->
+        <form class="m-[0_23px_20px] p-[17px] border border-[var(--border-color)] rounded-[13px] bg-[var(--card-bg-muted)] max-[700px]:mx-4" (submit)="changePassword($event)">
+          <!-- password-form-grid -->
+          <div class="grid grid-cols-2 gap-[15px] max-[700px]:grid-cols-1">
+            <!-- profile-field -->
+            <div class="relative min-w-0 grid gap-[7px]">
+              <label for="new-password" class="text-[var(--card-text-default)] text-[13px] font-[750]">
                 {{ 'profile.new_password' | translate }}
               </label>
 
-              <div class="password-input">
-                <input id="new-password" [(ngModel)]="newPassword" name="newPassword" [type]="
-                        showPassword()
-                          ? 'text'
-                          : 'password'
-                      " minlength="6" autocomplete="new-password" required [placeholder]="
-                        'profile.new_password_placeholder'
-                        | translate
-                      " />
+              <!-- password-input -->
+              <div class="relative">
+                <input id="new-password" [(ngModel)]="newPassword" name="newPassword" [type]="showPassword() ? 'text' : 'password'" minlength="6" autocomplete="new-password" required [placeholder]="'profile.new_password_placeholder' | translate" class="w-full min-h-[44px] px-3 py-[10px] pr-[44px] border border-[var(--border-color)] rounded-[11px] bg-[var(--card-bg)] text-[var(--card-text-default)] text-[13.5px] outline-none transition-all duration-150 focus:border-[var(--brand)] focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--brand)_11%,transparent)]" />
 
-                <button type="button" (click)="
-                        showPassword.update(
-                          value => !value
-                        )
-                      " [attr.aria-label]="
-                        showPassword()
-                          ? (
-                            'profile.hide_password'
-                            | translate
-                          )
-                          : (
-                            'profile.show_password'
-                            | translate
-                          )
-                      ">
-                  <i class="bi" [class.bi-eye]="!showPassword()" [class.bi-eye-slash]="showPassword()">
-                  </i>
+                <button type="button" (click)="showPassword.update(value => !value)" [attr.aria-label]="showPassword() ? ('profile.hide_password' | translate) : ('profile.show_password' | translate)" class="absolute top-0 right-0 w-[43px] h-full grid place-items-center border-0 bg-transparent text-[var(--text-muted)] cursor-pointer transition-colors duration-150 hover:text-[var(--brand)]">
+                  <i class="bi" [class.bi-eye]="!showPassword()" [class.bi-eye-slash]="showPassword()"></i>
                 </button>
               </div>
 
-              <small class="profile-field-hint">
+              <!-- profile-field-hint -->
+              <small class="justify-self-end text-[var(--text-faint)] text-[11.5px]">
                 {{ 'profile.min_6_chars' | translate }}
               </small>
             </div>
 
-            <div class="profile-field">
-              <label for="confirm-password">
-                {{
-                'profile.confirm_new_password'
-                | translate
-                }}
+            <!-- profile-field -->
+            <div class="relative min-w-0 grid gap-[7px]">
+              <label for="confirm-password" class="text-[var(--card-text-default)] text-[13px] font-[750]">
+                {{ 'profile.confirm_new_password' | translate }}
               </label>
 
-              <input id="confirm-password" [(ngModel)]="confirmNewPassword" name="confirmNewPassword" [type]="
-                      showPassword()
-                        ? 'text'
-                        : 'password'
-                    " minlength="6" autocomplete="new-password" required [placeholder]="
-                      'profile.confirm_new_password_placeholder'
-                      | translate
-                    " class="profile-input" />
+              <!-- profile-input -->
+              <input id="confirm-password" [(ngModel)]="confirmNewPassword" name="confirmNewPassword" [type]="showPassword() ? 'text' : 'password'" minlength="6" autocomplete="new-password" required [placeholder]="'profile.confirm_new_password_placeholder' | translate" class="w-full min-h-[44px] px-3 py-[10px] border border-[var(--border-color)] rounded-[11px] bg-[var(--card-bg)] text-[var(--card-text-default)] text-[13.5px] outline-none transition-all duration-150 focus:border-[var(--brand)] focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--brand)_11%,transparent)]" />
 
-              @if (
-              confirmNewPassword &&
-              newPassword !== confirmNewPassword
-              ) {
-              <small class="profile-field-error">
-                {{
-                'profile.passwords_do_not_match'
-                | translate
-                }}
+              @if (confirmNewPassword && newPassword !== confirmNewPassword) {
+              <!-- profile-field-error -->
+              <small class="text-[var(--danger,#dc2626)] text-[12px]">
+                {{ 'profile.passwords_do_not_match' | translate }}
               </small>
               }
             </div>
           </div>
 
-          <div class="password-form-actions">
-            <button type="button" class="btn btn-secondary" (click)="cancelPasswordChange()">
+          <!-- password-form-actions -->
+          <div class="flex justify-end gap-[9px] mt-4 max-[480px]:items-stretch max-[480px]:flex-col-reverse">
+            <button type="button" class="btn btn-secondary max-[480px]:w-full max-[480px]:justify-center" (click)="cancelPasswordChange()">
               {{ 'modal.cancel' | translate }}
             </button>
 
-            <button type="submit" class="btn btn-primary" [disabled]="
-                    isChangingPassword() ||
-                    newPassword.length < 6 ||
-                    newPassword !== confirmNewPassword
-                  ">
-
+            <button type="submit" class="btn btn-primary max-[480px]:w-full max-[480px]:justify-center" [disabled]="isChangingPassword() || newPassword.length < 6 || newPassword !== confirmNewPassword">
               @if (isChangingPassword()) {
-              <span class="button-spinner"></span>
-
-              {{
-              'profile.updating_password'
-              | translate
-              }}
+              <!-- button-spinner -->
+              <span class="w-[14px] h-[14px] inline-block shrink-0 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
+              {{ 'profile.updating_password' | translate }}
               } @else {
               <i class="bi bi-check-lg"></i>
-
-              {{
-              'profile.update_password_btn'
-              | translate
-              }}
+              {{ 'profile.update_password_btn' | translate }}
               }
             </button>
           </div>
         </form>
         }
 
-        <!-- Phiên đăng nhập -->
-        <div class="security-row">
-          <div class="security-row__main">
-            <span class="security-row__icon">
+        <!-- security-row -->
+        <div class="flex items-center justify-between gap-[22px] p-[19px_23px] border-b border-[var(--border-color)] max-[700px]:items-start max-[700px]:flex-col max-[700px]:px-4">
+          <!-- security-row__main -->
+          <div class="min-w-0 flex items-center gap-3">
+            <!-- security-row__icon -->
+            <span class="w-[36px] h-[36px] grid place-items-center shrink-0 rounded-[10px] bg-[var(--card-bg-muted)] text-[var(--text-muted)] text-[14px]">
               <i class="bi bi-display"></i>
             </span>
 
-            <div class="security-row__copy">
-              <h3>
+            <!-- security-row__copy -->
+            <div class="min-w-0">
+              <h3 class="m-0 text-[var(--card-text-default)] text-[14px] font-[800]">
                 {{ 'profile.login_sessions' | translate }}
               </h3>
 
-              <p>
-                {{
-                'profile.login_sessions_desc'
-                | translate
-                }}
+              <p class="max-w-[590px] mt-1 mb-0 text-[var(--text-muted)] text-[12px] leading-[1.5]">
+                {{ 'profile.login_sessions_desc' | translate }}
               </p>
             </div>
           </div>
 
-          <button type="button" class="btn btn-secondary" (click)="logoutAll()">
+          <button type="button" class="btn btn-secondary max-[700px]:w-full max-[700px]:justify-center" (click)="logoutAll()">
             <i class="bi bi-box-arrow-right"></i>
-
             {{ 'profile.logout_all' | translate }}
           </button>
         </div>
 
-        <!-- Xóa tài khoản -->
-        <div class="security-row security-row--danger">
-          <div class="security-row__main">
-            <span class="security-row__icon">
+        <!-- security-row security-row--danger -->
+        <div class="flex items-center justify-between gap-[22px] p-[19px_23px] max-[700px]:items-start max-[700px]:flex-col max-[700px]:px-4 bg-[color-mix(in_srgb,var(--danger,#dc2626)_5%,var(--card-bg))]">
+          <!-- security-row__main -->
+          <div class="min-w-0 flex items-center gap-3">
+            <!-- security-row__icon -->
+            <span class="w-[36px] h-[36px] grid place-items-center shrink-0 rounded-[10px] bg-[color-mix(in_srgb,var(--danger,#dc2626)_10%,transparent)] text-[var(--danger,#dc2626)] text-[14px]">
               <i class="bi bi-trash"></i>
             </span>
 
-            <div class="security-row__copy">
-              <h3>
+            <!-- security-row__copy -->
+            <div class="min-w-0">
+              <h3 class="m-0 text-[var(--danger,#dc2626)] text-[14px] font-[800]">
                 {{ 'profile.delete_account' | translate }}
               </h3>
 
-              <p>
-                {{
-                'profile.delete_account_desc'
-                | translate
-                }}
+              <p class="max-w-[590px] mt-1 mb-0 text-[var(--text-muted)] text-[12px] leading-[1.5]">
+                {{ 'profile.delete_account_desc' | translate }}
               </p>
             </div>
           </div>
 
-          <button type="button" class="btn danger-button" [disabled]="isDeleting()" (click)="deleteAccount()">
-
+          <!-- danger-button -->
+          <button type="button" class="btn border border-[color-mix(in_srgb,var(--danger,#dc2626)_35%,var(--border-color))] bg-transparent text-[var(--danger,#dc2626)] transition-colors duration-150 hover:bg-[var(--danger,#dc2626)] hover:text-white max-[700px]:w-full max-[700px]:justify-center" [disabled]="isDeleting()" (click)="deleteAccount()">
             @if (isDeleting()) {
-            <span class="button-spinner"></span>
+            <!-- button-spinner -->
+            <span class="w-[14px] h-[14px] inline-block shrink-0 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
             } @else {
             <i class="bi bi-trash"></i>
             }
-
             {{ 'profile.delete_account' | translate }}
           </button>
         </div>
@@ -578,4 +520,4 @@
     </section>
   </div>
   }
-</main>
+</main>

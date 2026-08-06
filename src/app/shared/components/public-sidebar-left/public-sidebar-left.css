@@ -4,72 +4,9 @@
   display: block;
 }
 
-.sidebar-stack {
-  @apply grid gap-[12px];
-}
-
-.sidebar-filter-card {
-  @apply overflow-hidden rounded-[14px];
-}
-
-.sidebar-card__header {
-  @apply flex items-center justify-between gap-[10px] pt-[17px] px-[15px] pb-[10px];
-}
-
-.sidebar-card__title,
-.sidebar-search__label {
-  @apply flex items-center gap-2 m-0 text-[var(--card-text-default)] text-[13.5px] font-[800] leading-[1.3] tracking-[-0.01em] normal-case;
-}
-
-.sidebar-search__label {
-  @apply mb-[10px];
-}
-
-.sidebar-card__title i,
-.sidebar-search__label i {
-  @apply text-[var(--brand)] text-[12px];
-}
-
-.sidebar-card__body {
-  @apply pt-[3px] px-[9px] pb-[11px];
-}
-
-.filter-list {
-  @apply grid gap-1;
-}
-
-.filter-button {
-  @apply w-full min-h-[39px] flex items-center gap-[9px] px-[9px] py-[7px] border border-transparent rounded-[10px] bg-transparent text-[var(--text-muted)] hover:text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] text-[13px] font-[650] text-left cursor-pointer transition-all duration-150;
-}
-
-.filter-button.is-active {
-  @apply text-white border-[var(--brand)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--brand)_94%,#ffffff),var(--brand))] shadow-[0_7px_16px_color-mix(in_srgb,var(--brand)_20%,transparent)];
-}
-
-.filter-button__icon {
-  @apply w-[22px] h-[22px] grid place-items-center shrink-0 rounded-[7px] bg-[color-mix(in_srgb,var(--card-bg-muted)_76%,transparent)];
-}
-
-.filter-button.is-active .filter-button__icon {
-  @apply bg-white/16;
-}
-
-.filter-button__label {
-  @apply min-w-0 flex-1;
-}
-
-.filter-button__check {
-  @apply shrink-0 text-[13px];
-}
-
-.sidebar-search {
-  @apply p-[14px] border-t border-[var(--border-color)] bg-transparent;
-}
-
-.sidebar-search--standalone {
-  @apply border-t-0;
-}
-
 :host ::ng-deep .sidebar-search .app-input-field {
-  @apply min-h-[40px] rounded-[10px] bg-[var(--card-bg)] text-[13px];
+  min-height: 40px;
+  border-radius: 10px;
+  background-color: var(--card-bg);
+  font-size: 13px;
 }

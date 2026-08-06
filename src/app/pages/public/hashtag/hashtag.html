@@ -1,31 +1,36 @@
-<main class="page-shell hashtag-page">
-  <!-- Header hashtag -->
-  <section class="hashtag-hero" [class.hashtag-hero--selected]="isTagSelected()">
+<!-- hashtag-page -->
+<main class="page-shell pt-5 max-[720px]:pt-3">
+  <!-- hashtag-hero -->
+  <section class="relative min-h-[112px] flex items-center mb-[18px] p-[20px_24px] overflow-hidden border border-[var(--border-color)] rounded-[16px] bg-[radial-gradient(circle_at_92%_18%,color-mix(in_srgb,var(--brand)_13%,transparent),transparent_190px),linear-gradient(115deg,color-mix(in_srgb,var(--brand-soft)_55%,var(--card-bg)),var(--card-bg)_62%)] shadow-[var(--shadow-sm)] max-[720px]:min-h-0 max-[720px]:p-[18px_17px]">
 
-    <div class="hashtag-hero__content">
+    <!-- hashtag-hero__content -->
+    <div class="relative z-[2] w-full min-w-0">
       @if (isTagSelected()) {
-      <button type="button" class="hashtag-back" (click)="showAllTags()">
+      <!-- hashtag-back -->
+      <button type="button" class="inline-flex items-center gap-[7px] mb-2 p-0 border-0 bg-transparent text-[var(--brand)] text-[12px] font-[700] cursor-pointer transition-all duration-160 hover:gap-[10px] hover:text-[color-mix(in_srgb,var(--brand)_80%,#000000)]" (click)="showAllTags()">
         <i class="bi bi-arrow-left"></i>
         {{ 'hashtag.back_to_all' | translate }}
       </button>
       } @else {
-      <span class="hashtag-hero__eyebrow">
+      <!-- hashtag-hero__eyebrow -->
+      <span class="inline-flex items-center gap-[7px] text-[var(--brand)] text-[10px] font-[800] tracking-[0.09em] uppercase">
         <i class="bi bi-hash"></i>
         {{ 'nav.hashtags' | translate }}
       </span>
       }
 
-      <div class="hashtag-hero__heading">
+      <!-- hashtag-hero__heading -->
+      <div class="flex items-end justify-between gap-5 max-[720px]:items-start">
         <div>
-          <h1>
+          <h1 class="m-0 text-[var(--card-text-default)] text-[clamp(25px,3vw,34px)] font-[820] leading-[1.14] tracking-[-0.045em] max-[720px]:text-[26px]">
             @if (isTagSelected()) {
-            <span class="hashtag-symbol">#</span>{{ selectedTagName() || selectedTagId() }}
+            <span class="text-[var(--brand)]">#</span>{{ selectedTagName() || selectedTagId() }}
             } @else {
             {{ 'hashtag.title' | translate }}
             }
           </h1>
 
-          <p>
+          <p class="max-w-[680px] mt-[6px] mb-0 text-[var(--text-muted)] text-[13px] leading-[1.55]">
             {{
             (
             isTagSelected()
@@ -37,45 +42,46 @@
         </div>
 
         @if (isTagSelected() && !isLoading()) {
-        <div class="hashtag-stat">
-          <span class="hashtag-stat__icon">
+        <!-- hashtag-stat -->
+        <div class="min-w-[126px] flex items-center gap-[10px] p-[10px_13px] border border-[var(--border-color)] rounded-[12px] bg-[color-mix(in_srgb,var(--card-bg)_82%,transparent)] backdrop-blur-[12px] max-[720px]:hidden">
+          <span class="w-[34px] h-[34px] grid place-items-center shrink-0 rounded-[9px] bg-[var(--brand-soft)] text-[var(--brand)]">
             <i class="bi bi-journal-text"></i>
           </span>
 
-          <span class="hashtag-stat__copy">
-            <strong>{{ totalItems() }}</strong>
-            <small>{{ 'nav.posts' | translate }}</small>
+          <span class="min-w-0">
+            <strong class="block text-[var(--card-text-default)] text-[16px] leading-none">{{ totalItems() }}</strong>
+            <small class="block mt-1 text-[var(--text-faint)] text-[9px] font-[750] tracking-[0.04em] uppercase">{{ 'nav.posts' | translate }}</small>
           </span>
         </div>
         }
       </div>
     </div>
 
-    <span class="hashtag-hero__decoration">#</span>
+    <!-- hashtag-hero__decoration -->
+    <span class="absolute top-1/2 right-[34px] z-0 text-[color-mix(in_srgb,var(--brand)_7%,transparent)] text-[150px] font-[900] leading-none -translate-y-[52%] -rotate-8 select-none max-[720px]:right-[5px] max-[720px]:text-[110px]">#</span>
   </section>
 
-  <!-- Search mobile -->
-  <div class="hashtag-mobile-search">
-    <i class="bi bi-search"></i>
+  <!-- hashtag-mobile-search -->
+  <div class="relative hidden mb-[14px] max-[940px]:block">
+    <i class="bi bi-search absolute top-1/2 left-[14px] z-[1] text-[var(--brand)] -translate-y-1/2"></i>
 
-    <input type="search" [placeholder]="searchPlaceholder()" [value]="searchTerm()"
-      (input)="onSearchChange($any($event.target).value)" />
+    <input type="search" [placeholder]="searchPlaceholder()" [value]="searchTerm()" (input)="onSearchChange($any($event.target).value)" class="w-full min-h-[44px] pl-[42px] pr-[14px] py-[10px] border border-[var(--border-color)] rounded-[12px] bg-[var(--card-bg)] text-[var(--card-text-default)] text-[12px] outline-none placeholder:text-[var(--text-faint)] focus:border-[color-mix(in_srgb,var(--brand)_65%,var(--border-color))] focus:shadow-[0_0_0_4px_color-mix(in_srgb,var(--brand)_12%,transparent)]" />
   </div>
 
-  <div class="hashtag-layout">
+  <!-- hashtag-layout -->
+  <div class="grid grid-cols-[220px_minmax(0,760px)_280px] items-start justify-center gap-[18px] max-[1240px]:grid-cols-[220px_minmax(0,760px)] max-[940px]:grid-cols-[minmax(0,1fr)]">
     <!-- Sidebar trái -->
-    <app-public-sidebar-left [showFilters]="isTagSelected()" [activeFilter]="activeFilter()"
-      [searchPlaceholder]="searchPlaceholder()" [searchTerm]="searchTerm()" (filterChange)="onFilterChange($event)"
-      (searchChange)="onSearchChange($event)">
+    <app-public-sidebar-left class="min-w-0 max-[940px]:hidden" [showFilters]="isTagSelected()" [activeFilter]="activeFilter()" [searchPlaceholder]="searchPlaceholder()" [searchTerm]="searchTerm()" (filterChange)="onFilterChange($event)" (searchChange)="onSearchChange($event)">
     </app-public-sidebar-left>
 
-    <!-- Nội dung chính -->
-    <section class="hashtag-feed">
-      <header class="hashtag-feed__header">
+    <!-- hashtag-feed -->
+    <section class="min-w-0">
+      <!-- hashtag-feed__header -->
+      <header class="min-h-[58px] flex items-end justify-between gap-4 mb-3 p-[1px_2px_11px] border-b border-[var(--border-color)] max-[720px]:items-center">
         <div>
-          <span class="hashtag-feed__eyebrow">
-            <i class="bi" [class.bi-hash]="!isTagSelected()" [class.bi-journal-text]="isTagSelected()">
-            </i>
+          <!-- hashtag-feed__eyebrow -->
+          <span class="inline-flex items-center gap-[7px] text-[var(--brand)] text-[10px] font-[800] tracking-[0.09em] uppercase">
+            <i class="bi" [class.bi-hash]="!isTagSelected()" [class.bi-journal-text]="isTagSelected()"></i>
 
             @if (isTagSelected()) {
             {{ 'nav.posts' | translate }}
@@ -84,7 +90,7 @@
             }
           </span>
 
-          <h2>
+          <h2 class="mt-1 mb-0 text-[var(--card-text-default)] text-[18px] font-[800] leading-[1.25] tracking-[-0.028em]">
             @if (isTagSelected()) {
             #{{ selectedTagName() || selectedTagId() }}
             } @else {
@@ -93,7 +99,7 @@
           </h2>
 
           @if (!isLoading()) {
-          <p>
+          <p class="mt-[3px] mb-0 text-[var(--text-faint)] text-[10px]">
             {{ totalItems() }}
 
             {{
@@ -108,7 +114,8 @@
         </div>
 
         @if (!isLoading()) {
-        <span class="hashtag-feed__counter">
+        <!-- hashtag-feed__counter -->
+        <span class="min-w-[35px] h-[29px] grid place-items-center px-[9px] rounded-[9px] bg-[var(--brand-soft)] text-[var(--brand)] text-[11px] font-[800]">
           {{ totalItems() }}
         </span>
         }
@@ -116,18 +123,20 @@
 
       <!-- Loading -->
       @if (isLoading()) {
-      <div class="hashtag-feed-list">
+      <!-- hashtag-feed-list -->
+      <div class="grid grid-cols-[minmax(0,1fr)] gap-3">
         @for (item of [1, 2, 3]; track item) {
-        <div class="hashtag-post-skeleton">
-          <span class="hashtag-post-skeleton__media skeleton"></span>
+        <!-- hashtag-post-skeleton -->
+        <div class="min-h-[188px] grid grid-cols-[230px_minmax(0,1fr)] overflow-hidden border border-[var(--border-color)] rounded-[14px] bg-[var(--card-bg)] shadow-[var(--shadow-sm)] max-[720px]:grid-cols-1">
+          <span class="min-h-[188px] rounded-none max-[720px]:min-h-[190px] skeleton"></span>
 
-          <span class="hashtag-post-skeleton__content">
+          <span class="flex flex-col gap-3 p-[19px]">
             <span class="h-4 w-28 rounded skeleton"></span>
             <span class="h-6 w-4/5 rounded skeleton"></span>
             <span class="h-3 w-full rounded skeleton"></span>
             <span class="h-3 w-3/4 rounded skeleton"></span>
 
-            <span class="hashtag-post-skeleton__footer">
+            <span class="flex items-center justify-between gap-[15px] mt-auto">
               <span class="h-8 w-28 rounded skeleton"></span>
               <span class="h-4 w-16 rounded skeleton"></span>
             </span>
@@ -161,23 +170,28 @@
       <!-- Danh sách hashtag -->
       @else if (!isTagSelected()) {
       @if (tags().length > 0) {
-      <div class="hashtag-directory">
+      <!-- hashtag-directory -->
+      <div class="grid grid-cols-2 gap-3 max-[720px]:grid-cols-1">
         @for (tag of tags(); track tag.id) {
-        <button type="button" class="hashtag-directory__item" (click)="selectTag(tag)">
+        <!-- hashtag-directory__item -->
+        <button type="button" class="group min-w-0 flex items-center gap-3 p-[15px] border border-[var(--border-color)] rounded-[13px] bg-[var(--card-bg)] text-[var(--card-text-default)] text-left shadow-[var(--shadow-sm)] cursor-pointer transition-all duration-170 hover:border-[color-mix(in_srgb,var(--brand)_35%,var(--border-color))] hover:bg-[color-mix(in_srgb,var(--brand-soft)_35%,var(--card-bg))] hover:shadow-[var(--shadow-md)] hover:-translate-y-[2px]" (click)="selectTag(tag)">
 
-          <span class="hashtag-directory__icon">
+          <!-- hashtag-directory__icon -->
+          <span class="w-[39px] h-[39px] grid place-items-center shrink-0 rounded-[11px] bg-[var(--brand-soft)] text-[var(--brand)] text-[18px] font-[850]">
             #
           </span>
 
-          <span class="hashtag-directory__copy">
-            <strong>#{{ tag.name }}</strong>
+          <!-- hashtag-directory__copy -->
+          <span class="min-w-0 flex-1">
+            <strong class="block overflow-hidden truncate text-[var(--card-text-default)] text-[13px] font-[780]">#{{ tag.name }}</strong>
 
-            <small>
+            <small class="block overflow-hidden truncate mt-1 text-[var(--text-faint)] text-[9px]">
               {{ 'hashtag.related_posts' | translate }}
             </small>
           </span>
 
-          <span class="hashtag-directory__arrow">
+          <!-- hashtag-directory__arrow -->
+          <span class="w-[29px] h-[29px] grid place-items-center shrink-0 rounded-[8px] bg-[var(--card-bg-muted)] text-[var(--brand)] transition-all duration-160 group-hover:text-white group-hover:bg-[var(--brand)] group-hover:translate-x-[2px] group-hover:-translate-y-[2px]">
             <i class="bi bi-arrow-up-right"></i>
           </span>
         </button>
@@ -185,14 +199,15 @@
       </div>
 
       @if (totalPages() > 1) {
-      <div class="hashtag-pagination">
-        <app-pagination [totalItems]="totalItems()" [itemsPerPage]="itemsPerPage" [currentPage]="currentPage()"
-          (currentPageChange)="onPageChange($event)">
+      <!-- hashtag-pagination -->
+      <div class="mt-5">
+        <app-pagination [totalItems]="totalItems()" [itemsPerPage]="itemsPerPage" [currentPage]="currentPage()" (currentPageChange)="onPageChange($event)">
         </app-pagination>
       </div>
       }
       } @else {
-      <div class="empty-state hashtag-empty">
+      <!-- hashtag-empty -->
+      <div class="empty-state min-h-[320px]">
         <span class="empty-state__icon">
           <i class="bi bi-hash"></i>
         </span>
@@ -211,22 +226,24 @@
       <!-- Danh sách bài viết -->
       @else {
       @if (posts().length > 0) {
-      <div class="hashtag-feed-list">
+      <!-- hashtag-feed-list -->
+      <div class="grid grid-cols-[minmax(0,1fr)] gap-3">
         @for (post of posts(); track post.id) {
-        <app-post-card [post]="post" variant="list">
+        <app-post-card [post]="post" variant="list" class="block min-w-0">
         </app-post-card>
         }
       </div>
 
       @if (totalPages() > 1) {
-      <div class="hashtag-pagination">
-        <app-pagination [totalItems]="totalItems()" [itemsPerPage]="itemsPerPage" [currentPage]="currentPage()"
-          (currentPageChange)="onPageChange($event)">
+      <!-- hashtag-pagination -->
+      <div class="mt-5">
+        <app-pagination [totalItems]="totalItems()" [itemsPerPage]="itemsPerPage" [currentPage]="currentPage()" (currentPageChange)="onPageChange($event)">
         </app-pagination>
       </div>
       }
       } @else {
-      <div class="empty-state hashtag-empty">
+      <!-- hashtag-empty -->
+      <div class="empty-state min-h-[320px]">
         <span class="empty-state__icon">
           <i class="bi bi-journal-x"></i>
         </span>
@@ -244,6 +261,6 @@
     </section>
 
     <!-- Sidebar phải -->
-    <app-public-sidebar-right></app-public-sidebar-right>
+    <app-public-sidebar-right class="min-w-0 max-[1240px]:hidden"></app-public-sidebar-right>
   </div>
-</main>
+</main>

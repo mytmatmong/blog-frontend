@@ -1,9 +1,17 @@
-<div class="flex flex-col lg:flex-row min-h-screen bg-aquamarine-50/50 dark:bg-aquamarine-950">
+<!-- dashboard-layout -->
+<div class="flex flex-col lg:flex-row min-h-screen bg-[var(--card-bg-muted,#f8fafc)] text-[var(--card-text-default)]">
+  <!-- dashboard-sidebar -->
   <app-dashboard-sidebar></app-dashboard-sidebar>
+
+  <!-- dashboard-main-content -->
   <main class="flex-grow lg:ml-64 min-h-screen flex flex-col">
+    <!-- dashboard-header -->
     <app-dashboard-header></app-dashboard-header>
+
+    <!-- dashboard-page-body -->
     <div class="p-6 flex-grow">
       <router-outlet></router-outlet>
     </div>
   </main>
 </div>
+

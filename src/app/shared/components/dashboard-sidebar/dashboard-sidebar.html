@@ -1,41 +1,50 @@
-<aside class="w-full lg:w-64 bg-white dark:bg-aquamarine-950 text-aquamarine-900 dark:text-aquamarine-100 lg:fixed lg:top-0 lg:bottom-0 lg:left-0 p-5 overflow-y-auto flex flex-col border-r border-aquamarine-200 dark:border-aquamarine-800">
-  <h4 class="text-aquamarine-950 dark:text-white font-bold text-xl mb-6 flex items-center gap-2">
-    <i class="bi bi-stars text-aquamarine-600 dark:text-aquamarine-400"></i>Blogy.
+<!-- dashboard-sidebar -->
+<aside class="w-full lg:w-64 bg-[var(--card-bg)] text-[var(--card-text-default)] lg:fixed lg:top-0 lg:bottom-0 lg:left-0 p-5 overflow-y-auto flex flex-col border-r border-[var(--border-color)]">
+  <!-- dashboard-sidebar-logo -->
+  <h4 class="text-[var(--card-text-default)] font-extrabold text-xl mb-6 flex items-center gap-2">
+    <i class="bi bi-stars text-[var(--brand)]"></i>Blogy.
   </h4>
-  
+
+  <!-- dashboard-sidebar-section-owner -->
   @if (activeSection === 'owner') {
-    <div class="text-xs text-aquamarine-500 dark:text-aquamarine-400 font-bold tracking-wider uppercase mb-2 px-3">Owner</div>
-    <div class="space-y-1">
-      <a routerLink="/dashboard/owner" routerLinkActive="bg-aquamarine-100 dark:bg-aquamarine-900 text-aquamarine-950 dark:text-white font-medium" [routerLinkActiveOptions]="{exact: true}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-aquamarine-700 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-900 hover:text-aquamarine-950 dark:hover:text-white transition-colors"><i class="bi bi-speedometer2"></i>{{ 'nav.owner_dashboard' | translate }}</a>
-      <a routerLink="/dashboard/owner/posts" routerLinkActive="bg-aquamarine-100 dark:bg-aquamarine-900 text-aquamarine-950 dark:text-white font-medium" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-aquamarine-700 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-900 hover:text-aquamarine-950 dark:hover:text-white transition-colors"><i class="bi bi-file-earmark-text"></i>{{ 'dashboard.my_posts' | translate }}</a>
-      <a routerLink="/dashboard/owner/create-post" routerLinkActive="bg-aquamarine-100 dark:bg-aquamarine-900 text-aquamarine-950 dark:text-white font-medium" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-aquamarine-700 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-900 hover:text-aquamarine-950 dark:hover:text-white transition-colors"><i class="bi bi-plus-circle"></i>{{ 'dashboard.create_post' | translate }}</a>
-    </div>
+  <div class="text-xs text-[var(--brand)] font-bold tracking-wider uppercase mb-2 px-3">Owner</div>
+  <div class="space-y-1">
+    <a routerLink="/dashboard/owner" routerLinkActive="bg-[var(--brand-soft)] text-[var(--brand)] font-semibold" [routerLinkActiveOptions]="{exact: true}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] hover:text-[var(--brand)] transition-colors"><i class="bi bi-speedometer2"></i>{{ 'nav.owner_dashboard' | translate }}</a>
+    <a routerLink="/dashboard/owner/posts" routerLinkActive="bg-[var(--brand-soft)] text-[var(--brand)] font-semibold" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] hover:text-[var(--brand)] transition-colors"><i class="bi bi-file-earmark-text"></i>{{ 'dashboard.my_posts' | translate }}</a>
+    <a routerLink="/dashboard/owner/create-post" routerLinkActive="bg-[var(--brand-soft)] text-[var(--brand)] font-semibold" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] hover:text-[var(--brand)] transition-colors"><i class="bi bi-plus-circle"></i>{{ 'dashboard.create_post' | translate }}</a>
+  </div>
   }
 
+  <!-- dashboard-sidebar-section-moderator -->
   @if (activeSection === 'moderator') {
-    <div class="text-xs text-aquamarine-500 dark:text-aquamarine-400 font-bold tracking-wider uppercase my-2 px-3">Moderator</div>
-    <div class="space-y-1">
-      <a routerLink="/dashboard/moderator" routerLinkActive="bg-aquamarine-100 dark:bg-aquamarine-900 text-aquamarine-950 dark:text-white font-medium" [routerLinkActiveOptions]="{exact: true}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-aquamarine-700 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-900 hover:text-aquamarine-950 dark:hover:text-white transition-colors"><i class="bi bi-shield-check"></i>{{ 'dashboard.mod_dashboard' | translate }}</a>
-      <a routerLink="/dashboard/moderator/manage-blogs" routerLinkActive="bg-aquamarine-100 dark:bg-aquamarine-900 text-aquamarine-950 dark:text-white font-medium" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-aquamarine-700 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-900 hover:text-aquamarine-950 dark:hover:text-white transition-colors"><i class="bi bi-journals"></i>{{ 'dashboard.approve_posts' | translate }}</a>
-      <a routerLink="/dashboard/moderator/manage-categories" routerLinkActive="bg-aquamarine-100 dark:bg-aquamarine-900 text-aquamarine-950 dark:text-white font-medium" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-aquamarine-700 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-900 hover:text-aquamarine-950 dark:hover:text-white transition-colors"><i class="bi bi-folder-check"></i>{{ 'dashboard.categories' | translate }}</a>
-      <a routerLink="/dashboard/moderator/manage-comments" routerLinkActive="bg-aquamarine-100 dark:bg-aquamarine-900 text-aquamarine-950 dark:text-white font-medium" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-aquamarine-700 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-900 hover:text-aquamarine-950 dark:hover:text-white transition-colors"><i class="bi bi-chat-dots"></i>{{ 'dashboard.comments' | translate }}</a>
-    </div>
+  <div class="text-xs text-[var(--brand)] font-bold tracking-wider uppercase my-2 px-3">Moderator</div>
+  <div class="space-y-1">
+    <a routerLink="/dashboard/moderator" routerLinkActive="bg-[var(--brand-soft)] text-[var(--brand)] font-semibold" [routerLinkActiveOptions]="{exact: true}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] hover:text-[var(--brand)] transition-colors"><i class="bi bi-shield-check"></i>{{ 'dashboard.mod_dashboard' | translate }}</a>
+    <a routerLink="/dashboard/moderator/manage-blogs" routerLinkActive="bg-[var(--brand-soft)] text-[var(--brand)] font-semibold" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] hover:text-[var(--brand)] transition-colors"><i class="bi bi-journals"></i>{{ 'dashboard.approve_posts' | translate }}</a>
+    <a routerLink="/dashboard/moderator/manage-categories" routerLinkActive="bg-[var(--brand-soft)] text-[var(--brand)] font-semibold" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] hover:text-[var(--brand)] transition-colors"><i class="bi bi-folder-check"></i>{{ 'dashboard.categories' | translate }}</a>
+    <a routerLink="/dashboard/moderator/manage-comments" routerLinkActive="bg-[var(--brand-soft)] text-[var(--brand)] font-semibold" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] hover:text-[var(--brand)] transition-colors"><i class="bi bi-chat-dots"></i>{{ 'dashboard.comments' | translate }}</a>
+  </div>
   }
 
+  <!-- dashboard-sidebar-section-admin -->
   @if (activeSection === 'admin') {
-    <div class="text-xs text-aquamarine-500 dark:text-aquamarine-400 font-bold tracking-wider uppercase my-2 px-3">Admin</div>
-    <div class="space-y-1">
-      <a routerLink="/dashboard/admin" routerLinkActive="bg-aquamarine-100 dark:bg-aquamarine-900 text-aquamarine-950 dark:text-white font-medium" [routerLinkActiveOptions]="{exact: true}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-aquamarine-700 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-900 hover:text-aquamarine-950 dark:hover:text-white transition-colors"><i class="bi bi-gear"></i>{{ 'nav.admin_dashboard' | translate }}</a>
-      <a routerLink="/dashboard/admin/manage-users" routerLinkActive="bg-aquamarine-100 dark:bg-aquamarine-900 text-aquamarine-950 dark:text-white font-medium" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-aquamarine-700 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-900 hover:text-aquamarine-950 dark:hover:text-white transition-colors"><i class="bi bi-people"></i>{{ 'dashboard.manage_users' | translate }}</a>
-      <a routerLink="/dashboard/admin/manage-languages" routerLinkActive="bg-aquamarine-100 dark:bg-aquamarine-900 text-aquamarine-950 dark:text-white font-medium" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-aquamarine-700 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-900 hover:text-aquamarine-950 dark:hover:text-white transition-colors"><i class="bi bi-translate"></i>{{ 'dashboard.manage_languages' | translate }}</a>
-    </div>
+  <div class="text-xs text-[var(--brand)] font-bold tracking-wider uppercase my-2 px-3">Admin</div>
+  <div class="space-y-1">
+    <a routerLink="/dashboard/admin" routerLinkActive="bg-[var(--brand-soft)] text-[var(--brand)] font-semibold" [routerLinkActiveOptions]="{exact: true}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] hover:text-[var(--brand)] transition-colors"><i class="bi bi-gear"></i>{{ 'nav.admin_dashboard' | translate }}</a>
+    <a routerLink="/dashboard/admin/manage-users" routerLinkActive="bg-[var(--brand-soft)] text-[var(--brand)] font-semibold" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] hover:text-[var(--brand)] transition-colors"><i class="bi bi-people"></i>{{ 'dashboard.manage_users' | translate }}</a>
+    <a routerLink="/dashboard/admin/manage-languages" routerLinkActive="bg-[var(--brand-soft)] text-[var(--brand)] font-semibold" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] hover:text-[var(--brand)] transition-colors"><i class="bi bi-translate"></i>{{ 'dashboard.manage_languages' | translate }}</a>
+  </div>
   }
 
-  <hr class="border-aquamarine-200 dark:border-aquamarine-800 my-4">
+  <!-- dashboard-sidebar-divider -->
+  <hr class="border-[var(--border-color)] my-4">
+
+  <!-- dashboard-sidebar-footer -->
   <div class="space-y-1 mt-auto">
-    <a routerLink="/" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-aquamarine-700 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-900 hover:text-aquamarine-950 dark:hover:text-white transition-colors"><i class="bi bi-house"></i>{{ 'dashboard.back_public' | translate }}</a>
-    <a routerLink="/auth" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-red-700 dark:hover:text-red-300 transition-colors" (click)="auth.setRole('guest')">
+    <a routerLink="/" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] hover:text-[var(--brand)] transition-colors"><i class="bi bi-house"></i>{{ 'dashboard.back_public' | translate }}</a>
+    <a routerLink="/auth" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--danger,#dc2626)] hover:bg-[color-mix(in_srgb,var(--danger,#dc2626)_8%,transparent)] transition-colors" (click)="auth.setRole('guest')">
       <i class="bi bi-box-arrow-right"></i>{{ 'dashboard.logout' | translate }}
     </a>
   </div>
 </aside>
+

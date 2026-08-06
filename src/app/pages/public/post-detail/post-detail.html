@@ -1,9 +1,14 @@
-<main class="page-shell post-detail-page">
-  <div class="article-layout">
-    <div class="article-main">
+<!-- post-detail-page -->
+<main class="page-shell pt-5 pb-[44px] overflow-visible max-[760px]:pt-3 max-[760px]:pb-[26px]">
+  <!-- article-layout -->
+  <div class="w-full max-w-[1240px] grid grid-cols-[minmax(0,920px)_280px] items-start justify-center gap-[22px] mx-auto overflow-visible max-[1180px]:grid-cols-[minmax(0,920px)]">
+    <!-- article-main -->
+    <div class="min-w-0">
       @if (isLoading()) {
-      <article class="article-card article-loading" aria-busy="true">
-        <div class="article-reading-width">
+      <!-- article-card article-loading -->
+      <article class="overflow-hidden border border-[var(--border-color)] rounded-[16px] bg-[var(--card-bg)] shadow-[var(--shadow-sm)] max-[760px]:rounded-[13px] p-[30px] max-[760px]:p-[20px_16px] grid gap-[26px]" aria-busy="true">
+        <!-- article-reading-width -->
+        <div class="w-[min(100%,760px)] mx-auto">
           <div class="h-4 w-44 rounded skeleton"></div>
           <div class="mt-6 h-9 w-11/12 rounded-xl skeleton"></div>
           <div class="mt-3 h-9 w-3/4 rounded-xl skeleton"></div>
@@ -18,9 +23,11 @@
           </div>
         </div>
 
-        <div class="article-cover article-cover--loading skeleton"></div>
+        <!-- article-cover article-cover--loading -->
+        <div class="w-full h-[410px] my-[26px] mx-0 overflow-hidden border border-[var(--border-color)] rounded-[14px] bg-[var(--card-bg-muted)] max-[760px]:h-[260px] max-[760px]:my-[22px] max-[760px]:mx-0 max-[760px]:rounded-[11px] max-[480px]:h-[220px] skeleton"></div>
 
-        <div class="article-reading-width space-y-3">
+        <!-- article-reading-width -->
+        <div class="w-[min(100%,760px)] mx-auto space-y-3">
           <div class="h-4 w-full rounded skeleton"></div>
           <div class="h-4 w-full rounded skeleton"></div>
           <div class="h-4 w-11/12 rounded skeleton"></div>
@@ -30,233 +37,189 @@
       }
 
       @else if (post(); as currentPost) {
-      <article class="article-card">
+      <!-- article-card -->
+      <article class="overflow-hidden border border-[var(--border-color)] rounded-[16px] bg-[var(--card-bg)] shadow-[var(--shadow-sm)] max-[760px]:rounded-[13px] p-[30px] max-[760px]:p-[20px_16px]">
         @if (isRefreshingLanguage()) {
-        <div class="article-status article-status--loading">
-          <span class="article-status__spinner"></span>
-
-          <span>
-            {{ 'post.refreshing_language' | translate }}
-          </span>
+        <!-- article-status article-status--loading -->
+        <div class="flex items-center gap-[10px] mb-[22px] p-[11px_13px] border border-[color-mix(in_srgb,var(--brand)_25%,var(--border-color))] rounded-[11px] bg-[var(--brand-soft)] text-[var(--brand)] text-[13px] font-[650]">
+          <!-- article-status__spinner -->
+          <span class="w-4 h-4 shrink-0 border-2 border-[color-mix(in_srgb,var(--brand)_25%,transparent)] border-t-[var(--brand)] rounded-full animate-spin"></span>
+          <span>{{ 'post.refreshing_language' | translate }}</span>
         </div>
         }
 
         @if (errorMessage() && !isRefreshingLanguage()) {
-        <div class="alert-box article-alert">
+        <!-- article-alert -->
+        <div class="alert-box mb-[22px]">
           <i class="bi bi-exclamation-circle-fill"></i>
-
-          <span class="flex-1">
-            {{ errorMessage() }}
-          </span>
-
+          <span class="flex-1">{{ errorMessage() }}</span>
           <button type="button" class="btn btn-secondary" (click)="retryPost()">
             {{ 'common.retry' | translate }}
           </button>
         </div>
         }
 
-        <!-- Phần đầu bài viết -->
-        <header class="article-header article-reading-width">
-          <nav class="article-breadcrumb" aria-label="Breadcrumb">
-
-            <a routerLink="/">
+        <!-- article-header -->
+        <header class="pt-[2px] w-[min(100%,760px)] mx-auto">
+          <!-- article-breadcrumb -->
+          <nav class="flex items-center gap-[7px] min-w-0 mb-4 text-[var(--text-faint)] text-[12px] font-[650] whitespace-nowrap" aria-label="Breadcrumb">
+            <a routerLink="/" class="shrink-0 text-[var(--text-muted)] transition-colors duration-150 hover:text-[var(--brand)]">
               {{ 'nav.posts' | translate }}
             </a>
-
-            <i class="bi bi-chevron-right"></i>
+            <i class="bi bi-chevron-right shrink-0 text-[9px]"></i>
 
             @if (currentPost.categories[0]; as primaryCategory) {
-            <a routerLink="/category" [queryParams]="{
-                    categoryId: primaryCategory.id
-                  }">
+            <a routerLink="/category" [queryParams]="{ categoryId: primaryCategory.id }" class="shrink-0 text-[var(--text-muted)] transition-colors duration-150 hover:text-[var(--brand)]">
               {{ primaryCategory.name }}
             </a>
-
-            <i class="bi bi-chevron-right"></i>
+            <i class="bi bi-chevron-right shrink-0 text-[9px]"></i>
             }
 
-            <span>
+            <span class="min-w-0 overflow-hidden truncate">
               {{ currentPost.title }}
             </span>
           </nav>
 
-          <div class="article-taxonomy">
-            @for (
-            category of currentPost.categories;
-            track category.id
-            ) {
-            <a class="category-badge" routerLink="/category" [queryParams]="{
-                    categoryId: category.id
-                  }">
+          <!-- article-taxonomy -->
+          <div class="flex flex-wrap items-center gap-[7px] mb-[14px]">
+            @for (category of currentPost.categories; track category.id) {
+            <!-- category-badge -->
+            <a class="min-h-[24px] inline-flex items-center px-2 py-[4px] border border-[color-mix(in_srgb,var(--brand)_18%,transparent)] rounded-[7px] bg-[var(--brand-soft)] text-[var(--brand)] text-[11px] font-[800] tracking-[0.035em] uppercase" routerLink="/category" [queryParams]="{ categoryId: category.id }">
               {{ category.name }}
             </a>
             }
 
-            @for (
-            tag of currentPost.tags;
-            track tag.id
-            ) {
-            <a class="tag" routerLink="/hashtag" [queryParams]="{
-                    tagId: tag.id,
-                    tagName: tag.name
-                  }">
+            @for (tag of currentPost.tags; track tag.id) {
+            <!-- tag -->
+            <a class="min-h-[24px] inline-flex items-center px-2 py-[4px] border border-[var(--border-color)] rounded-[7px] bg-[var(--card-bg-muted)] text-[var(--text-muted)] text-[11px] font-[800] tracking-[0.035em]" routerLink="/hashtag" [queryParams]="{ tagId: tag.id, tagName: tag.name }">
               #{{ tag.name }}
             </a>
             }
           </div>
 
-          <h1 class="article-title">
+          <!-- article-title -->
+          <h1 class="max-w-[760px] m-0 text-[var(--card-text-default)] text-[clamp(30px,4vw,45px)] font-[850] leading-[1.13] tracking-[-0.048em] [text-wrap:balance] max-[760px]:text-[clamp(27px,9vw,36px)]">
             {{ currentPost.title }}
           </h1>
 
-          <div class="article-meta-bar">
-            <a [routerLink]="[
-                  '/author',
-                  currentPost.authorId
-                ]" class="article-author">
-
+          <!-- article-meta-bar -->
+          <div class="flex items-center justify-between gap-[18px] mt-[23px] py-[15px] border-y border-[var(--border-color)] max-[760px]:items-start max-[760px]:flex-col">
+            <!-- article-author -->
+            <a [routerLink]="['/author', currentPost.authorId]" class="group min-w-0 flex items-center gap-[10px] text-inherit">
               @if (currentPost.author.avatarUrl) {
-              <img [src]="currentPost.author.avatarUrl" [alt]="currentPost.author.username"
-                class="article-author__avatar" />
+              <img [src]="currentPost.author.avatarUrl" [alt]="currentPost.author.username" class="w-[39px] h-[39px] grid place-items-center shrink-0 border-2 border-[var(--card-bg)] rounded-full bg-[var(--brand)] text-white object-cover shadow-[0_0_0_1px_var(--border-color)]" />
               } @else {
-              <span class="article-author__avatar article-author__initial">
-                {{
-                getAvatarInitial(
-                currentPost.author.username
-                )
-                }}
+              <!-- article-author__avatar article-author__initial -->
+              <span class="w-[39px] h-[39px] grid place-items-center shrink-0 border-2 border-[var(--card-bg)] rounded-full bg-[var(--brand)] text-white text-[13px] font-[800] shadow-[0_0_0_1px_var(--border-color)]">
+                {{ getAvatarInitial(currentPost.author.username) }}
               </span>
               }
 
-              <span class="article-author__copy">
-                <strong>
+              <!-- article-author__copy -->
+              <span class="min-w-0">
+                <strong class="block overflow-hidden text-[var(--card-text-default)] text-[13px] font-[800] truncate transition-colors duration-150 group-hover:text-[var(--brand)]">
                   {{ currentPost.author.username }}
                 </strong>
-
-                <small>
-                  {{
-                  formatDate(
-                  currentPost.publishedAt ??
-                  currentPost.createdAt
-                  )
-                  }}
-
+                <small class="block mt-[3px] text-[var(--text-faint)] text-[12px] leading-[1.4]">
+                  {{ formatDate(currentPost.publishedAt ?? currentPost.createdAt) }}
                   <span aria-hidden="true">·</span>
-
-                  {{ currentPost.viewCount }}
-                  {{ 'post.views' | translate }}
+                  {{ currentPost.viewCount }} {{ 'post.views' | translate }}
                 </small>
               </span>
             </a>
 
-            <div class="article-meta-actions">
-              <span class="article-meta-stat">
-                <i class="bi bi-heart"></i>
+            <!-- article-meta-actions -->
+            <div class="flex items-center justify-end gap-[12px] shrink-0 max-[760px]:w-full max-[760px]:justify-start max-[480px]:gap-[9px]">
+              <!-- article-meta-stat -->
+              <span class="inline-flex items-center gap-[5px] text-[var(--text-faint)] text-[12px] font-[650]">
+                <i class="bi bi-heart text-[13px]"></i>
                 {{ currentPost.likeCount }}
               </span>
 
-              <span class="article-meta-stat">
-                <i class="bi bi-eye"></i>
+              <!-- article-meta-stat -->
+              <span class="inline-flex items-center gap-[5px] text-[var(--text-faint)] text-[12px] font-[650]">
+                <i class="bi bi-eye text-[13px]"></i>
                 {{ currentPost.viewCount }}
               </span>
 
-              @if (
-              isAuthenticated() &&
-              currentUserId() !== currentPost.authorId
-              ) {
-              <button type="button" class="article-report-button" (click)="openPostReport()">
+              @if (isAuthenticated() && currentUserId() !== currentPost.authorId) {
+              <!-- article-report-button -->
+              <button type="button" class="min-h-[31px] inline-flex items-center gap-[6px] px-[9px] py-[6px] border border-[var(--border-color)] rounded-[8px] bg-[var(--card-bg-muted)] text-[var(--text-muted)] text-[12px] font-[700] cursor-pointer transition-colors duration-150 hover:border-[color-mix(in_srgb,var(--danger)_30%,var(--border-color))] hover:bg-[color-mix(in_srgb,var(--danger)_7%,var(--card-bg))] hover:text-[var(--danger)]" (click)="openPostReport()">
                 <i class="bi bi-flag"></i>
-
-                <span>
-                  {{ 'post.report' | translate }}
-                </span>
+                <span class="max-[480px]:hidden">{{ 'post.report' | translate }}</span>
               </button>
               }
             </div>
           </div>
         </header>
 
-        <!-- Ảnh đại diện -->
+        <!-- article-cover -->
         @if (currentPost.thumbnailUrl) {
-        <figure class="article-cover">
-          <img [src]="currentPost.thumbnailUrl" [alt]="currentPost.title" loading="eager" />
+        <figure class="w-full h-[clamp(280px,38vw,430px)] my-[26px] mx-0 overflow-hidden border border-[var(--border-color)] rounded-[14px] bg-[var(--card-bg-muted)] max-[760px]:h-[260px] max-[760px]:my-[22px] max-[760px]:mx-0 max-[760px]:rounded-[11px] max-[480px]:h-[220px] group">
+          <img [src]="currentPost.thumbnailUrl" [alt]="currentPost.title" loading="eager" class="w-full h-full block object-cover object-center transition-transform duration-500 group-hover:scale-[1.012]" />
         </figure>
         }
 
-        <!-- Nội dung bài viết -->
-        <section class="article-body article-reading-width">
-          <div class="article-prose" [innerHTML]="currentPost.content">
-          </div>
+        <!-- article-body -->
+        <section class="pt-[2px] w-[min(100%,760px)] mx-auto">
+          <!-- article-prose -->
+          <div class="article-prose text-[var(--card-text-default)] text-[17px] leading-[1.85] [overflow-wrap:anywhere] max-[760px]:text-[16px] max-[760px]:leading-[1.78]" [innerHTML]="currentPost.content"></div>
         </section>
 
-        <!-- Media phụ -->
+        <!-- article-media -->
         @if (currentPost.media.length > 0) {
-        <section class="article-media article-reading-width">
-          @for (
-          item of currentPost.media;
-          track item.id
-          ) {
+        <section class="grid gap-5 mt-[32px] w-[min(100%,760px)] mx-auto">
+          @for (item of currentPost.media; track item.id) {
           @if (item.mediaType === 'IMAGE') {
-          <figure class="article-media__item">
-            <img [src]="item.mediaUrl" [alt]="currentPost.title" loading="lazy" />
+          <!-- article-media__item -->
+          <figure class="w-full max-h-[520px] overflow-hidden border border-[var(--border-color)] rounded-[13px] bg-[var(--card-bg-muted)]">
+            <img [src]="item.mediaUrl" [alt]="currentPost.title" loading="lazy" class="w-full max-h-[520px] block object-cover" />
           </figure>
           } @else {
-          <div class="article-media__item">
-            <video [src]="item.mediaUrl" controls preload="metadata">
-            </video>
+          <!-- article-media__item -->
+          <div class="w-full max-h-[520px] overflow-hidden border border-[var(--border-color)] rounded-[13px] bg-[var(--card-bg-muted)]">
+            <video [src]="item.mediaUrl" controls preload="metadata" class="w-full max-h-[520px] block object-cover"></video>
           </div>
           }
           }
         </section>
         }
 
-        <!-- Tương tác cuối bài -->
-        <footer class="article-footer article-reading-width">
-          <div class="article-footer__stats">
-            <span>
-              <i class="bi bi-heart"></i>
-
-              {{ currentPost.likeCount }}
-              {{ 'post.likes' | translate }}
+        <!-- article-footer -->
+        <footer class="flex items-center justify-between gap-[18px] mt-[38px] pt-[20px] border-t border-[var(--border-color)] max-[760px]:items-start max-[760px]:flex-col w-[min(100%,760px)] mx-auto">
+          <!-- article-footer__stats -->
+          <div class="flex flex-wrap items-center gap-[10px] text-[var(--text-muted)] text-[12px] font-[650] max-[480px]:items-start max-[480px]:flex-col">
+            <span class="inline-flex items-center gap-[6px]">
+              <i class="bi bi-heart text-[var(--brand)]"></i>
+              {{ currentPost.likeCount }} {{ 'post.likes' | translate }}
             </span>
 
-            <span>
-              <i class="bi bi-eye"></i>
-
-              {{ currentPost.viewCount }}
-              {{ 'post.views' | translate }}
+            <span class="inline-flex items-center gap-[6px]">
+              <i class="bi bi-eye text-[var(--brand)]"></i>
+              {{ currentPost.viewCount }} {{ 'post.views' | translate }}
             </span>
           </div>
 
-          <div class="article-footer__actions">
-            <button type="button" class="btn btn-secondary" [class.active]="isLiked()" [disabled]="
-                  isLikeBusy() ||
-                  isLoadingInteractions()
-                " (click)="toggleLike()">
-
-              <i class="bi" [class.bi-heart-fill]="isLiked()" [class.bi-heart]="!isLiked()">
-              </i>
-
-              {{
-              isLiked()
-              ? ('post.unlike' | translate)
-              : ('post.like' | translate)
-              }}
+          <!-- article-footer__actions -->
+          <div class="flex flex-wrap items-center gap-[10px] max-[760px]:w-full">
+            <button
+              type="button"
+              class="btn btn-secondary max-[760px]:flex-1 max-[760px]:justify-center"
+              [ngClass]="isLiked() ? '!border-[color-mix(in_srgb,var(--brand)_35%,var(--border-color))] !bg-[var(--brand-soft)] !text-[var(--brand)]' : ''"
+              [disabled]="isLikeBusy() || isLoadingInteractions()"
+              (click)="toggleLike()">
+              <i class="bi" [class.bi-heart-fill]="isLiked()" [class.bi-heart]="!isLiked()"></i>
+              {{ isLiked() ? ('post.unlike' | translate) : ('post.like' | translate) }}
             </button>
 
-            <button type="button" class="btn btn-secondary" [class.active]="isBookmarked()" [disabled]="
-                  isBookmarkBusy() ||
-                  isLoadingInteractions()
-                " (click)="toggleBookmark()">
-
-              <i class="bi" [class.bi-bookmark-fill]="isBookmarked()" [class.bi-bookmark]="!isBookmarked()">
-              </i>
-
-              {{
-              isBookmarked()
-              ? ('post.unsave' | translate)
-              : ('post.save' | translate)
-              }}
+            <button
+              type="button"
+              class="btn btn-secondary max-[760px]:flex-1 max-[760px]:justify-center"
+              [ngClass]="isBookmarked() ? '!border-[color-mix(in_srgb,var(--brand)_35%,var(--border-color))] !bg-[var(--brand-soft)] !text-[var(--brand)]' : ''"
+              [disabled]="isBookmarkBusy() || isLoadingInteractions()"
+              (click)="toggleBookmark()">
+              <i class="bi" [class.bi-bookmark-fill]="isBookmarked()" [class.bi-bookmark]="!isBookmarked()"></i>
+              {{ isBookmarked() ? ('post.unsave' | translate) : ('post.save' | translate) }}
             </button>
           </div>
         </footer>
@@ -264,105 +227,91 @@
       }
 
       @else {
+      <!-- empty-state -->
       <div class="empty-state">
         <span class="empty-state__icon">
           <i class="bi bi-file-earmark-x"></i>
         </span>
-
-        <p>
-          {{
-          errorMessage() ||
-          ('post.not_found' | translate)
-          }}
-        </p>
-
+        <p>{{ errorMessage() || ('post.not_found' | translate) }}</p>
         <button type="button" class="btn btn-primary mt-4" (click)="retryPost()">
           {{ 'common.retry' | translate }}
         </button>
       </div>
       }
 
-      <!-- Bình luận -->
+      <!-- comments-card -->
       @if (post()) {
-      <section id="post-comments" class="comments-card scroll-mt-24">
-
-        <div class="comments-inner">
-          <header class="comments-header">
+      <section id="post-comments" class="overflow-hidden border border-[var(--border-color)] rounded-[16px] bg-[var(--card-bg)] shadow-[var(--shadow-sm)] max-[760px]:rounded-[13px] mt-[18px] p-[27px_30px] max-[760px]:p-[20px_16px] scroll-mt-24">
+        <!-- comments-inner -->
+        <div class="w-[min(100%,760px)] mx-auto">
+          <!-- comments-header -->
+          <header class="flex items-end justify-between gap-[18px] mb-5 pb-[15px] border-b border-[var(--border-color)] max-[760px]:items-start max-[760px]:flex-col">
             <div>
               <span class="section-label">
                 <i class="bi bi-chat-square-text"></i>
                 {{ 'comments.title' | translate }}
               </span>
 
-              <h2>
+              <h2 class="flex items-center gap-2 mt-[4px] mb-0 text-[var(--card-text-default)] text-[20px] font-[820] tracking-[-0.025em]">
                 {{ 'comments.title' | translate }}
-
                 @if (commentsTotalItems() > 0) {
-                <small>
+                <small class="min-w-[25px] h-[25px] grid place-items-center px-[7px] rounded-[8px] bg-[var(--brand-soft)] text-[var(--brand)] text-[12px]">
                   {{ commentsTotalItems() }}
                 </small>
                 }
               </h2>
             </div>
 
-            <select class="comments-sort" [value]="commentsSortOrder()" (change)="
-                  onCommentsSortChange(
-                    $any($event.target).value
-                  )
-                ">
-              <option value="desc">
-                {{ 'comments.newest_first' | translate }}
-              </option>
-
-              <option value="asc">
-                {{ 'comments.oldest_first' | translate }}
-              </option>
+            <!-- comments-sort -->
+            <select class="min-h-[38px] px-[11px] py-[7px] pr-[31px] border border-[var(--border-color)] rounded-[9px] bg-[var(--card-bg)] text-[var(--card-text-default)] text-[12px] outline-none focus:border-[var(--brand)] focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--brand)_11%,transparent)] max-[760px]:w-full" [value]="commentsSortOrder()" (change)="onCommentsSortChange($any($event.target).value)">
+              <option value="desc">{{ 'comments.newest_first' | translate }}</option>
+              <option value="asc">{{ 'comments.oldest_first' | translate }}</option>
             </select>
           </header>
 
           @if (isAuthenticated()) {
-          <form class="comment-form" (submit)="submitComment($event)">
-
+          <!-- comment-form -->
+          <form class="mb-6 p-[15px] border border-[var(--border-color)] rounded-[13px] bg-[var(--card-bg-muted)]" (submit)="submitComment($event)">
             @if (replyTo(); as target) {
-            <div class="comment-form__notice">
-              {{ 'comments.replying_to' | translate }}
-              <strong>{{ target.username }}</strong>
+            <!-- comment-form__notice -->
+            <div class="mb-2 text-[var(--text-muted)] text-[12px]">
+              {{ 'comments.replying_to' | translate }} <strong>{{ target.username }}</strong>
             </div>
             }
 
             @if (editingComment()) {
-            <div class="comment-form__notice">
+            <!-- comment-form__notice -->
+            <div class="mb-2 text-[var(--text-muted)] text-[12px]">
               {{ 'comments.editing' | translate }}
             </div>
             }
 
-            <textarea [(ngModel)]="commentDraft" name="commentDraft" maxlength="1000" rows="4"
-              class="comment-form__textarea" [placeholder]="
-                    'comments.placeholder' | translate
-                  ">
-                </textarea>
+            <!-- comment-form__textarea -->
+            <textarea
+              [(ngModel)]="commentDraft"
+              name="commentDraft"
+              maxlength="1000"
+              rows="4"
+              class="w-full min-h-[112px] block resize-y px-[13px] py-3 border border-[var(--border-color)] rounded-[10px] bg-[var(--card-bg)] text-[var(--card-text-default)] text-[14px] leading-[1.6] outline-none placeholder:text-[var(--text-faint)] focus:border-[var(--brand)] focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--brand)_11%,transparent)]"
+              [placeholder]="'comments.placeholder' | translate"></textarea>
 
-            <div class="comment-form__footer">
-              <span class="comment-form__counter">
+            <!-- comment-form__footer -->
+            <div class="flex items-center justify-between gap-[14px] mt-[11px] max-[760px]:items-start max-[760px]:flex-col">
+              <!-- comment-form__counter -->
+              <span class="text-[var(--text-faint)] text-[12px]">
                 {{ commentDraft.length }}/1000
               </span>
 
-              <div class="comment-form__actions">
-                @if (
-                replyTo() ||
-                editingComment()
-                ) {
-                <button type="button" class="btn btn-secondary" (click)="cancelCommentMode()">
+              <!-- comment-form__actions -->
+              <div class="flex items-center gap-2 max-[760px]:w-full">
+                @if (replyTo() || editingComment()) {
+                <button type="button" class="btn btn-secondary max-[760px]:flex-1 max-[760px]:justify-center" (click)="cancelCommentMode()">
                   {{ 'modal.cancel' | translate }}
                 </button>
                 }
 
-                <button type="submit" class="btn btn-primary" [disabled]="isSavingComment()">
-                  {{
-                  editingComment()
-                  ? ('comments.save_edit' | translate)
-                  : ('comments.submit' | translate)
-                  }}
+                <button type="submit" class="btn btn-primary max-[760px]:flex-1 max-[760px]:justify-center" [disabled]="isSavingComment()">
+                  {{ editingComment() ? ('comments.save_edit' | translate) : ('comments.submit' | translate) }}
                 </button>
               </div>
             </div>
@@ -370,19 +319,16 @@
           }
 
           @else {
-          <a routerLink="/auth" [queryParams]="{
-                  redirect: router.url
-                }" class="comments-login">
+          <!-- comments-login -->
+          <a routerLink="/auth" [queryParams]="{ redirect: router.url }" class="flex items-center gap-[9px] mb-[22px] p-[13px_14px] border border-[color-mix(in_srgb,var(--brand)_22%,var(--border-color))] rounded-[11px] bg-[var(--brand-soft)] text-[var(--brand)] text-[13px] font-[700] hover:underline hover:[text-underline-offset:3px]">
             <i class="bi bi-box-arrow-in-right"></i>
             {{ 'comments.login_required' | translate }}
           </a>
           }
 
-          @if (
-          isLoadingComments() &&
-          comments().length === 0
-          ) {
-          <div class="comments-loading">
+          @if (isLoadingComments() && comments().length === 0) {
+          <!-- comments-loading -->
+          <div class="grid gap-3 py-2">
             <div class="h-4 w-1/3 rounded skeleton"></div>
             <div class="h-20 w-full rounded-xl skeleton"></div>
           </div>
@@ -391,11 +337,7 @@
           @else if (commentsErrorMessage()) {
           <div class="alert-box">
             <i class="bi bi-exclamation-circle-fill"></i>
-
-            <span class="flex-1">
-              {{ commentsErrorMessage() }}
-            </span>
-
+            <span class="flex-1">{{ commentsErrorMessage() }}</span>
             <button type="button" class="btn btn-secondary" (click)="loadComments()">
               {{ 'common.retry' | translate }}
             </button>
@@ -403,42 +345,41 @@
           }
 
           @else if (comments().length > 0) {
-          <div class="comments-list" [class.opacity-60]="
-                  isLoadingComments()
-                ">
-
-            @for (
-            comment of comments();
-            track comment.id
-            ) {
-            <app-comment-item [comment]="comment" [currentUserId]="currentUserId()"
-              [isAuthenticated]="isAuthenticated()" (replyRequested)="beginReply($event)"
-              (editRequested)="beginEdit($event)" (deleteRequested)="deleteComment($event)"
+          <!-- comments-list -->
+          <div class="transition-opacity duration-160" [class.opacity-60]="isLoadingComments()">
+            @for (comment of comments(); track comment.id) {
+            <app-comment-item
+              [comment]="comment"
+              [currentUserId]="currentUserId()"
+              [isAuthenticated]="isAuthenticated()"
+              (replyRequested)="beginReply($event)"
+              (editRequested)="beginEdit($event)"
+              (deleteRequested)="deleteComment($event)"
               (reportRequested)="openCommentReport($event)">
             </app-comment-item>
             }
           </div>
 
           @if (commentsTotalPages() > 1) {
-          <div class="comments-pagination">
-            <app-pagination [totalItems]="commentsTotalItems()" [itemsPerPage]="commentsPerPage"
-              [currentPage]="commentsCurrentPage()" (currentPageChange)="
-                      onCommentsPageChange($event)
-                    ">
+          <!-- comments-pagination -->
+          <div class="mt-5">
+            <app-pagination
+              [totalItems]="commentsTotalItems()"
+              [itemsPerPage]="commentsPerPage"
+              [currentPage]="commentsCurrentPage()"
+              (currentPageChange)="onCommentsPageChange($event)">
             </app-pagination>
           </div>
           }
           }
 
           @else {
-          <div class="empty-state comments-empty">
+          <!-- comments-empty -->
+          <div class="empty-state min-h-[190px] py-[28px]">
             <span class="empty-state__icon">
               <i class="bi bi-chat"></i>
             </span>
-
-            <p>
-              {{ 'comments.empty' | translate }}
-            </p>
+            <p>{{ 'comments.empty' | translate }}</p>
           </div>
           }
         </div>
@@ -446,36 +387,30 @@
       }
     </div>
 
-    <!-- Sidebar -->
-    <aside class="article-sidebar">
-      <app-public-sidebar-right>
-      </app-public-sidebar-right>
+    <!-- article-sidebar -->
+    <aside class="sticky top-[86px] self-start min-w-0 h-max overflow-visible max-[1180px]:hidden">
+      <app-public-sidebar-right></app-public-sidebar-right>
     </aside>
   </div>
 </main>
 
-<!-- Modal báo cáo -->
+<!-- report-modal -->
 @if (reportTarget(); as target) {
 <div class="modal-backdrop" (click)="closeReport()">
-
-  <form class="modal-card report-modal" (submit)="submitReport($event)" (click)="$event.stopPropagation()">
-
-    <header class="report-modal__header">
+  <form class="modal-card w-[min(100%,510px)] grid gap-[18px] p-[22px] max-[480px]:p-[18px]" (submit)="submitReport($event)" (click)="$event.stopPropagation()">
+    <!-- report-modal__header -->
+    <header class="flex items-start justify-between gap-4">
       <div>
         <span class="section-label">
           <i class="bi bi-flag"></i>
           {{ 'report.reason' | translate }}
         </span>
 
-        <h2>
-          {{
-          target.type === 'POST'
-          ? ('post.report' | translate)
-          : ('comments.report' | translate)
-          }}
+        <h2 class="mt-[5px] mb-0 text-[var(--card-text-default)] text-[20px] font-[820] tracking-[-0.025em]">
+          {{ target.type === 'POST' ? ('post.report' | translate) : ('comments.report' | translate) }}
         </h2>
 
-        <p>
+        <p class="max-w-[400px] mt-[6px] mb-0 overflow-hidden text-[var(--text-faint)] text-[12px] leading-[1.5] line-clamp-2">
           {{ target.label }}
         </p>
       </div>
@@ -485,34 +420,30 @@
       </button>
     </header>
 
-    <div class="report-modal__field">
-      <label>
+    <!-- report-modal__field -->
+    <div class="grid gap-[7px]">
+      <label class="text-[var(--card-text-default)] text-[12.5px] font-[750]">
         {{ 'report.reason' | translate }}
       </label>
 
-      <select [(ngModel)]="reportReason" name="reportReason">
-
-        @for (
-        reason of reportReasons;
-        track reason
-        ) {
-        <option [value]="reason">
-          {{ reason }}
-        </option>
+      <select [(ngModel)]="reportReason" name="reportReason" class="w-full min-h-[42px] px-3 py-[10px] border border-[var(--border-color)] rounded-[10px] bg-[var(--card-bg)] text-[var(--card-text-default)] text-[14px] outline-none focus:border-[var(--brand)] focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--brand)_11%,transparent)]">
+        @for (reason of reportReasons; track reason) {
+        <option [value]="reason">{{ reason }}</option>
         }
       </select>
     </div>
 
-    <div class="report-modal__field">
-      <label>
+    <!-- report-modal__field -->
+    <div class="grid gap-[7px]">
+      <label class="text-[var(--card-text-default)] text-[12.5px] font-[750]">
         {{ 'report.description' | translate }}
       </label>
 
-      <textarea [(ngModel)]="reportDescription" name="reportDescription" maxlength="1000" rows="4">
-        </textarea>
+      <textarea [(ngModel)]="reportDescription" name="reportDescription" maxlength="1000" rows="4" class="w-full min-h-[105px] resize-y leading-[1.55] px-3 py-[10px] border border-[var(--border-color)] rounded-[10px] bg-[var(--card-bg)] text-[var(--card-text-default)] text-[14px] outline-none focus:border-[var(--brand)] focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--brand)_11%,transparent)]"></textarea>
     </div>
 
-    <footer class="report-modal__actions">
+    <!-- report-modal__actions -->
+    <footer class="flex justify-end gap-[9px]">
       <button type="button" class="btn btn-secondary" (click)="closeReport()">
         {{ 'modal.cancel' | translate }}
       </button>
@@ -523,4 +454,4 @@
     </footer>
   </form>
 </div>
-}
+}

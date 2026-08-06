@@ -1,35 +1,36 @@
-<main class="page-shell home-page">
-  <div class="home-layout">
-    <aside class="home-left-rail">
-      <!-- Danh mục -->
-      <section class="sidebar-card navigation-card">
-        <div class="sidebar-card__header">
-          <h2 class="sidebar-card__title">
-            <i class="bi bi-grid"></i>
+<!-- home-page -->
+<main class="page-shell overflow-visible">
+  <!-- home-layout -->
+  <div class="grid grid-cols-[220px_minmax(0,1fr)_280px] items-start gap-[18px] overflow-visible max-[1240px]:grid-cols-[210px_minmax(0,1fr)_260px] max-[1240px]:gap-[15px] max-[1100px]:grid-cols-[210px_minmax(0,1fr)] max-[940px]:grid-cols-[minmax(0,1fr)]">
+    <!-- home-left-rail -->
+    <aside class="min-w-0 sticky top-[var(--home-sticky-top)] self-start w-full h-max max-h-none overflow-visible max-[940px]:static max-[940px]:top-auto max-[940px]:w-auto max-[940px]:h-auto grid gap-[14px] max-[940px]:hidden">
+      <!-- navigation-card categories -->
+      <section class="sidebar-card overflow-hidden rounded-[14px]">
+        <div class="min-h-[47px] flex items-center justify-between gap-[10px] p-[13px_14px_9px]">
+          <h2 class="min-w-0 flex items-center gap-2 m-0 text-[var(--card-text-default)] text-[12px] font-[800] leading-[1.3] tracking-[-0.01em] normal-case">
+            <i class="bi bi-grid text-[var(--brand)] text-[12px]"></i>
             {{ 'nav.categories' | translate }}
           </h2>
-
-
         </div>
 
-        <div class="sidebar-card__body">
-          <nav class="category-navigation" aria-label="Categories">
+        <div class="p-[3px_9px_9px]">
+          <!-- category-navigation -->
+          <nav class="grid gap-[3px]" aria-label="Categories">
 
-            <a routerLink="/" class="category-navigation__item is-active">
-
-              <span class="category-navigation__icon">
+            <a routerLink="/" class="min-w-0 min-h-[37px] flex items-center gap-2 p-[6px_8px] rounded-[9px] text-[10px] font-[650] transition-colors duration-150 bg-[var(--brand-soft)] text-[var(--brand)]">
+              <span class="w-[23px] h-[23px] grid place-items-center shrink-0 rounded-[7px] bg-[var(--brand)] text-white text-[10px]">
                 <i class="bi bi-grid"></i>
               </span>
 
-              <span class="category-navigation__label">
+              <span class="min-w-0 flex-1 overflow-hidden truncate">
                 {{ 'category.all' | translate }}
               </span>
 
-              <i class="bi bi-chevron-right category-navigation__arrow"></i>
+              <i class="bi bi-chevron-right shrink-0 text-[var(--text-faint)] text-[7px]"></i>
             </a>
 
             @if (isLoadingCategories()) {
-            <div class="sidebar-loading-list">
+            <div class="grid gap-[5px] py-1">
               @for (item of [1, 2, 3, 4]; track item) {
               <div class="h-9 rounded-lg skeleton"></div>
               }
@@ -42,55 +43,52 @@
             ) {
             <a routerLink="/category" [queryParams]="{
                 categoryId: category.id
-              }" class="category-navigation__item">
+              }" class="min-w-0 min-h-[37px] flex items-center gap-2 p-[6px_8px] rounded-[9px] text-[var(--text-muted)] text-[10px] font-[650] transition-colors duration-150 hover:text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)]">
 
-              <span class="category-navigation__icon">
-                <i class="bi" [class.bi-code-slash]="index % 6 === 0" [class.bi-lightbulb]="index % 6 === 1"
-                  [class.bi-palette]="index % 6 === 2" [class.bi-briefcase]="index % 6 === 3"
-                  [class.bi-phone]="index % 6 === 4" [class.bi-cloud]="index % 6 === 5">
+              <span class="w-[23px] h-[23px] grid place-items-center shrink-0 rounded-[7px] bg-[var(--card-bg-muted)] text-[var(--brand)] text-[10px]">
+                <i class="bi" [class.bi-code-slash]="index % 6 === 0" [class.bi-lightbulb]="index % 6 === 1" [class.bi-palette]="index % 6 === 2" [class.bi-briefcase]="index % 6 === 3" [class.bi-phone]="index % 6 === 4" [class.bi-cloud]="index % 6 === 5">
                 </i>
               </span>
 
-              <span class="category-navigation__label">
+              <span class="min-w-0 flex-1 overflow-hidden truncate">
                 {{ category.name }}
               </span>
 
-              <i class="bi bi-chevron-right category-navigation__arrow"></i>
+              <i class="bi bi-chevron-right shrink-0 text-[var(--text-faint)] text-[7px]"></i>
             </a>
             }
             }
           </nav>
 
-          <a routerLink="/category" class="sidebar-view-all">
-
+          <!-- sidebar-view-all -->
+          <a routerLink="/category" class="group min-h-[35px] flex items-center justify-center gap-[7px] mt-[7px] p-[7px_9px] border-t border-[var(--border-color)] text-[var(--brand)] text-[9px] font-[750]">
             <span>
               {{ 'category.title' | translate }}
             </span>
-
-
-            <i class="bi bi-arrow-right"></i>
+            <i class="bi bi-arrow-right text-[9px] transition-transform duration-150 group-hover:translate-x-[3px]"></i>
           </a>
         </div>
       </section>
 
-      <!-- Hashtag phổ biến -->
-      <section class="sidebar-card navigation-card">
-        <div class="sidebar-card__header">
-          <h2 class="sidebar-card__title">
-            <i class="bi bi-hash"></i>
+      <!-- navigation-card popular tags -->
+      <section class="sidebar-card overflow-hidden rounded-[14px]">
+        <div class="min-h-[47px] flex items-center justify-between gap-[10px] p-[13px_14px_9px]">
+          <h2 class="min-w-0 flex items-center gap-2 m-0 text-[var(--card-text-default)] text-[12px] font-[800] leading-[1.3] tracking-[-0.01em] normal-case">
+            <i class="bi bi-hash text-[var(--brand)] text-[12px]"></i>
             {{ 'sidebar.popular_tags' | translate }}
           </h2>
         </div>
 
-        <div class="sidebar-card__body">
+        <div class="p-[3px_9px_9px]">
           @if (isLoadingTags()) {
-          <div class="sidebar-loading-list">
+          <div class="grid gap-[5px] py-1">
             @for (item of [1, 2, 3, 4]; track item) {
             <div class="h-8 rounded-lg skeleton"></div>
             }
           </div>
           } @else if (topTags().length > 0) {
-          <div class="popular-tag-list">
+          <!-- popular-tag-list -->
+          <div class="grid gap-[3px]">
             @for (
             tag of topTags().slice(0, 5);
             track tag.id;
@@ -99,54 +97,52 @@
             <a routerLink="/hashtag" [queryParams]="{
                 tagId: tag.id,
                 tagName: tag.name
-              }" class="popular-tag-row">
+              }" class="group min-w-0 min-h-[34px] flex items-center gap-[7px] p-[5px_7px] rounded-[9px] text-[var(--text-muted)] text-[9px] transition-colors duration-150 hover:text-[var(--brand)] hover:bg-[var(--brand-soft)]">
 
-              <span class="popular-tag-row__rank">
+              <span class="w-[21px] h-[21px] grid place-items-center shrink-0 rounded-[6px] bg-[var(--card-bg-muted)] text-[var(--text-faint)] text-[8px] font-[800] group-hover:bg-[var(--brand)] group-hover:text-white">
                 {{ index + 1 }}
               </span>
 
-              <span class="popular-tag-row__name">
+              <span class="min-w-0 flex-1 overflow-hidden font-[700] truncate">
                 #{{ tag.name }}
               </span>
 
-              <small>
+              <small class="shrink-0 text-[var(--text-faint)] text-[8px]">
                 {{ tag.postCount }}
               </small>
             </a>
             }
           </div>
           } @else {
-          <div class="sidebar-empty-message">
-            <i class="bi bi-hash"></i>
-
+          <div class="min-h-[80px] grid place-items-center content-center gap-[7px] text-[var(--text-faint)] text-[9px] text-center">
+            <i class="w-[30px] h-[30px] grid place-items-center rounded-[9px] bg-[var(--brand-soft)] text-[var(--brand)] text-[13px] bi bi-hash"></i>
             <span>
               {{ 'sidebar.no_tags' | translate }}
             </span>
           </div>
           }
 
-          <a routerLink="/hashtag" class="sidebar-view-all">
-
+          <!-- sidebar-view-all -->
+          <a routerLink="/hashtag" class="group min-h-[35px] flex items-center justify-center gap-[7px] mt-[7px] p-[7px_9px] border-t border-[var(--border-color)] text-[var(--brand)] text-[9px] font-[750]">
             <span>
               {{ 'hashtag.title' | translate }}
             </span>
-
-
-            <i class="bi bi-arrow-right"></i>
+            <i class="bi bi-arrow-right text-[9px] transition-transform duration-150 group-hover:translate-x-[3px]"></i>
           </a>
         </div>
       </section>
     </aside>
 
-    <section class="home-feed">
+    <!-- home-feed -->
+    <section class="min-w-0 w-full">
       @if (isLoading()) {
-      <div class="featured-post skeleton" aria-busy="true"></div>
-      <div class="feed-heading feed-heading--home">
+      <div class="group relative min-h-[255px] grid grid-cols-[minmax(0,1.03fr)_minmax(260px,0.97fr)] overflow-hidden border border-[color-mix(in_srgb,var(--brand)_12%,var(--border-color))] rounded-[14px] bg-[radial-gradient(circle_at_82%_12%,rgba(255,255,255,0.72),transparent_15rem),linear-gradient(115deg,#f1efff_0%,#f7f6ff_44%,#e4e6ff_100%)] dark:bg-[radial-gradient(circle_at_78%_8%,rgba(126,100,255,0.12),transparent_16rem),linear-gradient(118deg,#171d2b_0%,#181d2b_52%,#20223c_100%)] shadow-[var(--shadow-sm)] max-[820px]:grid-cols-1 skeleton" aria-busy="true"></div>
+      <div class="flex items-center justify-between my-[17px] px-[2px]">
         <div>
           <div class="h-5 w-36 rounded skeleton"></div>
         </div>
       </div>
-      <div class="post-grid">
+      <div class="grid grid-cols-3 gap-3 max-[820px]:grid-cols-2 max-[480px]:grid-cols-1">
         <div class="h-80 rounded-2xl skeleton"></div>
         <div class="h-80 rounded-2xl skeleton"></div>
         <div class="h-80 rounded-2xl skeleton"></div>
@@ -171,55 +167,60 @@
       </div>
       } @else {
       @if (featuredPost(); as featured) {
-      <article class="featured-post">
-        <div class="featured-post__content">
-          <span class="featured-post__label"><i class="bi bi-stars"></i>{{ 'dashboard.featured_posts' | translate
-            }}</span>
-          <h1><a [routerLink]="['/post', featured.id]">{{ featured.title }}</a></h1>
-          <p>{{ featured.excerpt }}</p>
-          <div class="featured-post__author">
-            <a [routerLink]="['/author', featured.authorId]" class="featured-post__identity">
+      <!-- featured-post -->
+      <article class="group relative min-h-[255px] grid grid-cols-[minmax(0,1.03fr)_minmax(260px,0.97fr)] overflow-hidden border border-[color-mix(in_srgb,var(--brand)_12%,var(--border-color))] rounded-[14px] bg-[radial-gradient(circle_at_82%_12%,rgba(255,255,255,0.72),transparent_15rem),linear-gradient(115deg,#f1efff_0%,#f7f6ff_44%,#e4e6ff_100%)] dark:bg-[radial-gradient(circle_at_78%_8%,rgba(126,100,255,0.12),transparent_16rem),linear-gradient(118deg,#171d2b_0%,#181d2b_52%,#20223c_100%)] shadow-[var(--shadow-sm)] max-[820px]:grid-cols-1">
+        <!-- featured-post__content -->
+        <div class="relative z-[2] flex flex-col justify-center p-[28px_14px_27px_28px] max-[820px]:p-[25px]">
+          <span class="w-fit inline-flex items-center gap-[6px] px-2 py-[5px] rounded-[6px] bg-[color-mix(in_srgb,var(--brand)_12%,transparent)] text-[var(--brand)] text-[9px] font-[820] tracking-[0.05em] uppercase"><i class="bi bi-stars"></i>{{ 'dashboard.featured_posts' | translate }}</span>
+          <h1 class="max-w-[560px] mt-[12px] mb-[8px] text-[#131624] dark:text-[var(--card-text-default)] text-[clamp(25px,2.35vw,34px)] leading-[1.12] tracking-[-0.05em]"><a [routerLink]="['/post', featured.id]" class="hover:text-[var(--brand)]">{{ featured.title }}</a></h1>
+          <p class="max-w-[520px] m-0 overflow-hidden text-[#626b80] dark:text-[var(--text-muted)] text-[12px] leading-[1.6] line-clamp-2">{{ featured.excerpt }}</p>
+          <!-- featured-post__author -->
+          <div class="flex items-center justify-between gap-[14px] mt-5 max-[600px]:items-start max-[600px]:flex-col">
+            <a [routerLink]="['/author', featured.authorId]" class="min-w-0 flex items-center gap-[9px]">
               @if (featured.authorAvatarUrl) {
               <img [src]="featured.authorAvatarUrl" [alt]="featured.authorName" class="avatar-sm object-cover" />
               } @else {
               <span class="avatar-sm">{{ featured.authorAvatar }}</span>
               }
-              <span><strong>{{ featured.authorName }}</strong><small>{{ featured.timeAgo }} · {{ featured.readTime
+              <span class="min-w-0"><strong class="overflow-hidden text-[var(--card-text-default)] text-[10px] font-[730] truncate block">{{ featured.authorName }}</strong><small class="mt-[1px] text-[var(--text-faint)] text-[9px] block">{{ featured.timeAgo }} · {{ featured.readTime
                   }}</small></span>
             </a>
-            <a [routerLink]="['/post', featured.id]" class="btn btn-primary">{{ 'hashtag.related_posts' | translate }}
+            <a [routerLink]="['/post', featured.id]" class="btn btn-primary min-h-[34px] px-3 rounded-[8px] text-[10px]">{{ 'hashtag.related_posts' | translate }}
               <i class="bi bi-arrow-up-right"></i></a>
           </div>
         </div>
-        <a [routerLink]="['/post', featured.id]" class="featured-post__media" [attr.aria-label]="featured.title">
+
+        <!-- featured-post__media -->
+        <a [routerLink]="['/post', featured.id]" class="relative min-w-0 min-h-[255px] overflow-hidden max-[820px]:min-h-[220px] after:content-[''] after:absolute after:inset-y-0 after:left-0 after:w-[28%] after:bg-[linear-gradient(90deg,color-mix(in_srgb,#f5f3ff_96%,transparent),transparent)] dark:after:bg-[linear-gradient(90deg,color-mix(in_srgb,#181d2b_96%,transparent),transparent)] after:pointer-events-none max-[820px]:after:inset-x-0 max-[820px]:after:top-0 max-[820px]:after:w-full max-[820px]:after:h-[22%] max-[820px]:after:bg-[linear-gradient(180deg,color-mix(in_srgb,#f7f6ff_96%,transparent),transparent)] dark:max-[820px]:after:bg-[linear-gradient(180deg,color-mix(in_srgb,#181d2b_96%,transparent),transparent)]" [attr.aria-label]="featured.title">
           @if (featured.thumbnailUrl) {
-          <img [src]="featured.thumbnailUrl" [alt]="featured.title" />
+          <img [src]="featured.thumbnailUrl" [alt]="featured.title" class="w-full h-full min-h-[255px] block object-cover transition-transform duration-400 max-[820px]:min-h-[220px] group-hover:scale-[1.035]" />
           } @else {
-          <span class="featured-post__illustration" aria-hidden="true">
-            <span class="illustration-plant"><i class="bi bi-flower1"></i></span>
-            <span class="illustration-screen"><i class="bi bi-code-slash"></i></span>
-            <span class="illustration-lamp"><i class="bi bi-lightbulb"></i></span>
+          <!-- featured-post__illustration -->
+          <span class="absolute inset-[32px_30px_24px_22px] grid place-items-center rounded-[24px_24px_14px_14px] bg-[linear-gradient(#8f85e8,#8f85e8)_50%_68%_/_76%_7%_no-repeat,linear-gradient(#b7b2ef,#b7b2ef)_50%_75%_/_67%_5%_no-repeat,radial-gradient(circle_at_50%_44%,#ffffff_0_7%,#d9d6ff_8%_31%,transparent_32%)] text-[#5d3df2]" aria-hidden="true">
+            <span class="absolute grid place-items-center rounded-[14px] bg-white/80 shadow-[0_14px_30px_rgba(72,54,154,0.14)] left-[10%] bottom-[23%] w-[54px] h-[74px] text-[27px]"><i class="bi bi-flower1"></i></span>
+            <span class="absolute grid place-items-center rounded-[14px] bg-white/80 shadow-[0_14px_30px_rgba(72,54,154,0.14)] w-[104px] h-[72px] text-[33px]"><i class="bi bi-code-slash"></i></span>
+            <span class="absolute grid place-items-center rounded-[14px] bg-white/80 shadow-[0_14px_30px_rgba(72,54,154,0.14)] right-[9%] top-[24%] w-[46px] h-[46px] text-[20px]"><i class="bi bi-lightbulb"></i></span>
           </span>
           }
         </a>
       </article>
       }
 
-      <div class="mobile-home-tools">
+      <!-- mobile-home-tools -->
+      <div class="hidden max-[600px]:block max-[600px]:mt-3">
         <div class="relative">
           <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-aquamarine-500"></i>
-          <input type="search" class="w-full min-h-12 rounded-2xl border px-4 ps-11"
-            [placeholder]="'search.placeholder_posts' | translate" [value]="searchTerm()"
-            (input)="onSearchChange($any($event.target).value)" />
+          <input type="search" class="w-full min-h-12 rounded-2xl border px-4 ps-11" [placeholder]="'search.placeholder_posts' | translate" [value]="searchTerm()" (input)="onSearchChange($any($event.target).value)" />
         </div>
       </div>
 
-      <div class="feed-heading feed-heading--home">
+      <!-- feed-heading -->
+      <div class="flex items-center justify-between my-[17px] px-[2px]">
         <div>
-          <h2>{{ 'filter.latest' | translate }}</h2>
-          <p>{{ totalItems() }} {{ 'nav.posts' | translate }}</p>
+          <h2 class="text-[15px] font-[790]">{{ 'filter.latest' | translate }}</h2>
+          <p class="text-[10px]">{{ totalItems() }} {{ 'nav.posts' | translate }}</p>
         </div>
-        <select class="feed-sort" [value]="activeFilter()" (change)="onFilterChange($any($event.target).value)">
+        <select class="min-h-[34px] pl-[10px] pr-[30px] py-[5px] border border-[var(--border-color)] rounded-[9px] bg-[var(--card-bg)] text-[var(--text-muted)] text-[10px] font-[650]" [value]="activeFilter()" (change)="onFilterChange($any($event.target).value)">
           <option value="latest">{{ 'filter.latest' | translate }}</option>
           <option value="oldest">{{ 'filter.oldest' | translate }}</option>
           <option value="mostViewed">{{ 'filter.most_viewed' | translate }}</option>
@@ -229,7 +230,8 @@
       </div>
 
       @if (latestPosts().length > 0) {
-      <div class="post-grid">
+      <!-- post-grid -->
+      <div class="grid grid-cols-3 gap-3 max-[820px]:grid-cols-2 max-[480px]:grid-cols-1">
         @for (post of latestPosts(); track post.id) {
         <app-post-card [post]="post"></app-post-card>
         }
@@ -237,15 +239,15 @@
       }
 
       @if (totalPages() > 1) {
-      <app-pagination [totalItems]="totalItems()" [itemsPerPage]="itemsPerPage" [currentPage]="currentPage()"
-        (currentPageChange)="onPageChange($event)">
+      <app-pagination [totalItems]="totalItems()" [itemsPerPage]="itemsPerPage" [currentPage]="currentPage()" (currentPageChange)="onPageChange($event)">
       </app-pagination>
       }
       }
     </section>
 
-    <aside class="home-right-rail">
-      <app-public-sidebar-right></app-public-sidebar-right>
+    <!-- home-right-rail -->
+    <aside class="min-w-0 sticky top-[var(--home-sticky-top)] self-start w-full h-max max-h-none overflow-visible block max-[1100px]:hidden">
+      <app-public-sidebar-right class="block w-full"></app-public-sidebar-right>
     </aside>
   </div>
-</main>
+</main>

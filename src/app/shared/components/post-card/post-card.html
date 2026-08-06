@@ -1,19 +1,46 @@
-<article class="post-card" [class.post-card--list]="variant === 'list'"> <a [routerLink]="['/post', post.id]"
-    class="post-card__media" [attr.aria-label]="post.title">
+<!-- post-card -->
+<article
+  class="group relative min-w-0 h-full flex flex-col gap-0 p-0 overflow-hidden border border-[var(--border-color)] rounded-[12px] bg-[var(--card-bg)] shadow-[var(--shadow-sm)] transition-all duration-180 hover:-translate-y-[3px] hover:border-[color-mix(in_srgb,var(--brand)_24%,var(--border-color))] hover:shadow-[var(--shadow-md)]"
+  [ngClass]="variant === 'list' ? '!min-h-[190px] !grid !grid-cols-[216px_minmax(0,1fr)] max-[720px]:!flex max-[720px]:!min-h-0 max-[720px]:!flex-col !rounded-[14px] hover:-translate-y-[2px]' : ''">
+  <!-- post-card__media -->
+  <a
+    [routerLink]="['/post', post.id]"
+    class="relative w-full min-h-[135px] aspect-[16/8.7] overflow-hidden rounded-none bg-[linear-gradient(145deg,var(--brand-soft),var(--card-bg-muted))]"
+    [ngClass]="variant === 'list' ? '!h-full !min-h-[190px] !aspect-auto max-[720px]:!h-auto max-[720px]:!min-h-[195px] max-[720px]:!aspect-[16/8.8]' : ''"
+    [attr.aria-label]="post.title">
     @if (post.thumbnailUrl) {
-    <img [src]="post.thumbnailUrl" [alt]="post.title" loading="lazy" width="520" height="300" />
+    <img
+      [src]="post.thumbnailUrl"
+      [alt]="post.title"
+      loading="lazy"
+      width="520"
+      height="300"
+      class="w-full h-full min-h-[135px] block object-cover transition-transform duration-360 group-hover:scale-[1.045]"
+      [ngClass]="variant === 'list' ? '!min-h-[190px] max-[720px]:!min-h-[195px]' : ''" />
     } @else {
-    <span class="post-card__placeholder">
+    <!-- post-card__placeholder -->
+    <span
+      class="absolute inset-0 flex flex-col items-center justify-center gap-[6px] text-[var(--brand)] text-[28px] min-h-[135px]"
+      [ngClass]="variant === 'list' ? '!min-h-[190px] max-[720px]:!min-h-[195px]' : ''">
       <i class="bi bi-code-square"></i>
-      <small>Blogy.</small>
+      <small class="text-[10px] font-[800]">Blogy.</small>
     </span>
     }
   </a>
 
-  <div class="post-card__floating-actions">
+  <!-- post-card__floating-actions -->
+  <div
+    class="absolute top-2 right-2 z-[4] flex gap-[5px]"
+    [ngClass]="variant === 'list' ? '!top-[10px] !right-[calc(100%-216px+10px)] max-[720px]:!top-[9px] max-[720px]:!right-[9px]' : ''">
     @if (showUserActions) {
-    <button type="button" class="action-button" [class.is-liked]="isLiked()" [disabled]="isLikeBusy()"
-      [title]="isLiked() ? ('post.unlike' | translate) : ('post.like' | translate)" (click)="requestLikeAction()">
+    <!-- action-button -->
+    <button
+      type="button"
+      class="min-h-[28px] px-2 py-[5px] border border-white/48 rounded-[8px] bg-[rgba(20,24,38,0.48)] text-white text-[9px] backdrop-blur-[9px] cursor-pointer transition-colors duration-150 hover:border-white/70 hover:bg-[rgba(20,24,38,0.72)] inline-flex items-center gap-[5px]"
+      [ngClass]="isLiked() ? '!text-[#ff8798]' : ''"
+      [disabled]="isLikeBusy()"
+      [title]="isLiked() ? ('post.unlike' | translate) : ('post.like' | translate)"
+      (click)="requestLikeAction()">
       @if (isLikeBusy()) {
       <span class="w-3.5 h-3.5 rounded-full border-2 border-current/25 border-t-current animate-spin"></span>
       } @else {
@@ -21,8 +48,13 @@
       }
       <span>{{ displayedLikes() }}</span>
     </button>
-    <button type="button" class="action-button action-button--icon" [class.is-saved]="isBookmarked()"
-      [disabled]="isBookmarkBusy()" [title]="isBookmarked() ? ('post.unsave' | translate) : ('post.save' | translate)"
+    <!-- action-button action-button--icon -->
+    <button
+      type="button"
+      class="min-h-[28px] w-[28px] px-0 py-[5px] border border-white/48 rounded-[8px] bg-[rgba(20,24,38,0.48)] text-white text-[9px] backdrop-blur-[9px] cursor-pointer transition-colors duration-150 hover:border-white/70 hover:bg-[rgba(20,24,38,0.72)] inline-flex items-center justify-center gap-[5px]"
+      [ngClass]="isBookmarked() ? '!text-[#b9abff]' : ''"
+      [disabled]="isBookmarkBusy()"
+      [title]="isBookmarked() ? ('post.unsave' | translate) : ('post.save' | translate)"
       (click)="requestBookmarkAction()">
       @if (isBookmarkBusy()) {
       <span class="w-3.5 h-3.5 rounded-full border-2 border-current/25 border-t-current animate-spin"></span>
@@ -31,55 +63,104 @@
       }
     </button>
     } @else {
-    <span class="action-button is-liked"><i class="bi bi-heart-fill"></i>{{ displayedLikes() }}</span>
+    <!-- action-button is-liked -->
+    <span class="min-h-[28px] px-2 py-[5px] border border-white/48 rounded-[8px] bg-[rgba(20,24,38,0.48)] !text-[#ff8798] text-[9px] backdrop-blur-[9px] inline-flex items-center gap-[5px]"><i class="bi bi-heart-fill"></i>{{ displayedLikes() }}</span>
     }
   </div>
 
-  <div class="post-card__body">
+  <!-- post-card__body -->
+  <div
+    class="min-w-0 flex-1 flex flex-col p-[13px_13px_12px]"
+    [ngClass]="variant === 'list' ? '!p-[17px_18px_14px] max-[720px]:!p-[15px]' : ''">
     @if (post.categories.length > 0) {
-    <div class="post-card__categories">
+    <!-- post-card__categories -->
+    <div class="flex flex-wrap gap-[5px] mb-[7px]">
       @for (category of post.categories.slice(0, 2); track category.id) {
-      <a routerLink="/category" [queryParams]="{ categoryId: category.id }" class="category-badge">
+      <!-- category-badge -->
+      <a
+        routerLink="/category"
+        [queryParams]="{ categoryId: category.id }"
+        class="min-h-[20px] px-[6px] py-[3px] border-0 rounded-[5px] bg-[var(--brand-soft)] !text-[var(--brand)] text-[8px] font-[800] tracking-[0.04em] uppercase inline-flex items-center"
+        [ngClass]="variant === 'list' ? '!min-h-[21px] !px-[7px] !rounded-[6px] !text-[11px]' : ''">
         {{ category.name }}
       </a>
       }
     </div>
     }
 
-    <h2 class="post-card__title">
-      <a [routerLink]="['/post', post.id]">{{ post.title }}</a>
+    <!-- post-card__title -->
+    <h2
+      class="min-h-[38px] m-0 overflow-hidden text-[var(--card-text-default)] text-[14px] leading-[1.35] tracking-[-0.025em] line-clamp-2"
+      [ngClass]="variant === 'list' ? '!min-h-0 !pr-0 !text-[17px] !leading-[1.32] max-[720px]:!text-[16px]' : ''">
+      <a [routerLink]="['/post', post.id]" class="hover:text-[var(--brand)] transition-colors duration-150">{{ post.title }}</a>
     </h2>
 
-    <p class="post-card__excerpt">{{ post.excerpt }}</p>
+    <!-- post-card__excerpt -->
+    <p
+      class="min-h-[43px] my-[7px] mx-0 overflow-hidden text-[var(--text-muted)] text-[12.5px] leading-[1.5] line-clamp-3"
+      [ngClass]="variant === 'list' ? '!min-h-0 !my-[8px] !text-[13px] !leading-[1.55] !line-clamp-2 max-[720px]:!text-[12.5px] max-[720px]:!line-clamp-3' : ''">
+      {{ post.excerpt }}
+    </p>
 
-    <div class="post-card__tags">
+    <!-- post-card__tags -->
+    <div
+      class="min-h-[22px] flex items-center flex-wrap gap-1 mb-[10px]"
+      [ngClass]="variant === 'list' ? '!min-h-0 !mb-[9px]' : ''">
       @for (tag of post.tags.slice(0, 3); track tag.id) {
-      <a class="tag" routerLink="/hashtag" [queryParams]="{ tagId: tag.id, tagName: tag.name }">
+      <!-- tag -->
+      <a
+        class="min-h-[19px] px-[5px] py-[3px] border-0 rounded-[5px] bg-[var(--card-bg-muted)] !text-[var(--text-faint)] text-[11px] inline-flex items-center"
+        [ngClass]="variant === 'list' ? '!min-h-[20px] !px-[6px]' : ''"
+        routerLink="/hashtag"
+        [queryParams]="{ tagId: tag.id, tagName: tag.name }">
         #{{ tag.name }}
       </a>
       }
     </div>
 
-    <footer class="post-card__footer">
-      <a [routerLink]="['/author', post.authorId]" class="post-card__author">
+    <!-- post-card__footer -->
+    <footer
+      class="flex items-center justify-between gap-2 mt-auto pt-[10px] border-t border-[var(--border-color)]"
+      [ngClass]="variant === 'list' ? '!pt-[9px]' : ''">
+      <!-- post-card__author -->
+      <a [routerLink]="['/author', post.authorId]" class="min-w-0 flex items-center gap-[7px]">
         @if (post.authorAvatarUrl) {
-        <img [src]="post.authorAvatarUrl" [alt]="post.authorName" class="avatar-sm object-cover" loading="lazy"
-          width="32" height="32" />
+        <img
+          [src]="post.authorAvatarUrl"
+          [alt]="post.authorName"
+          class="avatar-sm !w-[26px] !h-[26px] !text-[11px] object-cover"
+          loading="lazy"
+          width="32"
+          height="32" />
         } @else {
-        <span class="avatar-sm">{{ post.authorAvatar }}</span>
+        <span class="avatar-sm !w-[26px] !h-[26px] !text-[11px]">{{ post.authorAvatar }}</span>
         }
-        <span class="post-card__author-info">
-          <span class="post-card__author-name">{{ post.authorName }}</span>
-          <span class="post-card__meta">{{ post.timeAgo }} · {{ post.readTime }}</span>
+        <!-- post-card__author-info -->
+        <span class="min-w-0">
+          <!-- post-card__author-name -->
+          <span
+            class="block overflow-hidden max-w-[92px] text-[var(--card-text-default)] text-[12px] font-[730] truncate"
+            [ngClass]="variant === 'list' ? '!max-w-[170px] !text-[12px]' : ''">
+            {{ post.authorName }}
+          </span>
+          <!-- post-card__meta -->
+          <span
+            class="block overflow-hidden max-w-[112px] mt-[1px] text-[var(--text-faint)] text-[11px] truncate"
+            [ngClass]="variant === 'list' ? '!max-w-[210px] !text-[11px]' : ''">
+            {{ post.timeAgo }} · {{ post.readTime }}
+          </span>
         </span>
       </a>
 
-      <div class="post-card__stats">
-        <span><i class="bi bi-eye"></i>{{ post.views }}</span>
+      <!-- post-card__stats -->
+      <div
+        class="shrink-0 flex gap-[7px] text-[var(--text-faint)] text-[11px]"
+        [ngClass]="variant === 'list' ? '!gap-[9px]' : ''">
+        <span class="inline-flex items-center gap-[3px]"><i class="bi bi-eye"></i>{{ post.views }}</span>
         @if (post.showCommentCount ?? true) {
-        <span><i class="bi bi-chat"></i>{{ post.comments }}</span>
+        <span class="inline-flex items-center gap-[3px]"><i class="bi bi-chat"></i>{{ post.comments }}</span>
         }
       </div>
     </footer>
   </div>
-</article>
+</article>
