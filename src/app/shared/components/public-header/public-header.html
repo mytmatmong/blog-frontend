@@ -1,7 +1,7 @@
 <!-- site-header -->
-<header class="sticky top-0 z-[70] pt-2 min-[821px]:pt-[14px] min-h-[calc(var(--header-height)+10px)] min-[821px]:min-h-[calc(var(--header-height)+18px)] border-0 bg-[color-mix(in_srgb,var(--bg-website)_88%,transparent)] backdrop-blur-[18px] backdrop-saturate-[140%]">
+<header class="sticky top-0 z-[70] pt-2 min-h-[calc(var(--header-height)+10px)] border-0 bg-[color-mix(in_srgb,var(--bg-website)_88%,transparent)] backdrop-blur-[18px] backdrop-saturate-[140%]">
   <!-- site-header__inner -->
-  <div class="site-container min-h-[var(--header-height)] flex flex-wrap min-[821px]:flex-nowrap items-center gap-[22px] px-4 border border-[var(--border-color)] rounded-[12px] min-[821px]:rounded-[14px] bg-[color-mix(in_srgb,var(--card-bg)_94%,transparent)] shadow-[var(--shadow-sm)]">
+  <div class="site-container min-h-[var(--header-height)] flex flex-wrap items-center gap-[22px] px-4 border border-[var(--border-color)] rounded-[12px] bg-[color-mix(in_srgb,var(--card-bg)_94%,transparent)] shadow-[var(--shadow-sm)]">
     <!-- brand -->
     <a class="inline-flex items-center gap-[9px] shrink-0 text-[17px] font-[850] tracking-[-0.035em] text-[var(--text-website)] hover:opacity-90 transition-opacity" routerLink="/" aria-label="Blogy home" (click)="closeAllMenus()">
       <!-- brand__mark -->
@@ -13,7 +13,7 @@
     <!-- mobile-menu-button -->
     <button
       type="button"
-      class="w-[36px] h-[36px] max-[820px]:inline-grid min-[821px]:hidden ml-auto place-items-center shrink-0 border border-transparent hover:border-[var(--border-color)] rounded-[9px] bg-transparent hover:bg-[var(--card-bg-muted)] text-[var(--text-muted)] hover:text-[var(--card-text-default)] text-[13px] cursor-pointer transition-colors duration-150"
+      class="site-mobile-btn w-[36px] h-[36px] ml-auto place-items-center shrink-0 border border-transparent hover:border-[var(--border-color)] rounded-[9px] bg-transparent hover:bg-[var(--card-bg-muted)] text-[var(--text-muted)] hover:text-[var(--card-text-default)] text-[13px] cursor-pointer transition-colors duration-150"
       (click)="toggleMobileMenu()"
       [attr.aria-expanded]="isMobileMenuOpen()"
       aria-label="Toggle navigation">
@@ -22,10 +22,12 @@
 
     <!-- header-menu -->
     <div
-      class="hidden min-[821px]:flex min-[821px]:w-auto min-[821px]:basis-auto min-[821px]:flex-1 min-[821px]:items-center min-[821px]:justify-between min-[821px]:gap-[18px] min-[821px]:py-0"
-      [ngClass]="isMobileMenuOpen() ? '!grid !w-full !basis-full !py-1 !pb-[13px] !gap-[9px]' : ''">
+      class="site-header-menu"
+      [ngClass]="isMobileMenuOpen() ? 'mobile-open' : ''">
+      
+      @if (!isAuthPage()) {
       <!-- header-nav -->
-      <nav class="flex flex-col min-[821px]:flex-row items-stretch min-[821px]:items-center shrink-0 gap-1 min-[821px]:gap-[2px]" aria-label="Primary navigation">
+      <nav class="site-header-nav shrink-0 gap-1" aria-label="Primary navigation">
         <!-- nav-link -->
         <a
           class="relative inline-flex items-center min-h-[34px] px-[11px] rounded-[8px] text-[var(--text-muted)] hover:text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] text-[12px] font-[680] transition-colors duration-150"
@@ -52,7 +54,7 @@
       </nav>
 
       <!-- header-search -->
-      <form class="relative w-full min-[821px]:w-[min(100%,360px)] min-[821px]:min-w-[180px] min-[821px]:mx-auto max-[980px]:w-[min(100%,300px)]" role="search" (submit)="submitSearch($event)">
+      <form class="relative w-full max-w-[360px] min-w-[180px] mx-auto" role="search" (submit)="submitSearch($event)">
         <i class="bi bi-search absolute left-[13px] top-1/2 -translate-y-1/2 z-10 text-[var(--text-faint)] text-[12px] pointer-events-none"></i>
         <input
           type="search"
@@ -68,9 +70,11 @@
         </button>
         }
       </form>
+      }
 
       <!-- header-actions -->
-      <div class="flex max-[820px]:grid max-[820px]:grid-cols-[auto_auto_minmax(0,1fr)] max-[820px]:pt-[9px] max-[820px]:border-t max-[820px]:border-[var(--border-color)] items-center shrink-0 gap-[6px]">
+      <div class="flex items-center shrink-0 gap-[6px]"
+        [ngClass]="isAuthPage() ? 'ms-auto' : ''">
         <!-- header-dropdown-wrap (language) -->
         <div class="relative">
           <!-- header-control header-language -->
@@ -103,22 +107,24 @@
         </button>
 
         @if (auth.currentRole() === 'guest') {
+        @if (!isAuthPage()) {
         <!-- header-login -->
-        <a class="btn btn-primary min-h-[36px] !rounded-[9px] px-[13px] text-[12px] max-[820px]:w-full max-[820px]:justify-center" routerLink="/auth" (click)="closeMobileMenu()">
+        <a class="btn btn-primary min-h-[36px] !rounded-[9px] px-[13px] text-[12px]" routerLink="/auth" (click)="closeMobileMenu()">
           {{ 'nav.login' | translate }}
         </a>
+        }
         } @else {
         <!-- header-dropdown-wrap (user profile) -->
         <div class="relative">
           <!-- header-profile -->
-          <button type="button" class="min-h-[38px] inline-flex items-center gap-[9px] py-[3px] pr-[7px] pl-[3px] border border-transparent hover:border-[var(--border-color)] rounded-[10px] bg-transparent hover:bg-[var(--card-bg-muted)] text-[var(--card-text-default)] max-[820px]:w-full max-[820px]:justify-center cursor-pointer transition-colors duration-150" (click)="toggleUserDropdown()">
+          <button type="button" class="min-h-[38px] inline-flex items-center gap-[9px] py-[3px] pr-[7px] pl-[3px] border border-transparent hover:border-[var(--border-color)] rounded-[10px] bg-transparent hover:bg-[var(--card-bg-muted)] text-[var(--card-text-default)] cursor-pointer transition-colors duration-150" (click)="toggleUserDropdown()">
             @if (auth.currentUser()?.avatarUrl) {
             <img [src]="auth.currentUser()?.avatarUrl" [alt]="auth.currentUser()?.username" class="avatar-sm object-cover" />
             } @else {
             <span class="avatar-sm">{{ auth.currentUser()?.username?.charAt(0)?.toUpperCase() || 'U' }}</span>
             }
             <!-- header-profile__name -->
-            <span class="max-w-[112px] truncate text-[13px] font-[650] max-[980px]:hidden max-[820px]:inline">{{ auth.currentUser()?.username }}</span>
+            <span class="max-w-[112px] truncate text-[13px] font-[650]">{{ auth.currentUser()?.username }}</span>
             <i class="bi bi-chevron-down text-[10px] text-aquamarine-500"></i>
           </button>
 
@@ -179,4 +185,4 @@
       </div>
     </div>
   </div>
-</header>
+</header>

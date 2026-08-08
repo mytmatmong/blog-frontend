@@ -4,6 +4,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { NgClass } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import {
@@ -78,6 +79,7 @@ interface ReportTarget {
     CommentItem,
     Pagination,
     TranslatePipe,
+    NgClass,
   ],
   templateUrl: './post-detail.html',
   styleUrl: './post-detail.css',

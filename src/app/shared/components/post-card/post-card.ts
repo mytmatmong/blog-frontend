@@ -9,6 +9,7 @@ import {
   signal,
   SimpleChanges,
 } from '@angular/core';
+import { NgClass } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
 import {
@@ -71,6 +72,7 @@ export type PostCardVariant =
   imports: [
     RouterLink,
     TranslatePipe,
+    NgClass,
   ],
   templateUrl: './post-card.html',
   styleUrl: './post-card.css',

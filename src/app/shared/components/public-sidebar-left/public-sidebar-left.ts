@@ -1,3 +1,4 @@
+import { NgClass } from '@angular/common';
 import {
   Component,
   EventEmitter,
@@ -85,6 +86,7 @@ export function isFilterSortOption(
   imports: [
     InputComponent,
     TranslatePipe,
+    NgClass,
   ],
 
   templateUrl:

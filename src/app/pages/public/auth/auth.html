@@ -29,14 +29,26 @@
       <!-- auth-card -->
       <div class="w-[min(100%,430px)]">
         <!-- auth-tabs -->
-        <div class="grid grid-cols-3 gap-[5px] mb-[30px] p-[5px] border border-[var(--border-color)] rounded-[14px] bg-[var(--card-bg-muted)]">
-          <button type="button" class="min-h-[38px] border-0 rounded-[10px] bg-transparent text-[var(--text-muted)] text-[12px] font-[700] cursor-pointer transition-colors duration-150" [class.bg-[var(--card-bg)]]="activeTab() === 'login'" [class.text-[var(--brand)]]="activeTab() === 'login'" [class.shadow-[var(--shadow-sm)]]="activeTab() === 'login'" (click)="setTab('login')">
+        <div class="grid grid-cols-3 gap-[5px] mb-[30px] p-[5px] border border-[var(--border-color)] rounded-[14px] bg-[var(--card-bg-muted)] shadow-[inset_0_1px_2px_rgba(0,0,0,0.03)]">
+          <button
+            type="button"
+            class="min-h-[40px] border border-transparent rounded-[10px] text-[var(--text-muted)] hover:text-[var(--card-text-default)] hover:bg-[color-mix(in_srgb,var(--card-bg)_70%,transparent)] text-[13px] font-[700] cursor-pointer transition-all duration-150 active:scale-[0.98]"
+            [ngClass]="activeTab() === 'login' ? '!bg-[var(--brand)] !text-white !font-[800] !shadow-[0_4px_14px_color-mix(in_srgb,var(--brand)_35%,transparent)]' : ''"
+            (click)="setTab('login')">
             {{ 'auth.login_tab' | translate }}
           </button>
-          <button type="button" class="min-h-[38px] border-0 rounded-[10px] bg-transparent text-[var(--text-muted)] text-[12px] font-[700] cursor-pointer transition-colors duration-150" [class.bg-[var(--card-bg)]]="activeTab() === 'register'" [class.text-[var(--brand)]]="activeTab() === 'register'" [class.shadow-[var(--shadow-sm)]]="activeTab() === 'register'" (click)="setTab('register')">
+          <button
+            type="button"
+            class="min-h-[40px] border border-transparent rounded-[10px] text-[var(--text-muted)] hover:text-[var(--card-text-default)] hover:bg-[color-mix(in_srgb,var(--card-bg)_70%,transparent)] text-[13px] font-[700] cursor-pointer transition-all duration-150 active:scale-[0.98]"
+            [ngClass]="activeTab() === 'register' ? '!bg-[var(--brand)] !text-white !font-[800] !shadow-[0_4px_14px_color-mix(in_srgb,var(--brand)_35%,transparent)]' : ''"
+            (click)="setTab('register')">
             {{ 'auth.register_tab' | translate }}
           </button>
-          <button type="button" class="min-h-[38px] border-0 rounded-[10px] bg-transparent text-[var(--text-muted)] text-[12px] font-[700] cursor-pointer transition-colors duration-150" [class.bg-[var(--card-bg)]]="activeTab() === 'forgot'" [class.text-[var(--brand)]]="activeTab() === 'forgot'" [class.shadow-[var(--shadow-sm)]]="activeTab() === 'forgot'" (click)="setTab('forgot')">
+          <button
+            type="button"
+            class="min-h-[40px] border border-transparent rounded-[10px] text-[var(--text-muted)] hover:text-[var(--card-text-default)] hover:bg-[color-mix(in_srgb,var(--card-bg)_70%,transparent)] text-[13px] font-[700] cursor-pointer transition-all duration-150 active:scale-[0.98]"
+            [ngClass]="activeTab() === 'forgot' ? '!bg-[var(--brand)] !text-white !font-[800] !shadow-[0_4px_14px_color-mix(in_srgb,var(--brand)_35%,transparent)]' : ''"
+            (click)="setTab('forgot')">
             {{ 'auth.forgot_tab' | translate }}
           </button>
         </div>
@@ -52,9 +64,9 @@
             <app-input type="text" [placeholder]="ts.translate('auth.email_placeholder')" icon="bi bi-person-badge" [required]="true" [value]="loginIdentifier()" (valueChange)="loginIdentifier.set($event)"></app-input>
             <app-input type="password" [placeholder]="ts.translate('auth.password_placeholder')" icon="bi bi-lock" [required]="true" [value]="loginPassword()" (valueChange)="loginPassword.set($event)"></app-input>
             <div class="text-right">
-              <button type="button" class="text-xs font-semibold text-[var(--brand)] hover:underline" (click)="setTab('forgot')">{{ 'auth.forgot_tab' | translate }}?</button>
+              <button type="button" class="text-xs font-semibold text-[var(--brand)] hover:text-[var(--brand-hover)] hover:underline cursor-pointer transition-colors" (click)="setTab('forgot')">{{ 'auth.forgot_tab' | translate }}?</button>
             </div>
-            <button type="submit" class="btn btn-primary w-full" [disabled]="isLoading()">
+            <button type="submit" class="btn btn-primary w-full cursor-pointer transition-transform active:scale-[0.99]" [disabled]="isLoading()">
               @if (isLoading()) { <span class="h-4 w-4 animate-spin rounded-full border-2 border-current/30 border-t-current"></span> }
               {{ 'auth.submit_login' | translate }}
             </button>
@@ -73,7 +85,7 @@
             <app-input type="text" [placeholder]="ts.translate('auth.username_placeholder')" icon="bi bi-person" [required]="true" [value]="registerUsername()" (valueChange)="registerUsername.set($event)"></app-input>
             <app-input type="email" [placeholder]="ts.translate('auth.email_placeholder')" icon="bi bi-envelope" [required]="true" [value]="registerEmail()" (valueChange)="registerEmail.set($event)"></app-input>
             <app-input type="password" [placeholder]="ts.translate('auth.password_placeholder')" icon="bi bi-lock" [required]="true" [value]="registerPassword()" (valueChange)="registerPassword.set($event)"></app-input>
-            <button type="submit" class="btn btn-primary w-full" [disabled]="isLoading()">
+            <button type="submit" class="btn btn-primary w-full cursor-pointer transition-transform active:scale-[0.99]" [disabled]="isLoading()">
               @if (isLoading()) { <span class="h-4 w-4 animate-spin rounded-full border-2 border-current/30 border-t-current"></span> }
               {{ 'auth.submit_register' | translate }}
             </button>
@@ -91,11 +103,19 @@
 
           <!-- auth-stepper -->
           <div class="grid grid-cols-2 gap-2 mb-[22px]">
-            <button type="button" class="min-h-[42px] flex items-center justify-center gap-2 border rounded-[11px] text-[11px] font-[700] cursor-pointer transition-colors duration-150" [class.border-[var(--border-color)]]="forgotStep() !== 'request'" [class.bg-[var(--card-bg)]]="forgotStep() !== 'request'" [class.text-[var(--text-muted)]]="forgotStep() !== 'request'" [class.border-[color-mix(in_srgb,var(--brand)_36%,var(--border-color))]]="forgotStep() === 'request'" [class.bg-[var(--brand-soft)]]="forgotStep() === 'request'" [class.text-[var(--brand)]]="forgotStep() === 'request'" (click)="setForgotStep('request')">
-              <span class="w-5 h-5 grid place-items-center rounded-full text-[10px]" [class.bg-[var(--card-bg-muted)]]="forgotStep() !== 'request'" [class.bg-[var(--brand)]]="forgotStep() === 'request'" [class.text-white]="forgotStep() === 'request'">1</span>{{ 'auth.step_request' | translate }}
+            <button
+              type="button"
+              class="min-h-[44px] flex items-center justify-center gap-2 border rounded-[11px] text-[12px] font-[700] cursor-pointer transition-all duration-150 hover:border-[var(--brand-hover)]"
+              [ngClass]="forgotStep() === 'request' ? '!border-[var(--brand)] !bg-[var(--brand-soft)] !text-[var(--brand)] !shadow-sm' : 'border-[var(--border-color)] bg-[var(--card-bg)] text-[var(--text-muted)] hover:bg-[var(--card-bg-muted)]'"
+              (click)="setForgotStep('request')">
+              <span class="w-5 h-5 grid place-items-center rounded-full text-[10px] transition-colors" [ngClass]="forgotStep() === 'request' ? 'bg-[var(--brand)] text-white' : 'bg-[var(--card-bg-muted)] text-[var(--text-muted)]'">1</span>{{ 'auth.step_request' | translate }}
             </button>
-            <button type="button" class="min-h-[42px] flex items-center justify-center gap-2 border rounded-[11px] text-[11px] font-[700] cursor-pointer transition-colors duration-150" [class.border-[var(--border-color)]]="forgotStep() !== 'reset'" [class.bg-[var(--card-bg)]]="forgotStep() !== 'reset'" [class.text-[var(--text-muted)]]="forgotStep() !== 'reset'" [class.border-[color-mix(in_srgb,var(--brand)_36%,var(--border-color))]]="forgotStep() === 'reset'" [class.bg-[var(--brand-soft)]]="forgotStep() === 'reset'" [class.text-[var(--brand)]]="forgotStep() === 'reset'" (click)="setForgotStep('reset')">
-              <span class="w-5 h-5 grid place-items-center rounded-full text-[10px]" [class.bg-[var(--card-bg-muted)]]="forgotStep() !== 'reset'" [class.bg-[var(--brand)]]="forgotStep() === 'reset'" [class.text-white]="forgotStep() === 'reset'">2</span>{{ 'auth.step_reset' | translate }}
+            <button
+              type="button"
+              class="min-h-[44px] flex items-center justify-center gap-2 border rounded-[11px] text-[12px] font-[700] cursor-pointer transition-all duration-150 hover:border-[var(--brand-hover)]"
+              [ngClass]="forgotStep() === 'reset' ? '!border-[var(--brand)] !bg-[var(--brand-soft)] !text-[var(--brand)] !shadow-sm' : 'border-[var(--border-color)] bg-[var(--card-bg)] text-[var(--text-muted)] hover:bg-[var(--card-bg-muted)]'"
+              (click)="setForgotStep('reset')">
+              <span class="w-5 h-5 grid place-items-center rounded-full text-[10px] transition-colors" [ngClass]="forgotStep() === 'reset' ? 'bg-[var(--brand)] text-white' : 'bg-[var(--card-bg-muted)] text-[var(--text-muted)]'">2</span>{{ 'auth.step_reset' | translate }}
             </button>
           </div>
 

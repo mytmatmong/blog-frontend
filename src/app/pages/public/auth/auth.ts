@@ -1,6 +1,7 @@
 import { Component, signal, inject, OnInit } from '@angular/core';
+import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { InputComponent } from '../../../shared/components/input/input';
 import { TranslationService } from '../../../core/services/translation.service';
@@ -10,7 +11,7 @@ import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-auth',
-  imports: [FormsModule, InputComponent, TranslatePipe],
+  imports: [FormsModule, InputComponent, TranslatePipe, NgClass, RouterLink],
   templateUrl: './auth.html',
   styleUrl: './auth.css',
 })

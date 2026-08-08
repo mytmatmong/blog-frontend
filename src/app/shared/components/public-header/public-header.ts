@@ -1,12 +1,15 @@
-import { Component, inject, signal } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { NgClass } from '@angular/common';
+import { Component, computed, inject, signal } from '@angular/core';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { filter, map } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 import { TranslationService, SupportedLang } from '../../../core/services/translation.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-public-header',
-  imports: [RouterLink, RouterLinkActive, TranslatePipe],
+  imports: [RouterLink, RouterLinkActive, TranslatePipe, NgClass],
   templateUrl: './public-header.html',
   styleUrl: './public-header.css',
 })
@@ -19,6 +22,19 @@ export class PublicHeader {
   protected isUserDropdownOpen = signal(false);
   protected isLangDropdownOpen = signal(false);
   protected searchValue = signal('');
+
+  private readonly currentUrl = toSignal(
+    this.router.events.pipe(
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+      map((event) => event.urlAfterRedirects || event.url)
+    ),
+    { initialValue: this.router.url }
+  );
+
+  protected readonly isAuthPage = computed(() => {
+    const url = this.currentUrl() || '';
+    return url.startsWith('/auth') || url.includes('/auth');
+  });
 
   toggleMobileMenu(): void {
     this.isMobileMenuOpen.update((value) => !value);
