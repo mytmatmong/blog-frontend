@@ -1,62 +1,133 @@
 <section class="space-y-6">
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-    <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-      <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ 'dashboard.manage_users' | translate }}</div>
-      <h3 class="font-bold text-2xl text-aquamarine-600 dark:text-aquamarine-400 mt-1">320</h3>
+  @if (isLoading()) {
+    <div class="p-8 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 flex items-center justify-center gap-3">
+      <div class="animate-spin rounded-full h-6 w-6 border-2 border-aquamarine-600 border-t-transparent"></div>
+      <span class="text-sm font-medium text-aquamarine-700 dark:text-aquamarine-300">Đang tải dữ liệu dashboard...</span>
     </div>
-    <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-      <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ 'dashboard.blog_owners' | translate }}</div>
-      <h3 class="font-bold text-2xl text-cyan-500 mt-1">42</h3>
-    </div>
-    <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-      <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ 'dashboard.manage_languages' | translate }}</div>
-      <h3 class="font-bold text-2xl text-emerald-500 mt-1">3</h3>
-    </div>
-    <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-      <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ 'dashboard.approve_posts' | translate }}</div>
-      <h3 class="font-bold text-2xl text-yellow-500 mt-1">5</h3>
-    </div>
-  </div>
-
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-    <div class="lg:col-span-8">
-      <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm h-full flex flex-col justify-between">
-        <h6 class="font-bold text-base text-aquamarine-950 dark:text-aquamarine-50 mb-4">
-          {{ 'dashboard.user_growth_chart' | translate }}
-        </h6>
-        <div>
-          <canvas id="userGrowthChart" height="100"></canvas>
-        </div>
+  } @else if (errorMessage()) {
+    <div class="p-5 rounded-2xl border border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800 flex items-center justify-between">
+      <div class="flex items-center gap-3 text-red-700 dark:text-red-300 text-sm">
+        <i class="bi bi-exclamation-triangle-fill text-lg"></i>
+        <span>{{ errorMessage() }}</span>
       </div>
+      <button (click)="loadDashboardData()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-600 hover:bg-red-700 text-white transition-colors">
+        {{ 'common.retry' | translate }}
+      </button>
     </div>
-
-    <div class="lg:col-span-4">
-      <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm h-full">
-        <h6 class="font-bold text-base text-aquamarine-950 dark:text-aquamarine-50 mb-4">
-          {{ 'dashboard.quick_actions' | translate }}
-        </h6>
-        <div class="flex flex-col gap-3">
-          <a routerLink="/dashboard/admin/manage-users" class="flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 transition-colors">
-            <i class="bi bi-journal-check"></i>{{ 'dashboard.approve_requests_count' | translate }}
-          </a>
-          <a routerLink="/dashboard/admin/manage-languages" class="flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors">
-            <i class="bi bi-folder-plus"></i>{{ 'dashboard.add_language_btn' | translate }}
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-    <div class="lg:col-span-4">
+  } @else {
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-        <h6 class="font-bold text-base text-aquamarine-950 dark:text-aquamarine-50 mb-4">
-          {{ 'dashboard.blog_lang_dist_chart' | translate }}
-        </h6>
-        <div>
-          <canvas id="langPieChart"></canvas>
+        <div class="text-xs font-medium text-aquamarine-600 dark:text-aquamarine-400">{{ 'dashboard.manage_users' | translate }}</div>
+        <h3 class="font-bold text-2xl text-aquamarine-700 dark:text-aquamarine-300 mt-1">
+          {{ dashboardData()?.stats?.totalUsers ?? 0 }}
+        </h3>
+      </div>
+      <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
+        <div class="text-xs font-medium text-aquamarine-600 dark:text-aquamarine-400">{{ 'dashboard.blog_owners' | translate }}</div>
+        <h3 class="font-bold text-2xl text-cyan-500 mt-1">
+          {{ dashboardData()?.stats?.totalBlogOwners ?? 0 }}
+        </h3>
+      </div>
+      <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
+        <div class="text-xs font-medium text-aquamarine-600 dark:text-aquamarine-400">{{ 'dashboard.manage_languages' | translate }}</div>
+        <h3 class="font-bold text-2xl text-emerald-500 mt-1">
+          {{ dashboardData()?.stats?.totalLanguages ?? 0 }}
+        </h3>
+      </div>
+      <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
+        <div class="text-xs font-medium text-aquamarine-600 dark:text-aquamarine-400">{{ 'dashboard.approve_posts' | translate }}</div>
+        <h3 class="font-bold text-2xl text-amber-500 mt-1">
+          {{ dashboardData()?.stats?.pendingRequests ?? 0 }}
+        </h3>
+      </div>
+    </div>
+
+    <!-- Charts & Quick Actions Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div class="lg:col-span-8">
+        <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm h-full flex flex-col justify-between">
+          <h6 class="font-bold text-base text-aquamarine-950 dark:text-aquamarine-50 mb-4">
+            {{ 'dashboard.user_growth_chart' | translate }}
+          </h6>
+          <div>
+            <canvas id="userGrowthChart" height="100"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-4">
+        <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm h-full">
+          <h6 class="font-bold text-base text-aquamarine-950 dark:text-aquamarine-50 mb-4">
+            {{ 'dashboard.quick_actions' | translate }}
+          </h6>
+          <div class="flex flex-col gap-3">
+            <a routerLink="/dashboard/admin/manage-users" class="flex items-center justify-between px-4 py-2.5 rounded-xl font-medium text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 transition-colors">
+              <span class="flex items-center gap-2">
+                <i class="bi bi-journal-check"></i>
+                {{ 'dashboard.approve_requests_count' | translate }}
+              </span>
+              @if ((dashboardData()?.stats?.pendingRequests ?? 0) > 0) {
+                <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-amber-500 text-white">
+                  {{ dashboardData()?.stats?.pendingRequests }}
+                </span>
+              }
+            </a>
+            <a routerLink="/dashboard/admin/manage-languages" class="flex items-center justify-between px-4 py-2.5 rounded-xl font-medium text-sm text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors">
+              <span class="flex items-center gap-2">
+                <i class="bi bi-folder-plus"></i>
+                {{ 'dashboard.add_language_btn' | translate }}
+              </span>
+            </a>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+
+    <!-- Doughnut Chart & Language breakdown -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div class="lg:col-span-6">
+        <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
+          <h6 class="font-bold text-base text-aquamarine-950 dark:text-aquamarine-50 mb-4">
+            {{ 'dashboard.blog_lang_dist_chart' | translate }}
+          </h6>
+          <div>
+            <canvas id="langPieChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-6">
+        <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm h-full">
+          <h6 class="font-bold text-base text-aquamarine-950 dark:text-aquamarine-50 mb-4">
+            Chi tiết phân bổ theo ngôn ngữ
+          </h6>
+          <div class="space-y-3">
+            @for (lang of dashboardData()?.postsByLanguage?.details; track lang.id) {
+              <div class="p-3 rounded-xl border border-aquamarine-100 dark:border-aquamarine-800 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  @if (lang.flag) {
+                    <span class="text-xl">{{ lang.flag }}</span>
+                  }
+                  <div>
+                    <div class="font-semibold text-sm text-aquamarine-950 dark:text-aquamarine-50">
+                      {{ lang.name }} ({{ lang.code }})
+                    </div>
+                    <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400">
+                      {{ lang.postCount }} bài viết
+                    </div>
+                  </div>
+                </div>
+                <div class="text-sm font-bold text-aquamarine-700 dark:text-aquamarine-300">
+                  {{ lang.percentage }}%
+                </div>
+              </div>
+            } @empty {
+              <div class="text-xs text-aquamarine-500 italic">Chưa có dữ liệu ngôn ngữ</div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
 </section>

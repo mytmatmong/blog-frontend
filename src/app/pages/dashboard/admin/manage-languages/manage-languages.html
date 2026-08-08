@@ -6,74 +6,108 @@
     </button>
   </div>
 
-  <div class="rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm overflow-x-auto">
-    <table class="w-full text-left border-collapse text-sm">
-      <thead>
-        <tr class="border-b border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950/50">
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'table.lang_code' | translate }}</th>
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'table.lang_name' | translate }}</th>
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.default' | translate }}</th>
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.status' | translate }}</th>
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.actions' | translate }}</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-aquamarine-100 dark:divide-aquamarine-800">
-        @for (lang of paginatedLanguages; track lang.id) {
-          <tr class="hover:bg-aquamarine-50/30 dark:hover:bg-aquamarine-950/30 transition-colors">
-            <td class="p-4 font-bold uppercase text-aquamarine-950 dark:text-aquamarine-50">{{ lang.code }}</td>
-            <td class="p-4 text-aquamarine-950 dark:text-aquamarine-50">
-              <div class="flex items-center gap-2">
-                <img [src]="'https://flagcdn.com/w20/' + lang.flag + '.png'" [alt]="lang.flag" class="w-5 h-3.5 rounded-sm object-cover">
-                <span>{{ lang.name }}</span>
-              </div>
-            </td>
-            <td class="p-4 text-center">
-              @if (lang.isDefault) {
-                <span class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-md bg-aquamarine-100 text-aquamarine-800 dark:bg-aquamarine-800 dark:text-aquamarine-100">
-                  <i class="bi bi-star-fill"></i> Default
-                </span>
-              } @else {
-                <span class="text-aquamarine-400">-</span>
-              }
-            </td>
-            <td class="p-4 text-center">
-              @if (lang.status === 'ACTIVE') {
-                <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">ACTIVE</span>
-              } @else {
-                <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">INACTIVE</span>
-              }
-            </td>
-            <td class="p-4 text-center">
-              <div class="flex items-center justify-center gap-2">
-                <button (click)="setEditLanguage(lang)" class="p-1.5 text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-950/30 rounded-lg transition-colors" [title]="'comments.edit' | translate">
-                  <i class="bi bi-pencil-square text-lg"></i>
-                </button>
-                <button (click)="deleteLanguage(lang)" class="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors" [title]="'comments.delete' | translate">
-                  <i class="bi bi-trash3-fill text-lg"></i>
-                </button>
-              </div>
-            </td>
+  @if (isLoading()) {
+    <div class="p-8 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 flex items-center justify-center gap-3">
+      <div class="animate-spin rounded-full h-6 w-6 border-2 border-aquamarine-600 border-t-transparent"></div>
+      <span class="text-sm font-medium text-aquamarine-700 dark:text-aquamarine-300">Đang tải danh sách ngôn ngữ...</span>
+    </div>
+  } @else if (errorMessage()) {
+    <div class="p-5 rounded-2xl border border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800 flex items-center justify-between">
+      <div class="flex items-center gap-3 text-red-700 dark:text-red-300 text-sm">
+        <i class="bi bi-exclamation-triangle-fill text-lg"></i>
+        <span>{{ errorMessage() }}</span>
+      </div>
+      <button (click)="loadLanguages()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-600 hover:bg-red-700 text-white transition-colors">
+        {{ 'common.retry' | translate }}
+      </button>
+    </div>
+  } @else {
+    <div class="rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm overflow-x-auto">
+      <table class="w-full text-left border-collapse text-sm">
+        <thead>
+          <tr class="border-b border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950/50">
+            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'table.lang_code' | translate }}</th>
+            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'table.lang_name' | translate }}</th>
+            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.default' | translate }}</th>
+            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.status' | translate }}</th>
+            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.actions' | translate }}</th>
           </tr>
-        }
-      </tbody>
-    </table>
-  </div>
+        </thead>
+        <tbody class="divide-y divide-aquamarine-100 dark:divide-aquamarine-800">
+          @for (lang of paginatedLanguages(); track lang.id) {
+            <tr class="hover:bg-aquamarine-50/30 dark:hover:bg-aquamarine-950/30 transition-colors">
+              <td class="p-4 font-bold uppercase text-aquamarine-950 dark:text-aquamarine-50">{{ lang.code }}</td>
+              <td class="p-4 text-aquamarine-950 dark:text-aquamarine-50">
+                <div class="flex items-center gap-2">
+                  @if (is2LetterFlag(lang.flag)) {
+                    <img [src]="'https://flagcdn.com/w20/' + lang.flag?.toLowerCase() + '.png'" [alt]="lang.flag" class="w-5 h-3.5 rounded-sm object-cover">
+                  } @else if (lang.flag) {
+                    <span class="text-lg leading-none">{{ lang.flag }}</span>
+                  }
+                  <span>{{ lang.name }}</span>
+                </div>
+              </td>
+              <td class="p-4 text-center">
+                @if (lang.isDefault) {
+                  <span class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-md bg-aquamarine-100 text-aquamarine-800 dark:bg-aquamarine-800 dark:text-aquamarine-100">
+                    <i class="bi bi-star-fill"></i> Default
+                  </span>
+                } @else {
+                  <span class="text-aquamarine-400">-</span>
+                }
+              </td>
+              <td class="p-4 text-center">
+                @if (lang.isActive) {
+                  <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">ACTIVE</span>
+                } @else {
+                  <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">INACTIVE</span>
+                }
+              </td>
+              <td class="p-4 text-center">
+                <div class="flex items-center justify-center gap-2">
+                  <button (click)="setEditLanguage(lang)" class="p-1.5 text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-950/30 rounded-lg transition-colors" [title]="'comments.edit' | translate">
+                    <i class="bi bi-pencil-square text-lg"></i>
+                  </button>
+                  <button (click)="deleteLanguage(lang)" [disabled]="deletingId() === lang.id" class="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors disabled:opacity-50" [title]="'comments.delete' | translate">
+                    @if (deletingId() === lang.id) {
+                      <div class="animate-spin rounded-full h-4 w-4 border-2 border-red-600 border-t-transparent"></div>
+                    } @else {
+                      <i class="bi bi-trash3-fill text-lg"></i>
+                    }
+                  </button>
 
-  <div class="mt-6 flex justify-center">
-    <ul class="inline-flex items-center space-x-1 text-sm">
-      <li>
-        <button [disabled]="currentPage() === 1" [class.opacity-50]="currentPage() === 1" class="px-3 py-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="setPage(currentPage() - 1)">{{ 'pagination.prev' | translate }}</button>
-      </li>
-      @for (p of pageNumbers; track p) {
-        <li>
-          <button class="px-3.5 py-2 rounded-lg font-semibold transition-colors" [class.bg-aquamarine-600]="currentPage() === p" [class.text-white]="currentPage() === p" [class.border]="currentPage() !== p" [class.border-aquamarine-200]="currentPage() !== p" [class.dark:border-aquamarine-800]="currentPage() !== p" [class.bg-white]="currentPage() !== p" [class.dark:bg-aquamarine-900]="currentPage() !== p" [class.text-aquamarine-800]="currentPage() !== p" [class.dark:text-aquamarine-200]="currentPage() !== p" (click)="setPage(p)">{{ p }}</button>
-        </li>
-      }
-      <li>
-        <button [disabled]="currentPage() === totalPages()" [class.opacity-50]="currentPage() === totalPages()" class="px-3 py-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="setPage(currentPage() + 1)">{{ 'pagination.next' | translate }}</button>
-      </li>
-    </ul>
-  </div>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="p-8 text-center text-sm text-aquamarine-500 italic">
+                Chưa có ngôn ngữ nào.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (totalPages() > 1) {
+      <div class="mt-6 flex justify-center">
+        <ul class="inline-flex items-center space-x-1 text-sm">
+          <li>
+            <button [disabled]="currentPage() === 1" [class.opacity-50]="currentPage() === 1" class="px-3 py-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="setPage(currentPage() - 1)">{{ 'pagination.prev' | translate }}</button>
+          </li>
+          @for (p of pageNumbers(); track p) {
+            <li>
+              <button class="px-3.5 py-2 rounded-lg font-semibold transition-colors" [class.bg-aquamarine-600]="currentPage() === p" [class.text-white]="currentPage() === p" [class.border]="currentPage() !== p" [class.border-aquamarine-200]="currentPage() !== p" [class.dark:border-aquamarine-800]="currentPage() !== p" [class.bg-white]="currentPage() !== p" [class.dark:bg-aquamarine-900]="currentPage() !== p" [class.text-aquamarine-800]="currentPage() !== p" [class.dark:text-aquamarine-200]="currentPage() !== p" (click)="setPage(p)">{{ p }}</button>
+            </li>
+          }
+          <li>
+            <button [disabled]="currentPage() === totalPages()" [class.opacity-50]="currentPage() === totalPages()" class="px-3 py-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="setPage(currentPage() + 1)">{{ 'pagination.next' | translate }}</button>
+          </li>
+        </ul>
+      </div>
+    }
+  }
 </section>
 
 <!-- Modal Thêm Ngôn ngữ mới -->
@@ -128,7 +162,13 @@
         </div>
         <div class="flex justify-end gap-3 pt-2">
           <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="closeAddModal()">{{ 'modal.cancel' | translate }}</button>
-          <button type="submit" class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-aquamarine-600 hover:bg-aquamarine-700 disabled:opacity-50 transition-colors" [disabled]="!addCode.trim() || !addName.trim()">{{ 'modal.save' | translate }}</button>
+          <button type="submit" class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-aquamarine-600 hover:bg-aquamarine-700 disabled:opacity-50 transition-colors flex items-center gap-2" [disabled]="!addCode.trim() || !addName.trim() || isSubmittingAdd()">
+            @if (isSubmittingAdd()) {
+              <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+            }
+            {{ 'modal.save' | translate }}
+          </button>
+
         </div>
       </form>
     </div>
@@ -187,7 +227,13 @@
         </div>
         <div class="flex justify-end gap-3 pt-2">
           <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="closeEditModal()">{{ 'modal.cancel' | translate }}</button>
-          <button type="submit" class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-aquamarine-600 hover:bg-aquamarine-700 disabled:opacity-50 transition-colors" [disabled]="!editCode.trim() || !editName.trim()">{{ 'modal.save' | translate }}</button>
+          <button type="submit" class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-aquamarine-600 hover:bg-aquamarine-700 disabled:opacity-50 transition-colors flex items-center gap-2" [disabled]="!editCode.trim() || !editName.trim() || isSubmittingEdit() || isEditingLoading()">
+            @if (isSubmittingEdit()) {
+              <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+            }
+            {{ 'modal.save' | translate }}
+          </button>
+
         </div>
       </form>
     </div>

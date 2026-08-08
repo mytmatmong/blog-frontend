@@ -1,16 +1,15 @@
-import { Component, signal, computed, inject } from '@angular/core';
+import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import {
+  AdminLanguage,
+  CreateAdminLanguageRequest,
+  UpdateAdminLanguageRequest,
+} from '../../../../core/models/admin-api.model';
+import { AdminApiService } from '../../../../core/services/admin-api.service';
+import { ToastService } from '../../../../core/services/toast.service';
 import { TranslationService } from '../../../../core/services/translation.service';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
-
-interface LanguageItem {
-  id: number;
-  code: string;
-  name: string;
-  flag: string;
-  isDefault: boolean;
-  status: 'ACTIVE' | 'INACTIVE';
-}
 
 @Component({
   selector: 'app-manage-languages',
@@ -18,11 +17,22 @@ interface LanguageItem {
   templateUrl: './manage-languages.html',
   styleUrl: './manage-languages.css',
 })
-export class ManageLanguages {
+export class ManageLanguages implements OnInit {
   protected readonly ts = inject(TranslationService);
-  languagesMockData: LanguageItem[] = [];
+  private readonly adminApiService = inject(AdminApiService);
+  private readonly toastService = inject(ToastService);
+  private readonly destroyRef = inject(DestroyRef);
+
+  readonly languagesList = signal<AdminLanguage[]>([]);
+  readonly isLoading = signal<boolean>(true);
+  readonly errorMessage = signal<string | null>(null);
+  readonly isEditingLoading = signal<boolean>(false);
+  readonly isSubmittingAdd = signal<boolean>(false);
+  readonly isSubmittingEdit = signal<boolean>(false);
+  readonly deletingId = signal<number | null>(null);
+
   currentPage = signal<number>(1);
-  itemsPerPage = 6;
+  itemsPerPage = 10;
 
   isAddModalOpen = signal<boolean>(false);
   isAddFlagDropdownOpen = signal<boolean>(false);
@@ -37,7 +47,7 @@ export class ManageLanguages {
   addIsActive = true;
 
   // Edit Language Form Fields
-  activeEditLanguage = signal<LanguageItem | null>(null);
+  activeEditLanguage = signal<AdminLanguage | null>(null);
   selectedEditFlag = 'vn';
   selectedEditFlagName = 'Vietnam (VN)';
   editCode = '';
@@ -53,49 +63,64 @@ export class ManageLanguages {
     { code: 'kr', name: 'South Korea (KR)' },
     { code: 'cn', name: 'China (CN)' },
     { code: 'fr', name: 'France (FR)' },
-    { code: 'de', name: 'Germany (DE)' }
+    { code: 'de', name: 'Germany (DE)' },
   ];
 
-  constructor() {
-    const baseLanguages: Omit<LanguageItem, 'id'>[] = [
-      { code: 'vi', name: 'Tiếng Việt', flag: 'vn', isDefault: true, status: 'ACTIVE' as const },
-      { code: 'en', name: 'English', flag: 'gb', isDefault: false, status: 'ACTIVE' as const },
-      { code: 'ja', name: 'Japanese', flag: 'jp', isDefault: false, status: 'INACTIVE' as const },
-      { code: 'kr', name: 'Korean', flag: 'kr', isDefault: false, status: 'INACTIVE' as const },
-      { code: 'fr', name: 'French', flag: 'fr', isDefault: false, status: 'ACTIVE' as const }
-    ];
-
-    for (let i = 0; i < 20; i++) {
-      const lang = { ...baseLanguages[i % baseLanguages.length] } as LanguageItem;
-      lang.id = i + 1;
-      if (i >= 5) {
-        lang.code = `${lang.code}${i}`;
-        lang.name = `${lang.name} ${i}`;
-        lang.isDefault = false;
-      }
-      this.languagesMockData.push(lang);
-    }
+  ngOnInit() {
+    this.loadLanguages();
   }
 
-  totalPages = computed(() => Math.ceil(this.languagesMockData.length / this.itemsPerPage));
+  loadLanguages() {
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
 
-  get pageNumbers(): number[] {
-    const pages = [];
+    this.adminApiService
+      .getAdminLanguages()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => {
+          this.isLoading.set(false);
+          if (res?.success && Array.isArray(res.data)) {
+            this.languagesList.set(res.data);
+          }
+        },
+        error: (err) => {
+          this.isLoading.set(false);
+          this.errorMessage.set(
+            typeof err?.error?.message === 'string'
+              ? err.error.message
+              : 'Không thể tải danh sách ngôn ngữ.',
+          );
+        },
+      });
+  }
+
+  totalPages = computed(() => {
+    const total = Math.ceil(this.languagesList().length / this.itemsPerPage);
+    return total > 0 ? total : 1;
+  });
+
+  pageNumbers = computed(() => {
+    const pages: number[] = [];
     for (let i = 1; i <= this.totalPages(); i++) {
       pages.push(i);
     }
     return pages;
-  }
+  });
 
-  get paginatedLanguages(): LanguageItem[] {
+  paginatedLanguages = computed(() => {
     const startIndex = (this.currentPage() - 1) * this.itemsPerPage;
-    return this.languagesMockData.slice(startIndex, startIndex + this.itemsPerPage);
-  }
+    return this.languagesList().slice(startIndex, startIndex + this.itemsPerPage);
+  });
 
   setPage(page: number) {
     if (page >= 1 && page <= this.totalPages()) {
       this.currentPage.set(page);
     }
+  }
+
+  is2LetterFlag(flag: string | null): boolean {
+    return !!flag && /^[a-zA-Z]{2}$/.test(flag.trim());
   }
 
   openAddModal() {
@@ -124,70 +149,183 @@ export class ManageLanguages {
     this.isEditFlagDropdownOpen.set(false);
   }
 
-  setEditLanguage(lang: LanguageItem) {
+  /**
+   * Fetch language detail via GET /api/v1/admin/languages/:id (A03)
+   */
+  setEditLanguage(lang: AdminLanguage) {
     this.activeEditLanguage.set(lang);
-    this.selectedEditFlag = lang.flag;
-    const flagObj = this.flagOptions.find(f => f.code === lang.flag);
-    this.selectedEditFlagName = flagObj ? flagObj.name : lang.flag.toUpperCase();
+    this.populateEditForm(lang);
+    this.isEditingLoading.set(true);
+
+    this.adminApiService
+      .getAdminLanguageById(lang.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => {
+          this.isEditingLoading.set(false);
+          if (res?.success && res.data) {
+            this.activeEditLanguage.set(res.data);
+            this.populateEditForm(res.data);
+          }
+        },
+        error: () => {
+          this.isEditingLoading.set(false);
+        },
+      });
+  }
+
+  private populateEditForm(lang: AdminLanguage) {
+    this.selectedEditFlag = lang.flag || 'vn';
+    const flagObj = this.flagOptions.find((f) => f.code === lang.flag);
+    this.selectedEditFlagName = flagObj ? flagObj.name : (lang.flag || 'VN').toUpperCase();
     this.editCode = lang.code;
     this.editName = lang.name;
     this.editIsDefault = lang.isDefault;
-    this.editIsActive = lang.status === 'ACTIVE';
+    this.editIsActive = lang.isActive;
   }
 
+  /**
+   * Submit A04 — POST /api/v1/admin/languages
+   */
   submitAddLanguage() {
-    if (!this.addCode.trim() || !this.addName.trim()) return;
+    const code = this.addCode.trim();
+    const name = this.addName.trim();
 
-    if (this.addIsDefault) {
-      this.clearDefaults();
+    if (!code || !name) return;
+
+    if (code.length > 10) {
+      this.toastService.error('Mã ngôn ngữ tối đa 10 ký tự.');
+      return;
     }
 
-    const newLang: LanguageItem = {
-      id: this.languagesMockData.length + 1,
-      code: this.addCode,
-      name: this.addName,
+    if (name.length > 100) {
+      this.toastService.error('Tên ngôn ngữ tối đa 100 ký tự.');
+      return;
+    }
+
+    this.isSubmittingAdd.set(true);
+
+    const body: CreateAdminLanguageRequest = {
+      code,
+      name,
       flag: this.selectedAddFlag,
       isDefault: this.addIsDefault,
-      status: this.addIsActive ? 'ACTIVE' : 'INACTIVE'
+      isActive: this.addIsActive,
     };
 
-    this.languagesMockData.unshift(newLang);
-    this.resetAddForm();
-    this.closeAddModal();
+    this.adminApiService
+      .createAdminLanguage(body)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => {
+          this.isSubmittingAdd.set(false);
+          if (res?.success && res.data) {
+            this.toastService.success('Tạo ngôn ngữ mới thành công!');
+            this.loadLanguages();
+            this.resetAddForm();
+            this.closeAddModal();
+          }
+        },
+        error: (err) => {
+          this.isSubmittingAdd.set(false);
+          const errorMsg =
+            typeof err?.error?.message === 'string'
+              ? err.error.message
+              : Array.isArray(err?.error?.message)
+                ? err.error.message.join(', ')
+                : 'Tạo ngôn ngữ thất bại.';
+          this.toastService.error(errorMsg);
+        },
+      });
   }
 
+  /**
+   * Submit A05 — PATCH /api/v1/admin/languages/:id
+   */
   submitEditLanguage() {
-    if (!this.editCode.trim() || !this.editName.trim()) return;
     const lang = this.activeEditLanguage();
-    if (lang) {
-      if (this.editIsDefault) {
-        this.clearDefaults();
-      }
+    if (!lang) return;
 
-      const idx = this.languagesMockData.findIndex(l => l.id === lang.id);
-      if (idx !== -1) {
-        this.languagesMockData[idx].code = this.editCode;
-        this.languagesMockData[idx].name = this.editName;
-        this.languagesMockData[idx].flag = this.selectedEditFlag;
-        this.languagesMockData[idx].isDefault = this.editIsDefault;
-        this.languagesMockData[idx].status = this.editIsActive ? 'ACTIVE' : 'INACTIVE';
-      }
-      this.closeEditModal();
+    const code = this.editCode.trim();
+    const name = this.editName.trim();
+
+    if (!code || !name) return;
+
+    if (code.length > 10) {
+      this.toastService.error('Mã ngôn ngữ tối đa 10 ký tự.');
+      return;
     }
+
+    if (name.length > 100) {
+      this.toastService.error('Tên ngôn ngữ tối đa 100 ký tự.');
+      return;
+    }
+
+    this.isSubmittingEdit.set(true);
+
+    const body: UpdateAdminLanguageRequest = {
+      code,
+      name,
+      flag: this.selectedEditFlag,
+      isDefault: this.editIsDefault,
+      isActive: this.editIsActive,
+    };
+
+    this.adminApiService
+      .updateAdminLanguage(lang.id, body)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => {
+          this.isSubmittingEdit.set(false);
+          if (res?.success && res.data) {
+            this.toastService.success('Cập nhật ngôn ngữ thành công!');
+            this.loadLanguages();
+            this.closeEditModal();
+          }
+        },
+        error: (err) => {
+          this.isSubmittingEdit.set(false);
+          const errorMsg =
+            typeof err?.error?.message === 'string'
+              ? err.error.message
+              : Array.isArray(err?.error?.message)
+                ? err.error.message.join(', ')
+                : 'Cập nhật ngôn ngữ thất bại.';
+          this.toastService.error(errorMsg);
+        },
+      });
   }
 
-  deleteLanguage(lang: LanguageItem) {
-    if (confirm(this.ts.translate('modal.delete_confirm'))) {
-      this.languagesMockData = this.languagesMockData.filter(l => l.id !== lang.id);
-      const maxPages = Math.ceil(this.languagesMockData.length / this.itemsPerPage);
-      if (this.currentPage() > maxPages && maxPages >= 1) {
-        this.currentPage.set(maxPages);
-      }
-    }
-  }
+  /**
+   * Submit A06 — DELETE /api/v1/admin/languages/:id
+   */
+  deleteLanguage(lang: AdminLanguage) {
+    if (!confirm(this.ts.translate('modal.delete_confirm'))) return;
 
-  private clearDefaults() {
-    this.languagesMockData.forEach(l => l.isDefault = false);
+    this.deletingId.set(lang.id);
+
+    this.adminApiService
+      .deleteAdminLanguage(lang.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => {
+          this.deletingId.set(null);
+          if (res?.success) {
+            this.toastService.success('Xóa ngôn ngữ thành công!');
+            this.loadLanguages();
+          }
+        },
+        error: (err) => {
+          this.deletingId.set(null);
+          const errorMsg =
+            typeof err?.error?.message === 'string'
+              ? err.error.message
+              : Array.isArray(err?.error?.message)
+                ? err.error.message.join(', ')
+                : 'Xóa ngôn ngữ thất bại.';
+          this.toastService.error(errorMsg);
+        },
+      });
   }
 
   private resetAddForm() {
