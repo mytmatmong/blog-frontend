@@ -6,55 +6,154 @@
     </button>
   </div>
 
-  <div class="rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm overflow-x-auto">
-    <table class="w-full text-left border-collapse text-sm">
+  <!-- Search & Filter Toolbar -->
+  <div class="p-4 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+    <!-- Search Bar -->
+    <div class="relative flex-1 min-w-[240px]">
+      <i class="bi bi-search absolute left-3.5 top-1/2 -translate-y-1/2 text-aquamarine-500 dark:text-aquamarine-400"></i>
+      <input
+        type="text"
+        [ngModel]="searchQuery()"
+        (ngModelChange)="onSearchChange($event)"
+        placeholder="Tìm kiếm username hoặc email..."
+        class="w-full pl-10 pr-8 py-2 rounded-xl text-sm border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950/50 text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500 transition-all"
+      />
+      @if (searchQuery()) {
+        <button (click)="onSearchChange('')" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+          <i class="bi bi-x-circle-fill text-xs"></i>
+        </button>
+      }
+    </div>
+
+    <!-- Filters Group -->
+    <div class="flex flex-wrap items-center gap-3">
+      <!-- Role Filter -->
+      <div class="flex items-center gap-2">
+        <label class="text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 whitespace-nowrap"><i class="bi bi-funnel"></i> Vai trò:</label>
+        <select
+          [ngModel]="roleFilter()"
+          (ngModelChange)="onRoleFilterChange($event)"
+          class="px-3 py-2 rounded-xl text-sm border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none focus:ring-2 focus:ring-aquamarine-500 transition-all cursor-pointer"
+        >
+          <option value="ALL">Tất cả vai trò</option>
+          <option value="NORMAL">Normal User</option>
+          <option value="BLOG_OWNER">Blog Owner</option>
+          <option value="CONTENT_MODERATOR">Content Moderator</option>
+          <option value="SUPER_ADMIN">Super Admin</option>
+        </select>
+      </div>
+
+      <!-- Status Filter -->
+      <div class="flex items-center gap-2">
+        <label class="text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 whitespace-nowrap"><i class="bi bi-person-check"></i> Trạng thái:</label>
+        <select
+          [ngModel]="statusFilter()"
+          (ngModelChange)="onStatusFilterChange($event)"
+          class="px-3 py-2 rounded-xl text-sm border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none focus:ring-2 focus:ring-aquamarine-500 transition-all cursor-pointer"
+        >
+          <option value="ALL">Tất cả trạng thái</option>
+          <option value="ACTIVE">ACTIVE</option>
+          <option value="LOCKED">LOCKED</option>
+        </select>
+      </div>
+
+      <!-- Reset Filters Button -->
+      @if (searchQuery() || roleFilter() !== 'ALL' || statusFilter() !== 'ALL') {
+        <button
+          (click)="resetFilters()"
+          class="px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 hover:bg-rose-100 transition-colors flex items-center gap-1 whitespace-nowrap"
+          title="Xóa bộ lọc"
+        >
+          <i class="bi bi-x-lg"></i> Xóa lọc
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Users Table Container -->
+  <div class="rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm overflow-x-auto relative min-h-[300px]">
+    @if (isLoading()) {
+      <div class="absolute inset-0 z-10 bg-white/70 dark:bg-aquamarine-900/70 backdrop-blur-xs flex items-center justify-center">
+        <div class="flex items-center gap-3 text-aquamarine-600 dark:text-aquamarine-400 font-medium">
+          <i class="bi bi-arrow-repeat animate-spin text-2xl"></i>
+          <span>Đang tải danh sách người dùng...</span>
+        </div>
+      </div>
+    }
+
+    <table class="w-full text-left border-collapse text-sm table-fixed min-w-[900px]">
       <thead>
         <tr class="border-b border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950/50">
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'table.user' | translate }}</th>
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'table.role' | translate }}</th>
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.status' | translate }}</th>
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.actions' | translate }}</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 w-[30%] min-w-[200px]">{{ 'table.user' | translate }}</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 w-[20%] min-w-[150px]">{{ 'table.role' | translate }}</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center w-[15%] min-w-[110px]">{{ 'table.status' | translate }}</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-left w-[35%] min-w-[300px]">{{ 'table.actions' | translate }}</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-aquamarine-100 dark:divide-aquamarine-800">
-        @for (user of paginatedUsers; track user.id) {
+        @if (!isLoading() && users().length === 0) {
+          <tr>
+            <td colspan="4" class="p-8 text-center text-aquamarine-600 dark:text-aquamarine-400">
+              <i class="bi bi-search text-2xl block mb-2 text-aquamarine-400"></i>
+              Không tìm thấy người dùng nào phù hợp với điều kiện tìm kiếm.
+            </td>
+          </tr>
+        }
+        @for (user of users(); track user.id) {
           <tr class="hover:bg-aquamarine-50/30 dark:hover:bg-aquamarine-950/30 transition-colors">
             <td class="p-4 font-medium">
-              <a href="#" (click)="$event.preventDefault(); setPreviewUser(user)" class="text-aquamarine-950 dark:text-aquamarine-50 hover:text-aquamarine-600 dark:hover:text-aquamarine-400 transition-colors">
-                {{ user.email }}
-              </a>
+              <div class="flex items-center gap-3">
+                @if (user.avatarUrl) {
+                  <img [src]="user.avatarUrl" alt="Avatar" class="w-8 h-8 rounded-full object-cover shrink-0 border border-aquamarine-200 dark:border-aquamarine-700" />
+                } @else {
+                  <div class="w-8 h-8 rounded-full bg-aquamarine-100 dark:bg-aquamarine-800 text-aquamarine-700 dark:text-aquamarine-300 font-bold flex items-center justify-center text-xs shrink-0">
+                    {{ (user.username || user.email || 'U').substring(0, 1).toUpperCase() }}
+                  </div>
+                }
+                <div class="truncate">
+                  <a href="#" (click)="$event.preventDefault(); setPreviewUser(user)" class="text-aquamarine-950 dark:text-aquamarine-50 hover:text-aquamarine-600 dark:hover:text-aquamarine-400 font-bold transition-colors truncate block" [title]="user.username">
+                    {{ user.username || '—' }}
+                  </a>
+                  <span class="text-xs text-aquamarine-600 dark:text-aquamarine-400 truncate block font-normal" [title]="user.email">
+                    {{ user.email }}
+                  </span>
+                </div>
+              </div>
             </td>
-            <td class="p-4">
-              <span [className]="user.roleClass + ' font-semibold'">{{ user.role }}</span>
+            <td class="p-4 whitespace-nowrap">
+              <button (click)="openRoleModal(user)" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer" [className]="getRoleClass(user.role)" title="Đổi vai trò">
+                {{ user.role }} <i class="bi bi-chevron-down text-[10px]"></i>
+              </button>
             </td>
-            <td class="p-4 text-center">
+            <td class="p-4 text-center whitespace-nowrap">
               @if (user.status === 'ACTIVE') {
-                <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">{{ 'status.active' | translate }}</span>
-              } @else {
-                <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300">{{ 'status.locked' | translate }}</span>
+                <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">ACTIVE</span>
+              } @else if (user.status === 'LOCKED') {
+                <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300" [title]="user.lockReason ? 'Lý do: ' + user.lockReason : 'Đã bị khóa'">LOCKED</span>
               }
             </td>
-            <td class="p-4 text-center">
-              <div class="flex items-center justify-center gap-2">
-                @if (user.role === 'NORMAL_USER') {
-                  <button (click)="grantBlogOwner(user)" class="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg text-aquamarine-600 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" [title]="'users.grant_owner' | translate">
-                    <i class="bi bi-arrow-up-circle-fill"></i> {{ 'users.grant_owner' | translate }}
+            <td class="p-4 text-left">
+              <div class="flex items-center gap-2">
+                <!-- Edit User (A12) -->
+                <button (click)="openEditUserModal(user)" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 transition-colors flex items-center gap-1" title="Cập nhật thông tin">
+                  <i class="bi bi-pencil-square"></i> Sửa
+                </button>
+
+                <!-- Lock / Unlock Action (A13 / A14) -->
+                @if (user.status === 'ACTIVE') {
+                  <button (click)="openLockModal(user)" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 hover:bg-amber-100 transition-colors flex items-center gap-1" title="Khóa tài khoản">
+                    <i class="bi bi-lock-fill"></i> Khóa
                   </button>
-                } @else if (user.role === 'BLOG_OWNER') {
-                  <button (click)="revokeBlogOwner(user)" class="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-950/30 transition-colors" [title]="'users.revoke_owner' | translate">
-                    <i class="bi bi-arrow-down-circle-fill"></i> {{ 'users.revoke_owner' | translate }}
+                } @else if (user.status === 'LOCKED') {
+                  <button (click)="unlockUser(user)" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 hover:bg-emerald-100 transition-colors flex items-center gap-1" title="Mở khóa tài khoản">
+                    <i class="bi bi-unlock-fill"></i> Mở khóa
                   </button>
                 }
 
-                @if (user.status === 'ACTIVE') {
-                  <button (click)="lockUser(user)" class="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors" [title]="'users.lock_user' | translate">
-                    <i class="bi bi-lock-fill"></i> {{ 'users.lock_user' | translate }}
-                  </button>
-                } @else {
-                  <button (click)="unlockUser(user)" class="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors" [title]="'users.unlock_user' | translate">
-                    <i class="bi bi-unlock-fill"></i> {{ 'users.unlock_user' | translate }}
-                  </button>
-                }
+                <!-- Soft Delete Action (A16) -->
+                <button (click)="softDeleteUser(user)" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 hover:bg-rose-100 transition-colors flex items-center gap-1" title="Xóa mềm người dùng">
+                  <i class="bi bi-trash3-fill"></i> Xóa
+                </button>
               </div>
             </td>
           </tr>
@@ -63,106 +162,279 @@
     </table>
   </div>
 
-  <div class="mt-6 flex justify-center">
-    <ul class="inline-flex items-center space-x-1 text-sm">
-      <li>
-        <button [disabled]="currentPage() === 1" [class.opacity-50]="currentPage() === 1" class="px-3 py-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="setPage(currentPage() - 1)">{{ 'pagination.prev' | translate }}</button>
-      </li>
-      @for (p of pageNumbers; track p) {
+  <!-- Pagination -->
+  @if (totalPages() > 1) {
+    <div class="mt-6 flex justify-between items-center text-sm text-aquamarine-700 dark:text-aquamarine-300">
+      <div>Tổng cộng <strong>{{ totalItems() }}</strong> người dùng</div>
+      <ul class="inline-flex items-center space-x-1">
         <li>
-          <button class="px-3.5 py-2 rounded-lg font-semibold transition-colors" [class.bg-aquamarine-600]="currentPage() === p" [class.text-white]="currentPage() === p" [class.border]="currentPage() !== p" [class.border-aquamarine-200]="currentPage() !== p" [class.dark:border-aquamarine-800]="currentPage() !== p" [class.bg-white]="currentPage() !== p" [class.dark:bg-aquamarine-900]="currentPage() !== p" [class.text-aquamarine-800]="currentPage() !== p" [class.dark:text-aquamarine-200]="currentPage() !== p" (click)="setPage(p)">{{ p }}</button>
+          <button [disabled]="currentPage() === 1" [class.opacity-50]="currentPage() === 1" class="px-3 py-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer" (click)="setPage(currentPage() - 1)">
+            {{ 'pagination.prev' | translate }}
+          </button>
         </li>
-      }
-      <li>
-        <button [disabled]="currentPage() === totalPages()" [class.opacity-50]="currentPage() === totalPages()" class="px-3 py-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="setPage(currentPage() + 1)">{{ 'pagination.next' | translate }}</button>
-      </li>
-    </ul>
-  </div>
+        @for (p of pageNumbers; track p) {
+          <li>
+            <button class="px-3.5 py-2 rounded-lg font-semibold transition-colors cursor-pointer" [class.bg-aquamarine-600]="currentPage() === p" [class.text-white]="currentPage() === p" [class.border]="currentPage() !== p" [class.border-aquamarine-200]="currentPage() !== p" [class.dark:border-aquamarine-800]="currentPage() !== p" [class.bg-white]="currentPage() !== p" [class.dark:bg-aquamarine-900]="currentPage() !== p" [class.text-aquamarine-800]="currentPage() !== p" [class.dark:text-aquamarine-200]="currentPage() !== p" (click)="setPage(p)">
+              {{ p }}
+            </button>
+          </li>
+        }
+        <li>
+          <button [disabled]="currentPage() === totalPages()" [class.opacity-50]="currentPage() === totalPages()" class="px-3 py-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer" (click)="setPage(currentPage() + 1)">
+            {{ 'pagination.next' | translate }}
+          </button>
+        </li>
+      </ul>
+    </div>
+  }
 </section>
 
-<!-- Modal Tạo Moderator -->
+<!-- Modal Tạo Moderator (A10) -->
 @if (isCreateModModalOpen()) {
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
     <div class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-md p-6">
       <div class="flex justify-between items-center mb-4">
-        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">{{ 'modal.add_mod_title' | translate }}</h5>
+        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">Tạo mới Content Moderator</h5>
         <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" (click)="closeCreateModModal()">
           <i class="bi bi-x-lg text-lg"></i>
         </button>
       </div>
       <form (submit)="$event.preventDefault(); submitCreateMod()" class="space-y-4">
         <div>
-          <label for="modEmail" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'table.email' | translate }}</label>
+          <label for="modUsername" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">Username <span class="text-rose-500">*</span></label>
+          <input type="text" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" id="modUsername" name="username" [(ngModel)]="modUsername" placeholder="content_mod_01" required>
+        </div>
+        <div>
+          <label for="modEmail" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">Email <span class="text-rose-500">*</span></label>
           <input type="email" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" id="modEmail" name="email" [(ngModel)]="modEmail" placeholder="mod@example.com" required>
         </div>
         <div>
-          <label for="modPassword" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'users.temp_password' | translate }}</label>
-          <input type="password" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" id="modPassword" name="password" [(ngModel)]="modPassword" [placeholder]="'users.temp_password_placeholder' | translate" required>
-          <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400 mt-1">{{ 'users.temp_password_hint' | translate }}</div>
+          <label for="modPassword" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">Mật khẩu <span class="text-rose-500">*</span></label>
+          <input type="password" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" id="modPassword" name="password" [(ngModel)]="modPassword" placeholder="Tối thiểu 6 ký tự..." required>
         </div>
         <div>
-          <label for="modNote" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'users.note_label' | translate }}</label>
-          <textarea class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 p-3 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" id="modNote" name="note" [(ngModel)]="modNote" rows="2" [placeholder]="'users.note_placeholder' | translate"></textarea>
+          <label for="modBio" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">Tiểu sử / Bio (Tùy chọn)</label>
+          <textarea class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 p-3 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" id="modBio" name="bio" [(ngModel)]="modBio" rows="2" placeholder="Ví dụ: Kiểm duyệt bài viết mảng công nghệ..."></textarea>
         </div>
         <div class="flex justify-end gap-3 pt-2">
           <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="closeCreateModModal()">{{ 'modal.cancel' | translate }}</button>
-          <button type="submit" class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-aquamarine-600 hover:bg-aquamarine-700 disabled:opacity-50 transition-colors" [disabled]="!modEmail.trim() || !modPassword.trim()">{{ 'modal.save' | translate }}</button>
+          <button type="submit" class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-aquamarine-600 hover:bg-aquamarine-700 disabled:opacity-50 transition-colors flex items-center gap-2" [disabled]="!modUsername.trim() || !modEmail.trim() || !modPassword.trim() || isSubmittingMod()">
+            @if (isSubmittingMod()) {
+              <i class="bi bi-arrow-repeat animate-spin"></i>
+            }
+            {{ 'modal.save' | translate }}
+          </button>
         </div>
       </form>
     </div>
   </div>
 }
 
-<!-- Modal Thông tin User -->
+<!-- Modal Chi Tiết User & Bài Viết (A11) -->
 @if (activePreviewUser()) {
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
     <div class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-2xl max-h-[85vh] flex flex-col">
       <div class="flex justify-between items-center p-5 border-b border-aquamarine-200 dark:border-aquamarine-800">
-        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">{{ 'users.user_info_title' | translate }}: <span class="text-aquamarine-600 dark:text-aquamarine-400">{{ activePreviewUser()?.email }}</span></h5>
+        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">Chi tiết Người dùng: <span class="text-aquamarine-600 dark:text-aquamarine-400">{{ activePreviewUser()?.username || activePreviewUser()?.email }}</span></h5>
         <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" (click)="closePreviewUserModal()">
           <i class="bi bi-x-lg text-lg"></i>
         </button>
       </div>
       <div class="p-6 overflow-y-auto space-y-6">
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400 mb-1">{{ 'table.role' | translate }}</p>
-            <h6 [className]="activePreviewUser()?.roleClass + ' font-bold text-sm'">{{ activePreviewUser()?.role }}</h6>
+        @if (isLoadingDetail()) {
+          <div class="flex items-center justify-center py-10 text-aquamarine-600 dark:text-aquamarine-400 gap-3">
+            <i class="bi bi-arrow-repeat animate-spin text-2xl"></i>
+            <span>Đang tải thông tin chi tiết & bài viết...</span>
           </div>
-          <div>
-            <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400 mb-1">{{ 'table.status' | translate }}</p>
-            <h6 class="font-bold text-sm">
-              @if (activePreviewUser()?.status === 'ACTIVE') {
-                <span class="text-emerald-600 dark:text-emerald-400">{{ 'status.active' | translate }}</span>
-              } @else {
-                <span class="text-red-600 dark:text-red-400">{{ 'status.locked' | translate }}</span>
-              }
-            </h6>
-          </div>
-        </div>
-        <div>
-          <h6 class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-50 pb-2 border-b border-aquamarine-200 dark:border-aquamarine-800 mb-3">{{ 'users.recent_posts' | translate }}</h6>
-          <div class="space-y-3">
-            @if (activePreviewUser()?.role === 'NORMAL_USER') {
-              <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400 text-center py-4">{{ 'users.no_posts_hint' | translate }}</div>
-            } @else {
-              @for (i of [1, 2]; track i) {
-                <a href="#" (click)="$event.preventDefault()" class="block p-4 rounded-xl border border-aquamarine-100 dark:border-aquamarine-800 hover:bg-aquamarine-50/50 dark:hover:bg-aquamarine-950/50 transition-colors">
-                  <div class="flex justify-between items-center mb-1">
-                    <h6 class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-50">Bài viết demo của {{ activePreviewUser()?.email }} - Phần {{ i }}</h6>
-                    <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400">3 ngày trước</small>
-                  </div>
-                  <p class="text-xs text-aquamarine-800 dark:text-aquamarine-200 mb-2">Một bài viết ví dụ để hiển thị danh sách blog của user này.</p>
-                  <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400 flex items-center gap-1"><i class="bi bi-eye"></i> 412 lượt xem</small>
-                </a>
-              }
+        } @else if (activeUserDetail()) {
+          <div class="grid grid-cols-2 gap-4 bg-aquamarine-50/50 dark:bg-aquamarine-950/50 p-4 rounded-xl border border-aquamarine-100 dark:border-aquamarine-800 text-sm">
+            <div>
+              <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">ID Người dùng</p>
+              <p class="font-bold text-aquamarine-950 dark:text-aquamarine-50">#{{ activeUserDetail()?.id }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">Username</p>
+              <p class="font-bold text-aquamarine-950 dark:text-aquamarine-50">{{ activeUserDetail()?.username }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">Email</p>
+              <p class="font-bold text-aquamarine-950 dark:text-aquamarine-50 truncate" [title]="activeUserDetail()?.email">{{ activeUserDetail()?.email }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">Vai trò / Role</p>
+              <p class="font-bold" [className]="getRoleClass(activeUserDetail()!.role)">{{ activeUserDetail()?.role }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">Trạng thái</p>
+              <p class="font-bold">
+                @if (activeUserDetail()?.status === 'ACTIVE') {
+                  <span class="text-emerald-600 dark:text-emerald-400">ACTIVE</span>
+                } @else {
+                  <span class="text-amber-600 dark:text-amber-400">LOCKED</span>
+                }
+              </p>
+            </div>
+            <div>
+              <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">Ngày tham gia</p>
+              <p class="font-medium text-aquamarine-900 dark:text-aquamarine-100">{{ formatDate(activeUserDetail()?.createdAt) }}</p>
+            </div>
+            @if (activeUserDetail()?.bio) {
+              <div class="col-span-2">
+                <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">Tiểu sử / Bio</p>
+                <p class="text-xs italic text-aquamarine-900 dark:text-aquamarine-100 mt-0.5">{{ activeUserDetail()?.bio }}</p>
+              </div>
+            }
+            @if (activeUserDetail()?.lockReason) {
+              <div class="col-span-2 bg-amber-100/60 dark:bg-amber-950/40 p-2.5 rounded-lg border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300">
+                <p class="text-xs font-bold">Lý do khóa tài khoản:</p>
+                <p class="text-xs">{{ activeUserDetail()?.lockReason }}</p>
+              </div>
             }
           </div>
-        </div>
+
+          <div>
+            <h6 class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-50 pb-2 border-b border-aquamarine-200 dark:border-aquamarine-800 mb-3 flex items-center justify-between">
+              <span>Danh sách bài viết tác giả đã đăng ({{ activeUserDetail()?.posts?.length || 0 }})</span>
+            </h6>
+            <div class="space-y-3 max-h-[300px] overflow-y-auto pr-1">
+              @if (!activeUserDetail()?.posts || activeUserDetail()?.posts?.length === 0) {
+                <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400 text-center py-6">
+                  Người dùng này chưa có bài viết nào trong hệ thống.
+                </div>
+              } @else {
+                @for (post of activeUserDetail()?.posts; track post.id) {
+                  <div class="p-4 rounded-xl border border-aquamarine-100 dark:border-aquamarine-800 bg-aquamarine-50/30 dark:bg-aquamarine-950/30 space-y-2">
+                    <div class="flex justify-between items-start gap-2">
+                      <h6 class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-50 leading-snug">{{ post.title }}</h6>
+                      <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase shrink-0" [class.bg-emerald-100]="post.status === 'PUBLISHED'" [class.text-emerald-700]="post.status === 'PUBLISHED'" [class.bg-amber-100]="post.status === 'PENDING'" [class.text-amber-700]="post.status === 'PENDING'">
+                        {{ post.status }}
+                      </span>
+                    </div>
+                    <div class="flex items-center gap-4 text-xs text-aquamarine-600 dark:text-aquamarine-400">
+                      <span><i class="bi bi-eye"></i> {{ post.viewCount }} lượt xem</span>
+                      <span><i class="bi bi-hand-thumbs-up"></i> {{ post.likeCount }} thích</span>
+                      <span><i class="bi bi-chat-dots"></i> {{ post.commentCount }} bình luận</span>
+                      <span><i class="bi bi-calendar3"></i> {{ formatDate(post.createdAt) }}</span>
+                    </div>
+                  </div>
+                }
+              }
+            </div>
+          </div>
+        }
       </div>
       <div class="p-4 border-t border-aquamarine-200 dark:border-aquamarine-800 flex justify-end">
         <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="closePreviewUserModal()">{{ 'modal.close' | translate }}</button>
       </div>
+    </div>
+  </div>
+}
+
+<!-- Modal Sửa Người Dùng (A12) -->
+@if (isEditUserModalOpen()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-md p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">Cập nhật thông tin người dùng</h5>
+        <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" (click)="closeEditUserModal()">
+          <i class="bi bi-x-lg text-lg"></i>
+        </button>
+      </div>
+      <form (submit)="$event.preventDefault(); submitEditUser()" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">User ID / Username</label>
+          <input type="text" [value]="'#' + activeEditUser()?.id + ' — ' + (activeEditUser()?.username || activeEditUser()?.email)" disabled class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-gray-100 dark:bg-aquamarine-950/80 px-4 py-2.5 text-sm text-gray-500 font-semibold cursor-not-allowed">
+        </div>
+        <div>
+          <label for="editBio" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">Tiểu sử / Bio</label>
+          <textarea class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 p-3 text-sm text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" id="editBio" name="editBio" [(ngModel)]="editBio" rows="2" placeholder="Nhập tiểu sử mới..."></textarea>
+        </div>
+        <div>
+          <label for="editAvatarUrl" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">URL Ảnh đại diện (Avatar URL)</label>
+          <input type="url" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" id="editAvatarUrl" name="editAvatarUrl" [(ngModel)]="editAvatarUrl" placeholder="https://example.com/avatar.png">
+        </div>
+        <div>
+          <label for="editPassword" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">Mật khẩu mới (Tùy chọn)</label>
+          <input type="password" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" id="editPassword" name="editPassword" [(ngModel)]="editPassword" placeholder="Để trống nếu không đổi mật khẩu">
+        </div>
+        <div class="flex justify-end gap-3 pt-2">
+          <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="closeEditUserModal()">{{ 'modal.cancel' | translate }}</button>
+          <button type="submit" class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-aquamarine-600 hover:bg-aquamarine-700 disabled:opacity-50 transition-colors flex items-center gap-2" [disabled]="isSubmittingEdit()">
+            @if (isSubmittingEdit()) {
+              <i class="bi bi-arrow-repeat animate-spin"></i>
+            }
+            Lưu thay đổi
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Modal Khóa Tài Khoản (A13) -->
+@if (isLockModalOpen()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-md p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h5 class="font-bold text-lg text-amber-600 dark:text-amber-400 flex items-center gap-2"><i class="bi bi-lock-fill"></i> Khóa tài khoản người dùng</h5>
+        <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" (click)="closeLockModal()">
+          <i class="bi bi-x-lg text-lg"></i>
+        </button>
+      </div>
+      <form (submit)="$event.preventDefault(); submitLockUser()" class="space-y-4">
+        <p class="text-sm text-aquamarine-800 dark:text-aquamarine-200">
+          Bạn đang thực hiện khóa tài khoản <strong>{{ activeLockUser()?.username || activeLockUser()?.email }}</strong>. Tất cả phiên đăng nhập của người dùng sẽ bị thu hồi.
+        </p>
+        <div>
+          <label for="lockReasonInput" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">Lý do khóa tài khoản <span class="text-rose-500">*</span></label>
+          <textarea class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 p-3 text-sm text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none focus:ring-2 focus:ring-amber-500" id="lockReasonInput" name="lockReason" [value]="lockReason()" (input)="lockReason.set($any($event.target).value)" rows="3" placeholder="Nhập lý do chi tiết..." required></textarea>
+        </div>
+        <div class="flex justify-end gap-3 pt-2">
+          <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="closeLockModal()">{{ 'modal.cancel' | translate }}</button>
+          <button type="submit" class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-amber-600 hover:bg-amber-700 disabled:opacity-50 transition-colors flex items-center gap-2" [disabled]="!lockReason().trim() || isSubmittingLock()">
+            @if (isSubmittingLock()) {
+              <i class="bi bi-arrow-repeat animate-spin"></i>
+            }
+            Xác nhận khóa
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Modal Đổi Vai Trò / Role (A15) -->
+@if (isRoleModalOpen()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-md p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">Đổi vai trò người dùng</h5>
+        <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" (click)="closeRoleModal()">
+          <i class="bi bi-x-lg text-lg"></i>
+        </button>
+      </div>
+      <form (submit)="$event.preventDefault(); submitChangeRole()" class="space-y-4">
+        <p class="text-sm text-aquamarine-800 dark:text-aquamarine-200">
+          Chọn vai trò mới cho tài khoản <strong>{{ activeRoleUser()?.username || activeRoleUser()?.email }}</strong>:
+        </p>
+        <div>
+          <select [value]="selectedNewRole()" (change)="selectedNewRole.set($any($event.target).value)" class="w-full px-4 py-2.5 rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 text-aquamarine-950 dark:text-aquamarine-50 font-semibold focus:outline-none focus:ring-2 focus:ring-aquamarine-500 cursor-pointer">
+            <option value="NORMAL">NORMAL (Người dùng thông thường)</option>
+            <option value="BLOG_OWNER">BLOG_OWNER (Tác giả bài viết)</option>
+            <option value="CONTENT_MODERATOR">CONTENT_MODERATOR (Kiểm duyệt viên)</option>
+            <option value="SUPER_ADMIN">SUPER_ADMIN (Quản trị viên tối cao)</option>
+          </select>
+        </div>
+        <div class="flex justify-end gap-3 pt-2">
+          <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="closeRoleModal()">{{ 'modal.cancel' | translate }}</button>
+          <button type="submit" class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-aquamarine-600 hover:bg-aquamarine-700 disabled:opacity-50 transition-colors flex items-center gap-2" [disabled]="isSubmittingRole()">
+            @if (isSubmittingRole()) {
+              <i class="bi bi-arrow-repeat animate-spin"></i>
+            }
+            Cập nhật vai trò
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 }

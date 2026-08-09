@@ -21,6 +21,7 @@
   <div class="space-y-1">
     <a routerLink="/dashboard/moderator" routerLinkActive="bg-[var(--brand-soft)] text-[var(--brand)] font-semibold" [routerLinkActiveOptions]="{exact: true}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] hover:text-[var(--brand)] transition-colors"><i class="bi bi-shield-check"></i>{{ 'dashboard.mod_dashboard' | translate }}</a>
     <a routerLink="/dashboard/moderator/manage-blogs" routerLinkActive="bg-[var(--brand-soft)] text-[var(--brand)] font-semibold" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] hover:text-[var(--brand)] transition-colors"><i class="bi bi-journals"></i>{{ 'dashboard.approve_posts' | translate }}</a>
+    <a routerLink="/dashboard/moderator/manage-requests" routerLinkActive="bg-[var(--brand-soft)] text-[var(--brand)] font-semibold" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] hover:text-[var(--brand)] transition-colors"><i class="bi bi-person-check"></i>Duyệt yêu cầu tác giả</a>
     <a routerLink="/dashboard/moderator/manage-categories" routerLinkActive="bg-[var(--brand-soft)] text-[var(--brand)] font-semibold" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] hover:text-[var(--brand)] transition-colors"><i class="bi bi-folder-check"></i>{{ 'dashboard.categories' | translate }}</a>
     <a routerLink="/dashboard/moderator/manage-comments" routerLinkActive="bg-[var(--brand-soft)] text-[var(--brand)] font-semibold" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] hover:text-[var(--brand)] transition-colors"><i class="bi bi-chat-dots"></i>{{ 'dashboard.comments' | translate }}</a>
   </div>
@@ -32,6 +33,7 @@
   <div class="space-y-1">
     <a routerLink="/dashboard/admin" routerLinkActive="bg-[var(--brand-soft)] text-[var(--brand)] font-semibold" [routerLinkActiveOptions]="{exact: true}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] hover:text-[var(--brand)] transition-colors"><i class="bi bi-gear"></i>{{ 'nav.admin_dashboard' | translate }}</a>
     <a routerLink="/dashboard/admin/manage-users" routerLinkActive="bg-[var(--brand-soft)] text-[var(--brand)] font-semibold" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] hover:text-[var(--brand)] transition-colors"><i class="bi bi-people"></i>{{ 'dashboard.manage_users' | translate }}</a>
+    <a routerLink="/dashboard/admin/manage-requests" routerLinkActive="bg-[var(--brand-soft)] text-[var(--brand)] font-semibold" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] hover:text-[var(--brand)] transition-colors"><i class="bi bi-person-check"></i>Yêu cầu Blog Owner</a>
     <a routerLink="/dashboard/admin/manage-languages" routerLinkActive="bg-[var(--brand-soft)] text-[var(--brand)] font-semibold" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] hover:text-[var(--brand)] transition-colors"><i class="bi bi-translate"></i>{{ 'dashboard.manage_languages' | translate }}</a>
   </div>
   }
@@ -47,4 +49,3 @@
     </a>
   </div>
 </aside>
-

@@ -1,15 +1,18 @@
-import { Component, signal, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { TranslationService } from '../../../../core/services/translation.service';
-import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
-interface UserItem {
-  id: number;
-  email: string;
-  role: 'NORMAL_USER' | 'BLOG_OWNER' | 'CONTENT_MODERATOR' | 'SUPER_ADMIN';
-  roleClass: string;
-  status: 'ACTIVE' | 'LOCKED';
-}
+import {
+  AdminUserDetail,
+  AdminUserItem,
+  CreateModeratorRequest,
+  UserRole,
+  UserStatus,
+} from '../../../../core/models/admin-api.model';
+import { AdminApiService } from '../../../../core/services/admin-api.service';
+import { ToastService } from '../../../../core/services/toast.service';
+import { TranslationService } from '../../../../core/services/translation.service';
+import { getApiErrorMessage } from '../../../../core/utils/api-error.util';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-manage-users',
@@ -19,128 +22,391 @@ interface UserItem {
 })
 export class ManageUsers {
   protected readonly ts = inject(TranslationService);
-  usersMockData: UserItem[] = [];
-  currentPage = signal<number>(1);
-  itemsPerPage = 8;
+  private readonly adminApi = inject(AdminApiService);
+  private readonly toast = inject(ToastService);
+
+  // Users Data & Pagination Signals
+  readonly users = signal<AdminUserItem[]>([]);
+  readonly isLoading = signal<boolean>(false);
+  readonly currentPage = signal<number>(1);
+  readonly totalItems = signal<number>(0);
+  readonly totalPages = signal<number>(1);
+  readonly itemsPerPage = 8;
+
+  // Search & Filter Signals
+  readonly searchQuery = signal<string>('');
+  readonly roleFilter = signal<string>('ALL');
+  readonly statusFilter = signal<string>('ALL');
+
+  // Modals & Active State Signals
+  readonly isCreateModModalOpen = signal<boolean>(false);
+  readonly isSubmittingMod = signal<boolean>(false);
+  readonly activePreviewUser = signal<AdminUserItem | null>(null);
+  readonly activeUserDetail = signal<AdminUserDetail | null>(null);
+  readonly isLoadingDetail = signal<boolean>(false);
+
+  readonly isEditUserModalOpen = signal<boolean>(false);
+  readonly activeEditUser = signal<AdminUserItem | null>(null);
+  readonly isSubmittingEdit = signal<boolean>(false);
+
+  readonly isLockModalOpen = signal<boolean>(false);
+  readonly activeLockUser = signal<AdminUserItem | null>(null);
+  readonly lockReason = signal<string>('');
+  readonly isSubmittingLock = signal<boolean>(false);
+
+  readonly isRoleModalOpen = signal<boolean>(false);
+  readonly activeRoleUser = signal<AdminUserItem | null>(null);
+  readonly selectedNewRole = signal<UserRole>('NORMAL');
+  readonly isSubmittingRole = signal<boolean>(false);
 
   // New Mod form fields
+  modUsername = '';
   modEmail = '';
   modPassword = '';
-  modNote = '';
+  modBio = '';
 
-  isCreateModModalOpen = signal<boolean>(false);
-  activePreviewUser = signal<UserItem | null>(null);
+  // Edit User form fields
+  editBio = '';
+  editAvatarUrl = '';
+  editPassword = '';
 
   constructor() {
-    const roles: ('NORMAL_USER' | 'BLOG_OWNER' | 'CONTENT_MODERATOR' | 'SUPER_ADMIN')[] = [
-      'NORMAL_USER', 'BLOG_OWNER', 'CONTENT_MODERATOR', 'SUPER_ADMIN'
-    ];
+    this.loadUsers();
+  }
 
-    for (let i = 0; i < 25; i++) {
-      const role = roles[i % roles.length];
-      let roleClass = 'text-gray-600 dark:text-gray-400';
-      if (role === 'BLOG_OWNER') roleClass = 'text-aquamarine-600 dark:text-aquamarine-400';
-      if (role === 'CONTENT_MODERATOR') roleClass = 'text-amber-600 dark:text-amber-400';
-      if (role === 'SUPER_ADMIN') roleClass = 'text-purple-600 dark:text-purple-400';
+  loadUsers(): void {
+    this.isLoading.set(true);
 
-      this.usersMockData.push({
-        id: i + 1,
-        email: `user${i + 1}@example.com`,
-        role: role,
-        roleClass: roleClass,
-        status: i % 5 === 0 ? 'LOCKED' : 'ACTIVE'
-      });
+    const query: {
+      search?: string;
+      role?: UserRole;
+      status?: UserStatus;
+      page: number;
+      limit: number;
+    } = {
+      page: this.currentPage(),
+      limit: this.itemsPerPage,
+    };
+
+    const searchStr = this.searchQuery().trim();
+    if (searchStr) {
+      query.search = searchStr;
+    }
+
+    const roleStr = this.roleFilter();
+    if (roleStr !== 'ALL') {
+      query.role = roleStr as UserRole;
+    }
+
+    const statusStr = this.statusFilter();
+    if (statusStr !== 'ALL') {
+      query.status = statusStr as UserStatus;
+    }
+
+    this.adminApi.getAdminUsers(query).subscribe({
+      next: ({ data }) => {
+        this.users.set(data.items);
+        this.totalItems.set(data.meta.totalItems);
+        this.totalPages.set(Math.max(1, data.meta.totalPages));
+        this.currentPage.set(data.meta.currentPage);
+        this.isLoading.set(false);
+      },
+      error: (error: unknown) => {
+        this.users.set([]);
+        this.isLoading.set(false);
+        this.toast.error(getApiErrorMessage(error), 'Tải danh sách người dùng thất bại');
+      },
+    });
+  }
+
+  onSearchChange(query: string): void {
+    this.searchQuery.set(query);
+    this.currentPage.set(1);
+    this.loadUsers();
+  }
+
+  onRoleFilterChange(role: string): void {
+    this.roleFilter.set(role);
+    this.currentPage.set(1);
+    this.loadUsers();
+  }
+
+  onStatusFilterChange(status: string): void {
+    this.statusFilter.set(status);
+    this.currentPage.set(1);
+    this.loadUsers();
+  }
+
+  resetFilters(): void {
+    this.searchQuery.set('');
+    this.roleFilter.set('ALL');
+    this.statusFilter.set('ALL');
+    this.currentPage.set(1);
+    this.loadUsers();
+  }
+
+  setPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages() && page !== this.currentPage()) {
+      this.currentPage.set(page);
+      this.loadUsers();
     }
   }
 
-  totalPages = computed(() => Math.ceil(this.usersMockData.length / this.itemsPerPage));
-
   get pageNumbers(): number[] {
-    const pages = [];
+    const pages: number[] = [];
     for (let i = 1; i <= this.totalPages(); i++) {
       pages.push(i);
     }
     return pages;
   }
 
-  get paginatedUsers(): UserItem[] {
-    const startIndex = (this.currentPage() - 1) * this.itemsPerPage;
-    return this.usersMockData.slice(startIndex, startIndex + this.itemsPerPage);
-  }
-
-  setPage(page: number) {
-    if (page >= 1 && page <= this.totalPages()) {
-      this.currentPage.set(page);
-    }
-  }
-
-  setPreviewUser(user: UserItem) {
+  // --- Preview Detail Modal (A11) ---
+  setPreviewUser(user: AdminUserItem): void {
     this.activePreviewUser.set(user);
+    this.activeUserDetail.set(null);
+    this.isLoadingDetail.set(true);
+
+    this.adminApi.getAdminUserById(user.id).subscribe({
+      next: ({ data }) => {
+        this.activeUserDetail.set(data);
+        this.isLoadingDetail.set(false);
+      },
+      error: (error: unknown) => {
+        this.isLoadingDetail.set(false);
+        this.toast.error(getApiErrorMessage(error), 'Không thể tải chi tiết người dùng');
+      },
+    });
   }
 
-  closePreviewUserModal() {
+  closePreviewUserModal(): void {
     this.activePreviewUser.set(null);
+    this.activeUserDetail.set(null);
   }
 
-  openCreateModModal() {
+  // --- Create Moderator Modal (A10) ---
+  openCreateModModal(): void {
+    this.modUsername = '';
+    this.modEmail = '';
+    this.modPassword = '';
+    this.modBio = '';
     this.isCreateModModalOpen.set(true);
   }
 
-  closeCreateModModal() {
+  closeCreateModModal(): void {
     this.isCreateModModalOpen.set(false);
   }
 
-  submitCreateMod() {
-    if (!this.modEmail.trim() || !this.modPassword.trim()) return;
-    const newMod: UserItem = {
-      id: this.usersMockData.length + 1,
-      email: this.modEmail,
-      role: 'CONTENT_MODERATOR',
-      roleClass: 'text-amber-600 dark:text-amber-400',
-      status: 'ACTIVE'
+  submitCreateMod(): void {
+    if (!this.modUsername.trim() || !this.modEmail.trim() || !this.modPassword.trim()) {
+      this.toast.warning('Vui lòng điền đầy đủ thông tin bắt buộc (Username, Email, Mật khẩu).');
+      return;
+    }
+
+    if (this.modPassword.trim().length < 6) {
+      this.toast.warning('Mật khẩu phải có ít nhất 6 ký tự.');
+      return;
+    }
+
+    this.isSubmittingMod.set(true);
+
+    const payload: CreateModeratorRequest = {
+      username: this.modUsername.trim(),
+      email: this.modEmail.trim(),
+      password: this.modPassword.trim(),
+      ...(this.modBio.trim() ? { bio: this.modBio.trim() } : {}),
     };
-    this.usersMockData.unshift(newMod);
-    this.modEmail = '';
-    this.modPassword = '';
-    this.modNote = '';
-    this.closeCreateModModal();
+
+    this.adminApi.createModerator(payload).subscribe({
+      next: () => {
+        this.isSubmittingMod.set(false);
+        this.toast.success('Tạo tài khoản Content Moderator thành công!');
+        this.closeCreateModModal();
+        this.loadUsers();
+      },
+      error: (error: unknown) => {
+        this.isSubmittingMod.set(false);
+        this.toast.error(getApiErrorMessage(error), 'Tạo Moderator thất bại');
+      },
+    });
   }
 
-  grantBlogOwner(user: UserItem) {
-    if (confirm(this.ts.translate('modal.confirm'))) {
-      const idx = this.usersMockData.findIndex(u => u.id === user.id);
-      if (idx !== -1) {
-        this.usersMockData[idx].role = 'BLOG_OWNER';
-        this.usersMockData[idx].roleClass = 'text-aquamarine-600 dark:text-aquamarine-400';
-      }
+  // --- Edit User Modal (A12) ---
+  openEditUserModal(user: AdminUserItem): void {
+    this.activeEditUser.set(user);
+    this.editBio = user.bio || '';
+    this.editAvatarUrl = user.avatarUrl || '';
+    this.editPassword = '';
+    this.isEditUserModalOpen.set(true);
+  }
+
+  closeEditUserModal(): void {
+    this.isEditUserModalOpen.set(false);
+    this.activeEditUser.set(null);
+  }
+
+  submitEditUser(): void {
+    const user = this.activeEditUser();
+    if (!user) return;
+
+    if (this.editPassword.trim() && this.editPassword.trim().length < 6) {
+      this.toast.warning('Mật khẩu mới phải có ít nhất 6 ký tự.');
+      return;
+    }
+
+    this.isSubmittingEdit.set(true);
+
+    const body: { password?: string; bio?: string; avatarUrl?: string } = {};
+    if (this.editBio.trim() !== (user.bio || '')) {
+      body.bio = this.editBio.trim();
+    }
+    if (this.editAvatarUrl.trim() !== (user.avatarUrl || '')) {
+      body.avatarUrl = this.editAvatarUrl.trim();
+    }
+    if (this.editPassword.trim()) {
+      body.password = this.editPassword.trim();
+    }
+
+    this.adminApi.updateAdminUser(user.id, body).subscribe({
+      next: () => {
+        this.isSubmittingEdit.set(false);
+        this.toast.success('Cập nhật thông tin người dùng thành công!');
+        this.closeEditUserModal();
+        this.loadUsers();
+      },
+      error: (error: unknown) => {
+        this.isSubmittingEdit.set(false);
+        this.toast.error(getApiErrorMessage(error), 'Cập nhật người dùng thất bại');
+      },
+    });
+  }
+
+  // --- Lock User Modal (A13) ---
+  openLockModal(user: AdminUserItem): void {
+    this.activeLockUser.set(user);
+    this.lockReason.set('');
+    this.isLockModalOpen.set(true);
+  }
+
+  closeLockModal(): void {
+    this.isLockModalOpen.set(false);
+    this.activeLockUser.set(null);
+  }
+
+  submitLockUser(): void {
+    const user = this.activeLockUser();
+    const reason = this.lockReason().trim();
+
+    if (!user || !reason) {
+      this.toast.warning('Vui lòng nhập lý do khóa tài khoản.');
+      return;
+    }
+
+    this.isSubmittingLock.set(true);
+
+    this.adminApi.lockUser(user.id, { reason }).subscribe({
+      next: () => {
+        this.isSubmittingLock.set(false);
+        this.toast.success(`Đã khóa tài khoản ${user.username || user.email}`);
+        this.closeLockModal();
+        this.loadUsers();
+      },
+      error: (error: unknown) => {
+        this.isSubmittingLock.set(false);
+        this.toast.error(getApiErrorMessage(error), 'Khóa tài khoản thất bại');
+      },
+    });
+  }
+
+  // --- Unlock User (A14) ---
+  unlockUser(user: AdminUserItem): void {
+    if (typeof window !== 'undefined' && !window.confirm(`Mở khóa tài khoản ${user.username || user.email}?`)) {
+      return;
+    }
+
+    this.adminApi.unlockUser(user.id).subscribe({
+      next: () => {
+        this.toast.success(`Đã mở khóa tài khoản ${user.username || user.email}`);
+        this.loadUsers();
+      },
+      error: (error: unknown) => {
+        this.toast.error(getApiErrorMessage(error), 'Mở khóa thất bại');
+      },
+    });
+  }
+
+  // --- Change User Role Modal (A15) ---
+  openRoleModal(user: AdminUserItem): void {
+    this.activeRoleUser.set(user);
+    this.selectedNewRole.set(user.role);
+    this.isRoleModalOpen.set(true);
+  }
+
+  closeRoleModal(): void {
+    this.isRoleModalOpen.set(false);
+    this.activeRoleUser.set(null);
+  }
+
+  submitChangeRole(): void {
+    const user = this.activeRoleUser();
+    const newRole = this.selectedNewRole();
+
+    if (!user || !newRole) return;
+
+    if (newRole === user.role) {
+      this.closeRoleModal();
+      return;
+    }
+
+    this.isSubmittingRole.set(true);
+
+    this.adminApi.changeUserRole(user.id, { role: newRole }).subscribe({
+      next: () => {
+        this.isSubmittingRole.set(false);
+        this.toast.success(`Đã đổi vai trò của ${user.username || user.email} thành ${newRole}`);
+        this.closeRoleModal();
+        this.loadUsers();
+      },
+      error: (error: unknown) => {
+        this.isSubmittingRole.set(false);
+        this.toast.error(getApiErrorMessage(error), 'Đổi vai trò thất bại');
+      },
+    });
+  }
+
+  // --- Soft Delete User (A16) ---
+  softDeleteUser(user: AdminUserItem): void {
+    if (typeof window !== 'undefined' && !window.confirm(`Bạn có chắc chắn muốn xóa mềm người dùng ${user.username || user.email}?`)) {
+      return;
+    }
+
+    this.adminApi.deleteAdminUser(user.id).subscribe({
+      next: () => {
+        this.toast.success(`Đã xóa mềm người dùng ${user.username || user.email}`);
+        this.loadUsers();
+      },
+      error: (error: unknown) => {
+        this.toast.error(getApiErrorMessage(error), 'Xóa mềm thất bại');
+      },
+    });
+  }
+
+  // Helper formatting methods
+  getRoleClass(role: UserRole): string {
+    switch (role) {
+      case 'BLOG_OWNER':
+        return 'text-aquamarine-600 dark:text-aquamarine-400';
+      case 'CONTENT_MODERATOR':
+        return 'text-amber-600 dark:text-amber-400';
+      case 'SUPER_ADMIN':
+        return 'text-purple-600 dark:text-purple-400';
+      default:
+        return 'text-gray-600 dark:text-gray-400';
     }
   }
 
-  revokeBlogOwner(user: UserItem) {
-    if (confirm(this.ts.translate('modal.confirm'))) {
-      const idx = this.usersMockData.findIndex(u => u.id === user.id);
-      if (idx !== -1) {
-        this.usersMockData[idx].role = 'NORMAL_USER';
-        this.usersMockData[idx].roleClass = 'text-gray-600 dark:text-gray-400';
-      }
-    }
-  }
-
-  lockUser(user: UserItem) {
-    if (confirm(this.ts.translate('modal.confirm'))) {
-      const idx = this.usersMockData.findIndex(u => u.id === user.id);
-      if (idx !== -1) {
-        this.usersMockData[idx].status = 'LOCKED';
-      }
-    }
-  }
-
-  unlockUser(user: UserItem) {
-    if (confirm(this.ts.translate('modal.confirm'))) {
-      const idx = this.usersMockData.findIndex(u => u.id === user.id);
-      if (idx !== -1) {
-        this.usersMockData[idx].status = 'ACTIVE';
-      }
-    }
+  formatDate(value?: string | null): string {
+    if (!value) return '—';
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? '—' : date.toLocaleString('vi-VN');
   }
 }

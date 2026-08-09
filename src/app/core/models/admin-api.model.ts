@@ -105,7 +105,7 @@ export interface ReviewBlogOwnerRequestDto {
   rejectionReason?: string;
 }
 
-export type UserRole = 'NORMAL_USER' | 'BLOG_OWNER' | 'CONTENT_MODERATOR' | 'SUPER_ADMIN';
+export type UserRole = 'NORMAL' | 'BLOG_OWNER' | 'CONTENT_MODERATOR' | 'SUPER_ADMIN';
 export type UserStatus = 'ACTIVE' | 'LOCKED';
 
 export interface AdminUserItem {

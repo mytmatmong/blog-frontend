@@ -30,6 +30,7 @@ import { ManageComments } from './pages/dashboard/moderator/manage-comments/mana
 import { AdminDashboard } from './pages/dashboard/admin/admin-dashboard/admin-dashboard';
 import { ManageUsers } from './pages/dashboard/admin/manage-users/manage-users';
 import { ManageLanguages } from './pages/dashboard/admin/manage-languages/manage-languages';
+import { ManageRequests } from './pages/dashboard/admin/manage-requests/manage-requests';
 
 import { roleGuard } from './core/guards/role.guard';
 
@@ -80,6 +81,7 @@ export const routes: Routes = [
           { path: 'manage-blogs', component: ManageBlogs },
           { path: 'manage-categories', component: ManageCategories },
           { path: 'manage-comments', component: ManageComments },
+          { path: 'manage-requests', component: ManageRequests },
         ]
       },
 
@@ -91,6 +93,7 @@ export const routes: Routes = [
           { path: '', component: AdminDashboard },
           { path: 'manage-users', component: ManageUsers },
           { path: 'manage-languages', component: ManageLanguages },
+          { path: 'manage-requests', component: ManageRequests },
         ]
       },
     ],
