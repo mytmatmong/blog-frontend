@@ -17,12 +17,12 @@ import {
 } from '../../../../core/models/moderator-api.model';
 
 @Component({
-  selector: 'app-manage-comments',
+  selector: 'app-manage-reports',
   imports: [FormsModule, DatePipe, TranslatePipe],
-  templateUrl: './manage-comments.html',
-  styleUrl: './manage-comments.css',
+  templateUrl: './manage-reports.html',
+  styleUrl: './manage-reports.css',
 })
-export class ManageComments implements OnInit {
+export class ManageReports implements OnInit {
   protected readonly ts = inject(TranslationService);
   private readonly moderatorApiService = inject(ModeratorApiService);
   private readonly toast = inject(ToastService);
@@ -74,7 +74,7 @@ export class ManageComments implements OnInit {
           this.reports.set(res.data.items);
           this.meta.set(res.data.meta);
         } else {
-          this.error.set('Không thể tải danh sách báo cáo.');
+          this.error.set('Không thể tải danh sách báo cáo vi phạm.');
         }
       },
       error: (err) => {

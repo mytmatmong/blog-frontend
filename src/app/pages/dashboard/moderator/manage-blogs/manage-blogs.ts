@@ -1,107 +1,235 @@
-import { Component, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TranslationService } from '../../../../core/services/translation.service';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
-
-interface BlogItem {
-  id: number;
-  title: string;
-  author: string;
-  category: string;
-  lang: string;
-  status: string;
-}
+import { ModeratorApiService } from '../../../../core/services/moderator-api.service';
+import { ToastService } from '../../../../core/services/toast.service';
+import { AuthService } from '../../../../core/services/auth.service';
+import {
+  ModeratorPaginationMeta,
+  ModeratorPostItem,
+  ModeratorPostStatus,
+} from '../../../../core/models/moderator-api.model';
 
 @Component({
   selector: 'app-manage-blogs',
-  imports: [FormsModule, TranslatePipe],
+  imports: [FormsModule, DatePipe, TranslatePipe],
   templateUrl: './manage-blogs.html',
   styleUrl: './manage-blogs.css',
 })
-export class ManageBlogs {
+export class ManageBlogs implements OnInit {
   protected readonly ts = inject(TranslationService);
-  blogsMockData: BlogItem[] = [];
-  currentPage = signal<number>(1);
-  itemsPerPage = 8;
+  private readonly moderatorApiService = inject(ModeratorApiService);
+  private readonly toast = inject(ToastService);
+  readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
 
-  activePreviewBlog = signal<BlogItem | null>(null);
-  activeRejectBlog = signal<BlogItem | null>(null);
+  readonly loading = signal<boolean>(true);
+  readonly loadingDetail = signal<boolean>(false);
+  readonly actionLoading = signal<boolean>(false);
+  readonly error = signal<string | null>(null);
+  readonly isForbidden = signal<boolean>(false);
+  readonly posts = signal<ModeratorPostItem[]>([]);
+  readonly meta = signal<ModeratorPaginationMeta | null>(null);
+
+  readonly statusFilter = signal<ModeratorPostStatus>('PENDING_REVIEW');
+  readonly searchQuery = signal<string>('');
+  readonly currentPage = signal<number>(1);
+  readonly limit = 10;
+
+  readonly activePreviewBlog = signal<ModeratorPostItem | null>(null);
+  readonly activeRejectBlog = signal<ModeratorPostItem | null>(null);
   rejectReason = '';
 
-  constructor() {
-    const baseBlogs: Omit<BlogItem, 'id'>[] = [
-      { title: 'Hướng dẫn học ReactJS cơ bản cho người mới', author: 'User A', category: 'Frontend', lang: 'VI', status: 'Chờ duyệt' },
-      { title: '10 mẹo tối ưu hiệu suất với CSS', author: 'DevMaster', category: 'Frontend', lang: 'EN', status: 'Chờ duyệt' },
-      { title: 'Tìm hiểu về Web Components', author: 'CodeLover', category: 'Web Design', lang: 'VI', status: 'Chờ duyệt' }
-    ];
+  ngOnInit() {
+    this.loadPosts();
+  }
 
-    for (let i = 0; i < 25; i++) {
-      const blog = { ...baseBlogs[i % baseBlogs.length] } as BlogItem;
-      blog.id = i + 1;
-      blog.title = `${blog.title} (Phần ${i + 1})`;
-      this.blogsMockData.push(blog);
+  loadPosts() {
+    this.loading.set(true);
+    this.error.set(null);
+    this.isForbidden.set(false);
+
+    this.moderatorApiService
+      .getModeratorPosts({
+        status: this.statusFilter(),
+        search: this.searchQuery(),
+        page: this.currentPage(),
+        limit: this.limit,
+      })
+      .subscribe({
+        next: (res) => {
+          this.loading.set(false);
+          if (res.success && res.data) {
+            this.posts.set(res.data.items);
+            this.meta.set(res.data.meta);
+          } else {
+            this.error.set('Không thể tải danh sách bài viết.');
+          }
+        },
+        error: (err) => {
+          this.loading.set(false);
+          if (err?.status === 403) {
+            this.isForbidden.set(true);
+            this.error.set(
+              'Tài khoản hiện tại không có quyền CONTENT_MODERATOR. Backend yêu cầu tài khoản phải có vai trò Moderator để truy cập danh sách kiểm duyệt.',
+            );
+            this.toast.show('error', '403 Forbidden', 'Yêu cầu tài khoản Content Moderator');
+          } else {
+            const errMsg = err?.error?.message || 'Lỗi khi lấy danh sách bài viết kiểm duyệt.';
+            this.error.set(
+              typeof errMsg === 'string'
+                ? errMsg
+                : Array.isArray(errMsg)
+                ? errMsg.join(', ')
+                : 'Lỗi kết nối.',
+            );
+            this.toast.show('error', 'Lỗi', 'Không thể tải danh sách bài viết');
+          }
+        },
+      });
+  }
+
+  onStatusChange(status: ModeratorPostStatus) {
+    if (this.statusFilter() !== status) {
+      this.statusFilter.set(status);
+      this.currentPage.set(1);
+      this.loadPosts();
     }
   }
 
-  totalPages = computed(() => Math.ceil(this.blogsMockData.length / this.itemsPerPage));
-
-  get pageNumbers(): number[] {
-    const pages = [];
-    for (let i = 1; i <= this.totalPages(); i++) {
-      pages.push(i);
-    }
-    return pages;
+  onSearch() {
+    this.currentPage.set(1);
+    this.loadPosts();
   }
 
-  get paginatedBlogs(): BlogItem[] {
-    const startIndex = (this.currentPage() - 1) * this.itemsPerPage;
-    return this.blogsMockData.slice(startIndex, startIndex + this.itemsPerPage);
+  clearSearch() {
+    if (this.searchQuery()) {
+      this.searchQuery.set('');
+      this.currentPage.set(1);
+      this.loadPosts();
+    }
   }
 
   setPage(page: number) {
-    if (page >= 1 && page <= this.totalPages()) {
+    const total = this.meta()?.totalPages || 1;
+    if (page >= 1 && page <= total && page !== this.currentPage()) {
       this.currentPage.set(page);
+      this.loadPosts();
     }
   }
 
-  setPreviewBlog(blog: BlogItem) {
+  readonly pageNumbers = computed(() => {
+    const totalPages = this.meta()?.totalPages || 1;
+    const pages: number[] = [];
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(i);
+    }
+    return pages;
+  });
+
+  setPreviewBlog(blog: ModeratorPostItem) {
     this.activePreviewBlog.set(blog);
+    this.loadingDetail.set(true);
+
+    this.moderatorApiService.getModeratorPostDetail(blog.id).subscribe({
+      next: (res) => {
+        this.loadingDetail.set(false);
+        if (res.success && res.data) {
+          this.activePreviewBlog.set(res.data);
+        }
+      },
+      error: (err) => {
+        this.loadingDetail.set(false);
+        const errMsg = err?.error?.message || 'Không thể lấy chi tiết bài viết.';
+        this.toast.show(
+          'error',
+          'Lỗi',
+          typeof errMsg === 'string'
+            ? errMsg
+            : Array.isArray(errMsg)
+            ? errMsg.join(', ')
+            : 'Lỗi kết nối.',
+        );
+      },
+    });
   }
 
   closePreviewBlog() {
     this.activePreviewBlog.set(null);
+    this.loadingDetail.set(false);
   }
 
-  setRejectBlog(blog: BlogItem) {
+  setRejectBlog(blog: ModeratorPostItem) {
     this.activeRejectBlog.set(blog);
     this.rejectReason = '';
   }
 
   closeRejectModal() {
     this.activeRejectBlog.set(null);
+    this.rejectReason = '';
   }
 
-  approveBlog(blog: BlogItem) {
-    if (confirm(this.ts.translate('modal.confirm'))) {
-      this.blogsMockData = this.blogsMockData.filter(b => b.id !== blog.id);
-      this.adjustCurrentPage();
+  approveBlog(blog: ModeratorPostItem) {
+    if (confirm(`Bạn có chắc chắn muốn duyệt bài viết "${blog.title}"?`)) {
+      this.actionLoading.set(true);
+      this.moderatorApiService.approvePost(blog.id).subscribe({
+        next: (res) => {
+          this.actionLoading.set(false);
+          if (res.success) {
+            this.toast.show('success', 'Thành công', `Đã duyệt bài viết "${blog.title}" thành công.`);
+            if (this.activePreviewBlog()?.id === blog.id) {
+              this.activePreviewBlog.set(res.data);
+            }
+            this.loadPosts();
+          }
+        },
+        error: (err) => {
+          this.actionLoading.set(false);
+          const errMsg = err?.error?.message || 'Không thể duyệt bài viết.';
+          const messageStr = typeof errMsg === 'string' ? errMsg : Array.isArray(errMsg) ? errMsg.join(', ') : 'Lỗi xử lý.';
+          this.toast.show('error', 'Lỗi duyệt bài viết', messageStr);
+        },
+      });
     }
   }
 
   submitReject() {
-    if (!this.rejectReason.trim()) return;
+    const reason = this.rejectReason.trim();
+    if (!reason) {
+      this.toast.show('warning', 'Cảnh báo', 'Vui lòng nhập lý do từ chối bài viết');
+      return;
+    }
+
     const blog = this.activeRejectBlog();
     if (blog) {
-      this.blogsMockData = this.blogsMockData.filter(b => b.id !== blog.id);
-      this.adjustCurrentPage();
-      this.activeRejectBlog.set(null);
+      this.actionLoading.set(true);
+      this.moderatorApiService.rejectPost(blog.id, { rejectionReason: reason }).subscribe({
+        next: (res) => {
+          this.actionLoading.set(false);
+          if (res.success) {
+            this.toast.show('success', 'Thành công', `Đã từ chối bài viết "${blog.title}".`);
+            if (this.activePreviewBlog()?.id === blog.id) {
+              this.activePreviewBlog.set(res.data);
+            }
+            this.closeRejectModal();
+            this.loadPosts();
+          }
+        },
+        error: (err) => {
+          this.actionLoading.set(false);
+          const errMsg = err?.error?.message || 'Không thể từ chối bài viết.';
+          const messageStr = typeof errMsg === 'string' ? errMsg : Array.isArray(errMsg) ? errMsg.join(', ') : 'Lỗi xử lý.';
+          this.toast.show('error', 'Lỗi từ chối bài viết', messageStr);
+        },
+      });
     }
   }
 
-  private adjustCurrentPage() {
-    const maxPages = Math.ceil(this.blogsMockData.length / this.itemsPerPage);
-    if (this.currentPage() > maxPages && maxPages >= 1) {
-      this.currentPage.set(maxPages);
-    }
+  logoutAndSwitchAccount() {
+    this.auth.logout();
+    this.router.navigate(['/auth']);
   }
 }

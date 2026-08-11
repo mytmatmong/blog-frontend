@@ -26,6 +26,7 @@ import { ModeratorDashboard } from './pages/dashboard/moderator/moderator-dashbo
 import { ManageBlogs } from './pages/dashboard/moderator/manage-blogs/manage-blogs';
 import { ManageCategories } from './pages/dashboard/moderator/manage-categories/manage-categories';
 import { ManageComments } from './pages/dashboard/moderator/manage-comments/manage-comments';
+import { ManageReports } from './pages/dashboard/moderator/manage-reports/manage-reports';
 
 import { AdminDashboard } from './pages/dashboard/admin/admin-dashboard/admin-dashboard';
 import { ManageUsers } from './pages/dashboard/admin/manage-users/manage-users';
@@ -79,8 +80,9 @@ export const routes: Routes = [
         children: [
           { path: '', component: ModeratorDashboard },
           { path: 'manage-blogs', component: ManageBlogs },
+          { path: 'manage-reports', component: ManageReports },
           { path: 'manage-categories', component: ManageCategories },
-          { path: 'manage-comments', component: ManageComments },
+          { path: 'manage-comments', component: ManageReports },
           { path: 'manage-requests', component: ManageRequests },
         ]
       },

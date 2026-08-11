@@ -110,8 +110,8 @@
               } @else {
                 <div class="text-xs space-y-0.5 text-aquamarine-700 dark:text-aquamarine-300">
                   <div><i class="bi bi-calendar3"></i> Duyệt lúc: {{ formatDate(item.reviewedAt) }}</div>
-                  @if (item.reviewerId) {
-                    <div><i class="bi bi-person-badge"></i> Bởi Reviewer #{{ item.reviewerId }}</div>
+                  @if (item.reviewedById) {
+                    <div><i class="bi bi-person-badge"></i> Bởi Reviewer #{{ item.reviewedById }}</div>
                   }
                   @if (item.rejectionReason) {
                     <div class="text-rose-600 dark:text-rose-400 italic">Lý do từ chối: "{{ item.rejectionReason }}"</div>
