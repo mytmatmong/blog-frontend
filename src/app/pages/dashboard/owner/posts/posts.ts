@@ -1,163 +1,733 @@
-import { Component, signal, computed, inject } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
+import {
+  Component,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { TranslationService } from '../../../../core/services/translation.service';
-import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+import {
+  catchError,
+  forkJoin,
+  map,
+  Observable,
+  of,
+  switchMap,
+} from 'rxjs';
 
-interface PostItem {
-  id: number;
-  title: string;
-  category: string;
-  lang: string;
-  status: string;
-  statusClass: string;
-  modalId: string;
-  content: string;
-}
+import {
+  BlogOwnerPost,
+} from '../../../../core/models/blog-owner.model';
+import {
+  PostStatus,
+} from '../../../../core/models/post.model';
+import {
+  BlogOwnerApiService,
+} from '../../../../core/services/blog-owner-api.service';
+import {
+  ToastService,
+} from '../../../../core/services/toast.service';
+import {
+  TranslationService,
+} from '../../../../core/services/translation.service';
+import {
+  getApiErrorMessage,
+} from '../../../../core/utils/api-error.util';
+import {
+  OwnerPostPreviewComponent,
+} from '../../../../shared/components/owner-post-preview/owner-post-preview';
+import {
+  TranslatePipe,
+} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-posts',
-  imports: [RouterLink, TranslatePipe],
+
+  imports: [
+    RouterLink,
+    DecimalPipe,
+    TranslatePipe,
+    OwnerPostPreviewComponent,
+  ],
+
   templateUrl: './posts.html',
   styleUrl: './posts.css',
 })
-export class Posts {
-  protected readonly ts = inject(TranslationService);
-  postsMockData: PostItem[] = [];
-  currentPage = signal<number>(1);
-  itemsPerPage = 8;
-  activePreviewPost = signal<PostItem | null>(null);
+export class Posts implements OnInit {
+  private readonly api =
+    inject(BlogOwnerApiService);
 
-  constructor() {
-    const basePosts = [
-      {
-        id: 1, 
-        title: 'Thiết kế Blog đa ngôn ngữ', 
-        category: 'Backend',
-        lang: 'VI', 
-        status: 'PUBLISHED', 
-        statusClass: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300',
-        modalId: 'previewModal1',
-        content: `
-          <div class="mb-3">
-            <span class="inline-block px-2.5 py-1 text-xs font-semibold rounded-md bg-aquamarine-100 text-aquamarine-800 dark:bg-aquamarine-800 dark:text-aquamarine-100 me-2">Backend</span>
-            <span class="text-aquamarine-600 dark:text-aquamarine-400 text-xs">Ngôn ngữ gốc: VI | Đã xuất bản</span>
-          </div>
-          <h2 class="mb-4 font-bold text-xl text-aquamarine-950 dark:text-aquamarine-50">Cách xây dựng hệ thống đa ngôn ngữ hiệu quả cho Blog cá nhân</h2>
-          <div class="space-y-3 text-aquamarine-800 dark:text-aquamarine-200 text-sm">
-            <p>Xin chào mọi người! Hôm nay mình sẽ chia sẻ cách thiết kế kiến trúc đa ngôn ngữ cho hệ thống CMS. Điều quan trọng nhất khi làm đa ngôn ngữ là cấu trúc Database.</p>
-            <p><strong>1. Cấu trúc Database:</strong></p>
-            <p>Thay vì tạo thêm các cột như <code>title_en</code>, <code>content_en</code> trực tiếp vào bảng <code>posts</code> (cách này rất khó mở rộng sau này), chúng ta nên tách ra một bảng riêng gọi là <code>post_translations</code>.</p>
-            <pre class="bg-aquamarine-950 text-aquamarine-100 p-4 rounded-xl my-3 text-xs overflow-x-auto"><code>
-CREATE TABLE post_translations (
-    id INT PRIMARY KEY,
-    post_id INT,
-    language_code VARCHAR(10),
-    title VARCHAR(255),
-    content TEXT
-);
-            </code></pre>
-            <p>Với cấu trúc này, khi cần thêm tiếng Nhật (JA) hay tiếng Pháp (FR), chúng ta không cần đụng chạm gì đến cấu trúc bảng cũ, chỉ việc thêm dữ liệu mới vào bảng dịch. Thật tuyệt phải không?</p>
-            <p><strong>2. Xử lý trên Backend (NodeJS):</strong></p>
-            <p>Backend cần trả về đúng bản dịch dựa trên biến <code>?lang=vi</code> hoặc Accept-Language trên header của Request. Nhờ đó Frontend có thể render dữ liệu một cách mượt mà.</p>
-          </div>
-        `
-      },
-      {
-        id: 2, 
-        title: 'Angular Interceptor', 
-        category: 'Frontend',
-        lang: 'EN', 
-        status: 'DRAFT', 
-        statusClass: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300',
-        modalId: 'previewModal2',
-        content: `
-          <div class="mb-3">
-            <span class="inline-block px-2.5 py-1 text-xs font-semibold rounded-md bg-aquamarine-100 text-aquamarine-800 dark:bg-aquamarine-800 dark:text-aquamarine-100 me-2">Frontend</span>
-            <span class="text-aquamarine-600 dark:text-aquamarine-400 text-xs">Ngôn ngữ gốc: EN | Bản nháp</span>
-          </div>
-          <h2 class="mb-4 font-bold text-xl text-aquamarine-950 dark:text-aquamarine-50">Mastering Angular HttpInterceptor for Authentication</h2>
-          <div class="space-y-3 text-aquamarine-800 dark:text-aquamarine-200 text-sm">
-            <p>An <strong>HttpInterceptor</strong> is a fantastic tool in Angular for transforming HTTP requests and responses globally. We often use it for attaching JWT tokens to API calls.</p>
-            <p>Here is a simple implementation of an Auth Interceptor:</p>
-            <pre class="bg-aquamarine-950 text-aquamarine-100 p-4 rounded-xl my-3 text-xs overflow-x-auto"><code>
-import { Injectable } from '@angular/core';
-import { HttpInterceptor, HttpRequest, HttpHandler } from '@angular/common/http';
+  private readonly toast =
+    inject(ToastService);
 
-@Injectable()
-export class AuthInterceptor implements HttpInterceptor {
-  intercept(req: HttpRequest<any>, next: HttpHandler) {
-    const token = localStorage.getItem('access_token');
-    if (token) {
-      const cloned = req.clone({
-        headers: req.headers.set('Authorization', 'Bearer ' + token)
+  protected readonly ts =
+    inject(TranslationService);
+
+  readonly posts =
+    signal<BlogOwnerPost[]>([]);
+
+  readonly isLoading =
+    signal(true);
+
+  readonly loadError =
+    signal<string | null>(null);
+
+  readonly currentPage =
+    signal(1);
+
+  readonly itemsPerPage = 8;
+
+  readonly totalItems =
+    signal(0);
+
+  readonly totalPages =
+    signal(0);
+
+  readonly search =
+    signal('');
+
+  readonly statusFilter =
+    signal<PostStatus | ''>('');
+
+  readonly activePreviewPost =
+    signal<BlogOwnerPost | null>(null);
+
+  readonly submittingPostId =
+    signal<number | null>(null);
+
+  readonly deletingPostId =
+    signal<number | null>(null);
+
+  private readonly postsFetchLimit = 50;
+
+  private postsRequestId = 0;
+
+  readonly pageNumbers = computed(() => {
+    const total = this.totalPages();
+    const current = this.currentPage();
+
+    if (total <= 7) {
+      return Array.from(
+        { length: total },
+        (_, index) => index + 1,
+      );
+    }
+
+    const start = Math.max(
+      1,
+      Math.min(
+        current - 2,
+        total - 4,
+      ),
+    );
+
+    return Array.from(
+      { length: 5 },
+      (_, index) => start + index,
+    );
+  });
+
+  ngOnInit(): void {
+    this.loadPosts();
+  }
+
+  loadPosts(): void {
+    const requestId =
+      ++this.postsRequestId;
+
+    this.isLoading.set(true);
+    this.loadError.set(null);
+
+    const search =
+      this.search().trim();
+
+    const status =
+      this.statusFilter();
+
+    this.fetchAllOwnerPosts(
+      search || undefined,
+      status || undefined,
+    )
+      .pipe(
+        /*
+         * Chỉ giữ bài viết gốc.
+         *
+         * Bài gốc:
+         * parentPostId === null
+         *
+         * Bản dịch:
+         * parentPostId !== null
+         */
+        map((allPosts) =>
+          allPosts.filter(
+            (post) =>
+              post.parentPostId === null,
+          ),
+        ),
+
+        switchMap((rootPosts) => {
+          const rootTotalItems =
+            rootPosts.length;
+
+          const rootTotalPages =
+            Math.ceil(
+              rootTotalItems /
+              this.itemsPerPage,
+            );
+
+          let page =
+            this.currentPage();
+
+          if (rootTotalPages === 0) {
+            page = 1;
+          } else if (
+            page > rootTotalPages
+          ) {
+            page = rootTotalPages;
+          }
+
+          if (
+            page !== this.currentPage()
+          ) {
+            this.currentPage.set(page);
+          }
+
+          const startIndex =
+            (page - 1) *
+            this.itemsPerPage;
+
+          const pagePosts =
+            rootPosts.slice(
+              startIndex,
+              startIndex +
+              this.itemsPerPage,
+            );
+
+          if (
+            pagePosts.length === 0
+          ) {
+            return of({
+              items:
+                [] as BlogOwnerPost[],
+
+              totalItems:
+                rootTotalItems,
+
+              totalPages:
+                rootTotalPages,
+            });
+          }
+
+          /*
+           * API danh sách có thể không trả
+           * categories đầy đủ.
+           *
+           * Chỉ gọi chi tiết cho 8 bài
+           * của trang hiện tại.
+           */
+          return forkJoin(
+            pagePosts.map((post) =>
+              this.api
+                .getPost(post.id)
+                .pipe(
+                  map(
+                    (response) =>
+                      response.data,
+                  ),
+
+                  /*
+                   * Nếu chi tiết một bài lỗi,
+                   * vẫn dùng dữ liệu danh sách.
+                   */
+                  catchError(
+                    () => of(post),
+                  ),
+                ),
+            ),
+          ).pipe(
+            map((items) => ({
+              items,
+
+              totalItems:
+                rootTotalItems,
+
+              totalPages:
+                rootTotalPages,
+            })),
+          );
+        }),
+      )
+      .subscribe({
+        next: ({
+          items,
+          totalItems,
+          totalPages,
+        }) => {
+          /*
+           * Không nhận response cũ
+           * khi người dùng tìm kiếm liên tục.
+           */
+          if (
+            requestId !==
+            this.postsRequestId
+          ) {
+            return;
+          }
+
+          this.posts.set(items);
+
+          this.totalItems.set(
+            totalItems,
+          );
+
+          this.totalPages.set(
+            totalPages,
+          );
+
+          this.isLoading.set(false);
+        },
+
+        error: (error: unknown) => {
+          if (
+            requestId !==
+            this.postsRequestId
+          ) {
+            return;
+          }
+
+          this.posts.set([]);
+          this.totalItems.set(0);
+          this.totalPages.set(0);
+
+          this.loadError.set(
+            getApiErrorMessage(
+              error,
+              this.ts.translate(
+                'posts.load_error',
+              ),
+            ),
+          );
+
+          this.isLoading.set(false);
+        },
       });
-      return next.handle(cloned);
-    }
-    return next.handle(req);
   }
-}
-            </code></pre>
-            <p>Don't forget to provide it in your <code>app.module.ts</code>! This helps keep your API services clean and DRY.</p>
-          </div>
-        `
-      }
-    ];
 
-    const categoriesList = ['Backend', 'Frontend', 'Database', 'DevOps', 'AI', 'NodeJS', 'Angular'];
-    const langList = ['VI', 'EN'];
-    const statusList = [
-      { label: 'PUBLISHED', class: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' }, 
-      { label: 'DRAFT', class: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300' }
-    ];
+  onSearchInput(event: Event): void {
+    this.search.set(
+      (
+        event.target as
+        HTMLInputElement
+      ).value,
+    );
+  }
 
-    for (let i = 0; i < 25; i++) {
-      const post = { ...basePosts[i % 2] };
-      post.id = i + 1;
-      post.title = `${post.title} (Phần ${i + 1})`;
-      post.category = categoriesList[i % categoriesList.length];
-      post.lang = langList[i % langList.length];
-      post.status = statusList[i % statusList.length].label;
-      post.statusClass = statusList[i % statusList.length].class;
-      this.postsMockData.push(post);
+  applySearch(): void {
+    this.currentPage.set(1);
+    this.loadPosts();
+  }
+
+  onSearchKeydown(
+    event: KeyboardEvent,
+  ): void {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      this.applySearch();
     }
   }
 
-  totalPages = computed(() => Math.ceil(this.postsMockData.length / this.itemsPerPage));
+  onStatusChange(event: Event): void {
+    const value = (
+      event.target as
+      HTMLSelectElement
+    ).value;
 
-  get pageNumbers(): number[] {
-    const pages = [];
-    for (let i = 1; i <= this.totalPages(); i++) {
-      pages.push(i);
+    this.statusFilter.set(
+      value as PostStatus | '',
+    );
+
+    this.currentPage.set(1);
+    this.loadPosts();
+  }
+
+  clearFilters(): void {
+    this.search.set('');
+    this.statusFilter.set('');
+    this.currentPage.set(1);
+    this.loadPosts();
+  }
+
+  setPage(page: number): void {
+    if (
+      page < 1 ||
+      page > this.totalPages() ||
+      page === this.currentPage() ||
+      this.isLoading()
+    ) {
+      return;
     }
-    return pages;
+
+    this.currentPage.set(page);
+    this.loadPosts();
   }
 
-  get paginatedPosts(): PostItem[] {
-    const startIndex = (this.currentPage() - 1) * this.itemsPerPage;
-    return this.postsMockData.slice(startIndex, startIndex + this.itemsPerPage);
+  setPreviewPost(
+    post: BlogOwnerPost,
+  ): void {
+    this.activePreviewPost.set(
+      post,
+    );
   }
 
-  setPage(page: number) {
-    if (page >= 1 && page <= this.totalPages()) {
-      this.currentPage.set(page);
+  closePreviewModal(): void {
+    this.activePreviewPost.set(
+      null,
+    );
+  }
+
+  submitPost(
+    post: BlogOwnerPost,
+  ): void {
+    if (
+      post.status !== 'DRAFT' ||
+      this.submittingPostId() !== null
+    ) {
+      return;
+    }
+
+    if (
+      !confirm(
+        this.ts.translate(
+          'posts.submit_confirm',
+        ),
+      )
+    ) {
+      return;
+    }
+
+    this.submittingPostId.set(
+      post.id,
+    );
+
+    this.api
+      .submitPost(post.id)
+      .subscribe({
+        next: (response) => {
+          this.posts.update(
+            (items) =>
+              items.map((item) =>
+                item.id === post.id
+                  ? response.data
+                  : item,
+              ),
+          );
+
+          this.submittingPostId.set(
+            null,
+          );
+
+          this.toast.success(
+            this.ts.translate(
+              'posts.submit_success',
+            ),
+            this.ts.translate(
+              'common.success',
+            ),
+          );
+        },
+
+        error: (error: unknown) => {
+          this.submittingPostId.set(
+            null,
+          );
+
+          this.toast.error(
+            getApiErrorMessage(
+              error,
+              this.ts.translate(
+                'posts.submit_error',
+              ),
+            ),
+            this.ts.translate(
+              'common.error',
+            ),
+          );
+        },
+      });
+  }
+
+  deletePost(
+    post: BlogOwnerPost,
+  ): void {
+    if (
+      this.deletingPostId() !== null
+    ) {
+      return;
+    }
+
+    if (
+      !confirm(
+        this.ts.translate(
+          'post.delete_confirm',
+        ),
+      )
+    ) {
+      return;
+    }
+
+    this.deletingPostId.set(
+      post.id,
+    );
+
+    this.api
+      .deletePost(post.id)
+      .subscribe({
+        next: (response) => {
+          this.toast.success(
+            response.data.message,
+            this.ts.translate(
+              'common.success',
+            ),
+          );
+
+          this.deletingPostId.set(
+            null,
+          );
+
+          this.loadPosts();
+        },
+
+        error: (error: unknown) => {
+          this.deletingPostId.set(
+            null,
+          );
+
+          this.toast.error(
+            getApiErrorMessage(
+              error,
+              this.ts.translate(
+                'posts.delete_error',
+              ),
+            ),
+            this.ts.translate(
+              'common.error',
+            ),
+          );
+        },
+      });
+  }
+
+  canEdit(
+    _post: BlogOwnerPost,
+  ): boolean {
+    return true;
+  }
+
+  canSubmit(
+    post: BlogOwnerPost,
+  ): boolean {
+    return post.status === 'DRAFT';
+  }
+
+  categoryNames(
+    post: BlogOwnerPost,
+  ): string {
+    const payload =
+      post as unknown as {
+        categories?: Array<{
+          name?: string | null;
+
+          category?: {
+            name?: string | null;
+          } | null;
+        }>;
+
+        postCategories?: Array<{
+          name?: string | null;
+
+          category?: {
+            name?: string | null;
+          } | null;
+        }>;
+
+        category?: {
+          name?: string | null;
+        } | null;
+      };
+
+    let categoryItems =
+      payload.categories ?? [];
+
+    if (
+      categoryItems.length === 0 &&
+      payload.postCategories
+    ) {
+      categoryItems = payload.postCategories;
+    }
+
+    if (
+      categoryItems.length === 0 &&
+      payload.category
+    ) {
+      categoryItems = [payload.category];
+    }
+
+    const names =
+      categoryItems
+        .map((item) => {
+          return (
+            item.name ??
+            item.category?.name ??
+            ''
+          ).trim();
+        })
+        .filter(
+          (
+            name,
+          ): name is string =>
+            name.length > 0,
+        );
+
+    return (
+      [...new Set(names)].join(', ') ||
+      '—'
+    );
+  }
+
+  languageLabel(
+    post: BlogOwnerPost,
+  ): string {
+    const language =
+      post.language;
+
+    if (!language) {
+      return String(
+        post.languageId,
+      );
+    }
+
+    return `
+      ${language.flag ?? ''}
+      ${language.code.toUpperCase()}
+    `.trim();
+  }
+
+  statusLabel(
+    status: PostStatus,
+  ): string {
+    return this.ts.translate(
+      `post_status.${status.toLowerCase()}`,
+    );
+  }
+
+  statusClass(
+    status: PostStatus,
+  ): string {
+    switch (status) {
+      case 'PUBLISH':
+        return (
+          'bg-emerald-100 ' +
+          'text-emerald-800 ' +
+          'dark:bg-emerald-950 ' +
+          'dark:text-emerald-300'
+        );
+
+      case 'PENDING_REVIEW':
+        return (
+          'bg-amber-100 ' +
+          'text-amber-800 ' +
+          'dark:bg-amber-950 ' +
+          'dark:text-amber-300'
+        );
+
+      case 'REJECT':
+        return (
+          'bg-red-100 ' +
+          'text-red-800 ' +
+          'dark:bg-red-950 ' +
+          'dark:text-red-300'
+        );
+
+      default:
+        return (
+          'bg-gray-100 ' +
+          'text-gray-800 ' +
+          'dark:bg-gray-800 ' +
+          'dark:text-gray-300'
+        );
     }
   }
 
-  setPreviewPost(post: PostItem) {
-    this.activePreviewPost.set(post);
-  }
+  private fetchAllOwnerPosts(
+    search?: string,
+    status?: PostStatus,
+  ): Observable<BlogOwnerPost[]> {
+    const baseQuery = {
+      limit: this.postsFetchLimit,
+      search,
+      status,
+    };
 
-  closePreviewModal() {
-    this.activePreviewPost.set(null);
-  }
+    return this.api
+      .getPosts({
+        ...baseQuery,
+        page: 1,
+      })
+      .pipe(
+        switchMap(
+          (firstResponse) => {
+            const firstPage =
+              firstResponse.data;
 
-  deletePost(post: PostItem) {
-    if (confirm(this.ts.translate('post.delete_confirm'))) {
-      this.postsMockData = this.postsMockData.filter(p => p.id !== post.id);
-      const maxPages = Math.ceil(this.postsMockData.length / this.itemsPerPage);
-      if (this.currentPage() > maxPages && maxPages >= 1) {
-        this.currentPage.set(maxPages);
-      }
-    }
+            const apiTotalPages =
+              firstPage.meta.totalPages;
+
+            if (
+              apiTotalPages <= 1
+            ) {
+              return of(
+                firstPage.items,
+              );
+            }
+
+            const remainingRequests =
+              Array.from(
+                {
+                  length:
+                    apiTotalPages - 1,
+                },
+                (_, index) =>
+                  this.api
+                    .getPosts({
+                      ...baseQuery,
+                      page:
+                        index + 2,
+                    })
+                    .pipe(
+                      map(
+                        (response) =>
+                          response.data
+                            .items,
+                      ),
+                    ),
+              );
+
+            return forkJoin(
+              remainingRequests,
+            ).pipe(
+              map(
+                (
+                  remainingPages,
+                ) => [
+                    ...firstPage.items,
+
+                    ...remainingPages.flat(),
+                  ],
+              ),
+            );
+          },
+        ),
+      );
   }
 }

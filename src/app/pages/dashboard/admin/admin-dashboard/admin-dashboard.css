@@ -1,0 +1,91 @@
+:host {
+  --quick-card-bg: #ffffff;
+  --quick-card-border: #dbe3ef;
+  --quick-title: #111827;
+  --quick-primary-bg: #5b5bd6;
+  --quick-primary-hover: #4b4bc4;
+  --quick-primary-text: #ffffff;
+  --quick-secondary-bg: #ffffff;
+  --quick-secondary-hover: #f8fafc;
+  --quick-secondary-border: #cbd5e1;
+  --quick-secondary-text: #475569;
+}
+
+:host-context(.dark) {
+  --quick-card-bg: #171a28;
+  --quick-card-border: #303249;
+  --quick-title: #f8fafc;
+  --quick-primary-bg: #4f46e5;
+  --quick-primary-hover: #6366f1;
+  --quick-primary-text: #ffffff;
+  --quick-secondary-bg: #1d2030;
+  --quick-secondary-hover: #272a3d;
+  --quick-secondary-border: #3a3d58;
+  --quick-secondary-text: #dbe4f0;
+}
+
+.quick-actions-card {
+  border-color: var(--quick-card-border) !important;
+  background: var(--quick-card-bg) !important;
+}
+
+.quick-actions-title {
+  color: var(--quick-title) !important;
+}
+
+.quick-actions-list {
+  display: grid;
+  gap: 12px;
+}
+
+.quick-action {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 12px;
+  padding: 11px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.quick-action > span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quick-action--primary {
+  border: 1px solid var(--quick-primary-bg);
+  background: var(--quick-primary-bg) !important;
+  color: var(--quick-primary-text) !important;
+}
+
+.quick-action--primary:hover {
+  border-color: var(--quick-primary-hover);
+  background: var(--quick-primary-hover) !important;
+}
+
+.quick-action--secondary {
+  border: 1px solid var(--quick-secondary-border) !important;
+  background: var(--quick-secondary-bg) !important;
+  color: var(--quick-secondary-text) !important;
+}
+
+.quick-action--secondary:hover {
+  background: var(--quick-secondary-hover) !important;
+}
+
+.quick-action__badge {
+  min-width: 28px;
+  border-radius: 999px;
+  background: #f59e0b !important;
+  padding: 3px 8px;
+  color: #1f2937 !important;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}

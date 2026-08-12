@@ -20,7 +20,16 @@
     </div>
 
     <!-- comment-item__content -->
-    <p class="text-sm text-[var(--card-text-default)] pt-1 whitespace-pre-line">{{ comment.content }}</p>
+    <p class="text-sm text-[var(--card-text-default)] pt-1 whitespace-pre-line">
+      @if (leadingMention(comment.content); as mention) {
+        <strong class="comment-mention">{{ mention }}</strong>
+        @if (contentAfterMention(comment.content)) {
+          <span> {{ contentAfterMention(comment.content) }}</span>
+        }
+      } @else {
+        {{ comment.content }}
+      }
+    </p>
 
     @if (isAuthenticated) {
       <!-- comment-item__actions -->
@@ -35,6 +44,33 @@
           <button type="button" class="text-amber-500 hover:underline cursor-pointer" (click)="reportRequested.emit(rootTarget())">{{ 'comments.report' | translate }}</button>
         }
       </div>
+    }
+
+    @if (isAuthenticated && activeReplyId === comment.id) {
+      <form class="comment-inline-reply mt-3" (submit)="replySubmitted.emit($event)">
+        <div class="mb-2 text-[var(--text-muted)] text-[12px]">
+          {{ 'comments.replying_to' | translate }}
+          <strong class="comment-mention">&#64;{{ comment.user.username }}</strong>
+        </div>
+
+        <textarea autofocus [ngModel]="replyDraft" (ngModelChange)="replyDraftChange.emit($event)"
+          [name]="'replyDraft-' + comment.id" maxlength="1000" rows="1"
+          class="w-full min-h-[88px] block px-3 py-[10px] border border-[var(--border-color)] rounded-[10px] bg-[var(--card-bg)] text-[var(--card-text-default)] text-[14px] leading-[1.55] outline-none placeholder:text-[var(--text-faint)] focus:border-[var(--brand)]"
+          (input)="autoGrowReplyTextarea($event)"
+          [placeholder]="'comments.placeholder' | translate"></textarea>
+
+        <div class="flex items-center justify-between gap-3 mt-2">
+          <span class="text-[var(--text-faint)] text-[11px]">{{ replyDraft.length }}/1000</span>
+          <div class="flex items-center gap-2">
+            <button type="button" class="btn btn-secondary" (click)="replyCancelled.emit()">
+              {{ 'modal.cancel' | translate }}
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="isSavingReply">
+              {{ 'comments.submit' | translate }}
+            </button>
+          </div>
+        </div>
+      </form>
     }
 
     @if (comment.replies.length > 0) {
@@ -55,7 +91,16 @@
             </div>
 
             <!-- reply-item__content -->
-            <p class="text-xs text-[var(--text-muted)] whitespace-pre-line">{{ reply.content }}</p>
+            <p class="text-xs text-[var(--text-muted)] whitespace-pre-line">
+              @if (leadingMention(reply.content); as mention) {
+                <strong class="comment-mention">{{ mention }}</strong>
+                @if (contentAfterMention(reply.content)) {
+                  <span> {{ contentAfterMention(reply.content) }}</span>
+                }
+              } @else {
+                {{ reply.content }}
+              }
+            </p>
 
             @if (isAuthenticated) {
               <!-- reply-item__actions -->
@@ -68,6 +113,33 @@
                   <button type="button" class="text-amber-500 hover:underline cursor-pointer" (click)="reportRequested.emit(replyTarget(reply))">{{ 'comments.report' | translate }}</button>
                 }
               </div>
+            }
+
+            @if (isAuthenticated && activeReplyId === reply.id) {
+              <form class="comment-inline-reply mt-2" (submit)="replySubmitted.emit($event)">
+                <div class="mb-2 text-[var(--text-muted)] text-[11px]">
+                  {{ 'comments.replying_to' | translate }}
+                  <strong class="comment-mention">&#64;{{ reply.user.username }}</strong>
+                </div>
+
+                <textarea autofocus [ngModel]="replyDraft" (ngModelChange)="replyDraftChange.emit($event)"
+                  [name]="'replyDraft-' + reply.id" maxlength="1000" rows="1"
+                  class="w-full min-h-[82px] block px-3 py-[9px] border border-[var(--border-color)] rounded-[9px] bg-[var(--card-bg)] text-[var(--card-text-default)] text-[13px] leading-[1.5] outline-none placeholder:text-[var(--text-faint)] focus:border-[var(--brand)]"
+                  (input)="autoGrowReplyTextarea($event)"
+                  [placeholder]="'comments.placeholder' | translate"></textarea>
+
+                <div class="flex items-center justify-between gap-3 mt-2">
+                  <span class="text-[var(--text-faint)] text-[11px]">{{ replyDraft.length }}/1000</span>
+                  <div class="flex items-center gap-2">
+                    <button type="button" class="btn btn-secondary" (click)="replyCancelled.emit()">
+                      {{ 'modal.cancel' | translate }}
+                    </button>
+                    <button type="submit" class="btn btn-primary" [disabled]="isSavingReply">
+                      {{ 'comments.submit' | translate }}
+                    </button>
+                  </div>
+                </div>
+              </form>
             }
           </div>
         }

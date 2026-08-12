@@ -4,6 +4,7 @@ import {
   Input,
   Output,
 } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 
 import {
   CommentReply,
@@ -21,7 +22,10 @@ export interface CommentActionTarget {
 
 @Component({
   selector: 'app-comment-item',
-  imports: [TranslatePipe],
+  imports: [
+    FormsModule,
+    TranslatePipe,
+  ],
   templateUrl: './comment-item.html',
   styleUrl: './comment-item.css',
 })
@@ -29,8 +33,14 @@ export class CommentItem {
   @Input({ required: true }) comment!: PublicComment;
   @Input() currentUserId: number | null = null;
   @Input() isAuthenticated = false;
+  @Input() activeReplyId: number | null = null;
+  @Input() replyDraft = '';
+  @Input() isSavingReply = false;
 
   @Output() readonly replyRequested = new EventEmitter<CommentActionTarget>();
+  @Output() readonly replyDraftChange = new EventEmitter<string>();
+  @Output() readonly replySubmitted = new EventEmitter<Event>();
+  @Output() readonly replyCancelled = new EventEmitter<void>();
   @Output() readonly editRequested = new EventEmitter<CommentActionTarget>();
   @Output() readonly deleteRequested = new EventEmitter<CommentActionTarget>();
   @Output() readonly reportRequested = new EventEmitter<CommentActionTarget>();
@@ -75,5 +85,26 @@ export class CommentItem {
           hour: '2-digit',
           minute: '2-digit',
         });
+  }
+
+  autoGrowReplyTextarea(event: Event): void {
+    const textarea = event.target;
+
+    if (!(textarea instanceof HTMLTextAreaElement)) return;
+
+    textarea.style.height = 'auto';
+    textarea.style.height = `${Math.max(textarea.scrollHeight, 88)}px`;
+  }
+
+  leadingMention(content: string): string | null {
+    return content.match(/^@([\p{L}\p{N}_.-]+)(?=\s|$)/u)?.[0] ?? null;
+  }
+
+  contentAfterMention(content: string): string {
+    const mention = this.leadingMention(content);
+
+    return mention
+      ? content.slice(mention.length).trimStart()
+      : content;
   }
 }

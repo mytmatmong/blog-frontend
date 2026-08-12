@@ -1,96 +1,661 @@
-<section class="space-y-6">
-  <div class="p-6 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-    <h3 class="font-bold text-xl text-aquamarine-950 dark:text-aquamarine-50 mb-6">{{ 'post_form.create_title' | translate }}</h3>
-    
-    <form (submit)="$event.preventDefault()" class="space-y-6">
-      <div class="flex flex-wrap justify-between items-center gap-4 pb-4 border-b border-aquamarine-200 dark:border-aquamarine-800">
-        <div class="inline-flex rounded-xl bg-aquamarine-50 dark:bg-aquamarine-950 p-1">
-          <button type="button" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all" [class.bg-aquamarine-600]="currentEditLang() === 'VI'" [class.text-white]="currentEditLang() === 'VI'" [class.text-aquamarine-800]="currentEditLang() !== 'VI'" [class.dark:text-aquamarine-200]="currentEditLang() !== 'VI'" (click)="changeEditLang('VI')">
-            <img src="https://flagcdn.com/w20/vn.png" alt="VN" class="w-4 h-3 rounded-sm object-cover"> {{ 'lang.vietnamese' | translate }} 
-            <span class="px-1.5 py-0.5 rounded text-[10px]" [class.bg-aquamarine-700]="currentEditLang() === 'VI'" [class.bg-aquamarine-200]="currentEditLang() !== 'VI'" [class.dark:bg-aquamarine-800]="currentEditLang() !== 'VI'">
-              {{ originalLanguage() === 'VI' ? ('post_form.original_badge' | translate) : ('post_form.translated_badge' | translate) }}
-            </span>
-          </button>
+<section class="create-post-page">
+  <!-- PAGE HEADER -->
+  <header class="create-post-header">
+    <div class="create-post-header__content">
 
-          <button type="button" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all" [class.bg-aquamarine-600]="currentEditLang() === 'EN'" [class.text-white]="currentEditLang() === 'EN'" [class.text-aquamarine-800]="currentEditLang() !== 'EN'" [class.dark:text-aquamarine-200]="currentEditLang() !== 'EN'" (click)="changeEditLang('EN')">
-            <img src="https://flagcdn.com/w20/gb.png" alt="EN" class="w-4 h-3 rounded-sm object-cover"> {{ 'lang.english' | translate }} 
-            <span class="px-1.5 py-0.5 rounded text-[10px]" [class.bg-aquamarine-700]="currentEditLang() === 'EN'" [class.bg-aquamarine-200]="currentEditLang() !== 'EN'" [class.dark:bg-aquamarine-800]="currentEditLang() !== 'EN'">
-              {{ originalLanguage() === 'EN' ? ('post_form.original_badge' | translate) : ('post_form.translated_badge' | translate) }}
-            </span>
-          </button>
-        </div>
+      <h1>
+        {{ pageTitleKey() | translate }}
+      </h1>
 
-        <div class="flex items-center gap-2">
-          <label class="text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ 'post_form.original_lang' | translate }}</label>
-          <div class="flex items-center gap-1.5 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 px-2.5 py-1 shadow-sm">
-            @if (originalLanguage() === 'VI') {
-              <img src="https://flagcdn.com/w20/vn.png" alt="VN" class="w-4 h-3 rounded-sm object-cover">
-            } @else {
-              <img src="https://flagcdn.com/w20/gb.png" alt="EN" class="w-4 h-3 rounded-sm object-cover">
-            }
-            <select [value]="originalLanguage()" (change)="changeOriginalLanguage($any($event.target).value)" class="text-xs bg-transparent text-aquamarine-900 dark:text-aquamarine-100 outline-none cursor-pointer">
-              <option value="VI" class="bg-white dark:bg-aquamarine-900">{{ 'lang.vietnamese' | translate }}</option>
-              <option value="EN" class="bg-white dark:bg-aquamarine-900">{{ 'lang.english' | translate }}</option>
-            </select>
-          </div>
-        </div>
+      <p>
+        {{ pageSubtitleKey() | translate }}
+      </p>
+    </div>
+
+    @if (headerStatusPost(); as post) {
+    <div class="created-status">
+      <span>
+        {{ 'post_form.original_post' | translate }}
+        #{{ post.id }}
+      </span>
+
+      <strong [class.pending]="post.status === 'PENDING_REVIEW'">
+        {{ statusLabel(post.status) }}
+      </strong>
+    </div>
+    }
+  </header>
+
+  <!-- LOADING -->
+  @if (isLoadingOptions()) {
+  <article class="form-panel loading-panel">
+    <div class="loading-state">
+      <span class="loading-state__icon">
+        <i class="bi bi-arrow-repeat spin"></i>
+      </span>
+
+      <div>
+        <strong>{{ 'common.loading' | translate }}</strong>
+        <span>{{ 'post_form.loading_options' | translate }}</span>
       </div>
+    </div>
+  </article>
+  } @else {
+  <form class="create-post-form" (submit)="$event.preventDefault()" novalidate>
+    <fieldset [disabled]="formLocked()">
+      <div class="create-post-layout">
+        <!-- CỘT TRÁI -->
+        <main class="create-post-main">
+          <!-- NGÔN NGỮ -->
+          <article class="form-panel language-panel">
+            <div class="panel-heading panel-heading--compact">
+              <div class="panel-heading__icon">
+                <i class="bi bi-translate"></i>
+              </div>
 
-      <div class="space-y-4">
-        <div>
-          <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'post_form.title_label' | translate }} (<span>{{ currentEditLang() }}</span>) <span class="text-red-500">*</span></label>
-          <input type="text" [(ngModel)]="titleModel" name="title" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" [placeholder]="'post_form.title_placeholder' | translate" required>
-        </div>
+              <div class="panel-heading__content">
+                <h2>
+                  {{ 'post_form.target_language_label' | translate }}
+                </h2>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'post_form.category_label' | translate }}</label>
-            <div class="rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 p-3 h-28 overflow-y-auto space-y-2">
-              @for (cat of categories; track cat.id) {
-                <label class="flex items-center gap-2 text-xs text-aquamarine-900 dark:text-aquamarine-100 cursor-pointer">
-                  <input type="checkbox" [(ngModel)]="cat.checked" [name]="cat.id" [id]="cat.id" class="rounded border-aquamarine-300 text-aquamarine-600 focus:ring-aquamarine-500">
-                  <span>{{ cat.label }}</span>
+                <p>
+                  {{ 'post_form.target_language_note' | translate }}
+                </p>
+              </div>
+            </div>
+
+            <div class="language-grid">
+              <!-- NGÔN NGỮ GỐC -->
+              <div class="form-field">
+                <label for="source-language">
+                  {{ 'post_form.source_language_label' | translate }}
+                  <span class="required">*</span>
                 </label>
+
+                <div class="native-select language-select">
+                  <span class="flag">
+                    {{ sourceLanguage()?.flag || '🌐' }}
+                  </span>
+
+                  <select id="source-language" name="sourceLanguage" [ngModel]="originalLanguageId()" (ngModelChange)="
+    changeOriginalLanguage($event)
+  " [disabled]="sourceLanguageLocked()">
+                    @for (
+                    language of languages();
+                    track language.id
+                    ) {
+                    <option [ngValue]="language.id">
+                      {{ languageDisplayName(language) }}
+                      ({{ language.code.toUpperCase() }})
+                    </option>
+                    }
+                  </select>
+
+                  <i class="bi bi-chevron-down"></i>
+                </div>
+              </div>
+
+              <!-- NGÔN NGỮ DỊCH -->
+              <div class="form-field">
+                <label>
+                  {{ 'post_form.target_language_label' | translate }}
+
+                  <span class="label-note">
+                    {{ 'post_form.target_language_note' | translate }}
+                  </span>
+                </label>
+
+                <div class="multi-select" (click)="keepDropdownOpen($event)">
+                  <button type="button" class="multi-select-trigger" [class.open]="languageDropdownOpen()"
+                    (click)="toggleLanguageDropdown($event)" [attr.aria-label]="
+                  'post_form.target_language_aria' | translate
+                ">
+                    <span class="selected-values">
+                      @for (
+                      language of selectedTranslationLanguages();
+                      track language.id
+                      ) {
+                      <span class="selection-chip">
+                        <span>
+                          {{ language.flag || '🌐' }}
+                        </span>
+
+                        <span class="selection-chip__text">
+                          {{ languageDisplayName(language) }}
+                          ({{ language.code.toUpperCase() }})
+                        </span>
+
+                        <span class="chip-remove" role="button" tabindex="0" (click)="
+                          removeTranslationLanguage(
+                            language.id,
+                            $event
+                          )
+                        " [attr.aria-label]="
+                          ('post_form.remove_language' | translate) +
+                          ' ' +
+                          languageDisplayName(language)
+                        ">
+                          <i class="bi bi-x"></i>
+                        </span>
+                      </span>
+                      } @empty {
+                      <span class="placeholder">
+                        {{ 'post_form.no_translation' | translate }}
+                      </span>
+                      }
+                    </span>
+
+                    <i class="bi bi-chevron-down trigger-chevron"></i>
+                  </button>
+
+                  @if (languageDropdownOpen()) {
+                  <div class="dropdown-panel language-options">
+                    <div class="dropdown-title">
+                      {{ 'post_form.source_excluded' | translate }}
+                    </div>
+
+                    @for (
+                    language of availableTranslationLanguages();
+                    track language.id
+                    ) {
+                    <label class="dropdown-option">
+                      <input type="checkbox" [checked]="
+                          isTranslationLanguageSelected(language.id)
+                        " (change)="
+                          toggleTranslationLanguage(
+                            language.id,
+                            $any($event.target).checked
+                          )
+                        ">
+
+                      <span class="option-flag">
+                        {{ language.flag || '🌐' }}
+                      </span>
+
+                      <span class="option-name">
+                        {{ languageDisplayName(language) }}
+                      </span>
+
+                      <span class="option-code">
+                        {{ language.code.toUpperCase() }}
+                      </span>
+                    </label>
+                    } @empty {
+                    <div class="empty-option">
+                      {{
+                      'post_form.no_target_language'
+                      | translate
+                      }}
+                    </div>
+                    }
+                  </div>
+                  }
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- TIÊU ĐỀ VÀ NỘI DUNG -->
+          <article class="form-panel content-panel">
+            <div class="panel-heading">
+              <div class="panel-heading__icon">
+                <i class="bi bi-file-earmark-text"></i>
+              </div>
+
+              <div class="panel-heading__content">
+                <h2>
+                  {{ 'post_form.content_label' | translate }}
+                </h2>
+
+                <p>
+                  {{ 'post_form.editor_placeholder' | translate }}
+                </p>
+              </div>
+            </div>
+
+            <div class="form-field full-width title-field">
+              <div class="label-row">
+                <label for="post-title">
+                  {{ 'post_form.title_label' | translate }}
+                  ({{ sourceLanguage()?.code?.toUpperCase() || '--' }})
+                  <span class="required">*</span>
+                </label>
+
+                <span class="counter">
+                  {{ titleModel.length }}/255
+                </span>
+              </div>
+
+              <input id="post-title" type="text" name="title" [(ngModel)]="titleModel" maxlength="255"
+                [placeholder]="'post_form.title_placeholder' | translate" required>
+            </div>
+
+            <div class="form-field editor-field">
+              <label>
+                {{ 'post_form.content_label' | translate }}
+                ({{ sourceLanguage()?.code?.toUpperCase() || '--' }})
+                <span class="required">*</span>
+              </label>
+
+              <div class="editor-shell">
+                <div #editorContainer id="editor-container"></div>
+              </div>
+
+              <small class="editor-media-hint">
+                <i class="bi bi-image"></i>
+                {{ 'post_form.content_images_hint' | translate }}
+              </small>
+            </div>
+          </article>
+        </main>
+
+        <!-- CỘT PHẢI -->
+        <aside class="create-post-sidebar">
+          <!-- DANH MỤC VÀ HASHTAG -->
+          <article class="form-panel side-panel">
+            <div class="panel-heading panel-heading--compact">
+              <div class="panel-heading__icon">
+                <i class="bi bi-tags"></i>
+              </div>
+
+              <div class="panel-heading__content">
+                <h2>
+                  {{ 'post_form.category_label' | translate }}
+                </h2>
+              </div>
+            </div>
+
+            <div class="sidebar-fields">
+              <div class="form-field">
+                <label>
+                  {{ 'post_form.category_label' | translate }}
+                  <span class="required">*</span>
+                </label>
+
+                <div class="multi-select" (click)="keepDropdownOpen($event)">
+                  <button type="button" class="multi-select-trigger compact" [class.open]="categoryDropdownOpen()"
+                    (click)="toggleCategoryDropdown($event)">
+                    <span class="selected-values">
+                      @for (
+                      category of selectedCategories();
+                      track category.id
+                      ) {
+                      <span class="selection-chip category-chip">
+                        {{ category.name }}
+                      </span>
+                      } @empty {
+                      <span class="placeholder">
+                        {{ 'post_form.select_category' | translate }}
+                      </span>
+                      }
+                    </span>
+
+                    <i class="bi bi-chevron-down trigger-chevron"></i>
+                  </button>
+
+                  @if (categoryDropdownOpen()) {
+                  <div class="dropdown-panel category-options">
+                    @for (
+                    category of categoriesForSourceLanguage();
+                    track category.id
+                    ) {
+                    <label class="dropdown-option">
+                      <input type="checkbox" [checked]="isCategorySelected(category.id)" (change)="
+                          toggleCategory(
+                            category.id,
+                            $any($event.target).checked
+                          )
+                        ">
+
+                      <span class="option-name">
+                        {{ category.name }}
+                      </span>
+
+                      <span class="option-code">
+                        {{
+                        category.categoryGroup?.code ||
+                        (
+                        ('post_form.group' | translate) +
+                        ' #' +
+                        category.categoryGroupId
+                        )
+                        }}
+                      </span>
+                    </label>
+                    } @empty {
+                    <div class="empty-option">
+                      {{
+                      'post_form.no_category_for_language'
+                      | translate
+                      }}
+                    </div>
+                    }
+                  </div>
+                  }
+                </div>
+
+                <small>
+                  {{ 'post_form.only_source_categories' | translate }}
+                  ({{ languageDisplayName(sourceLanguage()) }}).
+                </small>
+              </div>
+
+              <div class="sidebar-divider"></div>
+              <div class="form-field hashtag-v3" (click)="$event.stopPropagation()">
+                <div class="label-row">
+                  <label for="hashtag-input-v3">
+                    {{ 'post_form.hashtags_max' | translate }}
+                  </label>
+
+                  <span class="counter" [class.hashtag-v3__counter--limit]="
+        selectedHashtagNames().length >= 5
+      ">
+                    {{ selectedHashtagNames().length }}/5
+                  </span>
+                </div>
+
+                @if (selectedHashtagNames().length > 0) {
+                <div class="hashtag-v3__selected">
+                  @for (
+                  hashtag of selectedHashtagNames();
+                  track hashtag
+                  ) {
+                  <span class="hashtag-v3__chip">
+                    <span>#{{ hashtag }}</span>
+
+                    <button type="button" (click)="removeHashtag(hashtag)"
+                      [attr.aria-label]="('post_form.hashtag_remove' | translate) + ' #' + hashtag">
+                      <i class="bi bi-x-lg"></i>
+                    </button>
+                  </span>
+                  }
+                </div>
+                }
+
+                <div class="hashtag-v3__control" [class.is-open]="hashtagPickerOpen()">
+                  <input id="hashtag-input-v3" type="text" name="hashtagInput" autocomplete="off"
+                    [(ngModel)]="hashtagInputModel" (keydown)="onHashtagInputKeydown($event)"
+                    [disabled]="selectedHashtagNames().length >= 5" [placeholder]="
+        selectedHashtagNames().length >= 5
+          ? ('post_form.hashtag_limit_reached' | translate)
+          : ('post_form.hashtags_placeholder' | translate)
+      ">
+
+                  <button type="button" class="hashtag-v3__toggle" (click)="toggleHashtagPicker($event)"
+                    [attr.aria-expanded]="hashtagPickerOpen()"
+                    [attr.aria-label]="'post_form.hashtag_picker_open' | translate">
+                    <i class="bi bi-hash"></i>
+                    <i class="bi bi-chevron-down" [class.is-rotated]="hashtagPickerOpen()"></i>
+                  </button>
+                </div>
+
+                @if (hashtagPickerOpen()) {
+                <div class="hashtag-v3__dropdown">
+                  <div class="hashtag-v3__dropdown-header">
+                    <div>
+                      <strong>{{ 'post_form.hashtag_picker_title' | translate }}</strong>
+                      <span>{{ 'post_form.hashtag_picker_hint' | translate }}</span>
+                    </div>
+
+                    <span class="hashtag-v3__count">
+                      {{ selectedHashtagNames().length }}/5
+                    </span>
+                  </div>
+
+                  <div class="hashtag-v3__options">
+                    @for (
+                    tag of options()?.tags ?? [];
+                    track tag.id
+                    ) {
+                    <button type="button" class="hashtag-v3__option" [class.is-selected]="isHashtagSelected(tag.name)"
+                      [disabled]="
+              !isHashtagSelected(tag.name) &&
+              selectedHashtagNames().length >= 5
+            " (click)="toggleHashtag(tag.name)">
+                      <span class="hashtag-v3__option-name">
+                        #{{ normalizeHashtagName(tag.name) }}
+                      </span>
+
+                      @if (isHashtagSelected(tag.name)) {
+                      <span class="hashtag-v3__option-state">
+                        <i class="bi bi-check-lg"></i>
+                        Đã chọn
+                      </span>
+                      } @else {
+                      <span class="hashtag-v3__option-state">
+                        Chọn
+                      </span>
+                      }
+                    </button>
+                    } @empty {
+                    <div class="hashtag-v3__empty">
+                      {{ 'post_form.hashtag_picker_empty' | translate }}
+                    </div>
+                    }
+                  </div>
+                </div>
+                }
+
+                <small class="hashtag-v3__hint">
+                  {{ 'post_form.hashtag_input_hint' | translate }}
+                </small>
+              </div>
+            </div>
+          </article>
+
+          <!-- ẢNH BÌA -->
+          <article class="form-panel side-panel">
+            <div class="panel-heading panel-heading--compact">
+              <div class="panel-heading__icon">
+                <i class="bi bi-image"></i>
+              </div>
+
+              <div class="panel-heading__content">
+                <h2>
+                  {{ 'post_form.thumbnail_section' | translate }}
+                </h2>
+              </div>
+            </div>
+
+            <div class="sidebar-fields">
+              <div class="form-field">
+                <label for="thumbnail">
+                  {{ 'post_form.thumbnail_label' | translate }}
+                </label>
+                @if (thumbnailPreviewUrl(); as previewUrl) {
+                <div class="current-thumbnail selected-thumbnail">
+                  <img [src]="previewUrl" [alt]="thumbnailFile()?.name || titleModel">
+
+                  <span>
+                    <i class="bi bi-check-circle"></i>
+                    {{ 'post_form.thumbnail_new_preview' | translate }}
+                  </span>
+                </div>
+                } @else if (
+                existingThumbnailUrl() &&
+                !thumbnailFile()
+                ) {
+                <div class="current-thumbnail">
+                  <img [src]="existingThumbnailUrl()!" [alt]="titleModel">
+
+                  <span>
+                    <i class="bi bi-image"></i>
+
+                    {{
+                    'post_form.thumbnail_current'
+                    | translate
+                    }}
+                  </span>
+                </div>
+                }
+
+                <label class="file-input" for="thumbnail">
+                  <span class="file-button">
+                    <i class="bi bi-upload"></i>
+                    {{ 'post_form.choose_file' | translate }}
+                  </span>
+
+                  <span class="file-name">
+                    {{
+                    thumbnailFile()?.name ||
+                    ('post_form.no_file_selected' | translate)
+                    }}
+                  </span>
+                </label>
+
+                <input id="thumbnail" class="visually-hidden" type="file" accept="image/*"
+                  (change)="onThumbnailSelected($event)">
+
+                <small>
+                  {{ 'post_form.thumbnail_upload_hint' | translate }}
+                </small>
+              </div>
+            </div>
+          </article>
+
+          <!-- GỬI DUYỆT -->
+          <article class="form-panel publish-panel">
+            <div class="panel-heading panel-heading--compact">
+              <div class="panel-heading__icon">
+                <i class="bi bi-send-check"></i>
+              </div>
+
+              <div class="panel-heading__content">
+                <h2>
+                  {{ primaryActionLabelKey() | translate }} </h2>
+              </div>
+            </div>
+
+            <div class="publish-note">
+              <i class="bi bi-info-circle"></i>
+
+              <p>
+                {{ pageSubtitleKey() | translate }} </p>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="primary-button" [disabled]="formLocked()" (click)="savePost(false)">
+                <i [class]="
+        isSubmitting()
+          ? 'bi bi-arrow-repeat spin'
+          : (
+              isEditMode()
+                ? 'bi bi-check2-circle'
+                : 'bi bi-save2'
+            )
+      "></i>
+
+                <span>
+                  {{
+                  primaryActionLabelKey()
+                  | translate
+                  }}
+                </span>
+              </button>
+
+              @if (showSubmitForReviewAction()) {
+              <button type="button" class="secondary-button" [disabled]="formLocked()" (click)="savePost(true)">
+                <i [class]="
+          isSubmitting()
+            ? 'bi bi-arrow-repeat spin'
+            : 'bi bi-send'
+        "></i>
+
+                <span>
+                  {{
+                  secondaryActionLabelKey()
+                  | translate
+                  }}
+                </span>
+              </button>
+              }
+
+              @if (isEditMode()) {
+              <button type="button" class="cancel-edit-button" [disabled]="isSubmitting()" (click)="cancelChanges()">
+                <i class="bi bi-x-circle"></i>
+
+                <span>
+                  {{
+                  'post_form.cancel_changes_btn'
+                  | translate
+                  }}
+                </span>
+              </button>
+              }
+
+              @if (isSubmitting()) {
+              <span class="submitting-text">
+                {{
+                'post_form.submitting'
+                | translate
+                }}
+              </span>
               }
             </div>
-            <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400 mt-1 block">{{ 'post_form.category_hint' | translate }}</small>
-          </div>
-          
-          <div>
-            <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'post_form.hashtags_label' | translate }}</label>
-            <input type="text" [(ngModel)]="hashtags" name="hashtags" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" [placeholder]="'post_form.hashtags_placeholder' | translate">
-          </div>
-          
-          <div>
-            <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'post_form.thumbnail_label' | translate }}</label>
-            <input type="file" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-3 py-2 text-xs text-aquamarine-950 dark:text-aquamarine-50 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-aquamarine-200 file:text-aquamarine-800 hover:file:bg-aquamarine-300" accept="image/*">
-            <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400 mt-1 block">{{ 'post_form.thumbnail_hint' | translate }}</small>
-          </div>
+          </article>
+        </aside>
+      </div>
+    </fieldset>
 
-          <div>
-            <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'post_form.video_label' | translate }}</label>
-            <input type="file" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-3 py-2 text-xs text-aquamarine-950 dark:text-aquamarine-50 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-aquamarine-200 file:text-aquamarine-800 hover:file:bg-aquamarine-300" accept="video/mp4,video/webm,video/ogg">
-            <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400 mt-1 block">{{ 'post_form.video_hint' | translate }}</small>
-          </div>
-        </div>
+    <!-- RESULT -->
+    @if (createdPost(); as post) {
+    <article class="result-panel">
+      <div class="result-heading">
+        <span class="result-heading__icon">
+          <i class="bi bi-check-lg"></i>
+        </span>
 
         <div>
-          <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'post_form.content_label' | translate }} <span class="text-red-500">*</span></label>
-          <div class="rounded-xl overflow-hidden border border-aquamarine-200 dark:border-aquamarine-800">
-            <div id="editor-container" class="h-80 bg-white dark:bg-aquamarine-950 text-aquamarine-950 dark:text-aquamarine-50"></div>
-          </div>
+          <strong>
+            {{ resultHeadingKey() | translate }} #{{ post.id }}
+          </strong>
+
+          <span>
+            {{ 'post_form.status' | translate }}:
+            {{ statusLabel(post.status) }}
+          </span>
         </div>
       </div>
-      
-      <div class="flex gap-3 pt-4 border-t border-aquamarine-200 dark:border-aquamarine-800">
-        <button type="button" (click)="handleSave('PUBLISHED')" class="px-6 py-2.5 rounded-xl font-semibold text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 transition-colors flex items-center gap-2">
-          <i class="bi bi-send"></i> {{ 'post_form.publish_btn' | translate }}
-        </button>
-        <button type="button" (click)="handleSave('DRAFT')" class="px-6 py-2.5 rounded-xl font-semibold text-sm text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors flex items-center gap-2">
-          <i class="bi bi-save"></i> {{ 'post_form.draft_btn' | translate }}
-        </button>
-      </div>
-    </form>
-  </div>
-</section>
 
+      @if (translationResults().length) {
+      <div class="translation-results">
+        @for (
+        result of translationResults();
+        track result.languageId
+        ) {
+        <div class="translation-result" [class.failed]="!result.success">
+          <span class="result-flag">
+            {{
+            translationLanguage(result.languageId)
+            ?.flag || '🌐'
+            }}
+          </span>
+
+          <div>
+            <strong>
+              {{
+              languageDisplayName(
+              translationLanguage(
+              result.languageId
+              )
+              )
+              }}
+            </strong>
+
+            <span>{{ result.message }}</span>
+          </div>
+
+          <i [class]="
+                      result.success
+                        ? 'bi bi-check-circle-fill'
+                        : 'bi bi-exclamation-triangle-fill'
+                    "></i>
+        </div>
+        }
+      </div>
+      }
+    </article>
+    }
+  </form>
+  }
+</section>

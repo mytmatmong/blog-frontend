@@ -1,149 +1,283 @@
-<section class="space-y-6">
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-    <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-      <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ 'dashboard.total_posts' | translate }}</div>
-      <h3 class="font-bold text-2xl text-aquamarine-600 dark:text-aquamarine-400 mt-1">24</h3>
+<section class="owner-dashboard">
+  <header class="owner-page-header">
+    <div class="owner-page-header__copy">
+
+      <h1>{{ 'dashboard.owner_title' | translate }}</h1>
+      <p>{{ 'dashboard.owner_desc' | translate }}</p>
     </div>
-    <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-      <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ 'dashboard.total_views' | translate }}</div>
-      <h3 class="font-bold text-2xl text-cyan-500 mt-1">12.4k</h3>
+
+    <div class="owner-page-header__actions">
+      <button type="button" class="dashboard-button dashboard-button--secondary" (click)="openShareModal()">
+        <i class="bi bi-share"></i>
+        <span>{{ 'dashboard.share_blog' | translate }}</span>
+      </button>
+
+      <a routerLink="/dashboard/owner/create-post" class="dashboard-button dashboard-button--primary">
+        <i class="bi bi-plus-lg"></i>
+        <span>{{ 'dashboard.create_new_post' | translate }}</span>
+      </a>
     </div>
-    <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-      <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ 'dashboard.total_likes' | translate }}</div>
-      <h3 class="font-bold text-2xl text-red-500 mt-1">3.2k</h3>
-    </div>
-    <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-      <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ 'dashboard.total_comments' | translate }}</div>
-      <h3 class="font-bold text-2xl text-gray-500 dark:text-gray-400 mt-1">4</h3>
-    </div>
+  </header>
+
+  @if (loadError()) {
+  <div class="dashboard-alert dashboard-alert--danger">
+    <i class="bi bi-exclamation-triangle-fill"></i>
+    <span>{{ loadError() }}</span>
+    <button type="button" (click)="loadDashboard()">{{ 'common.retry' | translate }}</button>
+  </div>
+  }
+
+  <div class="metric-grid">
+    <article class="metric-card metric-card--brand">
+      <div class="metric-card__value">
+        @if (isLoading()) {
+        <span class="metric-skeleton"></span>
+        } @else {
+        {{ (dashboard()?.postCounts?.total ?? 0) | number }}
+        }
+      </div>
+      <div class="metric-card__meta">
+        <div class="metric-card__label">{{ 'dashboard.total_posts' | translate }}</div>
+        <div class="metric-card__detail">
+          {{ (dashboard()?.postCounts?.published ?? 0) | number }} {{ 'post_status.publish' | translate }}
+        </div>
+      </div>
+    </article>
+
+    <article class="metric-card metric-card--sky">
+      <div class="metric-card__value">
+        @if (isLoading()) {
+        <span class="metric-skeleton"></span>
+        } @else {
+        {{ (dashboard()?.totals?.views ?? 0) | number }}
+        }
+      </div>
+      <div class="metric-card__meta">
+        <div class="metric-card__label">{{ 'dashboard.total_views' | translate }}</div>
+      </div>
+    </article>
+
+    <article class="metric-card metric-card--rose">
+      <div class="metric-card__value">
+        @if (isLoading()) {
+        <span class="metric-skeleton"></span>
+        } @else {
+        {{ (dashboard()?.totals?.likes ?? 0) | number }}
+        }
+      </div>
+      <div class="metric-card__meta">
+        <div class="metric-card__label">{{ 'dashboard.total_likes' | translate }}</div>
+      </div>
+    </article>
+
+    <article class="metric-card metric-card--amber">
+      <div class="metric-card__value">
+        @if (isLoading()) {
+        <span class="metric-skeleton"></span>
+        } @else {
+        {{ (dashboard()?.totals?.comments ?? 0) | number }}
+        }
+      </div>
+      <div class="metric-card__meta">
+        <div class="metric-card__label">{{ 'dashboard.total_comments' | translate }}</div>
+      </div>
+    </article>
   </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-    <div class="lg:col-span-8">
-      <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm h-full flex flex-col justify-between">
-        <h6 class="font-bold text-base text-aquamarine-950 dark:text-aquamarine-50 mb-4">
-          {{ 'dashboard.interaction_chart' | translate }}
-        </h6>
+  <div class="dashboard-overview-grid">
+    <article class="dashboard-panel dashboard-panel--chart">
+      <div class="panel-heading">
         <div>
-          <canvas id="interactionChart" height="100"></canvas>
+          <h2>{{ 'dashboard.interaction_chart' | translate }}</h2>
+        </div>
+        <div class="chart-legend" aria-label="Chart legend">
+          <span><i class="chart-dot chart-dot--views"></i>{{ 'table.views' | translate }}</span>
+          <span><i class="chart-dot chart-dot--likes"></i>{{ 'table.likes' | translate }}</span>
         </div>
       </div>
-    </div>
-    <div class="lg:col-span-4">
-      <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm h-full">
-        <h6 class="font-bold text-base text-aquamarine-950 dark:text-aquamarine-50 mb-4">
-          {{ 'dashboard.quick_actions' | translate }}
-        </h6>
-        <div class="flex flex-col gap-3">
-          <a routerLink="/dashboard/owner/create-post" class="flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 transition-colors">
-            <i class="bi bi-pencil-square"></i>{{ 'dashboard.create_new_post' | translate }}
-          </a>
-          <a routerLink="/dashboard/owner/posts" class="flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors">
-            <i class="bi bi-list-task"></i>{{ 'dashboard.my_posts' | translate }}
-          </a>
-          <button class="flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm text-cyan-700 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-700 hover:bg-cyan-50 dark:hover:bg-cyan-950/30 transition-colors text-left" (click)="openShareModal()">
-            <i class="bi bi-share"></i>{{ 'dashboard.share_blog' | translate }}
-          </button>
+
+      <div class="chart-stage">
+        @if (isLoading()) {
+        <div class="panel-loading"><i class="bi bi-arrow-repeat"></i>{{ 'common.loading' | translate }}</div>
+        }
+        <canvas #interactionChart></canvas>
+      </div>
+    </article>
+
+    <aside class="dashboard-panel status-panel">
+      <div class="panel-heading panel-heading--status">
+        <div>
+          <h2>{{ 'dashboard.my_posts' | translate }}</h2>
+        </div>
+        <a routerLink="/dashboard/owner/posts" class="panel-link" [title]="'dashboard.view_all' | translate">
+          <i class="bi bi-arrow-up-right"></i>
+        </a>
+      </div>
+
+      <div class="status-total">
+        <span>{{ 'dashboard.total_posts' | translate }}</span>
+        <strong>{{ (dashboard()?.postCounts?.total ?? 0) | number }}</strong>
+      </div>
+
+      <div class="status-list">
+        <div class="status-row status-row--published">
+          <span class="status-row__dot"></span>
+          <span>{{ 'post_status.publish' | translate }}</span>
+          <strong>{{ (dashboard()?.postCounts?.published ?? 0) | number }}</strong>
+        </div>
+        <div class="status-row status-row--pending">
+          <span class="status-row__dot"></span>
+          <span>{{ 'post_status.pending_review' | translate }}</span>
+          <strong>{{ (dashboard()?.postCounts?.pendingReview ?? 0) | number }}</strong>
+        </div>
+        <div class="status-row status-row--draft">
+          <span class="status-row__dot"></span>
+          <span>{{ 'post_status.draft' | translate }}</span>
+          <strong>{{ (dashboard()?.postCounts?.draft ?? 0) | number }}</strong>
+        </div>
+        <div class="status-row status-row--rejected">
+          <span class="status-row__dot"></span>
+          <span>{{ 'post_status.reject' | translate }}</span>
+          <strong>{{ (dashboard()?.postCounts?.rejected ?? 0) | number }}</strong>
         </div>
       </div>
-    </div>
+
+      <div class="quick-links">
+        <a routerLink="/dashboard/owner/create-post" class="quick-link">
+          <span><i class="bi bi-pencil-square"></i></span>
+          <div>
+            <strong>{{ 'dashboard.create_new_post' | translate }}</strong>
+            <small>{{ 'dashboard.create_post' | translate }}</small>
+          </div>
+          <i class="bi bi-chevron-right"></i>
+        </a>
+        <button type="button" class="quick-link" (click)="openShareModal()">
+          <span><i class="bi bi-share"></i></span>
+          <div>
+            <strong>{{ 'dashboard.share_blog' | translate }}</strong>
+            <small>{{ 'modal.share_desc' | translate }}</small>
+          </div>
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+    </aside>
   </div>
 
-  <div class="flex justify-between items-center pt-2">
-    <div class="flex items-center gap-3">
-      <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">{{ 'dashboard.featured_posts' | translate }}</h5>
-      <select [value]="sortCriteria()" (change)="onSortChange($event)" class="text-sm rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 px-3 py-1.5 text-aquamarine-900 dark:text-aquamarine-100 outline-none">
-        <option value="views">{{ 'filter.most_viewed' | translate }}</option>
-        <option value="likes">{{ 'filter.most_liked' | translate }}</option>
-      </select>
+  <article class="dashboard-panel posts-panel">
+    <div class="panel-heading posts-panel__heading">
+      <div>
+        <h2>{{ 'dashboard.featured_posts' | translate }}</h2>
+      </div>
+      <div class="posts-panel__controls">
+        <label class="sort-control">
+          <i class="bi bi-sliders"></i>
+          <select [value]="sortCriteria()" (change)="onSortChange($event)">
+            <option value="views">{{ 'filter.most_viewed' | translate }}</option>
+            <option value="likes">{{ 'filter.most_liked' | translate }}</option>
+          </select>
+        </label>
+        <a routerLink="/dashboard/owner/posts" class="view-all-link">
+          {{ 'dashboard.view_all' | translate }}
+          <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
     </div>
-    <a routerLink="/dashboard/owner/posts" class="text-sm text-aquamarine-600 hover:text-aquamarine-700 font-medium">{{ 'dashboard.view_all' | translate }}</a>
-  </div>
 
-  <div class="rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm overflow-x-auto">
-    <table class="w-full text-left border-collapse text-sm">
-      <thead>
-        <tr class="border-b border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950/50">
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'table.post_title' | translate }}</th>
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.status' | translate }}</th>
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.views' | translate }}</th>
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.likes' | translate }}</th>
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.actions' | translate }}</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-aquamarine-100 dark:divide-aquamarine-800">
-        @for (post of sortedPosts; track post.id) {
-          <tr class="hover:bg-aquamarine-50/30 dark:hover:bg-aquamarine-950/30 transition-colors">
-            <td class="p-4 font-medium text-aquamarine-950 dark:text-aquamarine-50">{{ post.title }}</td>
-            <td class="p-4 text-center">
-              <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full {{ post.statusClass }}">{{ post.status }}</span>
+    <div class="modern-table-wrap">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>{{ 'table.post_title' | translate }}</th>
+            <th>{{ 'table.status' | translate }}</th>
+            <th>{{ 'table.views' | translate }}</th>
+            <th>{{ 'table.likes' | translate }}</th>
+            <th class="owner-actions-column">{{ 'table.actions' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (isLoading()) {
+          <tr>
+            <td colspan="5">
+              <div class="table-empty"><i class="bi bi-arrow-repeat"></i>{{ 'common.loading' | translate }}</div>
             </td>
-            <td class="p-4 text-center text-aquamarine-800 dark:text-aquamarine-200">{{ post.views | number }}</td>
-            <td class="p-4 text-center">
-              <span class="text-red-500 font-medium"><i class="bi bi-heart-fill me-1"></i>{{ post.likes | number }}</span>
+          </tr>
+          } @else if (featuredPosts().length === 0) {
+          <tr>
+            <td colspan="5">
+              <div class="table-empty"><i class="bi bi-journal-x"></i>{{ 'posts.empty' | translate }}</div>
             </td>
-            <td class="p-4 text-center">
-              <div class="flex items-center justify-center gap-1">
-                <button (click)="setPreviewPost(post)" class="p-1.5 text-cyan-600 hover:bg-cyan-50 dark:hover:bg-cyan-950/30 rounded-lg transition-colors" [title]="'common.view' | translate">
-                  <i class="bi bi-eye"></i>
+          </tr>
+          } @else {
+          @for (post of featuredPosts(); track post.id) {
+          <tr>
+            <td>
+              <div class="post-identity">
+                @if (post.thumbnailUrl) {
+                <img [src]="post.thumbnailUrl" [alt]="post.title">
+                } @else {
+                <span class="post-identity__placeholder"><i class="bi bi-image"></i></span>
+                }
+                <div>
+                  <strong>{{ post.title }}</strong>
+                  <span>{{ post.language.flag }} {{ post.language.name }}</span>
+                </div>
+              </div>
+            </td>
+            <td><span class="status-pill {{ statusClass(post.status) }}">{{ statusLabel(post.status) }}</span></td>
+            <td><span class="table-metric"><i class="bi bi-eye"></i>{{ post.views | number }}</span></td>
+            <td><span class="table-metric table-metric--likes"><i class="bi bi-heart"></i>{{ post.likes | number
+                }}</span></td>
+            <td class="owner-actions-column">
+              <div class="owner-action-group">
+                <button type="button" class="owner-action-button" (click)="openPreview(post.id)"
+                  [title]="'common.view' | translate">
+                  <i class="bi bi-eye"></i><span>{{ 'common.view' | translate }}</span>
                 </button>
-                <a routerLink="/dashboard/owner/edit-post" class="p-1.5 text-aquamarine-600 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 rounded-lg transition-colors" [title]="'comments.edit' | translate">
-                  <i class="bi bi-pencil-square"></i>
+                <a class="owner-action-button" [routerLink]="[
+    '/dashboard/owner/edit-post',
+    post.id
+  ]" [title]="'comments.edit' | translate">
+                  <i class="bi bi-pencil-square"></i><span>{{ 'comments.edit' | translate }}</span>
                 </a>
-                <button (click)="deletePost(post)" class="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors" [title]="'comments.delete' | translate">
-                  <i class="bi bi-trash3-fill"></i>
+                <button type="button" class="owner-action-button owner-action-button--danger" (click)="deletePost(post)"
+                  [disabled]="deletingPostId() === post.id" [title]="'comments.delete' | translate">
+                  <i class="bi" [class.bi-arrow-repeat]="deletingPostId() === post.id"
+                    [class.spin]="deletingPostId() === post.id" [class.bi-trash3]="deletingPostId() !== post.id"></i>
+                  <span>{{ 'comments.delete' | translate }}</span>
                 </button>
               </div>
             </td>
           </tr>
-        }
-      </tbody>
-    </table>
-  </div>
+          }
+          }
+        </tbody>
+      </table>
+    </div>
+  </article>
 </section>
 
-<!-- Share Modal -->
 @if (isShareModalOpen()) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-    <div class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-md p-6">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">{{ 'modal.share_title' | translate }}</h3>
-        <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" (click)="closeShareModal()">
-          <i class="bi bi-x-lg text-lg"></i>
-        </button>
+<div class="dashboard-modal-backdrop" (click)="closeShareModal()">
+  <div class="dashboard-modal dashboard-modal--small" (click)="$event.stopPropagation()">
+    <div class="dashboard-modal__heading">
+      <span class="dashboard-modal__icon"><i class="bi bi-share-fill"></i></span>
+      <div>
+        <h3>{{ 'modal.share_title' | translate }}</h3>
+        <p>{{ 'modal.share_desc' | translate }}</p>
       </div>
-      <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400 mb-4">{{ 'modal.share_desc' | translate }}</p>
-      <div class="flex rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 overflow-hidden mb-2">
-        <input type="text" id="blogLinkInput" class="w-full px-3 py-2 text-sm bg-transparent outline-none text-aquamarine-950 dark:text-aquamarine-50" value="https://devblog.com/@sondev" readonly>
-        <button (click)="copyBlogLink()" class="px-4 py-2 text-xs font-semibold text-white transition-colors" [class.bg-aquamarine-600]="!copySuccess()" [class.bg-emerald-600]="copySuccess()" type="button">
-          <i class="bi me-1" [class.bi-clipboard]="!copySuccess()" [class.bi-check2]="copySuccess()"></i> 
-          {{ copySuccess() ? ('modal.copied' | translate) : ('modal.copy' | translate) }}
-        </button>
-      </div>
+      <button type="button" (click)="closeShareModal()"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="share-field">
+      <input type="text" id="blogLinkInput" [value]="publicBlogUrl" readonly>
+      <button type="button" (click)="copyBlogLink()" [class.is-success]="copySuccess()">
+        <i class="bi" [class.bi-clipboard]="!copySuccess()" [class.bi-check2]="copySuccess()"></i>
+        {{ copySuccess() ? ('modal.copied' | translate) : ('modal.copy' | translate) }}
+      </button>
     </div>
   </div>
+</div>
 }
 
-<!-- Preview Modal -->
-@if (activePreviewPost()) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-    <div class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-3xl max-h-[85vh] flex flex-col">
-      <div class="flex justify-between items-center p-5 border-b border-aquamarine-200 dark:border-aquamarine-800">
-        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">{{ 'modal.preview_title' | translate }}: {{ activePreviewPost()?.title }}</h5>
-        <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" (click)="closePreviewModal()">
-          <i class="bi bi-x-lg text-lg"></i>
-        </button>
-      </div>
-      <div class="p-6 overflow-y-auto space-y-4">
-        <div>
-          <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full {{ activePreviewPost()?.statusClass }}">{{ activePreviewPost()?.status }}</span>
-        </div>
-        <h2 class="font-bold text-2xl text-aquamarine-950 dark:text-aquamarine-50">{{ activePreviewPost()?.title }}</h2>
-        <div class="prose dark:prose-invert max-w-none text-aquamarine-800 dark:text-aquamarine-200" [innerHTML]="activePreviewPost()?.content"></div>
-      </div>
-      <div class="p-4 border-t border-aquamarine-200 dark:border-aquamarine-800 flex justify-end">
-        <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="closePreviewModal()">{{ 'modal.close' | translate }}</button>
-      </div>
-    </div>
-  </div>
-}
+<!-- SHARED POST PREVIEW -->
+<app-owner-post-preview [postId]="activePreviewPostId()" editRoute="/dashboard/owner/edit-post" [showEdit]="true"
+  (closed)="closePreviewModal()" />

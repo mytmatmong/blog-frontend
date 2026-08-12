@@ -1,8 +1,10 @@
 import {
   Component,
   computed,
+  ElementRef,
   inject,
   signal,
+  ViewChild,
 } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -85,6 +87,9 @@ interface ReportTarget {
   styleUrl: './post-detail.css',
 })
 export class PostDetail {
+  @ViewChild('commentTextarea')
+  private commentTextarea?: ElementRef<HTMLTextAreaElement>;
+
   private readonly route = inject(ActivatedRoute);
   protected readonly router = inject(Router);
   private readonly publicApi = inject(PublicApiService);
@@ -340,19 +345,43 @@ export class PostDetail {
     if (!this.requireAuthentication()) return;
     this.editingComment.set(null);
     this.replyTo.set(target);
-    this.commentDraft = '';
+    this.commentDraft = `@${target.username} `;
+    this.scheduleCommentTextareaResize();
   }
 
   beginEdit(target: CommentActionTarget): void {
     this.replyTo.set(null);
     this.editingComment.set(target);
     this.commentDraft = target.content;
+    this.scheduleCommentTextareaResize();
   }
 
   cancelCommentMode(): void {
     this.replyTo.set(null);
     this.editingComment.set(null);
     this.commentDraft = '';
+    this.scheduleCommentTextareaResize();
+  }
+
+  autoGrowCommentTextarea(event?: Event): void {
+    const eventTarget = event?.target;
+    const textarea =
+      eventTarget instanceof HTMLTextAreaElement
+        ? eventTarget
+        : this.commentTextarea?.nativeElement;
+
+    if (!textarea) return;
+
+    textarea.style.height = 'auto';
+    textarea.style.height = `${Math.max(textarea.scrollHeight, 112)}px`;
+  }
+
+  private scheduleCommentTextareaResize(): void {
+    if (typeof requestAnimationFrame === 'undefined') return;
+
+    requestAnimationFrame(() => {
+      this.autoGrowCommentTextarea();
+    });
   }
 
   submitComment(event: Event): void {

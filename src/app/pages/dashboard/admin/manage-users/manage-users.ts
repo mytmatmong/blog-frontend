@@ -157,12 +157,35 @@ export class ManageUsers {
     }
   }
 
-  get pageNumbers(): number[] {
-    const pages: number[] = [];
-    for (let i = 1; i <= this.totalPages(); i++) {
-      pages.push(i);
+  get pageNumbers(): Array<number | 'ellipsis'> {
+    const total = this.totalPages();
+    const current = this.currentPage();
+
+    if (total <= 7) {
+      return Array.from({ length: total }, (_, index) => index + 1);
     }
-    return pages;
+
+    const visiblePages = new Set<number>([
+      1,
+      total,
+      current - 1,
+      current,
+      current + 1,
+    ]);
+    const sortedPages = [...visiblePages]
+      .filter((page) => page >= 1 && page <= total)
+      .sort((left, right) => left - right);
+    const result: Array<number | 'ellipsis'> = [];
+
+    sortedPages.forEach((page, index) => {
+      const previousPage = sortedPages[index - 1];
+      if (previousPage && page - previousPage > 1) {
+        result.push('ellipsis');
+      }
+      result.push(page);
+    });
+
+    return result;
   }
 
   // --- Preview Detail Modal (A11) ---

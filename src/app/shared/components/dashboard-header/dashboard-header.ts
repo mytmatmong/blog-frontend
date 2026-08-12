@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { TranslationService, SupportedLang } from '../../../core/services/translation.service';
@@ -10,12 +10,16 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
   templateUrl: './dashboard-header.html',
   styleUrl: './dashboard-header.css',
 })
-export class DashboardHeader {
+export class DashboardHeader implements OnInit {
   auth = inject(AuthService);
   translationService = inject(TranslationService);
   private router = inject(Router);
 
   isLangDropdownOpen = signal<boolean>(false);
+
+  ngOnInit(): void {
+    this.translationService.loadLanguages();
+  }
 
   toggleLangDropdown() {
     this.isLangDropdownOpen.update(v => !v);

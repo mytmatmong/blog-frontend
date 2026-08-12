@@ -224,6 +224,7 @@ export class ManageLanguages implements OnInit {
           if (res?.success && res.data) {
             this.toastService.success('Tạo ngôn ngữ mới thành công!');
             this.loadLanguages();
+            this.ts.loadLanguages(true);
             this.resetAddForm();
             this.closeAddModal();
           }
@@ -282,6 +283,7 @@ export class ManageLanguages implements OnInit {
           if (res?.success && res.data) {
             this.toastService.success('Cập nhật ngôn ngữ thành công!');
             this.loadLanguages();
+            this.ts.loadLanguages(true);
             this.closeEditModal();
           }
         },
@@ -326,6 +328,7 @@ export class ManageLanguages implements OnInit {
             this.toastService.success('Xóa ngôn ngữ thành công!');
             this.pendingDeleteLanguage.set(null);
             this.loadLanguages();
+            this.ts.loadLanguages(true);
           }
         },
         error: (err) => {

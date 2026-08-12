@@ -69,7 +69,8 @@ export const routes: Routes = [
           { path: '', component: OwnerDashboard },
           { path: 'posts', component: Posts },
           { path: 'create-post', component: CreatePost },
-          { path: 'edit-post', component: EditPost },
+          { path: 'edit-post/:id', component: EditPost },
+          { path: 'edit-post', redirectTo: 'posts', pathMatch: 'full' },
         ]
       },
 

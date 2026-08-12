@@ -1,83 +1,305 @@
-<section class="space-y-6">
-  <div class="flex justify-between items-center">
-    <h3 class="font-bold text-xl text-aquamarine-950 dark:text-aquamarine-50">{{ 'dashboard.my_posts' | translate }}</h3>
-    <a routerLink="/dashboard/owner/create-post" class="px-4 py-2.5 rounded-xl font-semibold text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 transition-colors shadow-sm flex items-center gap-2">
-      <i class="bi bi-plus-lg"></i> {{ 'dashboard.create_post' | translate }}
+<section class="posts-page">
+  <!-- PAGE HEADER -->
+  <header class="posts-page-header">
+    <div class="posts-page-header__content">
+
+      <h1>{{ 'dashboard.my_posts' | translate }}</h1>
+
+      <p>
+        {{ 'posts.total_label' | translate }}:
+        <strong>{{ totalItems() | number }}</strong>
+      </p>
+    </div>
+
+    <a routerLink="/dashboard/owner/create-post" class="create-post-button">
+      <i class="bi bi-plus-lg"></i>
+
+      <span>{{ 'dashboard.create_post' | translate }}</span>
     </a>
+  </header>
+
+  <!-- FILTER -->
+  <article class="filter-panel" [attr.aria-label]="'common.search' | translate">
+    <div class="filter-grid">
+      <label class="search-field">
+        <i class="bi bi-search"></i>
+
+        <input type="search" [value]="search()" (input)="onSearchInput($event)" (keydown)="onSearchKeydown($event)"
+          [placeholder]="'posts.search_placeholder' | translate">
+
+        @if (search()) {
+        <button type="button" class="search-field__clear" (click)="clearFilters()"
+          [attr.aria-label]="'common.clear_search' | translate">
+          <i class="bi bi-x-lg"></i>
+        </button>
+        }
+      </label>
+
+      <label class="select-field">
+        <i class="bi bi-ui-checks"></i>
+
+        <select [value]="statusFilter()" (change)="onStatusChange($event)">
+          <option value="">
+            {{ 'posts.all_statuses' | translate }}
+          </option>
+
+          <option value="DRAFT">
+            {{ 'post_status.draft' | translate }}
+          </option>
+
+          <option value="PENDING_REVIEW">
+            {{ 'post_status.pending_review' | translate }}
+          </option>
+
+          <option value="PUBLISH">
+            {{ 'post_status.publish' | translate }}
+          </option>
+
+          <option value="REJECT">
+            {{ 'post_status.reject' | translate }}
+          </option>
+        </select>
+
+        <i class="bi bi-chevron-down select-field__arrow"></i>
+      </label>
+
+      <button type="button" class="filter-button filter-button--primary" (click)="applySearch()">
+        <i class="bi bi-search"></i>
+        <span>{{ 'common.search' | translate }}</span>
+      </button>
+
+      <button type="button" class="filter-button filter-button--secondary" (click)="clearFilters()">
+        <i class="bi bi-arrow-counterclockwise"></i>
+        <span>{{ 'common.clear_search' | translate }}</span>
+      </button>
+    </div>
+  </article>
+
+  <!-- ERROR -->
+  @if (loadError()) {
+  <div class="posts-alert">
+    <i class="bi bi-exclamation-triangle-fill"></i>
+
+    <span>{{ loadError() }}</span>
+
+    <button type="button" (click)="loadPosts()">
+      {{ 'common.retry' | translate }}
+    </button>
   </div>
-  
-  <div class="rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm overflow-x-auto">
-    <table class="w-full text-left border-collapse text-sm">
-      <thead>
-        <tr class="border-b border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950/50">
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'table.post_title' | translate }}</th>
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'table.category' | translate }}</th>
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.lang_name' | translate }}</th>
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.status' | translate }}</th>
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.actions' | translate }}</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-aquamarine-100 dark:divide-aquamarine-800">
-        @for (post of paginatedPosts; track post.id) {
-          <tr class="hover:bg-aquamarine-50/30 dark:hover:bg-aquamarine-950/30 transition-colors">
-            <td class="p-4 font-medium text-aquamarine-950 dark:text-aquamarine-50">{{ post.title }}</td>
-            <td class="p-4 text-aquamarine-800 dark:text-aquamarine-200">{{ post.category }}</td>
-            <td class="p-4 text-center">
-              <span class="inline-block px-2.5 py-0.5 text-xs font-semibold rounded-md border border-aquamarine-200 dark:border-aquamarine-700 bg-aquamarine-50 dark:bg-aquamarine-950 text-aquamarine-800 dark:text-aquamarine-200">{{ post.lang }}</span>
+  }
+
+  <!-- POSTS TABLE -->
+  <article class="posts-table-panel">
+
+    <div class="posts-table-wrap">
+      <table class="posts-table">
+        <thead>
+          <tr>
+            <th>{{ 'table.post_title' | translate }}</th>
+            <th>{{ 'table.category' | translate }}</th>
+            <th>{{ 'table.lang_name' | translate }}</th>
+            <th>{{ 'table.status' | translate }}</th>
+            <th>{{ 'table.submit' | translate }}</th>
+            <th class="owner-actions-column">{{ 'table.actions' | translate }}</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @if (isLoading()) {
+          <tr>
+            <td colspan="6">
+              <div class="posts-empty posts-empty--loading">
+                <i class="bi bi-arrow-repeat spin"></i>
+                <span>{{ 'common.loading' | translate }}</span>
+              </div>
             </td>
-            <td class="p-4 text-center">
-              <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full {{ post.statusClass }}">{{ post.status }}</span>
+          </tr>
+          } @else if (posts().length === 0) {
+          <tr>
+            <td colspan="6">
+              <div class="posts-empty">
+                <span class="posts-empty__icon">
+                  <i class="bi bi-journal-x"></i>
+                </span>
+
+                <strong>{{ 'posts.empty' | translate }}</strong>
+              </div>
             </td>
-            <td class="p-4 text-center">
-              <div class="flex items-center justify-center gap-1">
-                <button (click)="setPreviewPost(post)" class="p-1.5 text-cyan-600 hover:bg-cyan-50 dark:hover:bg-cyan-950/30 rounded-lg transition-colors" [title]="'common.view' | translate">
+          </tr>
+          } @else {
+          @for (post of posts(); track post.id) {
+          <tr>
+            <!-- POST -->
+            <td>
+              <div class="post-cell">
+                @if (post.thumbnailUrl) {
+                <img class="post-cell__thumbnail" [src]="post.thumbnailUrl" [alt]="post.title">
+                } @else {
+                <span class="post-cell__image">
+                  <i class="bi bi-image"></i>
+                </span>
+                }
+
+                <div class="post-cell__content">
+                  <strong class="post-cell__title" [title]="post.title">
+                    {{ post.title }}
+                  </strong>
+
+                  <span class="post-cell__meta">
+                    <span>
+                      <i class="bi bi-eye"></i>
+                      {{ post.viewCount | number }}
+                    </span>
+
+                    <span>
+                      <i class="bi bi-heart"></i>
+                      {{ post.likeCount | number }}
+                    </span>
+                  </span>
+                </div>
+              </div>
+            </td>
+
+            <!-- CATEGORY -->
+            <td>
+              <span class="category-text" [title]="categoryNames(post)">
+                {{ categoryNames(post) || '—' }}
+              </span>
+            </td>
+
+            <!-- LANGUAGE -->
+            <td>
+              <span class="language-chip">
+                {{ languageLabel(post) }}
+              </span>
+            </td>
+
+            <!-- STATUS -->
+            <td>
+              <div class="status-cell">
+                <span class="post-status {{ statusClass(post.status) }}">
+                  {{ statusLabel(post.status) }}
+                </span>
+
+                @if (
+                post.status === 'REJECT' &&
+                post.rejectionReason
+                ) {
+                <span class="reject-reason" [title]="post.rejectionReason">
+                  {{ post.rejectionReason }}
+                </span>
+                }
+              </div>
+            </td>
+
+            <!-- SUBMIT -->
+            <td>
+              <button type="button" class="submit-button" (click)="submitPost(post)" [disabled]="
+                      !canSubmit(post) ||
+                      submittingPostId() !== null
+                    " [title]="
+                      canSubmit(post)
+                        ? ('posts.submit' | translate)
+                        : ('posts.submit_disabled' | translate)
+                    ">
+                <i class="bi" [class.bi-arrow-repeat]="
+                        submittingPostId() === post.id
+                      " [class.spin]="
+                        submittingPostId() === post.id
+                      " [class.bi-send]="
+                        submittingPostId() !== post.id
+                      "></i>
+
+                <span>
+                  {{
+                  submittingPostId() === post.id
+                  ? ('common.sending' | translate)
+                  : ('posts.submit' | translate)
+                  }}
+                </span>
+              </button>
+            </td>
+
+            <!-- ACTIONS -->
+            <td class="owner-actions-column">
+              <div class="owner-action-group">
+                <button type="button" class="owner-action-button" (click)="setPreviewPost(post)"
+                  [title]="'common.view' | translate">
                   <i class="bi bi-eye"></i>
+                  <span>{{ 'common.view' | translate }}</span>
                 </button>
-                <a routerLink="/dashboard/owner/edit-post" class="p-1.5 text-aquamarine-600 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 rounded-lg transition-colors" [title]="'comments.edit' | translate">
+
+                @if (canEdit(post)) {
+                <a class="owner-action-button" [routerLink]="[
+    '/dashboard/owner/edit-post',
+    post.id
+  ]" [title]="'comments.edit' | translate">
                   <i class="bi bi-pencil-square"></i>
+                  <span>{{ 'comments.edit' | translate }}</span>
                 </a>
-                <button (click)="deletePost(post)" class="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors" [title]="'comments.delete' | translate">
-                  <i class="bi bi-trash3-fill"></i>
+                } @else {
+                <button type="button" class="owner-action-button" disabled [title]="
+                          'posts.edit_disabled' | translate
+                        ">
+                  <i class="bi bi-pencil-square"></i>
+                  <span>{{ 'comments.edit' | translate }}</span>
+                </button>
+                }
+
+                <button type="button" class="owner-action-button owner-action-button--danger" (click)="deletePost(post)"
+                  [disabled]="deletingPostId() !== null" [title]="'comments.delete' | translate">
+                  <i class="bi" [class.bi-arrow-repeat]="
+                          deletingPostId() === post.id
+                        " [class.spin]="
+                          deletingPostId() === post.id
+                        " [class.bi-trash3]="
+                          deletingPostId() !== post.id
+                        "></i>
+                  <span>{{ 'comments.delete' | translate }}</span>
                 </button>
               </div>
             </td>
           </tr>
-        }
-      </tbody>
-    </table>
-  </div>
-  
-  <div class="mt-6 flex justify-center">
-    <ul class="inline-flex items-center space-x-1 text-sm">
-      <li>
-        <button [disabled]="currentPage() === 1" [class.opacity-50]="currentPage() === 1" class="px-3 py-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="setPage(currentPage() - 1)">{{ 'pagination.prev' | translate }}</button>
-      </li>
-      @for (p of pageNumbers; track p) {
-        <li>
-          <button class="px-3.5 py-2 rounded-lg font-semibold transition-colors" [class.bg-aquamarine-600]="currentPage() === p" [class.text-white]="currentPage() === p" [class.border]="currentPage() !== p" [class.border-aquamarine-200]="currentPage() !== p" [class.dark:border-aquamarine-800]="currentPage() !== p" [class.bg-white]="currentPage() !== p" [class.dark:bg-aquamarine-900]="currentPage() !== p" [class.text-aquamarine-800]="currentPage() !== p" [class.dark:text-aquamarine-200]="currentPage() !== p" (click)="setPage(p)">{{ p }}</button>
-        </li>
-      }
-      <li>
-        <button [disabled]="currentPage() === totalPages()" [class.opacity-50]="currentPage() === totalPages()" class="px-3 py-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="setPage(currentPage() + 1)">{{ 'pagination.next' | translate }}</button>
-      </li>
-    </ul>
-  </div>
-</section>
+          }
+          }
+        </tbody>
+      </table>
+    </div>
 
-<!-- Preview Modal -->
-@if (activePreviewPost()) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-    <div class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-3xl max-h-[85vh] flex flex-col">
-      <div class="flex justify-between items-center p-5 border-b border-aquamarine-200 dark:border-aquamarine-800">
-        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">{{ 'modal.preview_title' | translate }}: {{ activePreviewPost()?.title }}</h5>
-        <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" (click)="closePreviewModal()">
-          <i class="bi bi-x-lg text-lg"></i>
+    <!-- PAGINATION -->
+    @if (totalPages() > 1) {
+    <nav class="posts-pagination" [attr.aria-label]="
+          'pagination.nav_label' | translate
+        ">
+      <span class="posts-pagination__summary">
+        {{ currentPage() }} / {{ totalPages() }}
+      </span>
+
+      <div class="posts-pagination__buttons">
+        <button type="button" [disabled]="currentPage() === 1 || isLoading()" (click)="setPage(currentPage() - 1)">
+          <i class="bi bi-chevron-left"></i>
+          <span>{{ 'pagination.prev' | translate }}</span>
+        </button>
+
+        @for (page of pageNumbers(); track page) {
+        <button type="button" class="page-number" [class.is-active]="currentPage() === page" (click)="setPage(page)">
+          {{ page }}
+        </button>
+        }
+
+        <button type="button" [disabled]="
+              currentPage() === totalPages() ||
+              isLoading()
+            " (click)="setPage(currentPage() + 1)">
+          <span>{{ 'pagination.next' | translate }}</span>
+          <i class="bi bi-chevron-right"></i>
         </button>
       </div>
-      <div class="p-6 overflow-y-auto" [innerHTML]="activePreviewPost()?.content"></div>
-      <div class="p-4 border-t border-aquamarine-200 dark:border-aquamarine-800 flex justify-end">
-        <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="closePreviewModal()">{{ 'modal.close' | translate }}</button>
-      </div>
-    </div>
-  </div>
-}
+    </nav>
+    }
+  </article>
+</section>
+
+<!-- SHARED POST PREVIEW -->
+<app-owner-post-preview [post]="activePreviewPost()" editRoute="/dashboard/owner/edit-post" [showEdit]="true"
+  (closed)="closePreviewModal()" />

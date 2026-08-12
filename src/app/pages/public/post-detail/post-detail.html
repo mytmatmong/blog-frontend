@@ -263,15 +263,9 @@
           </header>
 
           @if (isAuthenticated()) {
+          @if (!replyTo()) {
           <!-- comment-form -->
           <form class="mb-6 p-[15px] border border-[var(--border-color)] rounded-[13px] bg-[var(--card-bg-muted)]" (submit)="submitComment($event)">
-            @if (replyTo(); as target) {
-            <!-- comment-form__notice -->
-            <div class="mb-2 text-[var(--text-muted)] text-[12px]">
-              {{ 'comments.replying_to' | translate }} <strong>{{ target.username }}</strong>
-            </div>
-            }
-
             @if (editingComment()) {
             <!-- comment-form__notice -->
             <div class="mb-2 text-[var(--text-muted)] text-[12px]">
@@ -281,11 +275,13 @@
 
             <!-- comment-form__textarea -->
             <textarea
+              #commentTextarea
               [(ngModel)]="commentDraft"
               name="commentDraft"
               maxlength="1000"
-              rows="4"
-              class="w-full min-h-[112px] block resize-y px-[13px] py-3 border border-[var(--border-color)] rounded-[10px] bg-[var(--card-bg)] text-[var(--card-text-default)] text-[14px] leading-[1.6] outline-none placeholder:text-[var(--text-faint)] focus:border-[var(--brand)] focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--brand)_11%,transparent)]"
+              rows="1"
+              class="comment-autogrow w-full min-h-[112px] block px-[13px] py-3 border border-[var(--border-color)] rounded-[10px] bg-[var(--card-bg)] text-[var(--card-text-default)] text-[14px] leading-[1.6] outline-none placeholder:text-[var(--text-faint)] focus:border-[var(--brand)] focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--brand)_11%,transparent)]"
+              (input)="autoGrowCommentTextarea($event)"
               [placeholder]="'comments.placeholder' | translate"></textarea>
 
             <!-- comment-form__footer -->
@@ -297,7 +293,7 @@
 
               <!-- comment-form__actions -->
               <div class="flex items-center gap-2 max-[760px]:w-full">
-                @if (replyTo() || editingComment()) {
+                @if (editingComment()) {
                 <button type="button" class="btn btn-secondary max-[760px]:flex-1 max-[760px]:justify-center" (click)="cancelCommentMode()">
                   {{ 'modal.cancel' | translate }}
                 </button>
@@ -310,8 +306,7 @@
             </div>
           </form>
           }
-
-          @else {
+          } @else {
           <!-- comments-login -->
           <a routerLink="/auth" [queryParams]="{ redirect: router.url }" class="flex items-center gap-[9px] mb-[22px] p-[13px_14px] border border-[color-mix(in_srgb,var(--brand)_22%,var(--border-color))] rounded-[11px] bg-[var(--brand-soft)] text-[var(--brand)] text-[13px] font-[700] hover:underline hover:[text-underline-offset:3px]">
             <i class="bi bi-box-arrow-in-right"></i>
@@ -345,7 +340,13 @@
               [comment]="comment"
               [currentUserId]="currentUserId()"
               [isAuthenticated]="isAuthenticated()"
+              [activeReplyId]="isAuthenticated() ? (replyTo()?.id ?? null) : null"
+              [replyDraft]="commentDraft"
+              [isSavingReply]="isSavingComment()"
               (replyRequested)="beginReply($event)"
+              (replyDraftChange)="commentDraft = $event"
+              (replySubmitted)="submitComment($event)"
+              (replyCancelled)="cancelCommentMode()"
               (editRequested)="beginEdit($event)"
               (deleteRequested)="deleteComment($event)"
               (reportRequested)="openCommentReport($event)">

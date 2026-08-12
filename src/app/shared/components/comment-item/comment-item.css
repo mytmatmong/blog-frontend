@@ -4,3 +4,14 @@
   display: block;
 }
 
+.comment-inline-reply textarea {
+  field-sizing: content;
+  overflow-y: hidden;
+  resize: none;
+}
+
+.comment-mention {
+  color: var(--brand);
+  font-weight: 800;
+}
+

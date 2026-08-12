@@ -1,6 +1,18 @@
-import { Injectable, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Injectable, inject, signal } from '@angular/core';
+import { map, Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { ApiResponse } from '../models/auth.model';
+import { AdminLanguage } from '../models/admin-api.model';
+import { BlogOwnerOptions } from '../models/blog-owner.model';
+import { PaginatedCategoriesResponse, PublicLanguage } from '../models/post.model';
+import { AuthService } from './auth.service';
+import {
+  OWNER_TRANSLATIONS_EN,
+  OWNER_TRANSLATIONS_VI,
+} from '../i18n/owner-translations';
 
-export type SupportedLang = 'VI' | 'EN';
+export type SupportedLang = string;
 
 export interface LanguageOption {
   code: SupportedLang;
@@ -8,19 +20,32 @@ export interface LanguageOption {
   flag: string;
 }
 
+interface ApiLanguageRecord {
+  id: number;
+  code: string;
+  name: string;
+  flag: string | null;
+  isDefault: boolean;
+  isActive: boolean;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class TranslationService {
+  private readonly http = inject(HttpClient);
+  private readonly auth = inject(AuthService);
+  private readonly apiUrl = environment.apiUrl;
+  private languagesRequested = false;
+
   currentLang = signal<SupportedLang>('VI');
+  readonly languages = signal<LanguageOption[]>([]);
+  readonly languagesLoading = signal(false);
+  readonly languagesLoadError = signal(false);
 
-  readonly languages: LanguageOption[] = [
-    { code: 'VI', name: 'Tiếng Việt', flag: '🇻🇳' },
-    { code: 'EN', name: 'English', flag: '🇬🇧' },
-  ];
-
-  private translations: Record<SupportedLang, Record<string, string>> = {
+  private translations: Record<string, Record<string, string>> = {
     VI: {
+      ...OWNER_TRANSLATIONS_VI,
       // Header & Nav
       'nav.posts': 'Bài viết',
       'nav.categories': 'Danh mục',
@@ -647,6 +672,7 @@ export class TranslationService {
         'Bạn có chắc muốn hủy các thay đổi? Giao diện sẽ quay lại Danh sách bài viết.',
     },
     EN: {
+      ...OWNER_TRANSLATIONS_EN,
       'category.empty_posts': 'No Posts in this Category',
       'filter.oldest': 'Oldest',
       'filter.title_asc': 'Title A–Z',
@@ -1271,9 +1297,9 @@ export class TranslationService {
 
   constructor() {
     if (typeof window !== 'undefined') {
-      const savedLang = localStorage.getItem('app_lang') as SupportedLang;
-      if (savedLang && (savedLang === 'VI' || savedLang === 'EN')) {
-        this.currentLang.set(savedLang);
+      const savedLang = localStorage.getItem('app_lang');
+      if (savedLang?.trim()) {
+        this.currentLang.set(savedLang.trim().toUpperCase());
       }
     }
   }
@@ -1283,6 +1309,106 @@ export class TranslationService {
     if (typeof window !== 'undefined') {
       localStorage.setItem('app_lang', lang);
     }
+  }
+
+  /**
+   * Load active UI languages from the shared API. Both the public header and
+   * every dashboard role consume this single cached source.
+   */
+  loadLanguages(force = false): void {
+    if ((this.languagesRequested || this.languagesLoading()) && !force) {
+      return;
+    }
+
+    this.languagesRequested = true;
+    this.languagesLoading.set(true);
+    this.languagesLoadError.set(false);
+
+    this.getLanguagesFromApi()
+      .subscribe({
+        next: (languages) => {
+          const apiLanguages = languages
+            .filter((language) => language.isActive)
+            .map((language): LanguageOption => ({
+              code: language.code.trim().toUpperCase(),
+              name: language.name,
+              flag: this.toFlagEmoji(language.flag),
+            }));
+
+          this.languages.set(apiLanguages);
+          this.languagesLoading.set(false);
+
+          if (!apiLanguages.some((language) => language.code === this.currentLang())) {
+            const defaultLanguage = languages.find(
+              (language) =>
+                language.isActive &&
+                language.isDefault,
+            );
+            const nextLanguage = defaultLanguage?.code.trim().toUpperCase();
+
+            if (nextLanguage) {
+              this.setLanguage(nextLanguage);
+            } else if (apiLanguages[0]) {
+              this.setLanguage(apiLanguages[0].code);
+            }
+          }
+        },
+        error: () => {
+          this.languages.set([]);
+          this.languagesLoading.set(false);
+          this.languagesLoadError.set(true);
+        },
+      });
+  }
+
+  private getLanguagesFromApi(): Observable<ApiLanguageRecord[]> {
+    const role = this.auth.currentRole();
+
+    if (role === 'admin' || role === 'moderator') {
+      return this.http
+        .get<ApiResponse<AdminLanguage[]>>(`${this.apiUrl}/admin/languages`)
+        .pipe(map((response) => response?.data ?? []));
+    }
+
+    if (role === 'owner') {
+      return this.http
+        .get<ApiResponse<BlogOwnerOptions>>(`${this.apiUrl}/blog-owner/options`)
+        .pipe(map((response) => response?.data?.languages ?? []));
+    }
+
+    // Public and NORMAL users use the public categories API. Each category
+    // includes its real Language relation, so no authentication or mock data
+    // is required. De-duplicate those relations by language ID.
+    return this.http
+      .get<ApiResponse<PaginatedCategoriesResponse>>(`${this.apiUrl}/categories`, {
+        params: { page: 1, limit: 100 },
+      })
+      .pipe(
+        map((response) => {
+          const byId = new Map<number, PublicLanguage>();
+          for (const category of response?.data?.items ?? []) {
+            if (category.language) {
+              byId.set(category.language.id, category.language);
+            }
+          }
+          return [...byId.values()];
+        }),
+      );
+  }
+
+  currentLanguageOption(): LanguageOption | undefined {
+    return this.languages().find((language) => language.code === this.currentLang());
+  }
+
+  private toFlagEmoji(flag: string | null): string {
+    const value = flag?.trim() ?? '';
+    if (!/^[a-zA-Z]{2}$/.test(value)) {
+      return value || '🌐';
+    }
+
+    return [...value.toUpperCase()]
+      .map((character) => String.fromCodePoint(character.charCodeAt(0) + 127397))
+      .join('');
   }
 
   translate(key: string): string {

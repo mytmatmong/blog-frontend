@@ -87,7 +87,7 @@
           <div class="absolute top-[calc(100%+12px)] right-0 w-[188px] overflow-hidden border border-[var(--border-color)] rounded-[12px] bg-[var(--card-bg-raised)] shadow-[var(--shadow-lg)] p-[7px] z-[90]">
             <!-- dropdown-label -->
             <div class="px-[10px] pt-2 pb-[6px] text-[var(--text-faint)] text-[11px] font-[700] tracking-[0.08em] uppercase">{{ 'nav.language' | translate }}</div>
-            @for (lang of ts.languages; track lang.code) {
+            @for (lang of ts.languages(); track lang.code) {
             <!-- dropdown-item -->
             <button type="button" class="w-full min-h-[40px] flex items-center gap-[10px] px-[10px] py-2 border-0 rounded-[10px] bg-transparent text-[var(--text-muted)] hover:text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] text-[13px] text-left cursor-pointer transition-colors duration-150" (click)="selectLang(lang.code)">
               <span>{{ lang.flag }}</span>

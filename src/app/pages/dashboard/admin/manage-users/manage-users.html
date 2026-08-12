@@ -249,12 +249,12 @@
   <!-- Pagination -->
   @if (totalPages() > 1) {
     <div
-      class="mt-6 flex justify-between items-center text-sm text-aquamarine-700 dark:text-aquamarine-300"
+      class="mt-6 flex flex-wrap justify-between items-center gap-3 text-sm text-aquamarine-700 dark:text-aquamarine-300"
     >
       <div>
         Tổng cộng <strong>{{ totalItems() }}</strong> người dùng
       </div>
-      <ul class="inline-flex items-center space-x-1">
+      <ul class="inline-flex flex-wrap items-center justify-end gap-1">
         <li>
           <button
             [disabled]="currentPage() === 1"
@@ -265,8 +265,11 @@
             {{ 'pagination.prev' | translate }}
           </button>
         </li>
-        @for (p of pageNumbers; track p) {
+        @for (p of pageNumbers; track $index) {
           <li>
+            @if (p === 'ellipsis') {
+            <span class="inline-grid min-w-9 place-items-center px-1 py-2 text-aquamarine-400" aria-hidden="true">…</span>
+            } @else {
             <button
               class="px-3.5 py-2 rounded-lg font-semibold transition-colors cursor-pointer"
               [class.bg-aquamarine-600]="currentPage() === p"
@@ -282,6 +285,7 @@
             >
               {{ p }}
             </button>
+            }
           </li>
         }
         <li>

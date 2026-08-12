@@ -1,0 +1,207 @@
+@if (activePost(); as post) {
+<div class="post-preview-backdrop" (click)="close()">
+    <aside class="post-preview-sheet" role="dialog" aria-modal="true" [attr.aria-labelledby]="
+        'owner-post-preview-title-' + post.id
+      " (click)="$event.stopPropagation()">
+        <!-- HEADER -->
+        <header class="post-preview-toolbar">
+            <div class="post-preview-toolbar__context">
+                <span class="post-preview-toolbar__label">
+                    <i class="bi bi-eye"></i>
+                    {{ 'common.view' | translate }}
+                </span>
+
+                <span class="post-preview-status" [class]="
+              'post-preview-status ' +
+              statusClass(post.status)
+            ">
+                    {{ statusLabel(post.status) }}
+                </span>
+            </div>
+
+            <button type="button" class="post-preview-close" (click)="close()" [attr.aria-label]="
+            'modal.close' | translate
+          ">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </header>
+
+        <!-- LANGUAGE VERSIONS -->
+        @if (languageVersions().length > 1) {
+        <section class="post-preview-languages">
+            <div class="post-preview-languages__heading">
+                <span class="post-preview-languages__icon">
+                    <i class="bi bi-translate"></i>
+                </span>
+
+                <div>
+                    <strong>
+                        {{
+                        'posts.available_languages'
+                        | translate
+                        }}
+                    </strong>
+
+                    <small>
+                        {{
+                        'posts.available_languages_hint'
+                        | translate
+                        }}
+                    </small>
+                </div>
+            </div>
+
+            <div class="post-preview-languages__list">
+                @for (
+                version of languageVersions();
+                track version.id
+                ) {
+                <button type="button" class="post-preview-language" [class.is-active]="
+                  version.id === post.id
+                " [disabled]="
+                  loadingPostId() !== null
+                " [attr.aria-pressed]="
+                  version.id === post.id
+                " [title]="version.title" (click)="
+                  switchLanguage(version.id)
+                ">
+                    <span class="post-preview-language__flag">
+                        @if (
+                        loadingPostId() === version.id
+                        ) {
+                        <i class="
+                        bi bi-arrow-repeat
+                        post-preview-spin
+                      "></i>
+                        } @else {
+                        {{
+                        version.language?.flag ||
+                        '🌐'
+                        }}
+                        }
+                    </span>
+
+                    <span class="
+                    post-preview-language__content
+                  ">
+                        <strong>
+                            {{
+                            version.language?.name ||
+                            languageCode(version)
+                            }}
+                        </strong>
+
+                        <small>
+                            {{ languageCode(version) }}
+
+                            <span aria-hidden="true">•</span>
+
+                            {{
+                            statusLabel(version.status)
+                            }}
+                        </small>
+                    </span>
+
+                    @if (version.id === post.id) {
+                    <i class="
+                      bi bi-check-circle-fill
+                      post-preview-language__check
+                    "></i>
+                    }
+                </button>
+                }
+            </div>
+
+            @if (loadError()) {
+            <div class="post-preview-error">
+                <i class="
+                  bi
+                  bi-exclamation-triangle-fill
+                "></i>
+
+                <span>{{ loadError() }}</span>
+            </div>
+            }
+        </section>
+        }
+
+        <!-- CONTENT -->
+        <div class="post-preview-scroll">
+            <article class="post-preview-article">
+                <header class="post-preview-lead">
+                    <h2 [id]="
+                'owner-post-preview-title-' +
+                post.id
+              ">
+                        {{ post.title }}
+                    </h2>
+
+                    <div class="post-preview-meta">
+                        <span>
+                            <i class="bi bi-translate"></i>
+
+                            {{ post.language?.flag || '🌐' }}
+
+                            {{
+                            (
+                            post.language?.code || ''
+                            ).toUpperCase()
+                            }}
+                        </span>
+
+                        <span>
+                            <i class="bi bi-eye"></i>
+                            {{ post.viewCount | number }}
+                        </span>
+
+                        <span>
+                            <i class="bi bi-heart"></i>
+                            {{ post.likeCount | number }}
+                        </span>
+
+                        <span class="
+                  post-preview-meta__category
+                ">
+                            <i class="bi bi-folder2"></i>
+                            {{ categoryNames(post) }}
+                        </span>
+                    </div>
+                </header>
+
+                @if (post.thumbnailUrl) {
+                <figure class="post-preview-cover">
+                    <img [src]="post.thumbnailUrl" [alt]="post.title">
+                </figure>
+                }
+
+                <div class="post-preview-content" [innerHTML]="post.content"></div>
+            </article>
+        </div>
+
+        <!-- FOOTER -->
+        <footer class="post-preview-footer">
+            <button type="button" class="
+            post-preview-action
+            post-preview-action--secondary
+          " (click)="close()">
+                <i class="bi bi-x-lg"></i>
+                {{ 'modal.close' | translate }}
+            </button>
+
+            @if (canEdit(post)) {
+            <a class="
+    post-preview-action
+    post-preview-action--primary
+  " [routerLink]="[
+    editRoute,
+    post.id
+  ]" (click)="close()">
+                <i class="bi bi-pencil-square"></i>
+                {{ 'comments.edit' | translate }}
+            </a>
+            }
+
+        </footer>
+    </aside>
+</div>
+}

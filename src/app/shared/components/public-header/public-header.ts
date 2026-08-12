@@ -1,5 +1,5 @@
 import { NgClass } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map } from 'rxjs';
@@ -13,7 +13,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
   templateUrl: './public-header.html',
   styleUrl: './public-header.css',
 })
-export class PublicHeader {
+export class PublicHeader implements OnInit {
   protected readonly auth = inject(AuthService);
   protected readonly ts = inject(TranslationService);
   private readonly router = inject(Router);
@@ -35,6 +35,10 @@ export class PublicHeader {
     const url = this.currentUrl() || '';
     return url.startsWith('/auth') || url.includes('/auth');
   });
+
+  ngOnInit(): void {
+    this.ts.loadLanguages();
+  }
 
   toggleMobileMenu(): void {
     this.isMobileMenuOpen.update((value) => !value);
