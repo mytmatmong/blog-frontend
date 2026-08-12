@@ -36,7 +36,8 @@ export class TranslationService {
       'nav.language': 'Ngôn ngữ',
       'ui.community_label': 'Cộng đồng lập trình',
       'auth.showcase_title': 'Viết, chia sẻ và cùng nhau học hỏi.',
-      'auth.showcase_desc': 'Một không gian gọn gàng cho bài viết kỹ thuật, thảo luận hữu ích và những ý tưởng đáng lưu lại.',
+      'auth.showcase_desc':
+        'Một không gian gọn gàng cho bài viết kỹ thuật, thảo luận hữu ích và những ý tưởng đáng lưu lại.',
       'auth.feature_stories': 'Bài viết kỹ thuật',
       'auth.feature_community': 'Cộng đồng tác giả',
       'auth.feature_library': 'Thư viện cá nhân',
@@ -68,38 +69,27 @@ export class TranslationService {
       'hashtag.subtitle': 'Tìm kiếm các bài viết nổi bật được đánh tag tương ứng.',
       'category.all': 'Tất cả',
 
-      'hashtag.list_subtitle':
-        'Chọn một hashtag để xem các bài viết liên quan.',
+      'hashtag.list_subtitle': 'Chọn một hashtag để xem các bài viết liên quan.',
 
-      'hashtag.selected_subtitle':
-        'Các bài viết được gắn hashtag này.',
+      'hashtag.selected_subtitle': 'Các bài viết được gắn hashtag này.',
 
-      'hashtag.back_to_all':
-        'Tất cả hashtag',
+      'hashtag.back_to_all': 'Tất cả hashtag',
 
-      'hashtag.related_posts':
-        'Xem bài viết liên quan',
+      'hashtag.related_posts': 'Xem bài viết liên quan',
 
-      'hashtag.search_tags_placeholder':
-        'Tìm hashtag...',
+      'hashtag.search_tags_placeholder': 'Tìm hashtag...',
 
-      'hashtag.search_posts_placeholder':
-        'Tìm bài viết trong hashtag này...',
+      'hashtag.search_posts_placeholder': 'Tìm bài viết trong hashtag này...',
 
-      'hashtag.load_error':
-        'Không tải được dữ liệu',
+      'hashtag.load_error': 'Không tải được dữ liệu',
 
-      'hashtag.empty_tags':
-        'Không tìm thấy hashtag phù hợp.',
+      'hashtag.empty_tags': 'Không tìm thấy hashtag phù hợp.',
 
-      'hashtag.empty_posts':
-        'Không tìm thấy bài viết phù hợp với hashtag này.',
+      'hashtag.empty_posts': 'Không tìm thấy bài viết phù hợp với hashtag này.',
 
-      'common.retry':
-        'Thử lại',
+      'common.retry': 'Thử lại',
 
-      'common.clear_search':
-        'Xóa tìm kiếm',
+      'common.clear_search': 'Xóa tìm kiếm',
 
       // Post Card & Detail
       'post.read_time': 'phút đọc',
@@ -120,11 +110,10 @@ export class TranslationService {
       'comments.edit': 'Sửa',
       'comments.delete': 'Xóa',
       'comments.empty': 'Chưa có bình luận nào.',
-      'comments.report': "Báo cáo bình luận",
+      'comments.report': 'Báo cáo bình luận',
       'comments.load_error': 'Không thể tải bình luận.',
 
-      'common.backend_unreachable':
-        'Không kết nối được tới máy chủ.',
+      'common.backend_unreachable': 'Không kết nối được tới máy chủ.',
 
       // Auth
       'auth.login_tab': 'Đăng nhập',
@@ -157,9 +146,11 @@ export class TranslationService {
 
       // Request Blog Owner
       'request_owner.title': 'Yêu cầu trở thành Blog Owner',
-      'request_owner.subtitle': 'Hãy cung cấp lý do và thông tin giới thiệu bản thân để Moderator kiểm duyệt quyền viết bài.',
+      'request_owner.subtitle':
+        'Hãy cung cấp lý do và thông tin giới thiệu bản thân để Moderator kiểm duyệt quyền viết bài.',
       'request_owner.reason_label': 'Lý do muốn đăng ký',
-      'request_owner.reason_placeholder': 'Chia sẻ trải nghiệm và chủ đề bài viết bạn muốn chia sẻ...',
+      'request_owner.reason_placeholder':
+        'Chia sẻ trải nghiệm và chủ đề bài viết bạn muốn chia sẻ...',
       'request_owner.submit_btn': 'Gửi yêu cầu kiểm duyệt',
 
       // Dashboard Common & Sidebar
@@ -256,7 +247,8 @@ export class TranslationService {
       'modal.copy': 'Copy',
       'modal.copied': 'Đã copy',
       'modal.share_title': 'Chia sẻ Blog của bạn',
-      'modal.share_desc': 'Sao chép đường dẫn bên dưới để chia sẻ trang Blog của bạn với mọi người:',
+      'modal.share_desc':
+        'Sao chép đường dẫn bên dưới để chia sẻ trang Blog của bạn với mọi người:',
       'modal.preview_title': 'Xem trước bài viết',
       'modal.reject_title': 'Từ chối bài viết',
       'modal.reject_placeholder': 'Nhập lý do từ chối để thông báo cho tác giả...',
@@ -267,34 +259,35 @@ export class TranslationService {
       'modal.add_lang_title': 'Thêm ngôn ngữ hệ thống',
       'modal.add_language_title': 'Thêm ngôn ngữ hệ thống',
       'modal.delete_confirm': 'Bạn có chắc chắn muốn xóa bản ghi này không?',
-      'modal.preview_blog_p1': 'Đây là nội dung mô phỏng của bài viết để Moderator có thể đọc và đánh giá trước khi duyệt.',
-      'modal.preview_blog_p2': 'Kiểm tra kỹ lưỡng nội dung trước khi quyết định duyệt hoặc từ chối bài viết.',
+      'modal.preview_blog_p1':
+        'Đây là nội dung mô phỏng của bài viết để Moderator có thể đọc và đánh giá trước khi duyệt.',
+      'modal.preview_blog_p2':
+        'Kiểm tra kỹ lưỡng nội dung trước khi quyết định duyệt hoặc từ chối bài viết.',
       'modal.preview_blog_h1': '1. Tại sao tính năng này quan trọng?',
-      'modal.preview_blog_p3': 'Việc kiểm duyệt bài viết giúp đảm bảo nền tảng Blogy. luôn giữ được chất lượng nội dung tốt nhất.',
+      'modal.preview_blog_p3':
+        'Việc kiểm duyệt bài viết giúp đảm bảo nền tảng Blogy. luôn giữ được chất lượng nội dung tốt nhất.',
       'modal.preview_blog_h2': '2. Yêu cầu định dạng bài viết',
       'modal.preview_blog_li1': 'Tiêu đề phải rõ ràng, không giật tít câu view (clickbait).',
       'modal.preview_blog_li2': 'Nội dung không chứa ngôn từ kích động, thù địch hoặc spam.',
       'modal.preview_blog_li3': 'Các đoạn code cần được đặt trong thẻ Code block một cách hợp lệ.',
       'modal.preview_cat_post': 'Bài viết demo cho danh mục',
-      'modal.preview_comment_p1': 'Đây là nội dung mô phỏng của bài viết liên kết với bình luận này. Moderator có thể đọc nhanh nội dung bài viết ngay tại đây để có ngữ cảnh tốt hơn khi xử lý bình luận.',
-      'modal.preview_comment_p2': 'Ví dụ: một bình luận có thể trông không rõ ràng, nhưng khi đặt vào ngữ cảnh của bài viết thì lại hoàn toàn hợp lệ.',
+      'modal.preview_comment_p1':
+        'Đây là nội dung mô phỏng của bài viết liên kết với bình luận này. Moderator có thể đọc nhanh nội dung bài viết ngay tại đây để có ngữ cảnh tốt hơn khi xử lý bình luận.',
+      'modal.preview_comment_p2':
+        'Ví dụ: một bình luận có thể trông không rõ ràng, nhưng khi đặt vào ngữ cảnh của bài viết thì lại hoàn toàn hợp lệ.',
 
       'categories.load_error': 'Không tải được danh mục.',
 
-      'posts.load_error':
-        'Không tải được bài viết',
+      'posts.load_error': 'Không tải được bài viết',
 
-      'posts.empty':
-        'Không tìm thấy bài viết phù hợp.',
+      'posts.empty': 'Không tìm thấy bài viết phù hợp.',
       'filter.oldest': 'Cũ nhất',
       'filter.title_asc': 'Tiêu đề A–Z',
-      'comments.newest_first':
-        'Mới nhất trước',
+      'comments.newest_first': 'Mới nhất trước',
 
-      'comments.oldest_first':
-        'Cũ nhất trước',
+      'comments.oldest_first': 'Cũ nhất trước',
 
-      "category.empty_posts": "Chưa có bài viết trong danh mục này.",
+      'category.empty_posts': 'Chưa có bài viết trong danh mục này.',
 
       'author.default_bio': 'Chưa có thông tin giới thiệu.',
       'author.posts': 'bài viết',
@@ -308,7 +301,8 @@ export class TranslationService {
 
       'auth.step_request': '1. Yêu cầu khôi phục',
       'auth.step_reset': '2. Đặt lại mật khẩu',
-      'auth.request_desc': 'Nhập địa chỉ email đã đăng ký. Hệ thống sẽ gửi liên kết/mã khôi phục cho bạn.',
+      'auth.request_desc':
+        'Nhập địa chỉ email đã đăng ký. Hệ thống sẽ gửi liên kết/mã khôi phục cho bạn.',
       'auth.has_token_link': 'Đã có mã token? Đặt lại mật khẩu ngay →',
       'auth.reset_desc': 'Nhập mã token nhận được và mật khẩu mới để tiến hành khôi phục.',
       'auth.resend_request_link': '← Chưa nhận được email? Gửi lại yêu cầu',
@@ -348,6 +342,88 @@ export class TranslationService {
 
       'action.approve': 'Duyệt bài',
       'action.reject': 'Từ chối',
+      'action.edit': 'Sửa',
+      'action.lock': 'Khóa',
+      'action.unlock': 'Mở khóa',
+      'action.delete': 'Xóa',
+      'action.edit_user_title': 'Cập nhật thông tin người dùng',
+      'action.lock_user_title': 'Khóa tài khoản người dùng',
+      'action.unlock_user_title': 'Mở khóa tài khoản người dùng',
+      'action.delete_user_title': 'Xóa mềm người dùng',
+
+      'users.search_placeholder': 'Tìm kiếm username hoặc email...',
+      'users.all_roles': 'Tất cả vai trò',
+      'users.all_statuses': 'Tất cả trạng thái',
+      'users.clear_filters': 'Xóa lọc',
+      'users.loading': 'Đang tải danh sách người dùng...',
+      'users.empty': 'Không tìm thấy người dùng phù hợp với điều kiện tìm kiếm.',
+      'users.edit_title': 'Cập nhật thông tin người dùng',
+      'users.bio_label': 'Tiểu sử / Bio',
+      'users.bio_placeholder': 'Nhập tiểu sử mới...',
+      'users.avatar_url_label': 'URL ảnh đại diện (Avatar URL)',
+      'users.new_password_optional': 'Mật khẩu mới (Tùy chọn)',
+      'users.password_placeholder': 'Để trống nếu không đổi mật khẩu',
+      'users.lock_title': 'Khóa tài khoản người dùng',
+      'users.lock_description_before': 'Bạn đang thực hiện khóa tài khoản',
+      'users.lock_description_after': 'Tất cả phiên đăng nhập của người dùng sẽ bị thu hồi.',
+      'users.lock_reason_label': 'Lý do khóa tài khoản',
+      'users.lock_reason_placeholder': 'Nhập lý do chi tiết...',
+      'users.confirm_lock': 'Xác nhận khóa',
+
+      'admin_dashboard.refresh': 'Làm mới',
+      'admin_dashboard.loading': 'Đang tải dữ liệu dashboard...',
+      'admin_dashboard.in_7_days': 'trong 7 ngày',
+      'admin_dashboard.creator_accounts': 'Tài khoản sáng tạo nội dung',
+      'admin_dashboard.posts': 'bài viết',
+      'admin_dashboard.owner_requests': 'Yêu cầu Blog Owner',
+      'admin_dashboard.awaiting_review': 'Đang chờ xử lý',
+      'admin_dashboard.daily_growth_desc': 'Số tài khoản mới được tạo theo ngày',
+      'admin_dashboard.seven_day_total': 'Tổng 7 ngày',
+      'admin_dashboard.review_requests': 'Duyệt yêu cầu',
+      'admin_dashboard.language_distribution_desc': 'Tỷ lệ bài viết theo ngôn ngữ',
+      'admin_dashboard.language_details': 'Chi tiết theo ngôn ngữ',
+      'admin_dashboard.sorted_by_posts': 'Sắp xếp theo số lượng bài viết',
+      'admin_dashboard.languages': 'ngôn ngữ',
+      'admin_dashboard.no_language_data': 'Chưa có dữ liệu ngôn ngữ',
+      'admin_dashboard.new_users': 'người dùng mới',
+      'admin_dashboard.invalid_data': 'Dữ liệu dashboard trả về không hợp lệ.',
+      'admin_dashboard.load_error': 'Không thể tải dữ liệu dashboard admin.',
+      'admin_dashboard.growth_chart_label': 'Biểu đồ tăng trưởng người dùng',
+      'admin_dashboard.language_chart_label': 'Biểu đồ phân bổ bài viết theo ngôn ngữ',
+
+      'requests.title': 'Duyệt Yêu Cầu Blog Owner',
+      'requests.subtitle':
+        'Danh sách yêu cầu đăng ký làm tác giả bài viết của người dùng hệ thống.',
+      'requests.pending': 'Chờ duyệt',
+      'requests.approved': 'Đã duyệt',
+      'requests.rejected': 'Từ chối',
+      'requests.all': 'Tất cả',
+      'requests.loading': 'Đang tải danh sách yêu cầu...',
+      'requests.user_id': 'User ID',
+      'requests.reason_topics': 'Lý do & Chủ đề dự kiến',
+      'requests.actions_review': 'Thao tác / Thông tin duyệt',
+      'requests.empty': 'Không có yêu cầu Blog Owner nào phù hợp với bộ lọc.',
+      'requests.topics': 'Chủ đề',
+      'requests.approve': 'Duyệt',
+      'requests.reject': 'Từ chối',
+      'requests.reviewed_at': 'Duyệt lúc',
+      'requests.by_reviewer': 'Bởi Reviewer',
+      'requests.rejection_reason': 'Lý do từ chối',
+      'requests.total': 'Tổng cộng',
+      'requests.items': 'yêu cầu',
+      'requests.reject_modal_title': 'Từ chối Yêu cầu Blog Owner',
+      'requests.reject_confirm': 'Bạn có chắc muốn từ chối yêu cầu của',
+      'requests.rejection_reason_label': 'Lý do từ chối (Tùy chọn, tối đa 1000 ký tự)',
+      'requests.rejection_placeholder': 'Nhập lý do phản hồi cho người dùng...',
+      'requests.confirm_reject': 'Xác nhận Từ Chối',
+      'requests.load_error': 'Tải danh sách yêu cầu thất bại',
+      'requests.approve_confirm': 'Duyệt quyền Blog Owner cho yêu cầu',
+      'requests.approve_modal_title': 'Xác nhận duyệt yêu cầu',
+      'requests.confirm_approve': 'Xác nhận duyệt',
+      'requests.approve_success': 'Đã duyệt yêu cầu thành công',
+      'requests.approve_error': 'Duyệt yêu cầu thất bại',
+      'requests.reject_success': 'Đã từ chối yêu cầu',
+      'requests.reject_error': 'Từ chối yêu cầu thất bại',
 
       'users.grant_owner': 'Cấp quyền',
       'users.revoke_owner': 'Tước quyền',
@@ -355,7 +431,10 @@ export class TranslationService {
       'users.unlock_user': 'Mở khóa',
       'users.soft_delete': 'Xóa mềm',
       'users.restore': 'Khôi phục',
-      'users.confirm_delete': 'Bạn có chắc chắn muốn xóa mềm người dùng này?',
+      'users.confirm_delete': 'Bạn có chắc chắn muốn xóa mềm người dùng',
+      'users.confirm_unlock': 'Bạn có chắc chắn muốn mở khóa tài khoản',
+      'users.delete_confirm_title': 'Xóa mềm người dùng',
+      'users.unlock_confirm_title': 'Mở khóa tài khoản',
       'users.confirm_restore': 'Bạn có chắc chắn muốn khôi phục người dùng này?',
       'users.temp_password': 'Mật khẩu tạm thời',
       'users.temp_password_placeholder': 'Nhập mật khẩu cho Moderator',
@@ -372,6 +451,8 @@ export class TranslationService {
       'languages.name_placeholder': 'VD: Tiếng Việt',
       'languages.set_default': 'Đặt làm ngôn ngữ mặc định (Default)',
       'languages.activate_now': 'Kích hoạt ngay (Active)',
+      'languages.delete_confirm_title': 'Xóa ngôn ngữ hệ thống',
+      'languages.delete_confirm': 'Bạn có chắc chắn muốn xóa ngôn ngữ',
 
       'comments.reported_content_title': 'Nội dung bình luận bị báo cáo:',
       'comments.post_context_title': 'Ngữ cảnh bài viết:',
@@ -468,7 +549,8 @@ export class TranslationService {
       'profile.update_avatar_only': 'Chỉ cập nhật ảnh',
       'profile.security_desc': 'Quản lý mật khẩu và các phiên đăng nhập của tài khoản.',
       'profile.login_password': 'Mật khẩu đăng nhập',
-      'profile.password_advice': 'Nên sử dụng mật khẩu có ít nhất 6 ký tự và không dùng chung với dịch vụ khác.',
+      'profile.password_advice':
+        'Nên sử dụng mật khẩu có ít nhất 6 ký tự và không dùng chung với dịch vụ khác.',
       'profile.change_password': 'Đổi mật khẩu',
       'profile.new_password_placeholder': 'Nhập mật khẩu mới',
       'profile.hide_password': 'Ẩn mật khẩu',
@@ -480,7 +562,8 @@ export class TranslationService {
       'profile.updating_password': 'Đang cập nhật...',
       'profile.update_password_btn': 'Cập nhật mật khẩu',
       'profile.login_sessions': 'Phiên đăng nhập',
-      'profile.login_sessions_desc': 'Đăng xuất tài khoản khỏi tất cả trình duyệt và thiết bị đang sử dụng.',
+      'profile.login_sessions_desc':
+        'Đăng xuất tài khoản khỏi tất cả trình duyệt và thiết bị đang sử dụng.',
       'profile.delete_account_desc': 'Tài khoản sẽ bị khóa và bạn sẽ được đăng xuất ngay lập tức.',
       'profile.load_error': 'Không tải được hồ sơ',
       'profile.only_image_allowed': 'Chỉ được chọn tệp ảnh.',
@@ -560,24 +643,21 @@ export class TranslationService {
       'post_form.publish_success': 'Đã xuất bản bài viết thành công!',
       'post_form.draft_success': 'Đã lưu bản nháp thành công!',
       'post_form.update_success': 'Đã cập nhật bài viết thành công!',
-      'post_form.cancel_confirm': 'Bạn có chắc muốn hủy các thay đổi? Giao diện sẽ quay lại Danh sách bài viết.',
+      'post_form.cancel_confirm':
+        'Bạn có chắc muốn hủy các thay đổi? Giao diện sẽ quay lại Danh sách bài viết.',
     },
     EN: {
-      "category.empty_posts": "No Posts in this Category",
+      'category.empty_posts': 'No Posts in this Category',
       'filter.oldest': 'Oldest',
       'filter.title_asc': 'Title A–Z',
-      'comments.newest_first':
-        'Newest first',
+      'comments.newest_first': 'Newest first',
 
-      'comments.oldest_first':
-        'Oldest first',
+      'comments.oldest_first': 'Oldest first',
       'categories.load_error': 'Unable to load categories.',
 
-      'posts.load_error':
-        'Unable to load posts',
+      'posts.load_error': 'Unable to load posts',
 
-      'posts.empty':
-        'No matching posts found.',
+      'posts.empty': 'No matching posts found.',
 
       // Header & Nav
       'nav.posts': 'Posts',
@@ -594,7 +674,8 @@ export class TranslationService {
       'nav.language': 'Language',
       'ui.community_label': 'Developer community',
       'auth.showcase_title': 'Write, share and learn together.',
-      'auth.showcase_desc': 'A calmer place for technical writing, useful discussions and ideas worth saving.',
+      'auth.showcase_desc':
+        'A calmer place for technical writing, useful discussions and ideas worth saving.',
       'auth.feature_stories': 'Technical stories',
       'auth.feature_community': 'Author community',
       'auth.feature_library': 'Personal library',
@@ -625,38 +706,27 @@ export class TranslationService {
       'hashtag.title': '#Article Hashtags',
       'hashtag.subtitle': 'Find featured articles tagged accordingly.',
 
-      'hashtag.list_subtitle':
-        'Choose a hashtag to view related articles.',
+      'hashtag.list_subtitle': 'Choose a hashtag to view related articles.',
 
-      'hashtag.selected_subtitle':
-        'Articles tagged with this hashtag.',
+      'hashtag.selected_subtitle': 'Articles tagged with this hashtag.',
 
-      'hashtag.back_to_all':
-        'All hashtags',
+      'hashtag.back_to_all': 'All hashtags',
 
-      'hashtag.related_posts':
-        'View related articles',
+      'hashtag.related_posts': 'View related articles',
 
-      'hashtag.search_tags_placeholder':
-        'Search hashtags...',
+      'hashtag.search_tags_placeholder': 'Search hashtags...',
 
-      'hashtag.search_posts_placeholder':
-        'Search posts in this hashtag...',
+      'hashtag.search_posts_placeholder': 'Search posts in this hashtag...',
 
-      'hashtag.load_error':
-        'Unable to load data',
+      'hashtag.load_error': 'Unable to load data',
 
-      'hashtag.empty_tags':
-        'No matching hashtags found.',
+      'hashtag.empty_tags': 'No matching hashtags found.',
 
-      'hashtag.empty_posts':
-        'No matching articles found for this hashtag.',
+      'hashtag.empty_posts': 'No matching articles found for this hashtag.',
 
-      'common.retry':
-        'Try again',
+      'common.retry': 'Try again',
 
-      'common.clear_search':
-        'Clear search',
+      'common.clear_search': 'Clear search',
       'category.all': 'All',
 
       // Post Card & Detail
@@ -668,8 +738,7 @@ export class TranslationService {
       'post.not_found': 'Post not found.',
       'post.invalid_id': 'Invalid post ID.',
       'post.load_error': 'Unable to load the post.',
-      'post.refreshing_language':
-        'Switching language...',
+      'post.refreshing_language': 'Switching language...',
 
       // Comments
       'comments.title': 'Comments',
@@ -681,11 +750,9 @@ export class TranslationService {
       'comments.empty': 'No comments yet.',
       'comments.report': 'Report comment',
 
-      'comments.load_error':
-        'Unable to load comments.',
+      'comments.load_error': 'Unable to load comments.',
 
-      'common.backend_unreachable':
-        'Unable to connect to the server.',
+      'common.backend_unreachable': 'Unable to connect to the server.',
 
       // Auth
       'auth.login_tab': 'Log In',
@@ -720,7 +787,8 @@ export class TranslationService {
       'request_owner.title': 'Request Blog Owner Access',
       'request_owner.subtitle': 'Please provide your reason and intro for Moderator review.',
       'request_owner.reason_label': 'Reason for Application',
-      'request_owner.reason_placeholder': 'Share your experience and topics you want to write about...',
+      'request_owner.reason_placeholder':
+        'Share your experience and topics you want to write about...',
       'request_owner.submit_btn': 'Submit Request',
 
       // Dashboard Common & Sidebar
@@ -828,17 +896,22 @@ export class TranslationService {
       'modal.add_lang_title': 'Add system language',
       'modal.add_language_title': 'Add system language',
       'modal.delete_confirm': 'Are you sure you want to delete this record?',
-      'modal.preview_blog_p1': 'This is sample article content for the Moderator to read and evaluate before approving.',
-      'modal.preview_blog_p2': 'Carefully review content before deciding to approve or reject the post.',
+      'modal.preview_blog_p1':
+        'This is sample article content for the Moderator to read and evaluate before approving.',
+      'modal.preview_blog_p2':
+        'Carefully review content before deciding to approve or reject the post.',
       'modal.preview_blog_h1': '1. Why is this feature important?',
-      'modal.preview_blog_p3': 'Moderation ensures that the Blogy. platform always maintains the highest content quality.',
+      'modal.preview_blog_p3':
+        'Moderation ensures that the Blogy. platform always maintains the highest content quality.',
       'modal.preview_blog_h2': '2. Article formatting requirements',
       'modal.preview_blog_li1': 'Title must be clear and not clickbait.',
       'modal.preview_blog_li2': 'Content must not contain hate speech or spam.',
       'modal.preview_blog_li3': 'Code snippets must be properly enclosed in Code blocks.',
       'modal.preview_cat_post': 'Demo article for category',
-      'modal.preview_comment_p1': 'This is sample article content linked to this comment. Moderators can quickly read the context here when handling comments.',
-      'modal.preview_comment_p2': 'Example: A comment may look unclear on its own, but makes complete sense in the context of the article.',
+      'modal.preview_comment_p1':
+        'This is sample article content linked to this comment. Moderators can quickly read the context here when handling comments.',
+      'modal.preview_comment_p2':
+        'Example: A comment may look unclear on its own, but makes complete sense in the context of the article.',
 
       'author.default_bio': 'No bio available.',
       'author.posts': 'posts',
@@ -852,7 +925,8 @@ export class TranslationService {
 
       'auth.step_request': '1. Request Reset',
       'auth.step_reset': '2. Reset Password',
-      'auth.request_desc': 'Enter your registered email address. The system will send a reset link/code to you.',
+      'auth.request_desc':
+        'Enter your registered email address. The system will send a reset link/code to you.',
       'auth.has_token_link': 'Already have a token? Reset password now →',
       'auth.reset_desc': 'Enter the received token code and new password to proceed.',
       'auth.resend_request_link': "← Didn't receive an email? Resend request",
@@ -892,6 +966,87 @@ export class TranslationService {
 
       'action.approve': 'Approve',
       'action.reject': 'Reject',
+      'action.edit': 'Edit',
+      'action.lock': 'Lock',
+      'action.unlock': 'Unlock',
+      'action.delete': 'Delete',
+      'action.edit_user_title': 'Update user information',
+      'action.lock_user_title': 'Lock user account',
+      'action.unlock_user_title': 'Unlock user account',
+      'action.delete_user_title': 'Soft delete user',
+
+      'users.search_placeholder': 'Search username or email...',
+      'users.all_roles': 'All roles',
+      'users.all_statuses': 'All statuses',
+      'users.clear_filters': 'Clear filters',
+      'users.loading': 'Loading users...',
+      'users.empty': 'No users match the current search criteria.',
+      'users.edit_title': 'Update user information',
+      'users.bio_label': 'Bio',
+      'users.bio_placeholder': 'Enter a new bio...',
+      'users.avatar_url_label': 'Avatar URL',
+      'users.new_password_optional': 'New password (Optional)',
+      'users.password_placeholder': 'Leave blank to keep the current password',
+      'users.lock_title': 'Lock user account',
+      'users.lock_description_before': 'You are about to lock the account',
+      'users.lock_description_after': "All of this user's active sessions will be revoked.",
+      'users.lock_reason_label': 'Reason for locking the account',
+      'users.lock_reason_placeholder': 'Enter a detailed reason...',
+      'users.confirm_lock': 'Confirm lock',
+
+      'admin_dashboard.refresh': 'Refresh',
+      'admin_dashboard.loading': 'Loading dashboard data...',
+      'admin_dashboard.in_7_days': 'in the past 7 days',
+      'admin_dashboard.creator_accounts': 'Content creator accounts',
+      'admin_dashboard.posts': 'posts',
+      'admin_dashboard.owner_requests': 'Blog Owner Requests',
+      'admin_dashboard.awaiting_review': 'Awaiting review',
+      'admin_dashboard.daily_growth_desc': 'New accounts created each day',
+      'admin_dashboard.seven_day_total': '7-day total',
+      'admin_dashboard.review_requests': 'Review requests',
+      'admin_dashboard.language_distribution_desc': 'Percentage of posts by language',
+      'admin_dashboard.language_details': 'Language details',
+      'admin_dashboard.sorted_by_posts': 'Sorted by number of posts',
+      'admin_dashboard.languages': 'languages',
+      'admin_dashboard.no_language_data': 'No language data available',
+      'admin_dashboard.new_users': 'new users',
+      'admin_dashboard.invalid_data': 'The dashboard returned invalid data.',
+      'admin_dashboard.load_error': 'Unable to load the admin dashboard.',
+      'admin_dashboard.growth_chart_label': 'User growth chart',
+      'admin_dashboard.language_chart_label': 'Posts by language chart',
+
+      'requests.title': 'Review Blog Owner Requests',
+      'requests.subtitle': 'Review user requests to become authors on the platform.',
+      'requests.pending': 'Pending',
+      'requests.approved': 'Approved',
+      'requests.rejected': 'Rejected',
+      'requests.all': 'All',
+      'requests.loading': 'Loading requests...',
+      'requests.user_id': 'User ID',
+      'requests.reason_topics': 'Reason & Proposed Topics',
+      'requests.actions_review': 'Actions / Review Information',
+      'requests.empty': 'No Blog Owner requests match the selected filter.',
+      'requests.topics': 'Topics',
+      'requests.approve': 'Approve',
+      'requests.reject': 'Reject',
+      'requests.reviewed_at': 'Reviewed at',
+      'requests.by_reviewer': 'By reviewer',
+      'requests.rejection_reason': 'Rejection reason',
+      'requests.total': 'Total',
+      'requests.items': 'requests',
+      'requests.reject_modal_title': 'Reject Blog Owner Request',
+      'requests.reject_confirm': 'Are you sure you want to reject the request from',
+      'requests.rejection_reason_label': 'Rejection reason (Optional, up to 1,000 characters)',
+      'requests.rejection_placeholder': 'Enter feedback for the user...',
+      'requests.confirm_reject': 'Confirm Rejection',
+      'requests.load_error': 'Failed to load requests',
+      'requests.approve_confirm': 'Approve Blog Owner access for request',
+      'requests.approve_modal_title': 'Approve request',
+      'requests.confirm_approve': 'Confirm approval',
+      'requests.approve_success': 'Request approved successfully',
+      'requests.approve_error': 'Failed to approve request',
+      'requests.reject_success': 'Request rejected',
+      'requests.reject_error': 'Failed to reject request',
 
       'users.grant_owner': 'Grant Access',
       'users.revoke_owner': 'Revoke Access',
@@ -899,7 +1054,10 @@ export class TranslationService {
       'users.unlock_user': 'Unlock',
       'users.soft_delete': 'Soft Delete',
       'users.restore': 'Restore',
-      'users.confirm_delete': 'Are you sure you want to soft delete this user?',
+      'users.confirm_delete': 'Are you sure you want to soft delete user',
+      'users.confirm_unlock': 'Are you sure you want to unlock the account',
+      'users.delete_confirm_title': 'Soft delete user',
+      'users.unlock_confirm_title': 'Unlock account',
       'users.confirm_restore': 'Are you sure you want to restore this user?',
       'users.temp_password': 'Temporary Password',
       'users.temp_password_placeholder': 'Enter password for Moderator',
@@ -916,6 +1074,8 @@ export class TranslationService {
       'languages.name_placeholder': 'e.g., Vietnamese',
       'languages.set_default': 'Set as default language (Default)',
       'languages.activate_now': 'Activate now (Active)',
+      'languages.delete_confirm_title': 'Delete system language',
+      'languages.delete_confirm': 'Are you sure you want to delete language',
 
       'comments.reported_content_title': 'Reported Comment Content:',
       'comments.post_context_title': 'Article Context:',
@@ -1036,7 +1196,8 @@ export class TranslationService {
       'profile.avatar_upload_failed': 'Avatar upload failed',
       'profile.logout_all_success': 'Logged out from all devices successfully.',
       'profile.logout_failed': 'Logout failed',
-      'profile.delete_confirm': 'Deleting account will lock it and log you out immediately. Continue?',
+      'profile.delete_confirm':
+        'Deleting account will lock it and log you out immediately. Continue?',
       'profile.delete_success': 'Account deleted successfully.',
       'profile.delete_failed': 'Account deletion failed',
       'profile.password_min_length': 'New password must be at least 6 characters.',

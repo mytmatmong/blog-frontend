@@ -33,14 +33,6 @@
             {{ 'library.bookmarks' | translate }}
           </span>
 
-          @if (
-          activeTab() === 'bookmarks' &&
-          !isLoading()
-          ) {
-          <small>
-            {{ totalItems() }}
-          </small>
-          }
         </button>
 
         <button type="button" role="tab" class="library-tab" [class.is-active]="activeTab() === 'likes'"
@@ -55,14 +47,6 @@
             {{ 'library.likes' | translate }}
           </span>
 
-          @if (
-          activeTab() === 'likes' &&
-          !isLoading()
-          ) {
-          <small>
-            {{ totalItems() }}
-          </small>
-          }
         </button>
       </div>
     </section>
@@ -70,16 +54,6 @@
     <!-- Tiêu đề danh sách -->
     <header class="library-feed-header">
       <div>
-        <span class="library-feed-header__eyebrow">
-          @if (activeTab() === 'bookmarks') {
-          <i class="bi bi-bookmark"></i>
-          {{ 'library.bookmarks' | translate }}
-          } @else {
-          <i class="bi bi-heart"></i>
-          {{ 'library.likes' | translate }}
-          }
-        </span>
-
         <h2>
           @if (activeTab() === 'bookmarks') {
           {{ 'library.bookmarks' | translate }}
@@ -96,11 +70,6 @@
         }
       </div>
 
-      @if (!isLoading() && !errorMessage()) {
-      <span class="library-feed-header__count">
-        {{ totalItems() }}
-      </span>
-      }
     </header>
 
     <!-- Loading -->

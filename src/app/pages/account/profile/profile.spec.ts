@@ -1,6 +1,11 @@
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 
 import { Profile } from './profile';
+
+@Component({ template: '' })
+class TestAuthPage {}
 
 describe('Profile', () => {
   let component: Profile;
@@ -9,6 +14,7 @@ describe('Profile', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [Profile],
+      providers: [provideRouter([{ path: 'auth', component: TestAuthPage }])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(Profile);

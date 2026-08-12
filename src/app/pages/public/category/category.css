@@ -34,20 +34,8 @@
     min-width: 0;
 }
 
-.category-hero__eyebrow,
-.category-feed__eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    color: var(--brand);
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
-}
-
 .category-hero h1 {
-    margin: 7px 0 4px;
+    margin: 0 0 4px;
     color: var(--card-text-default);
     font-size: clamp(24px, 3vw, 32px);
     font-weight: 800;
@@ -59,7 +47,7 @@
     max-width: 660px;
     margin: 0;
     color: var(--text-muted);
-    font-size: 13px;
+    font-size: 15px;
     line-height: 1.6;
 }
 
@@ -105,14 +93,14 @@
 
 .category-summary-item strong {
     color: var(--card-text-default);
-    font-size: 14px;
+    font-size: 16px;
     line-height: 1.1;
 }
 
 .category-summary-item small {
     margin-top: 3px;
     color: var(--text-faint);
-    font-size: 8px;
+    font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -139,10 +127,10 @@
 }
 
 .category-tabs .category-pill {
-    min-height: 32px;
-    padding: 6px 11px;
+    min-height: 34px;
+    padding: 7px 12px;
     border-radius: 9px;
-    font-size: 10px;
+    font-size: 12px;
     white-space: nowrap;
 }
 
@@ -206,7 +194,7 @@
 }
 
 .category-feed__header h2 {
-    margin: 4px 0 0;
+    margin: 0;
     color: var(--card-text-default);
     font-size: 18px;
     font-weight: 800;
@@ -215,22 +203,10 @@
 }
 
 .category-feed__header p {
-    margin: 3px 0 0;
-    color: var(--text-faint);
-    font-size: 10px;
-}
-
-.category-feed__counter {
-    min-width: 35px;
-    height: 29px;
-    display: grid;
-    place-items: center;
-    padding-inline: 9px;
-    border-radius: 9px;
-    background: var(--brand-soft);
-    color: var(--brand);
-    font-size: 11px;
-    font-weight: 800;
+    margin: 4px 0 0;
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 550;
 }
 
 .category-feed-list {

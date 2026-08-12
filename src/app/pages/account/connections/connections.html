@@ -8,11 +8,6 @@
         </span>
 
         <div>
-          <span class="connections-hero__eyebrow">
-            <i class="bi bi-person-lines-fill"></i>
-            {{ 'connections.title' | translate }}
-          </span>
-
           <h1>
             {{ 'connections.title' | translate }}
           </h1>
@@ -36,15 +31,6 @@
             {{ 'connections.followers' | translate }}
           </span>
 
-          @if (
-          activeTab() === 'followers'
-          && !isLoading()
-          && !errorMessage()
-          ) {
-          <small>
-            {{ totalItems() }}
-          </small>
-          }
         </button>
 
         <button type="button" role="tab" class="connections-tab" [class.is-active]="activeTab() === 'following'"
@@ -58,15 +44,6 @@
             {{ 'connections.following' | translate }}
           </span>
 
-          @if (
-          activeTab() === 'following'
-          && !isLoading()
-          && !errorMessage()
-          ) {
-          <small>
-            {{ totalItems() }}
-          </small>
-          }
         </button>
       </div>
     </section>
@@ -74,16 +51,6 @@
     <!-- Tiêu đề danh sách -->
     <header class="connections-feed-header">
       <div>
-        <span class="connections-feed-header__eyebrow">
-          @if (activeTab() === 'followers') {
-          <i class="bi bi-people"></i>
-          {{ 'connections.followers' | translate }}
-          } @else {
-          <i class="bi bi-person-check"></i>
-          {{ 'connections.following' | translate }}
-          }
-        </span>
-
         <h2>
           @if (activeTab() === 'followers') {
           {{ 'connections.followers' | translate }}
@@ -100,11 +67,6 @@
         }
       </div>
 
-      @if (!isLoading() && !errorMessage()) {
-      <span class="connections-feed-header__count">
-        {{ totalItems() }}
-      </span>
-      }
     </header>
 
     <!-- Loading -->

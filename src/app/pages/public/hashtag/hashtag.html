@@ -11,12 +11,6 @@
         <i class="bi bi-arrow-left"></i>
         {{ 'hashtag.back_to_all' | translate }}
       </button>
-      } @else {
-      <!-- hashtag-hero__eyebrow -->
-      <span class="inline-flex items-center gap-[7px] text-[var(--brand)] text-[10px] font-[800] tracking-[0.09em] uppercase">
-        <i class="bi bi-hash"></i>
-        {{ 'nav.hashtags' | translate }}
-      </span>
       }
 
       <!-- hashtag-hero__heading -->
@@ -79,18 +73,7 @@
       <!-- hashtag-feed__header -->
       <header class="min-h-[58px] flex items-end justify-between gap-4 mb-3 p-[1px_2px_11px] border-b border-[var(--border-color)] max-[720px]:items-center">
         <div>
-          <!-- hashtag-feed__eyebrow -->
-          <span class="inline-flex items-center gap-[7px] text-[var(--brand)] text-[10px] font-[800] tracking-[0.09em] uppercase">
-            <i class="bi" [class.bi-hash]="!isTagSelected()" [class.bi-journal-text]="isTagSelected()"></i>
-
-            @if (isTagSelected()) {
-            {{ 'nav.posts' | translate }}
-            } @else {
-            {{ 'nav.hashtags' | translate }}
-            }
-          </span>
-
-          <h2 class="mt-1 mb-0 text-[var(--card-text-default)] text-[18px] font-[800] leading-[1.25] tracking-[-0.028em]">
+          <h2 class="m-0 text-[var(--card-text-default)] text-[18px] font-[800] leading-[1.25] tracking-[-0.028em]">
             @if (isTagSelected()) {
             #{{ selectedTagName() || selectedTagId() }}
             } @else {
@@ -99,7 +82,7 @@
           </h2>
 
           @if (!isLoading()) {
-          <p class="mt-[3px] mb-0 text-[var(--text-faint)] text-[10px]">
+          <p class="mt-[4px] mb-0 text-[var(--text-muted)] text-[14px] font-[550]">
             {{ totalItems() }}
 
             {{
@@ -113,12 +96,6 @@
           }
         </div>
 
-        @if (!isLoading()) {
-        <!-- hashtag-feed__counter -->
-        <span class="min-w-[35px] h-[29px] grid place-items-center px-[9px] rounded-[9px] bg-[var(--brand-soft)] text-[var(--brand)] text-[11px] font-[800]">
-          {{ totalItems() }}
-        </span>
-        }
       </header>
 
       <!-- Loading -->
@@ -263,4 +240,4 @@
     <!-- Sidebar phải -->
     <app-public-sidebar-right class="min-w-0 max-[1240px]:hidden"></app-public-sidebar-right>
   </div>
-</main>
+</main>

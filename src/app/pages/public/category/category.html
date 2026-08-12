@@ -2,11 +2,6 @@
   <!-- Header danh mục -->
   <section class="category-hero">
     <div class="category-hero__content">
-      <span class="category-hero__eyebrow">
-        <i class="bi bi-grid"></i>
-        {{ 'nav.categories' | translate }}
-      </span>
-
       <h1>{{ 'category.title' | translate }}</h1>
 
       <p>{{ 'category.subtitle' | translate }}</p>
@@ -91,11 +86,6 @@
     <section class="category-feed">
       <header class="category-feed__header">
         <div>
-          <span class="category-feed__eyebrow">
-            <i class="bi bi-folder2-open"></i>
-            {{ 'category.title' | translate }}
-          </span>
-
           <h2>{{ 'nav.posts' | translate }}</h2>
 
           @if (!isLoading()) {
@@ -106,11 +96,6 @@
           }
         </div>
 
-        @if (!isLoading()) {
-        <span class="category-feed__counter">
-          {{ totalItems() }}
-        </span>
-        }
       </header>
 
       @if (isLoading()) {

@@ -147,18 +147,6 @@
     background: rgba(255, 255, 255, 0.16);
 }
 
-.library-tab small {
-    min-width: 20px;
-    height: 19px;
-    display: grid;
-    place-items: center;
-    padding-inline: 5px;
-    border-radius: 6px;
-    background: rgba(255, 255, 255, 0.17);
-    color: inherit;
-    font-size: 11px;
-}
-
 /* ================================
    FEED HEADER
    ================================ */
@@ -175,19 +163,8 @@
     border-bottom: 1px solid var(--border-color);
 }
 
-.library-feed-header__eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    color: var(--brand);
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 0.075em;
-    text-transform: uppercase;
-}
-
 .library-feed-header h2 {
-    margin: 5px 0 0;
+    margin: 0;
     color: var(--card-text-default);
     font-size: 19px;
     font-weight: 830;
@@ -196,22 +173,10 @@
 }
 
 .library-feed-header p {
-    margin: 3px 0 0;
-    color: var(--text-faint);
-    font-size: 12.5px;
-}
-
-.library-feed-header__count {
-    min-width: 36px;
-    height: 30px;
-    display: grid;
-    place-items: center;
-    padding-inline: 9px;
-    border-radius: 9px;
-    background: var(--brand-soft);
-    color: var(--brand);
-    font-size: 13px;
-    font-weight: 800;
+    margin: 4px 0 0;
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 550;
 }
 
 /* ================================
@@ -435,10 +400,6 @@
     .library-tab {
         padding-inline: 8px;
         font-size: 11px;
-    }
-
-    .library-tab small {
-        display: none;
     }
 
     .library-feed-header {

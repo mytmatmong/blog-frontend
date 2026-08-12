@@ -5,8 +5,8 @@
 }
 
 :host ::ng-deep .sidebar-search .app-input-field {
-  min-height: 40px;
-  border-radius: 10px;
+  min-height: 44px;
+  border-radius: 11px;
   background-color: var(--card-bg);
-  font-size: 13px;
+  font-size: 14px;
 }

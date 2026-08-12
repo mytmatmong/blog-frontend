@@ -54,7 +54,6 @@
     font-size: 19px;
 }
 
-.connections-hero__eyebrow,
 .connections-feed-header__eyebrow,
 .connection-modal__eyebrow {
     display: inline-flex;
@@ -68,7 +67,7 @@
 }
 
 .connections-hero h1 {
-    margin: 5px 0 0;
+    margin: 0;
     color: var(--card-text-default);
     font-size: 22px;
     font-weight: 850;
@@ -146,21 +145,6 @@
     background: rgba(255, 255, 255, 0.16);
 }
 
-.connections-tab small {
-    min-width: 20px;
-    height: 19px;
-    display: grid;
-    place-items: center;
-    padding-inline: 5px;
-    border-radius: 6px;
-    background:
-        color-mix(in srgb,
-            currentColor 10%,
-            transparent);
-    color: inherit;
-    font-size: 11px;
-}
-
 /* ========================================
    FEED HEADER
    ======================================== */
@@ -177,7 +161,7 @@
 }
 
 .connections-feed-header h2 {
-    margin: 5px 0 0;
+    margin: 0;
     color: var(--card-text-default);
     font-size: 19px;
     font-weight: 830;
@@ -185,22 +169,10 @@
 }
 
 .connections-feed-header p {
-    margin: 3px 0 0;
-    color: var(--text-faint);
-    font-size: 12.5px;
-}
-
-.connections-feed-header__count {
-    min-width: 36px;
-    height: 30px;
-    display: grid;
-    place-items: center;
-    padding-inline: 9px;
-    border-radius: 9px;
-    background: var(--brand-soft);
-    color: var(--brand);
-    font-size: 13px;
-    font-weight: 800;
+    margin: 4px 0 0;
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 550;
 }
 
 /* ========================================
@@ -911,10 +883,6 @@
     .connections-tab {
         padding-inline: 7px;
         font-size: 11px;
-    }
-
-    .connections-tab small {
-        display: none;
     }
 
     .connections-feed-header {

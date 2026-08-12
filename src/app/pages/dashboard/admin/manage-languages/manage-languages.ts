@@ -9,11 +9,12 @@ import {
 import { AdminApiService } from '../../../../core/services/admin-api.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { TranslationService } from '../../../../core/services/translation.service';
+import { ConfirmDialog } from '../../../../shared/components/confirm-dialog/confirm-dialog';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-manage-languages',
-  imports: [FormsModule, TranslatePipe],
+  imports: [FormsModule, TranslatePipe, ConfirmDialog],
   templateUrl: './manage-languages.html',
   styleUrl: './manage-languages.css',
 })
@@ -30,6 +31,7 @@ export class ManageLanguages implements OnInit {
   readonly isSubmittingAdd = signal<boolean>(false);
   readonly isSubmittingEdit = signal<boolean>(false);
   readonly deletingId = signal<number | null>(null);
+  readonly pendingDeleteLanguage = signal<AdminLanguage | null>(null);
 
   currentPage = signal<number>(1);
   itemsPerPage = 10;
@@ -300,7 +302,17 @@ export class ManageLanguages implements OnInit {
    * Submit A06 — DELETE /api/v1/admin/languages/:id
    */
   deleteLanguage(lang: AdminLanguage) {
-    if (!confirm(this.ts.translate('modal.delete_confirm'))) return;
+    this.pendingDeleteLanguage.set(lang);
+  }
+
+  closeDeleteConfirmation(): void {
+    if (this.deletingId() !== null) return;
+    this.pendingDeleteLanguage.set(null);
+  }
+
+  confirmDeleteLanguage(): void {
+    const lang = this.pendingDeleteLanguage();
+    if (!lang) return;
 
     this.deletingId.set(lang.id);
 
@@ -312,6 +324,7 @@ export class ManageLanguages implements OnInit {
           this.deletingId.set(null);
           if (res?.success) {
             this.toastService.success('Xóa ngôn ngữ thành công!');
+            this.pendingDeleteLanguage.set(null);
             this.loadLanguages();
           }
         },
@@ -326,6 +339,11 @@ export class ManageLanguages implements OnInit {
           this.toastService.error(errorMsg);
         },
       });
+  }
+
+  get deleteConfirmationMessage(): string {
+    const lang = this.pendingDeleteLanguage();
+    return `${this.ts.translate('languages.delete_confirm')} ${lang?.name || lang?.code || ''}?`;
   }
 
   private resetAddForm() {

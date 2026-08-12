@@ -1,8 +1,8 @@
 <section class="space-y-6">
   <div class="flex justify-between items-center">
     <div>
-      <h3 class="font-bold text-xl text-aquamarine-950 dark:text-aquamarine-50">Duyệt Yêu Cầu Blog Owner</h3>
-      <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400 mt-1">Danh sách yêu cầu đăng ký làm tác giả bài viết của người dùng hệ thống.</p>
+      <h3 class="font-bold text-xl text-aquamarine-950 dark:text-aquamarine-50">{{ 'requests.title' | translate }}</h3>
+      <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400 mt-1">{{ 'requests.subtitle' | translate }}</p>
     </div>
   </div>
 
@@ -16,7 +16,7 @@
       [class.text-aquamarine-800]="statusFilter() !== 'PENDING'"
       [class.dark:text-aquamarine-200]="statusFilter() !== 'PENDING'"
     >
-      <i class="bi bi-clock-history"></i> Chờ duyệt (PENDING)
+      <i class="bi bi-clock-history"></i> {{ 'requests.pending' | translate }} (PENDING)
     </button>
     <button
       (click)="onStatusChange('APPROVED')"
@@ -26,7 +26,7 @@
       [class.text-aquamarine-800]="statusFilter() !== 'APPROVED'"
       [class.dark:text-aquamarine-200]="statusFilter() !== 'APPROVED'"
     >
-      <i class="bi bi-check-circle-fill"></i> Đã duyệt (APPROVED)
+      <i class="bi bi-check-circle-fill"></i> {{ 'requests.approved' | translate }} (APPROVED)
     </button>
     <button
       (click)="onStatusChange('REJECTED')"
@@ -36,7 +36,7 @@
       [class.text-aquamarine-800]="statusFilter() !== 'REJECTED'"
       [class.dark:text-aquamarine-200]="statusFilter() !== 'REJECTED'"
     >
-      <i class="bi bi-x-circle-fill"></i> Từ chối (REJECTED)
+      <i class="bi bi-x-circle-fill"></i> {{ 'requests.rejected' | translate }} (REJECTED)
     </button>
     <button
       (click)="onStatusChange('ALL')"
@@ -46,7 +46,7 @@
       [class.text-aquamarine-800]="statusFilter() !== 'ALL'"
       [class.dark:text-aquamarine-200]="statusFilter() !== 'ALL'"
     >
-      <i class="bi bi-grid"></i> Tất cả
+      <i class="bi bi-grid"></i> {{ 'requests.all' | translate }}
     </button>
   </div>
 
@@ -56,7 +56,7 @@
       <div class="absolute inset-0 z-10 bg-white/70 dark:bg-aquamarine-900/70 backdrop-blur-xs flex items-center justify-center">
         <div class="flex items-center gap-3 text-aquamarine-600 dark:text-aquamarine-400 font-medium">
           <i class="bi bi-arrow-repeat animate-spin text-2xl"></i>
-          <span>Đang tải danh sách yêu cầu...</span>
+          <span>{{ 'requests.loading' | translate }}</span>
         </div>
       </div>
     }
@@ -65,10 +65,10 @@
       <thead>
         <tr class="border-b border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950/50">
           <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 w-[8%] min-w-[60px]">ID</th>
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 w-[12%] min-w-[100px]">User ID</th>
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 w-[35%] min-w-[300px]">Lý do & Chủ đề dự kiến</th>
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center w-[15%] min-w-[120px]">Trạng thái</th>
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-left w-[30%] min-w-[220px]">Thao tác / Thông tin duyệt</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 w-[12%] min-w-[100px]">{{ 'requests.user_id' | translate }}</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 w-[35%] min-w-[300px]">{{ 'requests.reason_topics' | translate }}</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center w-[15%] min-w-[120px]">{{ 'table.status' | translate }}</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center w-[30%] min-w-[220px]">{{ 'requests.actions_review' | translate }}</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-aquamarine-100 dark:divide-aquamarine-800">
@@ -76,7 +76,7 @@
           <tr>
             <td colspan="5" class="p-8 text-center text-aquamarine-600 dark:text-aquamarine-400">
               <i class="bi bi-inbox text-3xl block mb-2 text-aquamarine-400"></i>
-              Không có yêu cầu Blog Owner nào phù hợp với bộ lọc.
+              {{ 'requests.empty' | translate }}
             </td>
           </tr>
         }
@@ -88,7 +88,7 @@
               <p class="text-xs text-aquamarine-950 dark:text-aquamarine-50 font-medium leading-relaxed">{{ item.reason }}</p>
               @if (item.topics) {
                 <div class="text-[11px] text-aquamarine-600 dark:text-aquamarine-400 flex items-center gap-1">
-                  <i class="bi bi-tags"></i> <strong>Chủ đề:</strong> {{ item.topics }}
+                  <i class="bi bi-tags"></i> <strong>{{ 'requests.topics' | translate }}:</strong> {{ item.topics }}
                 </div>
               }
             </td>
@@ -97,24 +97,24 @@
                 {{ item.status }}
               </span>
             </td>
-            <td class="p-4 text-left">
+            <td class="p-4 text-center">
               @if (item.status === 'PENDING') {
-                <div class="flex items-center gap-2">
+                <div class="flex items-center justify-center gap-2">
                   <button (click)="approveRequest(item)" [disabled]="isSubmitting()" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 transition-colors flex items-center gap-1 shadow-xs cursor-pointer">
-                    <i class="bi bi-check-circle"></i> Duyệt
+                    <i class="bi bi-check-circle"></i> {{ 'requests.approve' | translate }}
                   </button>
                   <button (click)="openRejectModal(item)" [disabled]="isSubmitting()" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 hover:bg-rose-100 disabled:opacity-50 transition-colors flex items-center gap-1 cursor-pointer">
-                    <i class="bi bi-x-circle"></i> Từ chối
+                    <i class="bi bi-x-circle"></i> {{ 'requests.reject' | translate }}
                   </button>
                 </div>
               } @else {
                 <div class="text-xs space-y-0.5 text-aquamarine-700 dark:text-aquamarine-300">
-                  <div><i class="bi bi-calendar3"></i> Duyệt lúc: {{ formatDate(item.reviewedAt) }}</div>
+                  <div><i class="bi bi-calendar3"></i> {{ 'requests.reviewed_at' | translate }}: {{ formatDate(item.reviewedAt) }}</div>
                   @if (item.reviewedById) {
-                    <div><i class="bi bi-person-badge"></i> Bởi Reviewer #{{ item.reviewedById }}</div>
+                    <div><i class="bi bi-person-badge"></i> {{ 'requests.by_reviewer' | translate }} #{{ item.reviewedById }}</div>
                   }
                   @if (item.rejectionReason) {
-                    <div class="text-rose-600 dark:text-rose-400 italic">Lý do từ chối: "{{ item.rejectionReason }}"</div>
+                    <div class="text-rose-600 dark:text-rose-400 italic">{{ 'requests.rejection_reason' | translate }}: "{{ item.rejectionReason }}"</div>
                   }
                 </div>
               }
@@ -128,7 +128,7 @@
   <!-- Pagination -->
   @if (totalPages() > 1) {
     <div class="mt-6 flex justify-between items-center text-sm text-aquamarine-700 dark:text-aquamarine-300">
-      <div>Tổng cộng <strong>{{ totalItems() }}</strong> yêu cầu</div>
+      <div>{{ 'requests.total' | translate }} <strong>{{ totalItems() }}</strong> {{ 'requests.items' | translate }}</div>
       <ul class="inline-flex items-center space-x-1">
         <li>
           <button [disabled]="currentPage() === 1" [class.opacity-50]="currentPage() === 1" class="px-3 py-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer" (click)="setPage(currentPage() - 1)">
@@ -152,13 +152,26 @@
   }
 </section>
 
+@if (isApproveModalOpen()) {
+  <app-confirm-dialog
+    [title]="'requests.approve_modal_title' | translate"
+    [message]="('requests.approve_confirm' | translate) + ' #' + selectedRequest()?.id + '?'"
+    [confirmLabel]="'requests.confirm_approve' | translate"
+    [cancelLabel]="'modal.cancel' | translate"
+    [busy]="isSubmitting()"
+    tone="primary"
+    (cancelled)="closeApproveModal()"
+    (confirmed)="submitApprove()"
+  />
+}
+
 <!-- Modal Từ Chối Yêu Cầu -->
 @if (isRejectModalOpen()) {
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
     <div class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-md p-6">
       <div class="flex justify-between items-center mb-4">
         <h5 class="font-bold text-lg text-rose-600 dark:text-rose-400 flex items-center gap-2">
-          <i class="bi bi-x-circle-fill"></i> Từ chối Yêu cầu Blog Owner #{{ selectedRequest()?.id }}
+          <i class="bi bi-x-circle-fill"></i> {{ 'requests.reject_modal_title' | translate }} #{{ selectedRequest()?.id }}
         </h5>
         <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" (click)="closeRejectModal()">
           <i class="bi bi-x-lg text-lg"></i>
@@ -166,11 +179,11 @@
       </div>
       <form (submit)="$event.preventDefault(); submitReject()" class="space-y-4">
         <p class="text-sm text-aquamarine-800 dark:text-aquamarine-200">
-          Bạn có chắc muốn từ chối yêu cầu của <strong>User #{{ selectedRequest()?.userId }}</strong>?
+          {{ 'requests.reject_confirm' | translate }} <strong>User #{{ selectedRequest()?.userId }}</strong>?
         </p>
         <div>
-          <label for="rejectionReasonInput" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">Lý do từ chối (Tùy chọn, tối đa 1000 ký tự)</label>
-          <textarea class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 p-3 text-sm text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none focus:ring-2 focus:ring-rose-500" id="rejectionReasonInput" name="rejectionReason" [value]="rejectionReason()" (input)="rejectionReason.set($any($event.target).value)" rows="3" placeholder="Nhập lý do phản hồi cho người dùng..."></textarea>
+          <label for="rejectionReasonInput" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'requests.rejection_reason_label' | translate }}</label>
+          <textarea class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 p-3 text-sm text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none focus:ring-2 focus:ring-rose-500" id="rejectionReasonInput" name="rejectionReason" [value]="rejectionReason()" (input)="rejectionReason.set($any($event.target).value)" rows="3" [placeholder]="'requests.rejection_placeholder' | translate"></textarea>
         </div>
         <div class="flex justify-end gap-3 pt-2">
           <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="closeRejectModal()">{{ 'modal.cancel' | translate }}</button>
@@ -178,7 +191,7 @@
             @if (isSubmitting()) {
               <i class="bi bi-arrow-repeat animate-spin"></i>
             }
-            Xác nhận Từ Chối
+            {{ 'requests.confirm_reject' | translate }}
           </button>
         </div>
       </form>

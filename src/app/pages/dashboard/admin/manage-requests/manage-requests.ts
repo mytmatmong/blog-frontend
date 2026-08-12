@@ -9,11 +9,12 @@ import { AdminApiService } from '../../../../core/services/admin-api.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { TranslationService } from '../../../../core/services/translation.service';
 import { getApiErrorMessage } from '../../../../core/utils/api-error.util';
+import { ConfirmDialog } from '../../../../shared/components/confirm-dialog/confirm-dialog';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-manage-requests',
-  imports: [FormsModule, TranslatePipe],
+  imports: [FormsModule, TranslatePipe, ConfirmDialog],
   templateUrl: './manage-requests.html',
 })
 export class ManageRequests {
@@ -32,6 +33,7 @@ export class ManageRequests {
 
   // Modals & Submitting signals
   readonly selectedRequest = signal<AdminBlogOwnerRequestItem | null>(null);
+  readonly isApproveModalOpen = signal<boolean>(false);
   readonly isRejectModalOpen = signal<boolean>(false);
   readonly rejectionReason = signal<string>('');
   readonly isSubmitting = signal<boolean>(false);
@@ -64,7 +66,7 @@ export class ManageRequests {
       error: (error: unknown) => {
         this.requests.set([]);
         this.isLoading.set(false);
-        this.toast.error(getApiErrorMessage(error), 'Tải danh sách yêu cầu thất bại');
+        this.toast.error(getApiErrorMessage(error), this.ts.translate('requests.load_error'));
       },
     });
   }
@@ -92,21 +94,33 @@ export class ManageRequests {
 
   // --- Duyệt Yêu Cầu (A08 - APPROVED) ---
   approveRequest(item: AdminBlogOwnerRequestItem): void {
-    if (typeof window !== 'undefined' && !window.confirm(`Duyệt quyền Blog Owner cho yêu cầu #${item.id}?`)) {
-      return;
-    }
+    this.selectedRequest.set(item);
+    this.isApproveModalOpen.set(true);
+  }
+
+  closeApproveModal(): void {
+    if (this.isSubmitting()) return;
+    this.isApproveModalOpen.set(false);
+    this.selectedRequest.set(null);
+  }
+
+  submitApprove(): void {
+    const item = this.selectedRequest();
+    if (!item) return;
 
     this.isSubmitting.set(true);
 
     this.adminApi.reviewBlogOwnerRequest(item.id, { status: 'APPROVED' }).subscribe({
       next: () => {
         this.isSubmitting.set(false);
-        this.toast.success(`Đã duyệt yêu cầu #${item.id} thành công!`);
+        this.toast.success(this.ts.translate('requests.approve_success'));
+        this.isApproveModalOpen.set(false);
+        this.selectedRequest.set(null);
         this.loadRequests();
       },
       error: (error: unknown) => {
         this.isSubmitting.set(false);
-        this.toast.error(getApiErrorMessage(error), 'Duyệt yêu cầu thất bại');
+        this.toast.error(getApiErrorMessage(error), this.ts.translate('requests.approve_error'));
       },
     });
   }
@@ -136,13 +150,13 @@ export class ManageRequests {
     }).subscribe({
       next: () => {
         this.isSubmitting.set(false);
-        this.toast.success(`Đã từ chối yêu cầu #${item.id}`);
+        this.toast.success(this.ts.translate('requests.reject_success'));
         this.closeRejectModal();
         this.loadRequests();
       },
       error: (error: unknown) => {
         this.isSubmitting.set(false);
-        this.toast.error(getApiErrorMessage(error), 'Từ chối yêu cầu thất bại');
+        this.toast.error(getApiErrorMessage(error), this.ts.translate('requests.reject_error'));
       },
     });
   }
@@ -150,7 +164,8 @@ export class ManageRequests {
   formatDate(value?: string | null): string {
     if (!value) return '—';
     const date = new Date(value);
-    return Number.isNaN(date.getTime()) ? '—' : date.toLocaleString('vi-VN');
+    const locale = this.ts.currentLang() === 'EN' ? 'en-US' : 'vi-VN';
+    return Number.isNaN(date.getTime()) ? '—' : date.toLocaleString(locale);
   }
 
   getStatusClass(status: BlogOwnerRequestStatus): string {

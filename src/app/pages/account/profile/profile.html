@@ -48,6 +48,21 @@
       <section class="border border-[var(--border-color)] rounded-[16px] bg-[var(--card-bg)] shadow-[var(--shadow-sm)] p-[24px_20px] overflow-hidden bg-[radial-gradient(circle_at_50%_-10%,color-mix(in_srgb,var(--brand)_13%,transparent),transparent_175px),var(--card-bg)] text-center">
         <!-- profile-avatar-wrap -->
         <div class="relative w-[94px] h-[94px] mx-auto">
+          <input
+            #avatarInput
+            id="profile-avatar-input"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            hidden
+            (change)="onAvatarSelected($event)"
+          />
+          <button
+            type="button"
+            class="group relative block w-[94px] h-[94px] p-0 overflow-hidden rounded-full cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-[color-mix(in_srgb,var(--brand)_22%,transparent)]"
+            [attr.aria-label]="'profile.choose_avatar' | translate"
+            [title]="'profile.choose_avatar' | translate"
+            (click)="avatarInput.click()"
+          >
           @if (avatarPreview() || currentUser.avatarUrl) {
           <!-- profile-avatar -->
           <img [src]="avatarPreview() || currentUser.avatarUrl" [alt]="currentUser.username" class="w-[94px] h-[94px] grid place-items-center border-4 border-[var(--card-bg)] rounded-full bg-[var(--brand)] text-white object-cover shadow-[0_0_0_2px_var(--brand),0_10px_24px_color-mix(in_srgb,var(--brand)_18%,transparent)]" />
@@ -57,6 +72,14 @@
             {{ getAvatarInitial(currentUser.username) }}
           </span>
           }
+
+          <span class="absolute inset-1 grid place-items-center rounded-full bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+            <span class="grid gap-1 text-center text-[11px] font-[750]">
+              <i class="bi bi-camera-fill text-[20px]"></i>
+              {{ 'profile.choose_avatar' | translate }}
+            </span>
+          </span>
+          </button>
 
           <!-- profile-online-dot -->
           <span class="absolute right-[3px] bottom-[7px] w-4 h-4 border-3 border-[var(--card-bg)] rounded-full bg-[#22c55e]" aria-hidden="true">
@@ -101,21 +124,13 @@
         <!-- followers-card__header -->
         <header class="flex items-center justify-between gap-3 p-[17px_17px_12px]">
           <div>
-            <!-- profile-section-label -->
-            <span class="inline-flex items-center gap-[6px] text-[var(--brand)] text-[11px] font-[800] tracking-[0.075em] uppercase">
-              <i class="bi bi-people"></i>
-              {{ 'connections.followers' | translate }}
-            </span>
-
-            <h2 class="mt-1 mb-0 text-[var(--card-text-default)] text-[15px] font-[820] tracking-[-0.02em]">
+            <h2 class="m-0 text-[var(--card-text-default)] text-[16px] font-[820] tracking-[-0.02em]">
               {{ 'profile.followers' | translate }}
             </h2>
+            <p class="mt-1 mb-0 text-[var(--text-muted)] text-[13px] font-[550]">
+              {{ currentUser.followers?.length || 0 }} {{ 'connections.followers' | translate }}
+            </p>
           </div>
-
-          <!-- followers-count -->
-          <span class="min-w-[29px] h-[27px] grid place-items-center px-[7px] rounded-[8px] bg-[var(--brand-soft)] text-[var(--brand)] text-[12px] font-[800]">
-            {{ currentUser.followers?.length || 0 }}
-          </span>
         </header>
 
         @if (currentUser.followers?.length) {
@@ -251,86 +266,13 @@
               </small>
             </div>
 
-            <!-- profile-field profile-field--full -->
-            <div class="relative min-w-0 grid gap-[7px] col-span-full">
-              <label class="text-[var(--card-text-default)] text-[13px] font-[750]">
-                {{ 'profile.avatar' | translate }}
-              </label>
-
-              <!-- profile-avatar-upload -->
-              <div class="min-h-[100px] flex items-center gap-4 p-[14px] border border-dashed border-[color-mix(in_srgb,var(--brand)_30%,var(--border-color))] rounded-[13px] bg-[color-mix(in_srgb,var(--brand-soft)_24%,var(--card-bg))] max-[700px]:items-start max-[480px]:flex-col">
-                <!-- profile-avatar-upload__preview -->
-                <div class="w-[70px] h-[70px] grid place-items-center shrink-0 overflow-hidden border border-[var(--border-color)] rounded-[13px] bg-[var(--brand)] text-white shadow-[var(--shadow-sm)]">
-                  @if (avatarPreview() || currentUser.avatarUrl) {
-                  <img [src]="avatarPreview() || currentUser.avatarUrl" [alt]="currentUser.username" class="w-full h-full object-cover" />
-                  } @else {
-                  <span class="text-[20px] font-[850]">
-                    {{ getAvatarInitial(currentUser.username) }}
-                  </span>
-                  }
-                </div>
-
-                <!-- profile-avatar-upload__content -->
-                <div class="min-w-0 flex-1">
-                  @if (selectedAvatar) {
-                  <!-- profile-avatar-upload__filename -->
-                  <strong class="block text-[var(--card-text-default)] text-[13px] font-[800] overflow-hidden truncate" [title]="selectedAvatar.name">
-                    {{ selectedAvatar.name }}
-                  </strong>
-
-                  <small class="block mt-[4px] text-[var(--text-muted)] text-[12px]">
-                    {{ formatFileSize(selectedAvatar.size) }}
-                  </small>
-                  } @else {
-                  <strong class="block text-[var(--card-text-default)] text-[13px] font-[800]">
-                    {{ 'profile.new_avatar_title' | translate }}
-                  </strong>
-
-                  <small class="block mt-[4px] text-[var(--text-muted)] text-[12px]">
-                    {{ 'profile.avatar_limit_hint' | translate }}
-                  </small>
-                  }
-
-                  <!-- profile-avatar-upload__actions -->
-                  <div class="flex flex-wrap gap-2 mt-[11px] max-[480px]:w-full">
-                    <input #avatarInput type="file" accept="image/jpeg,image/png,image/webp" hidden (change)="onAvatarSelected($event)" />
-
-                    <button type="button" class="btn btn-primary max-[480px]:w-full max-[480px]:justify-center" (click)="avatarInput.click()">
-                      <i class="bi bi-image"></i>
-                      {{ selectedAvatar ? ('profile.choose_other_avatar' | translate) : ('profile.choose_avatar' | translate) }}
-                    </button>
-
-                    @if (selectedAvatar) {
-                    <!-- profile-remove-avatar -->
-                    <button type="button" class="btn border border-[color-mix(in_srgb,var(--danger,#dc2626)_25%,var(--border-color))] bg-transparent text-[var(--danger,#dc2626)] transition-colors duration-150 hover:bg-[color-mix(in_srgb,var(--danger,#dc2626)_7%,transparent)] max-[480px]:w-full max-[480px]:justify-center" (click)="clearAvatarSelection(avatarInput)">
-                      <i class="bi bi-x-lg"></i>
-                      {{ 'profile.deselect_avatar' | translate }}
-                    </button>
-                    }
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 
         <!-- profile-form-footer -->
         <footer class="flex items-center justify-end gap-[9px] p-[15px_23px] border-t border-[var(--border-color)] bg-[var(--card-bg-muted)] max-[700px]:items-stretch max-[700px]:flex-col-reverse max-[700px]:px-4">
-          @if (selectedAvatar) {
-          <button type="button" class="btn btn-secondary max-[700px]:w-full max-[700px]:justify-center" [disabled]="isUploadingAvatar() || isSaving()" (click)="uploadAvatarOnly()">
-            @if (isUploadingAvatar()) {
-            <!-- button-spinner -->
-            <span class="w-[14px] h-[14px] inline-block shrink-0 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
-            {{ 'profile.uploading_avatar' | translate }}
-            } @else {
-            <i class="bi bi-cloud-arrow-up"></i>
-            {{ 'profile.update_avatar_only' | translate }}
-            }
-          </button>
-          }
-
           <!-- profile-save-button -->
-          <button type="submit" class="btn btn-primary min-w-[136px] max-[700px]:w-full max-[700px]:justify-center" [disabled]="isSaving() || isUploadingAvatar()">
+          <button type="submit" class="btn btn-primary min-w-[136px] max-[700px]:w-full max-[700px]:justify-center" [disabled]="isSaving()">
             @if (isSaving()) {
             <!-- button-spinner -->
             <span class="w-[14px] h-[14px] inline-block shrink-0 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
@@ -520,4 +462,4 @@
     </section>
   </div>
   }
-</main>
+</main>

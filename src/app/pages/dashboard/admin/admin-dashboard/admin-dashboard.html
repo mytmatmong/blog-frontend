@@ -1,131 +1,309 @@
 <section class="space-y-6">
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-aquamarine-950 dark:text-aquamarine-50">
+        {{ 'dashboard.admin_title' | translate }}
+      </h1>
+      <p class="mt-1 text-sm text-aquamarine-600 dark:text-aquamarine-400">
+        {{ 'dashboard.admin_desc' | translate }}
+      </p>
+    </div>
+    <button
+      type="button"
+      (click)="loadDashboardData()"
+      [disabled]="isLoading()"
+      class="inline-flex items-center justify-center gap-2 self-start rounded-xl border border-aquamarine-200 bg-white px-3.5 py-2 text-xs font-semibold text-aquamarine-700 shadow-sm transition-colors hover:bg-aquamarine-50 disabled:cursor-wait disabled:opacity-60 dark:border-aquamarine-800 dark:bg-aquamarine-900 dark:text-aquamarine-300 dark:hover:bg-aquamarine-800"
+    >
+      <i class="bi bi-arrow-clockwise" [class.animate-spin]="isLoading()"></i>
+      {{ 'admin_dashboard.refresh' | translate }}
+    </button>
+  </div>
+
   @if (isLoading()) {
-    <div class="p-8 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 flex items-center justify-center gap-3">
-      <div class="animate-spin rounded-full h-6 w-6 border-2 border-aquamarine-600 border-t-transparent"></div>
-      <span class="text-sm font-medium text-aquamarine-700 dark:text-aquamarine-300">Đang tải dữ liệu dashboard...</span>
+    <div
+      class="flex items-center justify-center gap-3 rounded-2xl border border-aquamarine-200 bg-white p-8 dark:border-aquamarine-800 dark:bg-aquamarine-900"
+      role="status"
+    >
+      <div
+        class="h-6 w-6 animate-spin rounded-full border-2 border-aquamarine-600 border-t-transparent"
+      ></div>
+      <span class="text-sm font-medium text-aquamarine-700 dark:text-aquamarine-300">{{
+        'admin_dashboard.loading' | translate
+      }}</span>
     </div>
   } @else if (errorMessage()) {
-    <div class="p-5 rounded-2xl border border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800 flex items-center justify-between">
-      <div class="flex items-center gap-3 text-red-700 dark:text-red-300 text-sm">
+    <div
+      class="flex flex-col gap-3 rounded-2xl border border-red-200 bg-red-50 p-5 sm:flex-row sm:items-center sm:justify-between dark:border-red-800 dark:bg-red-900/20"
+      role="alert"
+    >
+      <div class="flex items-center gap-3 text-sm text-red-700 dark:text-red-300">
         <i class="bi bi-exclamation-triangle-fill text-lg"></i>
         <span>{{ errorMessage() }}</span>
       </div>
-      <button (click)="loadDashboardData()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-600 hover:bg-red-700 text-white transition-colors">
+      <button
+        type="button"
+        (click)="loadDashboardData()"
+        class="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-700"
+      >
         {{ 'common.retry' | translate }}
       </button>
     </div>
   } @else {
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-        <div class="text-xs font-medium text-aquamarine-600 dark:text-aquamarine-400">{{ 'dashboard.manage_users' | translate }}</div>
-        <h3 class="font-bold text-2xl text-aquamarine-700 dark:text-aquamarine-300 mt-1">
-          {{ dashboardData()?.stats?.totalUsers ?? 0 }}
-        </h3>
-      </div>
-      <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-        <div class="text-xs font-medium text-aquamarine-600 dark:text-aquamarine-400">{{ 'dashboard.blog_owners' | translate }}</div>
-        <h3 class="font-bold text-2xl text-cyan-500 mt-1">
-          {{ dashboardData()?.stats?.totalBlogOwners ?? 0 }}
-        </h3>
-      </div>
-      <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-        <div class="text-xs font-medium text-aquamarine-600 dark:text-aquamarine-400">{{ 'dashboard.manage_languages' | translate }}</div>
-        <h3 class="font-bold text-2xl text-emerald-500 mt-1">
-          {{ dashboardData()?.stats?.totalLanguages ?? 0 }}
-        </h3>
-      </div>
-      <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-        <div class="text-xs font-medium text-aquamarine-600 dark:text-aquamarine-400">{{ 'dashboard.approve_posts' | translate }}</div>
-        <h3 class="font-bold text-2xl text-amber-500 mt-1">
-          {{ dashboardData()?.stats?.pendingRequests ?? 0 }}
-        </h3>
-      </div>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <a
+        routerLink="/dashboard/admin/manage-users"
+        class="flex items-center gap-4 rounded-2xl border border-aquamarine-200 bg-white p-5 shadow-sm transition-colors hover:border-aquamarine-400 dark:border-aquamarine-800 dark:bg-aquamarine-900 dark:hover:border-aquamarine-600"
+      >
+        <span
+          class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-aquamarine-50 text-aquamarine-600 dark:bg-aquamarine-800 dark:text-aquamarine-300"
+          ><i class="bi bi-people text-lg"></i
+        ></span>
+        <span class="min-w-0">
+          <span
+            class="block truncate text-xs font-medium text-aquamarine-600 dark:text-aquamarine-400"
+            >{{ 'dashboard.manage_users' | translate }}</span
+          >
+          <strong class="mt-1 block text-2xl text-aquamarine-800 dark:text-aquamarine-200">{{
+            dashboardData()?.stats?.totalUsers ?? 0
+          }}</strong>
+          <small class="mt-1 block text-xs text-aquamarine-500"
+            >+{{ totalNewUsers() }} {{ 'admin_dashboard.in_7_days' | translate }}</small
+          >
+        </span>
+      </a>
+
+      <a
+        routerLink="/dashboard/admin/manage-users"
+        class="flex items-center gap-4 rounded-2xl border border-aquamarine-200 bg-white p-5 shadow-sm transition-colors hover:border-aquamarine-400 dark:border-aquamarine-800 dark:bg-aquamarine-900 dark:hover:border-aquamarine-600"
+      >
+        <span
+          class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-cyan-50 text-cyan-600 dark:bg-cyan-900/30 dark:text-cyan-400"
+          ><i class="bi bi-pen text-lg"></i
+        ></span>
+        <span class="min-w-0">
+          <span
+            class="block truncate text-xs font-medium text-aquamarine-600 dark:text-aquamarine-400"
+            >{{ 'dashboard.blog_owners' | translate }}</span
+          >
+          <strong class="mt-1 block text-2xl text-cyan-600 dark:text-cyan-400">{{
+            dashboardData()?.stats?.totalBlogOwners ?? 0
+          }}</strong>
+          <small class="mt-1 block text-xs text-aquamarine-500">{{
+            'admin_dashboard.creator_accounts' | translate
+          }}</small>
+        </span>
+      </a>
+
+      <a
+        routerLink="/dashboard/admin/manage-languages"
+        class="flex items-center gap-4 rounded-2xl border border-aquamarine-200 bg-white p-5 shadow-sm transition-colors hover:border-aquamarine-400 dark:border-aquamarine-800 dark:bg-aquamarine-900 dark:hover:border-aquamarine-600"
+      >
+        <span
+          class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400"
+          ><i class="bi bi-translate text-lg"></i
+        ></span>
+        <span class="min-w-0">
+          <span
+            class="block truncate text-xs font-medium text-aquamarine-600 dark:text-aquamarine-400"
+            >{{ 'dashboard.manage_languages' | translate }}</span
+          >
+          <strong class="mt-1 block text-2xl text-emerald-600 dark:text-emerald-400">{{
+            dashboardData()?.stats?.totalLanguages ?? 0
+          }}</strong>
+          <small class="mt-1 block text-xs text-aquamarine-500"
+            >{{ totalPosts() }} {{ 'admin_dashboard.posts' | translate }}</small
+          >
+        </span>
+      </a>
+
+      <a
+        routerLink="/dashboard/admin/manage-requests"
+        class="flex items-center gap-4 rounded-2xl border border-aquamarine-200 bg-white p-5 shadow-sm transition-colors hover:border-amber-400 dark:border-aquamarine-800 dark:bg-aquamarine-900 dark:hover:border-amber-600"
+      >
+        <span
+          class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400"
+          ><i class="bi bi-person-check text-lg"></i
+        ></span>
+        <span class="min-w-0">
+          <span
+            class="block truncate text-xs font-medium text-aquamarine-600 dark:text-aquamarine-400"
+            >{{ 'admin_dashboard.owner_requests' | translate }}</span
+          >
+          <strong class="mt-1 block text-2xl text-amber-600 dark:text-amber-400">{{
+            dashboardData()?.stats?.pendingRequests ?? 0
+          }}</strong>
+          <small class="mt-1 block text-xs text-aquamarine-500">{{
+            'admin_dashboard.awaiting_review' | translate
+          }}</small>
+        </span>
+      </a>
     </div>
 
-    <!-- Charts & Quick Actions Row -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-12">
       <div class="lg:col-span-8">
-        <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm h-full flex flex-col justify-between">
-          <h6 class="font-bold text-base text-aquamarine-950 dark:text-aquamarine-50 mb-4">
-            {{ 'dashboard.user_growth_chart' | translate }}
-          </h6>
-          <div>
-            <canvas id="userGrowthChart" height="100"></canvas>
+        <div
+          class="flex h-full flex-col rounded-2xl border border-aquamarine-200 bg-white p-5 shadow-sm dark:border-aquamarine-800 dark:bg-aquamarine-900"
+        >
+          <div class="mb-4 flex items-start justify-between gap-4">
+            <div>
+              <h2 class="text-base font-bold text-aquamarine-950 dark:text-aquamarine-50">
+                {{ 'dashboard.user_growth_chart' | translate }}
+              </h2>
+              <p class="mt-1 text-xs text-aquamarine-500">
+                {{ 'admin_dashboard.daily_growth_desc' | translate }}
+              </p>
+            </div>
+            <div class="text-right">
+              <strong class="block text-xl text-aquamarine-700 dark:text-aquamarine-300"
+                >+{{ totalNewUsers() }}</strong
+              >
+              <span class="text-xs text-aquamarine-500">{{
+                'admin_dashboard.seven_day_total' | translate
+              }}</span>
+            </div>
+          </div>
+          <div class="relative min-h-64 flex-1">
+            <canvas
+              id="userGrowthChart"
+              [attr.aria-label]="'admin_dashboard.growth_chart_label' | translate"
+            ></canvas>
           </div>
         </div>
       </div>
 
       <div class="lg:col-span-4">
-        <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm h-full">
-          <h6 class="font-bold text-base text-aquamarine-950 dark:text-aquamarine-50 mb-4">
+        <div
+          class="h-full rounded-2xl border border-aquamarine-200 bg-white p-5 shadow-sm dark:border-aquamarine-800 dark:bg-aquamarine-900"
+        >
+          <h2 class="mb-4 text-base font-bold text-aquamarine-950 dark:text-aquamarine-50">
             {{ 'dashboard.quick_actions' | translate }}
-          </h6>
-          <div class="flex flex-col gap-3">
-            <a routerLink="/dashboard/admin/manage-users" class="flex items-center justify-between px-4 py-2.5 rounded-xl font-medium text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 transition-colors">
-              <span class="flex items-center gap-2">
-                <i class="bi bi-journal-check"></i>
-                {{ 'dashboard.approve_requests_count' | translate }}
-              </span>
-              @if ((dashboardData()?.stats?.pendingRequests ?? 0) > 0) {
-                <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-amber-500 text-white">
-                  {{ dashboardData()?.stats?.pendingRequests }}
-                </span>
-              }
+          </h2>
+          <div class="space-y-3">
+            <a
+              routerLink="/dashboard/admin/manage-requests"
+              class="flex items-center justify-between rounded-xl bg-aquamarine-600 px-4 py-3 text-sm font-medium text-white hover:bg-aquamarine-700"
+            >
+              <span class="flex items-center gap-2"
+                ><i class="bi bi-person-check"></i
+                >{{ 'admin_dashboard.review_requests' | translate }}</span
+              >
+              <span class="rounded-full bg-amber-500 px-2 py-0.5 text-xs font-bold">{{
+                dashboardData()?.stats?.pendingRequests ?? 0
+              }}</span>
             </a>
-            <a routerLink="/dashboard/admin/manage-languages" class="flex items-center justify-between px-4 py-2.5 rounded-xl font-medium text-sm text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors">
-              <span class="flex items-center gap-2">
-                <i class="bi bi-folder-plus"></i>
-                {{ 'dashboard.add_language_btn' | translate }}
-              </span>
+            <a
+              routerLink="/dashboard/admin/manage-users"
+              class="flex items-center justify-between rounded-xl border border-aquamarine-300 px-4 py-3 text-sm font-medium text-aquamarine-800 hover:bg-aquamarine-50 dark:border-aquamarine-700 dark:text-aquamarine-200 dark:hover:bg-aquamarine-800"
+            >
+              <span class="flex items-center gap-2"
+                ><i class="bi bi-people"></i>{{ 'dashboard.manage_users' | translate }}</span
+              ><i class="bi bi-chevron-right text-xs"></i>
+            </a>
+            <a
+              routerLink="/dashboard/admin/manage-languages"
+              class="flex items-center justify-between rounded-xl border border-aquamarine-300 px-4 py-3 text-sm font-medium text-aquamarine-800 hover:bg-aquamarine-50 dark:border-aquamarine-700 dark:text-aquamarine-200 dark:hover:bg-aquamarine-800"
+            >
+              <span class="flex items-center gap-2"
+                ><i class="bi bi-translate"></i>{{ 'dashboard.manage_languages' | translate }}</span
+              ><i class="bi bi-chevron-right text-xs"></i>
             </a>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Doughnut Chart & Language breakdown -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      <div class="lg:col-span-6">
-        <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-          <h6 class="font-bold text-base text-aquamarine-950 dark:text-aquamarine-50 mb-4">
-            {{ 'dashboard.blog_lang_dist_chart' | translate }}
-          </h6>
-          <div>
-            <canvas id="langPieChart"></canvas>
+    <div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
+      <div
+        class="rounded-2xl border border-aquamarine-200 bg-white p-5 shadow-sm lg:col-span-4 dark:border-aquamarine-800 dark:bg-aquamarine-900"
+      >
+        <h2 class="text-base font-bold text-aquamarine-950 dark:text-aquamarine-50">
+          {{ 'dashboard.blog_lang_dist_chart' | translate }}
+        </h2>
+        <p class="mt-1 text-xs text-aquamarine-500">
+          {{ 'admin_dashboard.language_distribution_desc' | translate }}
+        </p>
+
+        <div class="relative mx-auto mt-4 h-56 w-full max-w-64">
+          <canvas
+            id="langPieChart"
+            [attr.aria-label]="'admin_dashboard.language_chart_label' | translate"
+          ></canvas>
+          <div
+            class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center"
+          >
+            <strong class="text-2xl text-aquamarine-800 dark:text-aquamarine-200">{{
+              totalPosts()
+            }}</strong>
+            <span class="text-xs text-aquamarine-500">{{
+              'admin_dashboard.posts' | translate
+            }}</span>
           </div>
         </div>
       </div>
 
-      <div class="lg:col-span-6">
-        <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm h-full">
-          <h6 class="font-bold text-base text-aquamarine-950 dark:text-aquamarine-50 mb-4">
-            Chi tiết phân bổ theo ngôn ngữ
-          </h6>
-          <div class="space-y-3">
-            @for (lang of dashboardData()?.postsByLanguage?.details; track lang.id) {
-              <div class="p-3 rounded-xl border border-aquamarine-100 dark:border-aquamarine-800 flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                  @if (lang.flag) {
-                    <span class="text-xl">{{ lang.flag }}</span>
-                  }
-                  <div>
-                    <div class="font-semibold text-sm text-aquamarine-950 dark:text-aquamarine-50">
-                      {{ lang.name }} ({{ lang.code }})
-                    </div>
-                    <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400">
-                      {{ lang.postCount }} bài viết
-                    </div>
-                  </div>
-                </div>
-                <div class="text-sm font-bold text-aquamarine-700 dark:text-aquamarine-300">
-                  {{ lang.percentage }}%
+      <div
+        class="rounded-2xl border border-aquamarine-200 bg-white p-5 shadow-sm lg:col-span-8 dark:border-aquamarine-800 dark:bg-aquamarine-900"
+      >
+        <div class="mb-4 flex items-center justify-between gap-4">
+          <div>
+            <h2 class="text-base font-bold text-aquamarine-950 dark:text-aquamarine-50">
+              {{ 'admin_dashboard.language_details' | translate }}
+            </h2>
+            <p class="mt-1 text-xs text-aquamarine-500">
+              {{ 'admin_dashboard.sorted_by_posts' | translate }}
+            </p>
+          </div>
+          <span
+            class="rounded-full bg-aquamarine-50 px-2.5 py-1 text-xs font-semibold text-aquamarine-700 dark:bg-aquamarine-800 dark:text-aquamarine-300"
+          >
+            {{ dashboardData()?.postsByLanguage?.details?.length ?? 0 }}
+            {{ 'admin_dashboard.languages' | translate }}
+          </span>
+        </div>
+
+        <div class="divide-y divide-aquamarine-100 dark:divide-aquamarine-800">
+          @for (lang of dashboardData()?.postsByLanguage?.details; track lang.id) {
+            <div
+              class="grid grid-cols-[minmax(0,1fr)_56px] items-center gap-3 py-4 first:pt-1 last:pb-1 sm:grid-cols-[minmax(0,1fr)_minmax(120px,45%)_56px] sm:gap-4"
+            >
+              <div class="flex min-w-0 items-center gap-3">
+                <span
+                  class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-aquamarine-50 text-xs font-bold uppercase text-aquamarine-700 dark:bg-aquamarine-800 dark:text-aquamarine-300"
+                >
+                  {{ lang.flag || lang.code }}
+                </span>
+                <div class="min-w-0">
+                  <strong
+                    class="block truncate text-sm text-aquamarine-950 dark:text-aquamarine-50"
+                  >
+                    {{ getLanguageDisplayName(lang.code, lang.name) }}
+                  </strong>
+                  <span class="text-xs uppercase text-aquamarine-500">
+                    {{ lang.code }} · {{ lang.postCount }} {{ 'admin_dashboard.posts' | translate }}
+                  </span>
                 </div>
               </div>
-            } @empty {
-              <div class="text-xs text-aquamarine-500 italic">Chưa có dữ liệu ngôn ngữ</div>
-            }
-          </div>
+
+              <div
+                class="col-span-2 h-2 overflow-hidden rounded-full bg-aquamarine-100 sm:col-span-1 dark:bg-aquamarine-800"
+              >
+                <div
+                  class="h-full rounded-full bg-aquamarine-500"
+                  [style.width.%]="lang.percentage"
+                ></div>
+              </div>
+
+              <strong class="text-right text-sm text-aquamarine-700 dark:text-aquamarine-300">
+                {{ lang.percentage }}%
+              </strong>
+            </div>
+          } @empty {
+            <div
+              class="rounded-xl border border-dashed border-aquamarine-200 p-8 text-center text-sm text-aquamarine-500 dark:border-aquamarine-800"
+            >
+              {{ 'admin_dashboard.no_language_data' | translate }}
+            </div>
+          }
         </div>
       </div>
     </div>

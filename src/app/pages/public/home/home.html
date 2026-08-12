@@ -218,7 +218,7 @@
       <div class="flex items-center justify-between my-[17px] px-[2px]">
         <div>
           <h2 class="text-[15px] font-[790]">{{ 'filter.latest' | translate }}</h2>
-          <p class="text-[10px]">{{ totalItems() }} {{ 'nav.posts' | translate }}</p>
+          <p class="mt-1 text-[14px] font-[550] text-[var(--text-muted)]">{{ totalItems() }} {{ 'nav.posts' | translate }}</p>
         </div>
         <select class="min-h-[34px] pl-[10px] pr-[30px] py-[5px] border border-[var(--border-color)] rounded-[9px] bg-[var(--card-bg)] text-[var(--text-muted)] text-[10px] font-[650]" [value]="activeFilter()" (change)="onFilterChange($any($event.target).value)">
           <option value="latest">{{ 'filter.latest' | translate }}</option>
@@ -250,4 +250,4 @@
       <app-public-sidebar-right class="block w-full"></app-public-sidebar-right>
     </aside>
   </div>
-</main>
+</main>

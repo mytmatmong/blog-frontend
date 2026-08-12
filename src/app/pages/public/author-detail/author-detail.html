@@ -63,11 +63,6 @@
           <div class="author-profile__content">
             <div class="author-profile__heading">
               <div class="author-profile__identity">
-                <span class="author-profile__eyebrow">
-                  <i class="bi bi-person-badge"></i>
-                  {{ 'nav.authors' | translate }}
-                </span>
-
                 <h1>
                   {{ currentAuthor.username }}
                 </h1>
@@ -179,18 +174,6 @@
         <section class="author-connections">
           <header class="author-connections__header">
             <div>
-              <span class="author-profile__eyebrow">
-                <i class="bi" [class.bi-people]="connectionsMode() === 'followers'"
-                  [class.bi-person-check]="connectionsMode() === 'following'">
-                </i>
-
-                {{
-                connectionsMode() === 'followers'
-                ? ('connections.followers' | translate)
-                : ('connections.following' | translate)
-                }}
-              </span>
-
               <h2>
                 {{
                 connectionsMode() === 'followers'
@@ -279,11 +262,6 @@
       <section class="author-post-section">
         <header class="author-post-header">
           <div>
-            <span class="author-post-header__eyebrow">
-              <i class="bi bi-journal-richtext"></i>
-              {{ 'author.posts' | translate }}
-            </span>
-
             <h2>
               {{ 'author.posts_by' | translate }}
               {{ currentAuthor.username }}

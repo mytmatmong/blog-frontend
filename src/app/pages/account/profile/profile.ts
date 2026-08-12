@@ -45,7 +45,6 @@ export class Profile {
   readonly isLoading = signal(true);
 
   readonly isSaving = signal(false);
-  readonly isUploadingAvatar = signal(false);
   readonly isDeleting = signal(false);
   readonly avatarPreview = signal<string | null>(null);
 
@@ -264,64 +263,6 @@ export class Profile {
     });
   }
 
-  uploadAvatarOnly(): void {
-    if (!this.selectedAvatar) {
-      this.toast.warning(
-        this.ts.translate(
-          'profile.select_image_first',
-        ),
-      );
-
-      return;
-    }
-
-    this.isUploadingAvatar.set(true);
-
-    this.userApi
-      .uploadAvatar(this.selectedAvatar)
-      .subscribe({
-        next: ({ data }) => {
-          /*
-           * Response upload avatar có thể không chứa
-           * toàn bộ followers nên phải merge.
-           */
-          this.applyUser(
-            this.mergeUserData(data),
-          );
-
-          this.clearSelectedAvatar();
-          this.isUploadingAvatar.set(false);
-
-          this.toast.success(
-            this.ts.translate(
-              'profile.avatar_update_success',
-            ),
-          );
-
-          this.refreshProfileSilently();
-        },
-
-        error: (error: unknown) => {
-          this.isUploadingAvatar.set(false);
-
-          this.toast.error(
-            getApiErrorMessage(error),
-            this.ts.translate(
-              'profile.avatar_upload_failed',
-            ),
-          );
-        },
-      });
-  }
-
-  clearAvatarSelection(
-    input: HTMLInputElement,
-  ): void {
-    this.selectedAvatar = null;
-    this.avatarPreview.set(null);
-    input.value = '';
-  }
-
   logoutAll(): void {
     this.auth.logoutAllApi().subscribe({
       next: () => {
@@ -461,21 +402,6 @@ export class Profile {
           );
         },
       });
-  }
-
-  formatFileSize(size: number): string {
-    if (size < 1024) {
-      return `${size} B`;
-    }
-
-    if (size < 1024 * 1024) {
-      return `${(size / 1024).toFixed(1)} KB`;
-    }
-
-    return `${(
-      size
-      / (1024 * 1024)
-    ).toFixed(1)} MB`;
   }
 
   getAvatarInitial(

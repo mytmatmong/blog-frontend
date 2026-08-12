@@ -247,19 +247,12 @@
           <!-- comments-header -->
           <header class="flex items-end justify-between gap-[18px] mb-5 pb-[15px] border-b border-[var(--border-color)] max-[760px]:items-start max-[760px]:flex-col">
             <div>
-              <span class="section-label">
-                <i class="bi bi-chat-square-text"></i>
+              <h2 class="m-0 text-[var(--card-text-default)] text-[20px] font-[820] tracking-[-0.025em]">
                 {{ 'comments.title' | translate }}
-              </span>
-
-              <h2 class="flex items-center gap-2 mt-[4px] mb-0 text-[var(--card-text-default)] text-[20px] font-[820] tracking-[-0.025em]">
-                {{ 'comments.title' | translate }}
-                @if (commentsTotalItems() > 0) {
-                <small class="min-w-[25px] h-[25px] grid place-items-center px-[7px] rounded-[8px] bg-[var(--brand-soft)] text-[var(--brand)] text-[12px]">
-                  {{ commentsTotalItems() }}
-                </small>
-                }
               </h2>
+              <p class="mt-1 mb-0 text-[var(--text-muted)] text-[14px] font-[550]">
+                {{ commentsTotalItems() }} {{ 'comments.title' | translate }}
+              </p>
             </div>
 
             <!-- comments-sort -->
@@ -454,4 +447,4 @@
     </footer>
   </form>
 </div>
-}
+}

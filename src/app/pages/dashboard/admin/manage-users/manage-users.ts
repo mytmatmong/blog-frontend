@@ -12,11 +12,12 @@ import { AdminApiService } from '../../../../core/services/admin-api.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { TranslationService } from '../../../../core/services/translation.service';
 import { getApiErrorMessage } from '../../../../core/utils/api-error.util';
+import { ConfirmDialog } from '../../../../shared/components/confirm-dialog/confirm-dialog';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-manage-users',
-  imports: [FormsModule, TranslatePipe],
+  imports: [FormsModule, TranslatePipe, ConfirmDialog],
   templateUrl: './manage-users.html',
   styleUrl: './manage-users.css',
 })
@@ -58,6 +59,10 @@ export class ManageUsers {
   readonly activeRoleUser = signal<AdminUserItem | null>(null);
   readonly selectedNewRole = signal<UserRole>('NORMAL');
   readonly isSubmittingRole = signal<boolean>(false);
+
+  readonly confirmationUser = signal<AdminUserItem | null>(null);
+  readonly confirmationAction = signal<'UNLOCK' | 'DELETE' | null>(null);
+  readonly isSubmittingConfirmation = signal<boolean>(false);
 
   // New Mod form fields
   modUsername = '';
@@ -319,16 +324,37 @@ export class ManageUsers {
 
   // --- Unlock User (A14) ---
   unlockUser(user: AdminUserItem): void {
-    if (typeof window !== 'undefined' && !window.confirm(`Mở khóa tài khoản ${user.username || user.email}?`)) {
+    this.confirmationUser.set(user);
+    this.confirmationAction.set('UNLOCK');
+  }
+
+  closeUserConfirmation(): void {
+    if (this.isSubmittingConfirmation()) return;
+    this.confirmationUser.set(null);
+    this.confirmationAction.set(null);
+  }
+
+  submitUserConfirmation(): void {
+    const user = this.confirmationUser();
+    const action = this.confirmationAction();
+    if (!user || !action) return;
+
+    this.isSubmittingConfirmation.set(true);
+
+    if (action === 'DELETE') {
+      this.executeSoftDelete(user);
       return;
     }
 
     this.adminApi.unlockUser(user.id).subscribe({
       next: () => {
+        this.isSubmittingConfirmation.set(false);
         this.toast.success(`Đã mở khóa tài khoản ${user.username || user.email}`);
+        this.closeUserConfirmation();
         this.loadUsers();
       },
       error: (error: unknown) => {
+        this.isSubmittingConfirmation.set(false);
         this.toast.error(getApiErrorMessage(error), 'Mở khóa thất bại');
       },
     });
@@ -375,19 +401,43 @@ export class ManageUsers {
 
   // --- Soft Delete User (A16) ---
   softDeleteUser(user: AdminUserItem): void {
-    if (typeof window !== 'undefined' && !window.confirm(`Bạn có chắc chắn muốn xóa mềm người dùng ${user.username || user.email}?`)) {
-      return;
-    }
+    this.confirmationUser.set(user);
+    this.confirmationAction.set('DELETE');
+  }
 
+  private executeSoftDelete(user: AdminUserItem): void {
     this.adminApi.deleteAdminUser(user.id).subscribe({
       next: () => {
+        this.isSubmittingConfirmation.set(false);
         this.toast.success(`Đã xóa mềm người dùng ${user.username || user.email}`);
+        this.closeUserConfirmation();
         this.loadUsers();
       },
       error: (error: unknown) => {
+        this.isSubmittingConfirmation.set(false);
         this.toast.error(getApiErrorMessage(error), 'Xóa mềm thất bại');
       },
     });
+  }
+
+  get userConfirmationTitle(): string {
+    const key =
+      this.confirmationAction() === 'DELETE'
+        ? 'users.delete_confirm_title'
+        : 'users.unlock_confirm_title';
+    return this.ts.translate(key);
+  }
+
+  get userConfirmationMessage(): string {
+    const user = this.confirmationUser();
+    const key =
+      this.confirmationAction() === 'DELETE' ? 'users.confirm_delete' : 'users.confirm_unlock';
+    return `${this.ts.translate(key)} ${user?.username || user?.email || ''}?`;
+  }
+
+  get userConfirmationLabel(): string {
+    const key = this.confirmationAction() === 'DELETE' ? 'users.soft_delete' : 'users.unlock_user';
+    return this.ts.translate(key);
   }
 
   // Helper formatting methods

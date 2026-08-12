@@ -3,9 +3,9 @@
   <!-- site-header__inner -->
   <div class="site-container min-h-[var(--header-height)] flex flex-wrap items-center gap-[22px] px-4 border border-[var(--border-color)] rounded-[12px] bg-[color-mix(in_srgb,var(--card-bg)_94%,transparent)] shadow-[var(--shadow-sm)]">
     <!-- brand -->
-    <a class="inline-flex items-center gap-[9px] shrink-0 text-[17px] font-[850] tracking-[-0.035em] text-[var(--text-website)] hover:opacity-90 transition-opacity" routerLink="/" aria-label="Blogy home" (click)="closeAllMenus()">
+    <a class="inline-flex items-center gap-[9px] shrink-0 text-[19px] font-[850] tracking-[-0.035em] text-[var(--text-website)] hover:opacity-90 transition-opacity" routerLink="/" aria-label="Blogy home" (click)="closeAllMenus()">
       <!-- brand__mark -->
-      <span class="w-[28px] h-[28px] grid place-items-center rounded-[9px] text-white bg-[linear-gradient(145deg,#7657ff,#4d2fd8)] shadow-[0_7px_16px_rgba(93,61,242,0.24)] text-[12px]"><i class="bi bi-stars"></i></span>
+      <span class="w-[30px] h-[30px] grid place-items-center rounded-[9px] text-white bg-[linear-gradient(145deg,#7657ff,#4d2fd8)] shadow-[0_7px_16px_rgba(93,61,242,0.24)] text-[13px]"><i class="bi bi-stars"></i></span>
       <!-- brand__text -->
       <span>Blogy<span class="text-[var(--brand)]">.</span></span>
     </a>
@@ -30,7 +30,7 @@
       <nav class="site-header-nav shrink-0 gap-1" aria-label="Primary navigation">
         <!-- nav-link -->
         <a
-          class="relative inline-flex items-center min-h-[34px] px-[11px] rounded-[8px] text-[var(--text-muted)] hover:text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] text-[12px] font-[680] transition-colors duration-150"
+          class="relative inline-flex items-center min-h-[34px] px-[11px] rounded-[8px] text-[var(--text-muted)] hover:text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] text-[14px] font-[680] transition-colors duration-150"
           routerLink="/"
           routerLinkActive="text-[var(--brand)] bg-transparent font-[700] after:content-[''] after:absolute after:left-[11px] after:right-[11px] after:bottom-[1px] after:h-[2px] after:rounded-full after:bg-[var(--brand)]"
           [routerLinkActiveOptions]="{ exact: true }"
@@ -38,14 +38,14 @@
           {{ 'nav.posts' | translate }}
         </a>
         <a
-          class="relative inline-flex items-center min-h-[34px] px-[11px] rounded-[8px] text-[var(--text-muted)] hover:text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] text-[12px] font-[680] transition-colors duration-150"
+          class="relative inline-flex items-center min-h-[34px] px-[11px] rounded-[8px] text-[var(--text-muted)] hover:text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] text-[14px] font-[680] transition-colors duration-150"
           routerLink="/category"
           routerLinkActive="text-[var(--brand)] bg-transparent font-[700] after:content-[''] after:absolute after:left-[11px] after:right-[11px] after:bottom-[1px] after:h-[2px] after:rounded-full after:bg-[var(--brand)]"
           (click)="closeMobileMenu()">
           {{ 'nav.categories' | translate }}
         </a>
         <a
-          class="relative inline-flex items-center min-h-[34px] px-[11px] rounded-[8px] text-[var(--text-muted)] hover:text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] text-[12px] font-[680] transition-colors duration-150"
+          class="relative inline-flex items-center min-h-[34px] px-[11px] rounded-[8px] text-[var(--text-muted)] hover:text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] text-[14px] font-[680] transition-colors duration-150"
           routerLink="/hashtag"
           routerLinkActive="text-[var(--brand)] bg-transparent font-[700] after:content-[''] after:absolute after:left-[11px] after:right-[11px] after:bottom-[1px] after:h-[2px] after:rounded-full after:bg-[var(--brand)]"
           (click)="closeMobileMenu()">
@@ -55,10 +55,10 @@
 
       <!-- header-search -->
       <form class="relative w-full max-w-[360px] min-w-[180px] mx-auto" role="search" (submit)="submitSearch($event)">
-        <i class="bi bi-search absolute left-[13px] top-1/2 -translate-y-1/2 z-10 text-[var(--text-faint)] text-[12px] pointer-events-none"></i>
+        <i class="bi bi-search absolute left-[13px] top-1/2 -translate-y-1/2 z-10 text-[var(--text-faint)] text-[14px] pointer-events-none"></i>
         <input
           type="search"
-          class="w-full min-h-[38px] py-[7px] pr-[38px] pl-[36px] border border-transparent focus:border-[color-mix(in_srgb,var(--brand)_30%,var(--border-color))] rounded-[10px] bg-[var(--card-bg-muted)] focus:bg-[var(--card-bg)] text-[var(--card-text-default)] placeholder-[var(--text-faint)] text-[12px] outline-none focus:ring-3 focus:ring-[color-mix(in_srgb,var(--brand)_10%,transparent)] transition-all duration-150"
+          class="w-full min-h-[38px] py-[7px] pr-[38px] pl-[36px] border border-transparent focus:border-[color-mix(in_srgb,var(--brand)_30%,var(--border-color))] rounded-[10px] bg-[var(--card-bg-muted)] focus:bg-[var(--card-bg)] text-[var(--card-text-default)] placeholder-[var(--text-faint)] text-[14px] outline-none focus:ring-3 focus:ring-[color-mix(in_srgb,var(--brand)_10%,transparent)] transition-all duration-150"
           [value]="searchValue()"
           (input)="updateSearch($any($event.target).value)"
           [placeholder]="'search.placeholder_posts' | translate"
@@ -78,7 +78,7 @@
         <!-- header-dropdown-wrap (language) -->
         <div class="relative">
           <!-- header-control header-language -->
-          <button type="button" class="h-[36px] inline-grid place-items-center shrink-0 border border-transparent hover:border-[var(--border-color)] rounded-[9px] bg-transparent hover:bg-[var(--card-bg-muted)] text-[var(--text-muted)] hover:text-[var(--card-text-default)] cursor-pointer transition-colors duration-150 w-auto min-w-[38px] px-2 text-[10px] font-[800]" (click)="toggleLangDropdown()" [title]="ts.currentLang()">
+          <button type="button" class="h-[36px] inline-grid place-items-center shrink-0 border border-transparent hover:border-[var(--border-color)] rounded-[9px] bg-transparent hover:bg-[var(--card-bg-muted)] text-[var(--text-muted)] hover:text-[var(--card-text-default)] cursor-pointer transition-colors duration-150 w-auto min-w-[38px] px-2 text-[13px] font-[800]" (click)="toggleLangDropdown()" [title]="ts.currentLang()">
             <span>{{ ts.currentLang() }}</span>
           </button>
 
@@ -102,14 +102,14 @@
         </div>
 
         <!-- header-control (theme toggle) -->
-        <button type="button" class="w-[36px] h-[36px] inline-grid place-items-center shrink-0 border border-transparent hover:border-[var(--border-color)] rounded-[9px] bg-transparent hover:bg-[var(--card-bg-muted)] text-[var(--text-muted)] hover:text-[var(--card-text-default)] text-[13px] cursor-pointer transition-colors duration-150" (click)="auth.toggleTheme()" [title]="'nav.toggle_theme' | translate">
+        <button type="button" class="w-[36px] h-[36px] inline-grid place-items-center shrink-0 border border-transparent hover:border-[var(--border-color)] rounded-[9px] bg-transparent hover:bg-[var(--card-bg-muted)] text-[var(--text-muted)] hover:text-[var(--card-text-default)] text-[15px] cursor-pointer transition-colors duration-150" (click)="auth.toggleTheme()" [title]="'nav.toggle_theme' | translate">
           <i class="bi" [class.bi-sun-fill]="auth.isDarkMode()" [class.bi-moon-stars]="!auth.isDarkMode()"></i>
         </button>
 
         @if (auth.currentRole() === 'guest') {
         @if (!isAuthPage()) {
         <!-- header-login -->
-        <a class="btn btn-primary min-h-[36px] !rounded-[9px] px-[13px] text-[12px]" routerLink="/auth" (click)="closeMobileMenu()">
+        <a class="btn btn-primary min-h-[36px] !rounded-[9px] px-[13px] text-[14px]" routerLink="/auth" (click)="closeMobileMenu()">
           {{ 'nav.login' | translate }}
         </a>
         }
@@ -124,8 +124,8 @@
             <span class="avatar-sm">{{ auth.currentUser()?.username?.charAt(0)?.toUpperCase() || 'U' }}</span>
             }
             <!-- header-profile__name -->
-            <span class="max-w-[112px] truncate text-[13px] font-[650]">{{ auth.currentUser()?.username }}</span>
-            <i class="bi bi-chevron-down text-[10px] text-aquamarine-500"></i>
+            <span class="max-w-[112px] truncate text-[14px] font-[650]">{{ auth.currentUser()?.username }}</span>
+            <i class="bi bi-chevron-down text-[11px] text-aquamarine-500"></i>
           </button>
 
           @if (isUserDropdownOpen()) {
