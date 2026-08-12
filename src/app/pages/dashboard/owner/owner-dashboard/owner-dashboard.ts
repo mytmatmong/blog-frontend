@@ -26,6 +26,7 @@ import { ToastService } from '../../../../core/services/toast.service';
 import { TranslationService } from '../../../../core/services/translation.service';
 import { getApiErrorMessage } from '../../../../core/utils/api-error.util';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+import { ConfirmDialog } from '../../../../shared/components/confirm-dialog/confirm-dialog';
 
 type ChartInstance = {
   destroy(): void;
@@ -44,6 +45,7 @@ type ChartConstructor = new (
     DecimalPipe,
     TranslatePipe,
     OwnerPostPreviewComponent,
+    ConfirmDialog,
   ],
 
   templateUrl: './owner-dashboard.html',
@@ -68,6 +70,7 @@ export class OwnerDashboard implements OnInit, AfterViewInit, OnDestroy {
     signal<number | null>(null);
   readonly isShareModalOpen = signal(false);
   readonly deletingPostId = signal<number | null>(null);
+  readonly pendingDeletePost = signal<BlogOwnerDashboardPost | null>(null);
   readonly publicBlogUrl =
     typeof window !== 'undefined' ? window.location.origin : '';
 
@@ -151,7 +154,23 @@ export class OwnerDashboard implements OnInit, AfterViewInit, OnDestroy {
   }
 
   deletePost(post: BlogOwnerDashboardPost): void {
-    if (!confirm(this.ts.translate('post.delete_confirm'))) {
+    if (this.deletingPostId() !== null) {
+      return;
+    }
+
+    this.pendingDeletePost.set(post);
+  }
+
+  closeDeleteConfirmation(): void {
+    if (this.deletingPostId() === null) {
+      this.pendingDeletePost.set(null);
+    }
+  }
+
+  confirmDeletePost(): void {
+    const post = this.pendingDeletePost();
+
+    if (!post || this.deletingPostId() !== null) {
       return;
     }
 
@@ -164,6 +183,7 @@ export class OwnerDashboard implements OnInit, AfterViewInit, OnDestroy {
           this.ts.translate('common.success'),
         );
         this.deletingPostId.set(null);
+        this.pendingDeletePost.set(null);
         this.loadDashboard();
       },
       error: (error: unknown) => {

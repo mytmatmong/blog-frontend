@@ -659,3 +659,16 @@
   </form>
   }
 </section>
+
+@if (cancelConfirmationOpen()) {
+<app-confirm-dialog
+  [title]="'post_form.cancel_changes_btn' | translate"
+  [message]="'post_form.cancel_confirm' | translate"
+  [confirmLabel]="'modal.confirm' | translate"
+  [cancelLabel]="'modal.cancel' | translate"
+  [busy]="isSubmitting()"
+  tone="warning"
+  (cancelled)="closeCancelConfirmation()"
+  (confirmed)="confirmCancelChanges()"
+/>
+}

@@ -18,6 +18,7 @@ import {
 } from '../../../../core/models/blog-owner.model';
 import { getApiErrorMessage } from '../../../../core/utils/api-error.util';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+import { ConfirmDialog } from '../../../../shared/components/confirm-dialog/confirm-dialog';
 import { CreatePost } from '../create-post/create-post';
 
 @Component({
@@ -25,6 +26,7 @@ import { CreatePost } from '../create-post/create-post';
   imports: [
     FormsModule,
     TranslatePipe,
+    ConfirmDialog,
   ],
 
   /*
@@ -460,16 +462,20 @@ export class EditPost
 
     formData.append('title', title);
     formData.append('content', content);
-    formData.append(
-      'categoryIds',
-      JSON.stringify(categoryIds),
-    );
+    for (const categoryId of categoryIds) {
+      formData.append(
+        'categoryIds',
+        String(categoryId),
+      );
+    }
 
     if (tagNames.length) {
-      formData.append(
-        'tagNames',
-        JSON.stringify(tagNames),
-      );
+      for (const tagName of tagNames) {
+        formData.append(
+          'tagNames',
+          tagName,
+        );
+      }
     }
 
     formData.append('thumbnail', thumbnail);
@@ -480,15 +486,11 @@ export class EditPost
 
 
   override cancelChanges(): void {
-    const confirmed = confirm(
-      this.tr(
-        'post_form.cancel_confirm',
-      ),
-    );
+    this.cancelConfirmationOpen.set(true);
+  }
 
-    if (!confirmed) {
-      return;
-    }
+  override confirmCancelChanges(): void {
+    this.cancelConfirmationOpen.set(false);
 
     void this.router.navigate([
       '/dashboard/owner/posts',

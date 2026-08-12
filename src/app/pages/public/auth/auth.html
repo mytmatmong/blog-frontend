@@ -1,53 +1,50 @@
 <!-- auth-page -->
-<main class="w-[min(1180px,calc(100%-40px))] mx-auto py-[40px] pb-[64px] max-[900px]:w-[min(calc(100%-24px),560px)] max-[900px]:pt-6">
+<main class="auth-page">
   <!-- auth-layout -->
-  <div class="min-h-[min(720px,calc(100vh-var(--header-height)-104px))] grid grid-cols-[minmax(0,1.05fr)_minmax(380px,0.95fr)] overflow-hidden border border-[var(--border-color)] rounded-[26px] bg-[var(--card-bg)] shadow-[var(--shadow-lg)] max-[900px]:grid-cols-1 max-[900px]:min-h-0">
+  <div class="auth-layout">
     <!-- auth-showcase -->
-    <section class="relative flex flex-col justify-between overflow-hidden p-[42px] bg-[radial-gradient(circle_at_84%_18%,rgba(255,255,255,0.22),transparent_16rem),linear-gradient(145deg,#5b5bd6,#3f3fa5_62%,#29295e)] text-white after:content-[''] after:absolute after:-right-[120px] after:-bottom-[170px] after:w-[430px] after:h-[430px] after:border-[76px] after:border-white/10 after:rounded-full max-[900px]:hidden">
-      <a routerLink="/" class="brand text-white">
-        <span class="brand__mark text-[#5b5bd6] bg-white shadow-none"><i class="bi bi-stars"></i></span>
-        <span class="brand__text text-white">Blogy<span class="text-white">.</span></span>
+    <section class="auth-showcase">
+      <a routerLink="/" class="auth-brand">
+        <span class="auth-brand__mark"><i class="bi bi-stars"></i></span>
+        <span>Blogy.</span>
       </a>
 
       <!-- auth-showcase__copy -->
-      <div class="relative z-[1] max-w-[520px]">
-        <span class="page-intro__eyebrow text-white/70"><i class="bi bi-stars"></i>{{ 'ui.community_label' | translate }}</span>
-        <h1 class="mt-[14px] mb-[16px] text-[clamp(40px,5vw,64px)] leading-[1.02] tracking-[-0.06em]">{{ 'auth.showcase_title' | translate }}</h1>
-        <p class="max-w-[460px] m-0 text-white/70 text-[15px] leading-[1.7]">{{ 'auth.showcase_desc' | translate }}</p>
+      <div class="auth-showcase__copy">
+        <span class="auth-showcase__eyebrow">{{ 'ui.community_label' | translate }}</span>
+        <h1>{{ 'auth.showcase_title' | translate }}</h1>
+        <p>{{ 'auth.showcase_desc' | translate }}</p>
       </div>
 
       <!-- auth-showcase__features -->
-      <div class="relative z-[1] flex flex-wrap gap-[10px]">
-        <span class="inline-flex items-center gap-2 px-3 py-[9px] border border-white/20 rounded-full bg-white/10 text-white/80 text-[11px] font-[650] backdrop-blur-md"><i class="bi bi-journal-code"></i>{{ 'auth.feature_stories' | translate }}</span>
-        <span class="inline-flex items-center gap-2 px-3 py-[9px] border border-white/20 rounded-full bg-white/10 text-white/80 text-[11px] font-[650] backdrop-blur-md"><i class="bi bi-people"></i>{{ 'auth.feature_community' | translate }}</span>
-        <span class="inline-flex items-center gap-2 px-3 py-[9px] border border-white/20 rounded-full bg-white/10 text-white/80 text-[11px] font-[650] backdrop-blur-md"><i class="bi bi-bookmark-heart"></i>{{ 'auth.feature_library' | translate }}</span>
+      <div class="auth-showcase__features">
+        <span><i class="bi bi-journal-code"></i>{{ 'auth.feature_stories' | translate }}</span>
+        <span><i class="bi bi-people"></i>{{ 'auth.feature_community' | translate }}</span>
+        <span><i class="bi bi-bookmark-heart"></i>{{ 'auth.feature_library' | translate }}</span>
       </div>
     </section>
 
     <!-- auth-panel -->
-    <section class="grid place-items-center p-[40px] bg-[var(--card-bg)] max-[900px]:p-[34px_24px]">
+    <section class="auth-panel">
       <!-- auth-card -->
-      <div class="w-[min(100%,430px)]">
+      <div class="auth-card">
         <!-- auth-tabs -->
-        <div class="grid grid-cols-3 gap-[5px] mb-[30px] p-[5px] border border-[var(--border-color)] rounded-[14px] bg-[var(--card-bg-muted)] shadow-[inset_0_1px_2px_rgba(0,0,0,0.03)]">
+        <div class="auth-tabs">
           <button
             type="button"
-            class="min-h-[40px] border border-transparent rounded-[10px] text-[var(--text-muted)] hover:text-[var(--card-text-default)] hover:bg-[color-mix(in_srgb,var(--card-bg)_70%,transparent)] text-[13px] font-[700] cursor-pointer transition-all duration-150 active:scale-[0.98]"
-            [ngClass]="activeTab() === 'login' ? '!bg-[var(--brand)] !text-white !font-[800] !shadow-[0_4px_14px_color-mix(in_srgb,var(--brand)_35%,transparent)]' : ''"
+            [class.is-active]="activeTab() === 'login'"
             (click)="setTab('login')">
             {{ 'auth.login_tab' | translate }}
           </button>
           <button
             type="button"
-            class="min-h-[40px] border border-transparent rounded-[10px] text-[var(--text-muted)] hover:text-[var(--card-text-default)] hover:bg-[color-mix(in_srgb,var(--card-bg)_70%,transparent)] text-[13px] font-[700] cursor-pointer transition-all duration-150 active:scale-[0.98]"
-            [ngClass]="activeTab() === 'register' ? '!bg-[var(--brand)] !text-white !font-[800] !shadow-[0_4px_14px_color-mix(in_srgb,var(--brand)_35%,transparent)]' : ''"
+            [class.is-active]="activeTab() === 'register'"
             (click)="setTab('register')">
             {{ 'auth.register_tab' | translate }}
           </button>
           <button
             type="button"
-            class="min-h-[40px] border border-transparent rounded-[10px] text-[var(--text-muted)] hover:text-[var(--card-text-default)] hover:bg-[color-mix(in_srgb,var(--card-bg)_70%,transparent)] text-[13px] font-[700] cursor-pointer transition-all duration-150 active:scale-[0.98]"
-            [ngClass]="activeTab() === 'forgot' ? '!bg-[var(--brand)] !text-white !font-[800] !shadow-[0_4px_14px_color-mix(in_srgb,var(--brand)_35%,transparent)]' : ''"
+            [class.is-active]="activeTab() === 'forgot'"
             (click)="setTab('forgot')">
             {{ 'auth.forgot_tab' | translate }}
           </button>
@@ -57,8 +54,7 @@
         <div>
           <!-- auth-card__heading -->
           <div class="mb-6">
-            <span class="section-label"><i class="bi bi-box-arrow-in-right"></i>{{ 'auth.login_tab' | translate }}</span>
-            <h2 class="mt-[5px] mb-0 text-[var(--card-text-default)] text-[28px] leading-[1.2] tracking-[-0.04em]">{{ 'auth.login_title' | translate }}</h2>
+            <h2 class="m-0 text-[var(--card-text-default)] text-[28px] leading-[1.2] tracking-[-0.04em]">{{ 'auth.login_title' | translate }}</h2>
           </div>
           <form (submit)="onLogin($event)" class="grid gap-4">
             <app-input type="text" [placeholder]="ts.translate('auth.email_placeholder')" icon="bi bi-person-badge" [required]="true" [value]="loginIdentifier()" (valueChange)="loginIdentifier.set($event)"></app-input>
@@ -78,8 +74,7 @@
         <div>
           <!-- auth-card__heading -->
           <div class="mb-6">
-            <span class="section-label"><i class="bi bi-person-plus"></i>{{ 'auth.register_tab' | translate }}</span>
-            <h2 class="mt-[5px] mb-0 text-[var(--card-text-default)] text-[28px] leading-[1.2] tracking-[-0.04em]">{{ 'auth.register_title' | translate }}</h2>
+            <h2 class="m-0 text-[var(--card-text-default)] text-[28px] leading-[1.2] tracking-[-0.04em]">{{ 'auth.register_title' | translate }}</h2>
           </div>
           <form (submit)="onRegister($event)" class="grid gap-4">
             <app-input type="text" [placeholder]="ts.translate('auth.username_placeholder')" icon="bi bi-person" [required]="true" [value]="registerUsername()" (valueChange)="registerUsername.set($event)"></app-input>
@@ -97,8 +92,7 @@
         <div>
           <!-- auth-card__heading -->
           <div class="mb-6">
-            <span class="section-label"><i class="bi bi-shield-lock"></i>{{ 'auth.forgot_tab' | translate }}</span>
-            <h2 class="mt-[5px] mb-0 text-[var(--card-text-default)] text-[28px] leading-[1.2] tracking-[-0.04em]">{{ 'auth.forgot_title' | translate }}</h2>
+            <h2 class="m-0 text-[var(--card-text-default)] text-[28px] leading-[1.2] tracking-[-0.04em]">{{ 'auth.forgot_title' | translate }}</h2>
           </div>
 
           <!-- auth-stepper -->
@@ -108,14 +102,14 @@
               class="min-h-[44px] flex items-center justify-center gap-2 border rounded-[11px] text-[12px] font-[700] cursor-pointer transition-all duration-150 hover:border-[var(--brand-hover)]"
               [ngClass]="forgotStep() === 'request' ? '!border-[var(--brand)] !bg-[var(--brand-soft)] !text-[var(--brand)] !shadow-sm' : 'border-[var(--border-color)] bg-[var(--card-bg)] text-[var(--text-muted)] hover:bg-[var(--card-bg-muted)]'"
               (click)="setForgotStep('request')">
-              <span class="w-5 h-5 grid place-items-center rounded-full text-[10px] transition-colors" [ngClass]="forgotStep() === 'request' ? 'bg-[var(--brand)] text-white' : 'bg-[var(--card-bg-muted)] text-[var(--text-muted)]'">1</span>{{ 'auth.step_request' | translate }}
+              {{ 'auth.step_request' | translate }}
             </button>
             <button
               type="button"
               class="min-h-[44px] flex items-center justify-center gap-2 border rounded-[11px] text-[12px] font-[700] cursor-pointer transition-all duration-150 hover:border-[var(--brand-hover)]"
               [ngClass]="forgotStep() === 'reset' ? '!border-[var(--brand)] !bg-[var(--brand-soft)] !text-[var(--brand)] !shadow-sm' : 'border-[var(--border-color)] bg-[var(--card-bg)] text-[var(--text-muted)] hover:bg-[var(--card-bg-muted)]'"
               (click)="setForgotStep('reset')">
-              <span class="w-5 h-5 grid place-items-center rounded-full text-[10px] transition-colors" [ngClass]="forgotStep() === 'reset' ? 'bg-[var(--brand)] text-white' : 'bg-[var(--card-bg-muted)] text-[var(--text-muted)]'">2</span>{{ 'auth.step_reset' | translate }}
+              {{ 'auth.step_reset' | translate }}
             </button>
           </div>
 

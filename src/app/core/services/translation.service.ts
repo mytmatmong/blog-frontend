@@ -324,8 +324,8 @@ export class TranslationService {
       'common.back_home': 'Về trang chủ',
       'common.view': 'Xem',
 
-      'auth.step_request': '1. Yêu cầu khôi phục',
-      'auth.step_reset': '2. Đặt lại mật khẩu',
+      'auth.step_request': 'Yêu cầu khôi phục',
+      'auth.step_reset': 'Đặt lại mật khẩu',
       'auth.request_desc':
         'Nhập địa chỉ email đã đăng ký. Hệ thống sẽ gửi liên kết/mã khôi phục cho bạn.',
       'auth.has_token_link': 'Đã có mã token? Đặt lại mật khẩu ngay →',
@@ -949,8 +949,8 @@ export class TranslationService {
       'common.back_home': 'Back to Home',
       'common.view': 'View',
 
-      'auth.step_request': '1. Request Reset',
-      'auth.step_reset': '2. Reset Password',
+      'auth.step_request': 'Request Reset',
+      'auth.step_reset': 'Reset Password',
       'auth.request_desc':
         'Enter your registered email address. The system will send a reset link/code to you.',
       'auth.has_token_link': 'Already have a token? Reset password now →',

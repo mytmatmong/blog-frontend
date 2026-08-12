@@ -303,3 +303,29 @@
 <!-- SHARED POST PREVIEW -->
 <app-owner-post-preview [post]="activePreviewPost()" editRoute="/dashboard/owner/edit-post" [showEdit]="true"
   (closed)="closePreviewModal()" />
+
+@if (pendingSubmitPost()) {
+<app-confirm-dialog
+  [title]="'posts.submit' | translate"
+  [message]="'posts.submit_confirm' | translate"
+  [confirmLabel]="'posts.submit' | translate"
+  [cancelLabel]="'modal.cancel' | translate"
+  [busy]="submittingPostId() !== null"
+  tone="primary"
+  (cancelled)="closeSubmitConfirmation()"
+  (confirmed)="confirmSubmitPost()"
+/>
+}
+
+@if (pendingDeletePost()) {
+<app-confirm-dialog
+  [title]="'comments.delete' | translate"
+  [message]="'post.delete_confirm' | translate"
+  [confirmLabel]="'action.delete' | translate"
+  [cancelLabel]="'modal.cancel' | translate"
+  [busy]="deletingPostId() !== null"
+  tone="danger"
+  (cancelled)="closeDeleteConfirmation()"
+  (confirmed)="confirmDeletePost()"
+/>
+}

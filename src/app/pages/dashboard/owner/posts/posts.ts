@@ -37,6 +37,7 @@ import {
 import {
   OwnerPostPreviewComponent,
 } from '../../../../shared/components/owner-post-preview/owner-post-preview';
+import { ConfirmDialog } from '../../../../shared/components/confirm-dialog/confirm-dialog';
 import {
   TranslatePipe,
 } from '../../../../shared/pipes/translate.pipe';
@@ -49,6 +50,7 @@ import {
     DecimalPipe,
     TranslatePipe,
     OwnerPostPreviewComponent,
+    ConfirmDialog,
   ],
 
   templateUrl: './posts.html',
@@ -98,6 +100,12 @@ export class Posts implements OnInit {
 
   readonly deletingPostId =
     signal<number | null>(null);
+
+  readonly pendingSubmitPost =
+    signal<BlogOwnerPost | null>(null);
+
+  readonly pendingDeletePost =
+    signal<BlogOwnerPost | null>(null);
 
   private readonly postsFetchLimit = 50;
 
@@ -396,13 +404,19 @@ export class Posts implements OnInit {
       return;
     }
 
-    if (
-      !confirm(
-        this.ts.translate(
-          'posts.submit_confirm',
-        ),
-      )
-    ) {
+    this.pendingSubmitPost.set(post);
+  }
+
+  closeSubmitConfirmation(): void {
+    if (this.submittingPostId() === null) {
+      this.pendingSubmitPost.set(null);
+    }
+  }
+
+  confirmSubmitPost(): void {
+    const post = this.pendingSubmitPost();
+
+    if (!post || this.submittingPostId() !== null) {
       return;
     }
 
@@ -426,6 +440,7 @@ export class Posts implements OnInit {
           this.submittingPostId.set(
             null,
           );
+          this.pendingSubmitPost.set(null);
 
           this.toast.success(
             this.ts.translate(
@@ -466,13 +481,19 @@ export class Posts implements OnInit {
       return;
     }
 
-    if (
-      !confirm(
-        this.ts.translate(
-          'post.delete_confirm',
-        ),
-      )
-    ) {
+    this.pendingDeletePost.set(post);
+  }
+
+  closeDeleteConfirmation(): void {
+    if (this.deletingPostId() === null) {
+      this.pendingDeletePost.set(null);
+    }
+  }
+
+  confirmDeletePost(): void {
+    const post = this.pendingDeletePost();
+
+    if (!post || this.deletingPostId() !== null) {
       return;
     }
 
@@ -494,6 +515,7 @@ export class Posts implements OnInit {
           this.deletingPostId.set(
             null,
           );
+          this.pendingDeletePost.set(null);
 
           this.loadPosts();
         },

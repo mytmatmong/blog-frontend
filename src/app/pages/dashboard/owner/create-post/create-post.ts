@@ -23,6 +23,7 @@ import { ToastService } from '../../../../core/services/toast.service';
 import { TranslationService } from '../../../../core/services/translation.service';
 import { getApiErrorMessage } from '../../../../core/utils/api-error.util';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+import { ConfirmDialog } from '../../../../shared/components/confirm-dialog/confirm-dialog';
 
 interface QuillConstructor {
   new(
@@ -51,6 +52,7 @@ export interface TranslationCreationResult {
   imports: [
     FormsModule,
     TranslatePipe,
+    ConfirmDialog,
   ],
   templateUrl: './create-post.html',
   styleUrl: './create-post.css',
@@ -107,6 +109,9 @@ export class CreatePost implements OnInit {
 
   readonly createdPost =
     signal<BlogOwnerPost | null>(null);
+
+  readonly cancelConfirmationOpen =
+    signal(false);
 
   readonly translationResults =
     signal<TranslationCreationResult[]>([]);
@@ -306,6 +311,16 @@ export class CreatePost implements OnInit {
      * CreatePost không cần hủy thay đổi.
      * EditPost sẽ override hàm này.
      */
+  }
+
+  closeCancelConfirmation(): void {
+    if (!this.isSubmitting()) {
+      this.cancelConfirmationOpen.set(false);
+    }
+  }
+
+  confirmCancelChanges(): void {
+    this.cancelConfirmationOpen.set(false);
   }
 
   protected setEditorContent(
@@ -1335,12 +1350,12 @@ export class CreatePost implements OnInit {
       String(languageId),
     );
 
-    formData.append(
-      'categoryIds',
-      JSON.stringify(
-        categoryIds,
-      ),
-    );
+    for (const categoryId of categoryIds) {
+      formData.append(
+        'categoryIds',
+        String(categoryId),
+      );
+    }
 
     formData.append(
       'submitForReview',
@@ -1350,12 +1365,12 @@ export class CreatePost implements OnInit {
     );
 
     if (tagNames.length > 0) {
-      formData.append(
-        'tagNames',
-        JSON.stringify(
-          tagNames,
-        ),
-      );
+      for (const tagName of tagNames) {
+        formData.append(
+          'tagNames',
+          tagName,
+        );
+      }
     }
 
     formData.append(
