@@ -3,10 +3,6 @@ import { Injectable, inject, signal } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/auth.model';
-import { AdminLanguage } from '../models/admin-api.model';
-import { BlogOwnerOptions } from '../models/blog-owner.model';
-import { PaginatedCategoriesResponse, PublicLanguage } from '../models/post.model';
-import { AuthService } from './auth.service';
 import {
   OWNER_TRANSLATIONS_EN,
   OWNER_TRANSLATIONS_VI,
@@ -15,9 +11,11 @@ import {
 export type SupportedLang = string;
 
 export interface LanguageOption {
+  id: number;
   code: SupportedLang;
   name: string;
   flag: string;
+  isDefault: boolean;
 }
 
 interface ApiLanguageRecord {
@@ -26,7 +24,6 @@ interface ApiLanguageRecord {
   name: string;
   flag: string | null;
   isDefault: boolean;
-  isActive: boolean;
 }
 
 @Injectable({
@@ -34,7 +31,6 @@ interface ApiLanguageRecord {
 })
 export class TranslationService {
   private readonly http = inject(HttpClient);
-  private readonly auth = inject(AuthService);
   private readonly apiUrl = environment.apiUrl;
   private languagesRequested = false;
 
@@ -1328,11 +1324,12 @@ export class TranslationService {
       .subscribe({
         next: (languages) => {
           const apiLanguages = languages
-            .filter((language) => language.isActive)
             .map((language): LanguageOption => ({
+              id: language.id,
               code: language.code.trim().toUpperCase(),
               name: language.name,
               flag: this.toFlagEmoji(language.flag),
+              isDefault: language.isDefault,
             }));
 
           this.languages.set(apiLanguages);
@@ -1340,9 +1337,7 @@ export class TranslationService {
 
           if (!apiLanguages.some((language) => language.code === this.currentLang())) {
             const defaultLanguage = languages.find(
-              (language) =>
-                language.isActive &&
-                language.isDefault,
+              (language) => language.isDefault,
             );
             const nextLanguage = defaultLanguage?.code.trim().toUpperCase();
 
@@ -1362,38 +1357,9 @@ export class TranslationService {
   }
 
   private getLanguagesFromApi(): Observable<ApiLanguageRecord[]> {
-    const role = this.auth.currentRole();
-
-    if (role === 'admin' || role === 'moderator') {
-      return this.http
-        .get<ApiResponse<AdminLanguage[]>>(`${this.apiUrl}/admin/languages`)
-        .pipe(map((response) => response?.data ?? []));
-    }
-
-    if (role === 'owner') {
-      return this.http
-        .get<ApiResponse<BlogOwnerOptions>>(`${this.apiUrl}/blog-owner/options`)
-        .pipe(map((response) => response?.data?.languages ?? []));
-    }
-
-    // Public and NORMAL users use the public categories API. Each category
-    // includes its real Language relation, so no authentication or mock data
-    // is required. De-duplicate those relations by language ID.
     return this.http
-      .get<ApiResponse<PaginatedCategoriesResponse>>(`${this.apiUrl}/categories`, {
-        params: { page: 1, limit: 100 },
-      })
-      .pipe(
-        map((response) => {
-          const byId = new Map<number, PublicLanguage>();
-          for (const category of response?.data?.items ?? []) {
-            if (category.language) {
-              byId.set(category.language.id, category.language);
-            }
-          }
-          return [...byId.values()];
-        }),
-      );
+      .get<ApiResponse<ApiLanguageRecord[]>>(`${this.apiUrl}/languages`)
+      .pipe(map((response) => response?.data ?? []));
   }
 
   currentLanguageOption(): LanguageOption | undefined {
