@@ -23,6 +23,7 @@ import {
 import {
   FilterSortOption,
   getPostSortQuery,
+  sortPublicPosts,
 } from '../../../shared/components/public-sidebar-left/public-sidebar-left';
 
 import { PublicSidebarRight } from '../../../shared/components/public-sidebar-right/public-sidebar-right';
@@ -194,7 +195,10 @@ export class Home implements OnInit {
           const data = response.data;
 
           this.posts.set(
-            data.items.map((post) =>
+            sortPublicPosts(
+              data.items,
+              this.activeFilter(),
+            ).map((post) =>
               this.mapToPostItem(post),
             ),
           );

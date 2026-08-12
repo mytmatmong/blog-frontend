@@ -7,8 +7,6 @@ import {
   Output,
 } from '@angular/core';
 
-import { Router } from '@angular/router';
-
 import { InputComponent } from '../input/input';
 
 import { TranslationService } from '../../../core/services/translation.service';
@@ -17,6 +15,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 
 import {
   PostSortBy,
+  PublicPost,
   SortOrder,
 } from '../../../core/models/post.model';
 
@@ -68,6 +67,33 @@ export function getPostSortQuery(
   return POST_SORT_QUERY_MAP[filter];
 }
 
+export function sortPublicPosts(
+  posts: PublicPost[],
+  filter: FilterSortOption,
+): PublicPost[] {
+  const result = [...posts];
+  const publishedTime = (post: PublicPost): number =>
+    new Date(post.publishedAt ?? post.createdAt).getTime() || 0;
+
+  return result.sort((left, right) => {
+    switch (filter) {
+      case 'oldest':
+        return publishedTime(left) - publishedTime(right);
+      case 'mostViewed':
+        return right.viewCount - left.viewCount;
+      case 'mostLiked':
+        return right.likeCount - left.likeCount;
+      case 'titleAsc':
+        return left.title.localeCompare(right.title, undefined, {
+          sensitivity: 'base',
+        });
+      case 'latest':
+      default:
+        return publishedTime(right) - publishedTime(left);
+    }
+  });
+}
+
 export function isFilterSortOption(
   value: string | null,
 ): value is FilterSortOption {
@@ -96,9 +122,6 @@ export function isFilterSortOption(
     './public-sidebar-left.css',
 })
 export class PublicSidebarLeft {
-  private readonly router =
-    inject(Router);
-
   protected readonly ts =
     inject(TranslationService);
 
@@ -184,20 +207,6 @@ export class PublicSidebarLeft {
   get computedPlaceholder(): string {
     if (this.searchPlaceholder) {
       return this.searchPlaceholder;
-    }
-
-    const url = this.router.url;
-
-    if (url.includes('/category')) {
-      return this.ts.translate(
-        'search.placeholder_categories',
-      );
-    }
-
-    if (url.includes('/hashtag')) {
-      return this.ts.translate(
-        'search.placeholder_hashtags',
-      );
     }
 
     return this.ts.translate(
