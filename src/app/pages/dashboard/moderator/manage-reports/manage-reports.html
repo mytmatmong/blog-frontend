@@ -319,8 +319,8 @@
 
 <!-- Modal Xem chi tiết báo cáo vi phạm (API M07) -->
 @if (activePreviewReport(); as report) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-    <div class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-3xl max-h-[85vh] flex flex-col relative">
+  <div class="report-preview-backdrop" (click)="closePreviewReport()">
+    <aside class="report-preview-sheet" role="dialog" aria-modal="true" [attr.aria-labelledby]="'report-preview-title-' + report.id" (click)="$event.stopPropagation()">
       <!-- Loading overlay khi đang fetch API M07 -->
       @if (loadingDetail()) {
         <div class="absolute inset-0 bg-white/70 dark:bg-aquamarine-900/70 z-10 flex flex-col items-center justify-center rounded-2xl">
@@ -330,18 +330,18 @@
       }
 
       <!-- Modal Header -->
-      <div class="flex justify-between items-center p-5 border-b border-aquamarine-200 dark:border-aquamarine-800">
-        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50 flex items-center gap-2">
+      <header class="report-preview-header">
+        <h5 [id]="'report-preview-title-' + report.id" class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50 flex items-center gap-2">
           <span>Chi tiết báo cáo vi phạm:</span>
           <span class="text-aquamarine-600 dark:text-aquamarine-400">#{{ report.id }}</span>
         </h5>
         <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer" (click)="closePreviewReport()">
           <i class="bi bi-x-lg text-lg"></i>
         </button>
-      </div>
+      </header>
 
       <!-- Modal Body -->
-      <div class="p-6 overflow-y-auto space-y-5">
+      <div class="report-preview-body space-y-5">
         <!-- Reporter & Reason info box -->
         <div class="p-4 rounded-xl border border-amber-200 dark:border-amber-900 bg-amber-50/60 dark:bg-amber-950/30 space-y-2">
           <div class="flex items-center justify-between">
@@ -434,13 +434,13 @@
       </div>
 
       <!-- Modal Footer -->
-      <div class="p-4 border-t border-aquamarine-200 dark:border-aquamarine-800 flex justify-end gap-3">
+      <footer class="report-preview-footer">
         @if (report.status === 'PENDING') {
           <button
             type="button"
             (click)="setResolveReport(report)"
             [disabled]="actionLoading()"
-            class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 transition-colors cursor-pointer inline-flex items-center gap-2"
+            class="report-preview-action report-preview-action--resolve"
           >
             <i class="bi bi-check-circle-fill"></i> Xác nhận vi phạm & Ẩn nội dung
           </button>
@@ -448,14 +448,14 @@
             type="button"
             (click)="setRejectReport(report)"
             [disabled]="actionLoading()"
-            class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 transition-colors cursor-pointer inline-flex items-center gap-2"
+            class="report-preview-action report-preview-action--reject"
           >
             <i class="bi bi-x-circle-fill"></i> Bác bỏ báo cáo
           </button>
         }
-        <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer" (click)="closePreviewReport()">{{ 'modal.close' | translate }}</button>
-      </div>
-    </div>
+        <button type="button" class="report-preview-action report-preview-action--secondary" (click)="closePreviewReport()"><i class="bi bi-x-lg"></i>{{ 'modal.close' | translate }}</button>
+      </footer>
+    </aside>
   </div>
 }
 

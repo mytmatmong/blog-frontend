@@ -60,12 +60,23 @@ export class OwnerPostPreviewComponent
 
     @Input() showEdit = true;
 
+    /** Disable the owner-only detail request when another role supplies it. */
+    @Input() loadDetails = true;
+
+    @Input() showModerationActions = false;
+
+    @Input() moderationBusy = false;
+
     @Input() editRoute:
         | string
         | readonly unknown[] =
         '/dashboard/owner/edit-post';
 
     @Output() closed = new EventEmitter<void>();
+
+    @Output() approveRequested = new EventEmitter<BlogOwnerPost>();
+
+    @Output() rejectRequested = new EventEmitter<BlogOwnerPost>();
 
     readonly activePost =
         signal<BlogOwnerPost | null>(null);
@@ -97,7 +108,12 @@ export class OwnerPostPreviewComponent
                 this.mergeLanguageVersions([], this.post),
             );
 
-            this.loadPost(this.post.id);
+            if (this.loadDetails) {
+                this.loadPost(this.post.id);
+            } else {
+                this.loadingPostId.set(null);
+                this.loadError.set(null);
+            }
             return;
         }
 
@@ -146,7 +162,8 @@ export class OwnerPostPreviewComponent
 
         if (
             normalized === 'PUBLISHED' ||
-            normalized === 'APPROVED'
+            normalized === 'APPROVED' ||
+            normalized === 'PUBLISH'
         ) {
             return 'post-preview-status--published';
         }
@@ -159,7 +176,10 @@ export class OwnerPostPreviewComponent
             return 'post-preview-status--pending';
         }
 
-        if (normalized === 'REJECTED') {
+        if (
+            normalized === 'REJECTED' ||
+            normalized === 'REJECT'
+        ) {
             return 'post-preview-status--rejected';
         }
 
@@ -207,12 +227,22 @@ export class OwnerPostPreviewComponent
                 fallback: 'Đã xuất bản',
             },
 
+            PUBLISH: {
+                key: 'posts.status.published',
+                fallback: 'Đã xuất bản',
+            },
+
             APPROVED: {
                 key: 'posts.status.published',
                 fallback: 'Đã xuất bản',
             },
 
             REJECTED: {
+                key: 'posts.status.rejected',
+                fallback: 'Bị từ chối',
+            },
+
+            REJECT: {
                 key: 'posts.status.rejected',
                 fallback: 'Bị từ chối',
             },

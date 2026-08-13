@@ -301,138 +301,16 @@
   }
 </section>
 
-<!-- Modal Xem chi tiết bài viết (API M03) -->
-@if (activePreviewBlog(); as blog) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-    <div class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-3xl max-h-[85vh] flex flex-col relative">
-      <!-- Loading overlay khi đang fetch API M03 -->
-      @if (loadingDetail()) {
-        <div class="absolute inset-0 bg-white/70 dark:bg-aquamarine-900/70 z-10 flex flex-col items-center justify-center rounded-2xl">
-          <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-aquamarine-600 border-r-transparent mb-2"></div>
-          <span class="text-xs font-medium text-aquamarine-700 dark:text-aquamarine-300">Đang tải dữ liệu chi tiết bài viết...</span>
-        </div>
-      }
-
-      <!-- Modal Header -->
-      <div class="flex justify-between items-center p-5 border-b border-aquamarine-200 dark:border-aquamarine-800">
-        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50 flex items-center gap-2">
-          <span>Xem chi tiết bài viết:</span>
-          <span class="text-aquamarine-600 dark:text-aquamarine-400">#{{ blog.id }}</span>
-        </h5>
-        <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer" (click)="closePreviewBlog()">
-          <i class="bi bi-x-lg text-lg"></i>
-        </button>
-      </div>
-
-      <!-- Modal Body -->
-      <div class="p-6 overflow-y-auto space-y-4">
-        <!-- Metadata badges -->
-        <div class="flex flex-wrap items-center gap-2 text-xs">
-          @if (blog.categories && blog.categories.length > 0) {
-            @for (c of blog.categories; track c.id) {
-              <span class="px-2.5 py-1 text-xs font-semibold rounded-md bg-aquamarine-100 text-aquamarine-800 dark:bg-aquamarine-800 dark:text-aquamarine-100">
-                {{ c.name }}
-              </span>
-            }
-          }
-          <span class="text-aquamarine-600 dark:text-aquamarine-400">
-            Ngôn ngữ: {{ blog.language?.flag || '🌐' }} {{ blog.language?.name }} | Trạng thái: <strong>{{ blog.status }}</strong>
-          </span>
-        </div>
-
-        <h2 class="font-bold text-2xl text-aquamarine-950 dark:text-aquamarine-50">{{ blog.title }}</h2>
-
-        <!-- Author & Date info -->
-        <div class="flex flex-wrap items-center gap-3 text-xs text-aquamarine-600 dark:text-aquamarine-400">
-          <span class="flex items-center gap-1.5">
-            @if (blog.author.avatarUrl) {
-              <img [src]="blog.author.avatarUrl" [alt]="blog.author.username" class="w-5 h-5 rounded-full object-cover" />
-            }
-            <span>Tác giả: <strong class="text-aquamarine-950 dark:text-aquamarine-50">{{ blog.author.username }}</strong></span>
-          </span>
-          <span>•</span>
-          <span>Tạo ngày: {{ blog.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
-          @if (blog.viewCount != null) {
-            <span>•</span>
-            <span>Lượt xem: {{ blog.viewCount }}</span>
-          }
-        </div>
-
-        <!-- Thumbnail Image -->
-        @if (blog.thumbnailUrl) {
-          <div class="rounded-xl overflow-hidden max-h-72 my-3 border border-aquamarine-200 dark:border-aquamarine-800">
-            <img [src]="blog.thumbnailUrl" [alt]="blog.title" class="w-full h-full object-cover" />
-          </div>
-        }
-
-        <!-- Rejection reason if available -->
-        @if (blog.rejectionReason) {
-          <div class="p-3 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-xs text-red-700 dark:text-red-300">
-            <strong>Lý do từ chối:</strong> {{ blog.rejectionReason }}
-          </div>
-        }
-
-        <!-- HTML Content -->
-        <div class="prose dark:prose-invert max-w-none text-aquamarine-800 dark:text-aquamarine-200 text-sm border-t border-aquamarine-100 dark:border-aquamarine-800 pt-4" [innerHTML]="blog.content"></div>
-
-        <!-- Tags List -->
-        @if (blog.tags && blog.tags.length > 0) {
-          <div class="flex flex-wrap gap-1.5 pt-3 border-t border-aquamarine-100 dark:border-aquamarine-800">
-            <span class="text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mr-1">Tags:</span>
-            @for (tag of blog.tags; track tag.id) {
-              <span class="px-2 py-0.5 rounded-full text-xs bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                #{{ tag.name }}
-              </span>
-            }
-          </div>
-        }
-
-        <!-- Media List -->
-        @if (blog.media && blog.media.length > 0) {
-          <div class="pt-3 border-t border-aquamarine-100 dark:border-aquamarine-800">
-            <h6 class="font-bold text-xs text-aquamarine-900 dark:text-aquamarine-100 mb-2">File phương tiện (Media):</h6>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              @for (item of blog.media; track item.id) {
-                <div class="p-2 rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 text-xs">
-                  <div class="font-mono text-[10px] text-aquamarine-500 mb-1">{{ item.mediaType }}</div>
-                  @if (item.mediaType === 'IMAGE') {
-                    <img [src]="item.mediaUrl" class="w-full h-32 object-cover rounded-lg" />
-                  } @else if (item.mediaType === 'VIDEO') {
-                    <video [src]="item.mediaUrl" controls class="w-full h-32 rounded-lg bg-black"></video>
-                  } @else {
-                    <a [href]="item.mediaUrl" target="_blank" class="text-aquamarine-600 underline truncate block">{{ item.mediaUrl }}</a>
-                  }
-                </div>
-              }
-            </div>
-          </div>
-        }
-      </div>
-
-      <!-- Modal Footer -->
-      <div class="p-4 border-t border-aquamarine-200 dark:border-aquamarine-800 flex justify-end gap-3">
-        @if (blog.status === 'PENDING_REVIEW') {
-          <button
-            type="button"
-            (click)="approveBlog(blog)"
-            [disabled]="actionLoading()"
-            class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 transition-colors cursor-pointer inline-flex items-center gap-2"
-          >
-            <i class="bi bi-check-circle-fill"></i> Duyệt bài viết này
-          </button>
-          <button
-            type="button"
-            (click)="setRejectBlog(blog)"
-            class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors cursor-pointer inline-flex items-center gap-2"
-          >
-            <i class="bi bi-x-circle-fill"></i> Từ chối bài viết này
-          </button>
-        }
-        <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer" (click)="closePreviewBlog()">{{ 'modal.close' | translate }}</button>
-      </div>
-    </div>
-  </div>
-}
+<app-owner-post-preview
+  [post]="activePreviewPost()"
+  [showEdit]="false"
+  [loadDetails]="false"
+  [showModerationActions]="true"
+  [moderationBusy]="actionLoading()"
+  (closed)="closePreviewBlog()"
+  (approveRequested)="approveBlog(activePreviewBlog()!)"
+  (rejectRequested)="setRejectBlog(activePreviewBlog()!); closePreviewBlog()"
+/>
 
 <!-- Modal Từ chối bài viết (API M05) -->
 @if (activeRejectBlog(); as blog) {

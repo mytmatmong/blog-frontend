@@ -41,6 +41,16 @@
     --preview-warning: #a85c00;
     --preview-danger: #e34864;
 
+    --preview-approve-bg: #ecfdf5;
+    --preview-approve-bg-hover: #d1fae5;
+    --preview-approve-border: #a7f3d0;
+    --preview-approve-text: #047857;
+
+    --preview-reject-bg: #fff1f2;
+    --preview-reject-bg-hover: #ffe4e6;
+    --preview-reject-border: #fecdd3;
+    --preview-reject-text: #be123c;
+
     display: contents;
 }
 
@@ -63,6 +73,16 @@
     --preview-success: #5cdfaa;
     --preview-warning: #ffc36b;
     --preview-danger: #ff8699;
+
+    --preview-approve-bg: rgb(2 44 34 / 68%);
+    --preview-approve-bg-hover: rgb(6 78 59 / 78%);
+    --preview-approve-border: rgb(6 95 70 / 78%);
+    --preview-approve-text: #6ee7b7;
+
+    --preview-reject-bg: rgb(76 5 25 / 58%);
+    --preview-reject-bg-hover: rgb(88 7 29 / 76%);
+    --preview-reject-border: rgb(136 19 55 / 72%);
+    --preview-reject-text: #fb7185;
 }
 
 /* =========================================================
@@ -127,6 +147,9 @@
     overflow-x: hidden;
     overflow-y: auto;
 
+    /* Footer được ghim vào đáy cửa sổ, chừa chỗ để nội dung cuối không bị che. */
+    padding-bottom: 72px;
+
     overscroll-behavior: contain;
     scrollbar-width: thin;
 }
@@ -177,8 +200,11 @@
 
 /* Footer cố định dưới drawer */
 .post-preview-footer {
-    position: relative;
-    z-index: 3;
+    position: absolute;
+    z-index: 10;
+    right: 0;
+    bottom: 0;
+    left: 0;
 
     display: flex;
     min-height: 66px;
@@ -190,7 +216,7 @@
 
     border-top: 1px solid var(--preview-border);
 
-    background: var(--preview-surface-raised);
+    background: var(--preview-surface);
 
     box-shadow:
         0 -8px 20px rgb(15 23 42 / 5%);
@@ -594,6 +620,7 @@
 .post-preview-scroll {
     min-height: 0;
     overflow-y: auto;
+    padding-bottom: 72px;
     overscroll-behavior: contain;
     scrollbar-width: thin;
 }
@@ -679,6 +706,60 @@
     overflow-wrap: anywhere;
 }
 
+.post-preview-rejection {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 18px;
+    padding: 12px 14px;
+    border: 1px solid color-mix(in srgb, var(--preview-danger) 32%, var(--preview-border));
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--preview-danger) 8%, var(--preview-surface));
+    color: var(--preview-danger);
+    font-size: 12px;
+}
+
+.post-preview-rejection>div {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.post-preview-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--preview-border);
+}
+
+.post-preview-tags span {
+    padding: 5px 9px;
+    border-radius: 999px;
+    background: var(--preview-primary-soft);
+    color: var(--preview-primary);
+    font-size: 10.5px;
+    font-weight: 750;
+}
+
+.post-preview-media {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.post-preview-media img,
+.post-preview-media video {
+    display: block;
+    width: 100%;
+    max-height: 240px;
+    border-radius: 10px;
+    background: var(--preview-surface-soft);
+    object-fit: cover;
+}
+
 :host ::ng-deep .post-preview-content p {
     margin: 0 0 17px;
 }
@@ -718,6 +799,12 @@
 /* FOOTER */
 
 .post-preview-footer {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 10;
+
     display: flex;
     min-height: 59px;
     align-items: center;
@@ -827,4 +914,29 @@
         padding-right: 13px;
         padding-left: 13px;
     }
+}
+
+.post-preview-action--approve {
+    border: 1px solid var(--preview-approve-border);
+    background: var(--preview-approve-bg);
+    color: var(--preview-approve-text);
+}
+
+.post-preview-action--approve:hover:not(:disabled) {
+    background: var(--preview-approve-bg-hover);
+}
+
+.post-preview-action--reject {
+    border: 1px solid var(--preview-reject-border);
+    background: var(--preview-reject-bg);
+    color: var(--preview-reject-text);
+}
+
+.post-preview-action--reject:hover:not(:disabled) {
+    background: var(--preview-reject-bg-hover);
+}
+
+.post-preview-action:disabled {
+    cursor: wait;
+    opacity: 0.55;
 }

@@ -12,10 +12,12 @@ import {
   ModeratorPostItem,
   ModeratorPostStatus,
 } from '../../../../core/models/moderator-api.model';
+import { BlogOwnerPost } from '../../../../core/models/blog-owner.model';
+import { OwnerPostPreviewComponent } from '../../../../shared/components/owner-post-preview/owner-post-preview';
 
 @Component({
   selector: 'app-manage-blogs',
-  imports: [FormsModule, DatePipe, TranslatePipe],
+  imports: [FormsModule, DatePipe, TranslatePipe, OwnerPostPreviewComponent],
   templateUrl: './manage-blogs.html',
   styleUrl: './manage-blogs.css',
 })
@@ -40,6 +42,10 @@ export class ManageBlogs implements OnInit {
   readonly limit = 10;
 
   readonly activePreviewBlog = signal<ModeratorPostItem | null>(null);
+  readonly activePreviewPost = computed<BlogOwnerPost | null>(() => {
+    const blog = this.activePreviewBlog();
+    return blog ? this.toPreviewPost(blog) : null;
+  });
   readonly activeRejectBlog = signal<ModeratorPostItem | null>(null);
   rejectReason = '';
 
@@ -160,6 +166,55 @@ export class ManageBlogs implements OnInit {
   closePreviewBlog() {
     this.activePreviewBlog.set(null);
     this.loadingDetail.set(false);
+  }
+
+  private toPreviewPost(blog: ModeratorPostItem): BlogOwnerPost {
+    return {
+      id: blog.id,
+      title: blog.title,
+      thumbnailUrl: blog.thumbnailUrl ?? null,
+      content: blog.content,
+      status: blog.status,
+      viewCount: blog.viewCount ?? 0,
+      likeCount: 0,
+      publishedAt: blog.publishedAt ?? null,
+      parentPostId: blog.parentPostId ?? null,
+      authorId: blog.authorId,
+      languageId: blog.languageId,
+      reviewedAt: blog.reviewedAt ?? null,
+      rejectionReason: blog.rejectionReason ?? null,
+      createdAt: blog.createdAt,
+      updatedAt: blog.updatedAt,
+      author: {
+        id: blog.author.id,
+        username: blog.author.username,
+        bio: blog.author.bio ?? null,
+        avatarUrl: blog.author.avatarUrl ?? null,
+      },
+      language: {
+        id: blog.language.id,
+        code: blog.language.code,
+        name: blog.language.name,
+        flag: blog.language.flag ?? null,
+        isDefault: blog.language.isDefault ?? false,
+        isActive: blog.language.isActive ?? true,
+      },
+      categories: blog.categories.map((category) => ({
+        id: category.id,
+        name: category.name,
+        languageId: category.languageId ?? blog.languageId,
+        categoryGroupId: category.categoryGroupId ?? 0,
+      })),
+      tags: blog.tags.map((tag) => ({ ...tag })),
+      media: blog.media.map((item) => ({
+        id: item.id,
+        postId: item.postId,
+        mediaType: item.mediaType as 'IMAGE' | 'VIDEO',
+        mediaUrl: item.mediaUrl,
+        publicId: item.publicId,
+        createdAt: item.createdAt,
+      })),
+    };
   }
 
   setRejectBlog(blog: ModeratorPostItem) {

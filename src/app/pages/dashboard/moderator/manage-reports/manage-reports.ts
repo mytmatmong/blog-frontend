@@ -170,6 +170,9 @@ export class ManageReports implements OnInit {
   setResolveReport(report: ModeratorReportItem) {
     this.activeResolveReport.set(report);
     this.resolutionNote = 'Nội dung vi phạm tiêu chuẩn cộng đồng và đã được ẩn.';
+    if (this.activePreviewReport()?.id === report.id) {
+      this.closePreviewReport();
+    }
   }
 
   closeResolveModal() {
@@ -221,6 +224,9 @@ export class ManageReports implements OnInit {
   setRejectReport(report: ModeratorReportItem) {
     this.activeRejectReportItem.set(report);
     this.rejectReportNote = 'Không tìm thấy nội dung vi phạm trong ngữ cảnh hiện tại.';
+    if (this.activePreviewReport()?.id === report.id) {
+      this.closePreviewReport();
+    }
   }
 
   closeRejectReportModal() {

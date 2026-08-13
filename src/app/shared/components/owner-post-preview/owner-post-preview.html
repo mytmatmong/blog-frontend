@@ -137,6 +137,18 @@
                     </h2>
 
                     <div class="post-preview-meta">
+                        @if (post.author) {
+                        <span>
+                            <i class="bi bi-person"></i>
+                            {{ post.author.username }}
+                        </span>
+                        }
+
+                        <span>
+                            <i class="bi bi-calendar3"></i>
+                            {{ post.createdAt | date: 'dd/MM/yyyy HH:mm' }}
+                        </span>
+
                         <span>
                             <i class="bi bi-translate"></i>
 
@@ -174,12 +186,67 @@
                 </figure>
                 }
 
+                @if (post.rejectionReason) {
+                <div class="post-preview-rejection">
+                    <i class="bi bi-exclamation-circle-fill"></i>
+                    <div>
+                        <strong>{{ 'table.reason' | translate }}</strong>
+                        <span>{{ post.rejectionReason }}</span>
+                    </div>
+                </div>
+                }
+
                 <div class="post-preview-content" [innerHTML]="post.content"></div>
+
+                @if (post.tags.length) {
+                <div class="post-preview-tags">
+                    @for (tag of post.tags; track tag.id) {
+                    <span>#{{ tag.name }}</span>
+                    }
+                </div>
+                }
+
+                @if (post.media.length) {
+                <div class="post-preview-media">
+                    @for (item of post.media; track item.id) {
+                        @if (item.mediaType === 'IMAGE') {
+                        <img [src]="item.mediaUrl" [alt]="post.title">
+                        } @else if (item.mediaType === 'VIDEO') {
+                        <video [src]="item.mediaUrl" controls></video>
+                        }
+                    }
+                </div>
+                }
             </article>
         </div>
 
         <!-- FOOTER -->
         <footer class="post-preview-footer">
+            @if (
+                showModerationActions &&
+                post.status === 'PENDING_REVIEW'
+            ) {
+            <button
+                type="button"
+                class="post-preview-action post-preview-action--approve"
+                [disabled]="moderationBusy"
+                (click)="approveRequested.emit(post)"
+            >
+                <i class="bi" [class.bi-arrow-repeat]="moderationBusy" [class.post-preview-spin]="moderationBusy" [class.bi-check-circle-fill]="!moderationBusy"></i>
+                {{ 'requests.approve' | translate }}
+            </button>
+
+            <button
+                type="button"
+                class="post-preview-action post-preview-action--reject"
+                [disabled]="moderationBusy"
+                (click)="rejectRequested.emit(post)"
+            >
+                <i class="bi bi-x-circle-fill"></i>
+                {{ 'requests.reject' | translate }}
+            </button>
+            }
+
             <button type="button" class="
             post-preview-action
             post-preview-action--secondary
