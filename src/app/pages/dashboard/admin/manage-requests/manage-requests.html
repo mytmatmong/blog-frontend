@@ -8,46 +8,42 @@
 
   <!-- Status Filter Tabs -->
   <div class="flex flex-wrap gap-2 p-1.5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-    <button
-      (click)="onStatusChange('PENDING')"
-      class="px-4 py-2 rounded-xl text-sm font-semibold transition-all cursor-pointer flex items-center gap-2"
-      [class.bg-aquamarine-600]="statusFilter() === 'PENDING'"
-      [class.text-white]="statusFilter() === 'PENDING'"
-      [class.text-aquamarine-800]="statusFilter() !== 'PENDING'"
-      [class.dark:text-aquamarine-200]="statusFilter() !== 'PENDING'"
+    <app-icon-button
+      icon="bi bi-clock-history"
+      color="primary"
+      [variant]="statusFilter() === 'PENDING' ? 'solid' : 'soft'"
+      size="md"
+      (btnClick)="onStatusChange('PENDING')"
     >
-      <i class="bi bi-clock-history"></i> {{ 'requests.pending' | translate }} (PENDING)
-    </button>
-    <button
-      (click)="onStatusChange('APPROVED')"
-      class="px-4 py-2 rounded-xl text-sm font-semibold transition-all cursor-pointer flex items-center gap-2"
-      [class.bg-emerald-600]="statusFilter() === 'APPROVED'"
-      [class.text-white]="statusFilter() === 'APPROVED'"
-      [class.text-aquamarine-800]="statusFilter() !== 'APPROVED'"
-      [class.dark:text-aquamarine-200]="statusFilter() !== 'APPROVED'"
+      {{ 'requests.pending' | translate }}
+    </app-icon-button>
+    <app-icon-button
+      icon="bi bi-check-circle-fill"
+      [color]="statusFilter() === 'APPROVED' ? 'green' : 'primary'"
+      [variant]="statusFilter() === 'APPROVED' ? 'solid' : 'soft'"
+      size="md"
+      (btnClick)="onStatusChange('APPROVED')"
     >
-      <i class="bi bi-check-circle-fill"></i> {{ 'requests.approved' | translate }} (APPROVED)
-    </button>
-    <button
-      (click)="onStatusChange('REJECTED')"
-      class="px-4 py-2 rounded-xl text-sm font-semibold transition-all cursor-pointer flex items-center gap-2"
-      [class.bg-rose-600]="statusFilter() === 'REJECTED'"
-      [class.text-white]="statusFilter() === 'REJECTED'"
-      [class.text-aquamarine-800]="statusFilter() !== 'REJECTED'"
-      [class.dark:text-aquamarine-200]="statusFilter() !== 'REJECTED'"
+      {{ 'requests.approved' | translate }}
+    </app-icon-button>
+    <app-icon-button
+      icon="bi bi-x-circle-fill"
+      [color]="statusFilter() === 'REJECTED' ? 'red' : 'primary'"
+      [variant]="statusFilter() === 'REJECTED' ? 'solid' : 'soft'"
+      size="md"
+      (btnClick)="onStatusChange('REJECTED')"
     >
-      <i class="bi bi-x-circle-fill"></i> {{ 'requests.rejected' | translate }} (REJECTED)
-    </button>
-    <button
-      (click)="onStatusChange('ALL')"
-      class="px-4 py-2 rounded-xl text-sm font-semibold transition-all cursor-pointer flex items-center gap-2"
-      [class.bg-aquamarine-600]="statusFilter() === 'ALL'"
-      [class.text-white]="statusFilter() === 'ALL'"
-      [class.text-aquamarine-800]="statusFilter() !== 'ALL'"
-      [class.dark:text-aquamarine-200]="statusFilter() !== 'ALL'"
+      {{ 'requests.rejected' | translate }}
+    </app-icon-button>
+    <app-icon-button
+      icon="bi bi-grid"
+      color="primary"
+      [variant]="statusFilter() === 'ALL' ? 'solid' : 'soft'"
+      size="md"
+      (btnClick)="onStatusChange('ALL')"
     >
-      <i class="bi bi-grid"></i> {{ 'requests.all' | translate }}
-    </button>
+      {{ 'requests.all' | translate }}
+    </app-icon-button>
   </div>
 
   <!-- Table Container -->
@@ -93,19 +89,37 @@
               }
             </td>
             <td class="p-4 text-center whitespace-nowrap">
-              <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full border" [className]="getStatusClass(item.status)">
-                {{ item.status }}
-              </span>
+              @if (item.status === 'APPROVED') {
+                <app-badge color="green" shape="pill" size="sm" dot>APPROVED</app-badge>
+              } @else if (item.status === 'REJECTED') {
+                <app-badge color="red" shape="pill" size="sm" dot>REJECTED</app-badge>
+              } @else {
+                <app-badge color="yellow" shape="pill" size="sm" dot>PENDING</app-badge>
+              }
             </td>
             <td class="p-4 text-center">
               @if (item.status === 'PENDING') {
                 <div class="flex items-center justify-center gap-2">
-                  <button (click)="approveRequest(item)" [disabled]="isSubmitting()" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 transition-colors flex items-center gap-1 shadow-xs cursor-pointer">
-                    <i class="bi bi-check-circle"></i> {{ 'requests.approve' | translate }}
-                  </button>
-                  <button (click)="openRejectModal(item)" [disabled]="isSubmitting()" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 hover:bg-rose-100 disabled:opacity-50 transition-colors flex items-center gap-1 cursor-pointer">
-                    <i class="bi bi-x-circle"></i> {{ 'requests.reject' | translate }}
-                  </button>
+                  <app-icon-button
+                    icon="bi bi-check-circle"
+                    color="green"
+                    variant="soft"
+                    size="sm"
+                    [disabled]="isSubmitting()"
+                    (btnClick)="approveRequest(item)"
+                  >
+                    {{ 'requests.approve' | translate }}
+                  </app-icon-button>
+                  <app-icon-button
+                    icon="bi bi-x-circle"
+                    color="red"
+                    variant="soft"
+                    size="sm"
+                    [disabled]="isSubmitting()"
+                    (btnClick)="openRejectModal(item)"
+                  >
+                    {{ 'requests.reject' | translate }}
+                  </app-icon-button>
                 </div>
               } @else {
                 <div class="text-xs space-y-0.5 text-aquamarine-700 dark:text-aquamarine-300">
@@ -131,21 +145,35 @@
       <div>{{ 'requests.total' | translate }} <strong>{{ totalItems() }}</strong> {{ 'requests.items' | translate }}</div>
       <ul class="inline-flex items-center space-x-1">
         <li>
-          <button [disabled]="currentPage() === 1" [class.opacity-50]="currentPage() === 1" class="px-3 py-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer" (click)="setPage(currentPage() - 1)">
+          <app-text-button
+            variant="secondary"
+            size="sm"
+            [disabled]="currentPage() === 1"
+            (btnClick)="setPage(currentPage() - 1)"
+          >
             {{ 'pagination.prev' | translate }}
-          </button>
+          </app-text-button>
         </li>
         @for (p of pageNumbers; track p) {
           <li>
-            <button class="px-3.5 py-2 rounded-lg font-semibold transition-colors cursor-pointer" [class.bg-aquamarine-600]="currentPage() === p" [class.text-white]="currentPage() === p" [class.border]="currentPage() !== p" [class.border-aquamarine-200]="currentPage() !== p" [class.dark:border-aquamarine-800]="currentPage() !== p" [class.bg-white]="currentPage() !== p" [class.dark:bg-aquamarine-900]="currentPage() !== p" [class.text-aquamarine-800]="currentPage() !== p" [class.dark:text-aquamarine-200]="currentPage() !== p" (click)="setPage(p)">
+            <app-text-button
+              [variant]="currentPage() === p ? 'primary' : 'secondary'"
+              size="sm"
+              (btnClick)="setPage(p)"
+            >
               {{ p }}
-            </button>
+            </app-text-button>
           </li>
         }
         <li>
-          <button [disabled]="currentPage() === totalPages()" [class.opacity-50]="currentPage() === totalPages()" class="px-3 py-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer" (click)="setPage(currentPage() + 1)">
+          <app-text-button
+            variant="secondary"
+            size="sm"
+            [disabled]="currentPage() === totalPages()"
+            (btnClick)="setPage(currentPage() + 1)"
+          >
             {{ 'pagination.next' | translate }}
-          </button>
+          </app-text-button>
         </li>
       </ul>
     </div>
@@ -186,13 +214,24 @@
           <textarea class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 p-3 text-sm text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none focus:ring-2 focus:ring-rose-500" id="rejectionReasonInput" name="rejectionReason" [value]="rejectionReason()" (input)="rejectionReason.set($any($event.target).value)" rows="3" [placeholder]="'requests.rejection_placeholder' | translate"></textarea>
         </div>
         <div class="flex justify-end gap-3 pt-2">
-          <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors" (click)="closeRejectModal()">{{ 'modal.cancel' | translate }}</button>
-          <button type="submit" class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-rose-600 hover:bg-rose-700 disabled:opacity-50 transition-colors flex items-center gap-2" [disabled]="isSubmitting()">
-            @if (isSubmitting()) {
-              <i class="bi bi-arrow-repeat animate-spin"></i>
-            }
+          <app-text-button
+            variant="secondary"
+            size="md"
+            (btnClick)="closeRejectModal()"
+          >
+            {{ 'modal.cancel' | translate }}
+          </app-text-button>
+          <app-icon-button
+            icon="bi bi-x-circle-fill"
+            color="red"
+            variant="solid"
+            size="md"
+            type="submit"
+            [loading]="isSubmitting()"
+            [disabled]="isSubmitting()"
+          >
             {{ 'requests.confirm_reject' | translate }}
-          </button>
+          </app-icon-button>
         </div>
       </form>
     </div>

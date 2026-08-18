@@ -84,7 +84,6 @@ export const routes: Routes = [
           { path: 'manage-reports', component: ManageReports },
           { path: 'manage-categories', component: ManageCategories },
           { path: 'manage-comments', component: ManageReports },
-          { path: 'manage-requests', component: ManageRequests },
         ]
       },
 

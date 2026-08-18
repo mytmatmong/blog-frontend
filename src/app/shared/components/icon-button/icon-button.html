@@ -1,0 +1,21 @@
+<button
+  [type]="type()"
+  [disabled]="disabled() || loading()"
+  [class]="buttonClasses()"
+  (click)="handleClick($event)"
+>
+  <!-- Spinner khi đang tải -->
+  @if (loading()) {
+    <i class="bi bi-arrow-repeat animate-spin"></i>
+  } @else if (icon() && iconPosition() === 'left') {
+    <i [class]="icon()"></i>
+  }
+
+  <!-- Nội dung chữ (Text) bên cạnh icon -->
+  <ng-content></ng-content>
+
+  <!-- Icon bên phải (nếu chọn vị trí right) -->
+  @if (!loading() && icon() && iconPosition() === 'right') {
+    <i [class]="icon()"></i>
+  }
+</button>

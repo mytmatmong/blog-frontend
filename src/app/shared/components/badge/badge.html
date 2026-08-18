@@ -1,0 +1,14 @@
+<span [class]="badgeClasses()">
+  <!-- Chấm tròn hiển thị trạng thái (nếu dot=true) -->
+  @if (dot()) {
+    <span [class]="dotClasses()"></span>
+  }
+
+  <!-- Icon đi kèm (nếu truyền) -->
+  @if (icon()) {
+    <i [class]="icon()"></i>
+  }
+
+  <!-- Chữ hiển thị nhãn -->
+  <ng-content></ng-content>
+</span>

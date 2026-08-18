@@ -10,11 +10,21 @@ import { AdminApiService } from '../../../../core/services/admin-api.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { TranslationService } from '../../../../core/services/translation.service';
 import { ConfirmDialog } from '../../../../shared/components/confirm-dialog/confirm-dialog';
+import { BadgeComponent } from '../../../../shared/components/badge/badge';
+import { IconButtonComponent } from '../../../../shared/components/icon-button/icon-button';
+import { TextButtonComponent } from '../../../../shared/components/text-button/text-button';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-manage-languages',
-  imports: [FormsModule, TranslatePipe, ConfirmDialog],
+  imports: [
+    FormsModule,
+    TranslatePipe,
+    ConfirmDialog,
+    BadgeComponent,
+    IconButtonComponent,
+    TextButtonComponent,
+  ],
   templateUrl: './manage-languages.html',
   styleUrl: './manage-languages.css',
 })

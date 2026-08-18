@@ -1,0 +1,11 @@
+<button
+  [type]="type()"
+  [disabled]="disabled() || loading()"
+  [class]="buttonClasses()"
+  (click)="handleClick($event)"
+>
+  @if (loading()) {
+    <i class="bi bi-arrow-repeat animate-spin"></i>
+  }
+  <ng-content></ng-content>
+</button>

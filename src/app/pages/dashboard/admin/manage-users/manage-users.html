@@ -3,12 +3,15 @@
     <h3 class="font-bold text-xl text-aquamarine-950 dark:text-aquamarine-50">
       {{ 'dashboard.users' | translate }}
     </h3>
-    <button
-      class="px-4 py-2.5 rounded-xl font-semibold text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 transition-colors shadow-sm flex items-center gap-2"
-      (click)="openCreateModModal()"
+    <app-icon-button
+      icon="bi bi-person-plus"
+      color="primary"
+      variant="solid"
+      size="md"
+      (btnClick)="openCreateModModal()"
     >
-      <i class="bi bi-person-plus"></i>{{ 'modal.add_mod_title' | translate }}
-    </button>
+      {{ 'modal.add_mod_title' | translate }}
+    </app-icon-button>
   </div>
 
   <!-- Search & Filter Toolbar -->
@@ -77,13 +80,16 @@
 
       <!-- Reset Filters Button -->
       @if (searchQuery() || roleFilter() !== 'ALL' || statusFilter() !== 'ALL') {
-        <button
-          (click)="resetFilters()"
-          class="px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 hover:bg-rose-100 transition-colors flex items-center gap-1 whitespace-nowrap"
+        <app-icon-button
+          icon="bi bi-x-lg"
+          color="red"
+          variant="soft"
+          size="sm"
           [title]="'users.clear_filters' | translate"
+          (btnClick)="resetFilters()"
         >
-          <i class="bi bi-x-lg"></i> {{ 'users.clear_filters' | translate }}
-        </button>
+          {{ 'users.clear_filters' | translate }}
+        </app-icon-button>
       }
     </div>
   </div>
@@ -188,56 +194,69 @@
             </td>
             <td class="p-4 text-center whitespace-nowrap">
               @if (user.status === 'ACTIVE') {
-                <span
-                  class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
-                  >ACTIVE</span
-                >
+                <app-badge color="green" shape="pill" size="sm" dot>ACTIVE</app-badge>
               } @else if (user.status === 'LOCKED') {
-                <span
-                  class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300"
+                <app-badge
+                  color="yellow"
+                  shape="pill"
+                  size="sm"
+                  dot
                   [title]="user.lockReason ? 'Lý do: ' + user.lockReason : 'Đã bị khóa'"
-                  >LOCKED</span
                 >
+                  LOCKED
+                </app-badge>
               }
             </td>
             <td class="p-4 text-center">
               <div class="flex items-center justify-center gap-2">
                 <!-- Edit User (A12) -->
-                <button
-                  (click)="openEditUserModal(user)"
-                  class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 transition-colors flex items-center gap-1"
+                <app-icon-button
+                  icon="bi bi-pencil-square"
+                  color="blue"
+                  variant="soft"
+                  size="sm"
                   [title]="'action.edit_user_title' | translate"
+                  (btnClick)="openEditUserModal(user)"
                 >
-                  <i class="bi bi-pencil-square"></i> {{ 'action.edit' | translate }}
-                </button>
+                  {{ 'action.edit' | translate }}
+                </app-icon-button>
 
                 <!-- Lock / Unlock Action (A13 / A14) -->
                 @if (user.status === 'ACTIVE') {
-                  <button
-                    (click)="openLockModal(user)"
-                    class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 hover:bg-amber-100 transition-colors flex items-center gap-1"
+                  <app-icon-button
+                    icon="bi bi-lock-fill"
+                    color="yellow"
+                    variant="soft"
+                    size="sm"
                     [title]="'action.lock_user_title' | translate"
+                    (btnClick)="openLockModal(user)"
                   >
-                    <i class="bi bi-lock-fill"></i> {{ 'action.lock' | translate }}
-                  </button>
+                    {{ 'action.lock' | translate }}
+                  </app-icon-button>
                 } @else if (user.status === 'LOCKED') {
-                  <button
-                    (click)="unlockUser(user)"
-                    class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 hover:bg-emerald-100 transition-colors flex items-center gap-1"
+                  <app-icon-button
+                    icon="bi bi-unlock-fill"
+                    color="green"
+                    variant="soft"
+                    size="sm"
                     [title]="'action.unlock_user_title' | translate"
+                    (btnClick)="unlockUser(user)"
                   >
-                    <i class="bi bi-unlock-fill"></i> {{ 'action.unlock' | translate }}
-                  </button>
+                    {{ 'action.unlock' | translate }}
+                  </app-icon-button>
                 }
 
                 <!-- Soft Delete Action (A16) -->
-                <button
-                  (click)="softDeleteUser(user)"
-                  class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 hover:bg-rose-100 transition-colors flex items-center gap-1"
+                <app-icon-button
+                  icon="bi bi-trash3-fill"
+                  color="red"
+                  variant="soft"
+                  size="sm"
                   [title]="'action.delete_user_title' | translate"
+                  (btnClick)="softDeleteUser(user)"
                 >
-                  <i class="bi bi-trash3-fill"></i> {{ 'action.delete' | translate }}
-                </button>
+                  {{ 'action.delete' | translate }}
+                </app-icon-button>
               </div>
             </td>
           </tr>
@@ -256,47 +275,39 @@
       </div>
       <ul class="inline-flex flex-wrap items-center justify-end gap-1">
         <li>
-          <button
+          <app-text-button
+            variant="secondary"
+            size="sm"
             [disabled]="currentPage() === 1"
-            [class.opacity-50]="currentPage() === 1"
-            class="px-3 py-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer"
-            (click)="setPage(currentPage() - 1)"
+            (btnClick)="setPage(currentPage() - 1)"
           >
             {{ 'pagination.prev' | translate }}
-          </button>
+          </app-text-button>
         </li>
         @for (p of pageNumbers; track $index) {
           <li>
             @if (p === 'ellipsis') {
             <span class="inline-grid min-w-9 place-items-center px-1 py-2 text-aquamarine-400" aria-hidden="true">…</span>
             } @else {
-            <button
-              class="px-3.5 py-2 rounded-lg font-semibold transition-colors cursor-pointer"
-              [class.bg-aquamarine-600]="currentPage() === p"
-              [class.text-white]="currentPage() === p"
-              [class.border]="currentPage() !== p"
-              [class.border-aquamarine-200]="currentPage() !== p"
-              [class.dark:border-aquamarine-800]="currentPage() !== p"
-              [class.bg-white]="currentPage() !== p"
-              [class.dark:bg-aquamarine-900]="currentPage() !== p"
-              [class.text-aquamarine-800]="currentPage() !== p"
-              [class.dark:text-aquamarine-200]="currentPage() !== p"
-              (click)="setPage(p)"
+            <app-text-button
+              [variant]="currentPage() === p ? 'primary' : 'secondary'"
+              size="sm"
+              (btnClick)="setPage(p)"
             >
               {{ p }}
-            </button>
+            </app-text-button>
             }
           </li>
         }
         <li>
-          <button
+          <app-text-button
+            variant="secondary"
+            size="sm"
             [disabled]="currentPage() === totalPages()"
-            [class.opacity-50]="currentPage() === totalPages()"
-            class="px-3 py-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer"
-            (click)="setPage(currentPage() + 1)"
+            (btnClick)="setPage(currentPage() + 1)"
           >
             {{ 'pagination.next' | translate }}
-          </button>
+          </app-text-button>
         </li>
       </ul>
     </div>
@@ -386,25 +397,24 @@
           ></textarea>
         </div>
         <div class="flex justify-end gap-3 pt-2">
-          <button
-            type="button"
-            class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors"
-            (click)="closeCreateModModal()"
+          <app-text-button
+            variant="secondary"
+            size="md"
+            (btnClick)="closeCreateModModal()"
           >
             {{ 'modal.cancel' | translate }}
-          </button>
-          <button
+          </app-text-button>
+          <app-text-button
+            variant="primary"
+            size="md"
             type="submit"
-            class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-aquamarine-600 hover:bg-aquamarine-700 disabled:opacity-50 transition-colors flex items-center gap-2"
+            [loading]="isSubmittingMod()"
             [disabled]="
               !modUsername.trim() || !modEmail.trim() || !modPassword.trim() || isSubmittingMod()
             "
           >
-            @if (isSubmittingMod()) {
-              <i class="bi bi-arrow-repeat animate-spin"></i>
-            }
             {{ 'modal.save' | translate }}
-          </button>
+          </app-text-button>
         </div>
       </form>
     </div>
@@ -475,13 +485,13 @@
             </div>
             <div>
               <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">Trạng thái</p>
-              <p class="font-bold">
+              <div class="mt-1">
                 @if (activeUserDetail()?.status === 'ACTIVE') {
-                  <span class="text-emerald-600 dark:text-emerald-400">ACTIVE</span>
+                  <app-badge color="green" shape="pill" size="sm" dot>ACTIVE</app-badge>
                 } @else {
-                  <span class="text-amber-600 dark:text-amber-400">LOCKED</span>
+                  <app-badge color="yellow" shape="pill" size="sm" dot>LOCKED</app-badge>
                 }
-              </p>
+              </div>
             </div>
             <div>
               <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">Ngày tham gia</p>
@@ -533,15 +543,13 @@
                       >
                         {{ post.title }}
                       </h6>
-                      <span
-                        class="px-2 py-0.5 rounded text-[10px] font-bold uppercase shrink-0"
-                        [class.bg-emerald-100]="post.status === 'PUBLISHED'"
-                        [class.text-emerald-700]="post.status === 'PUBLISHED'"
-                        [class.bg-amber-100]="post.status === 'PENDING'"
-                        [class.text-amber-700]="post.status === 'PENDING'"
-                      >
-                        {{ post.status }}
-                      </span>
+                      @if (post.status === 'PUBLISHED') {
+                        <app-badge color="green" shape="rounded" size="sm">PUBLISHED</app-badge>
+                      } @else if (post.status === 'PENDING') {
+                        <app-badge color="yellow" shape="rounded" size="sm">{{ post.status }}</app-badge>
+                      } @else {
+                        <app-badge color="gray" shape="rounded" size="sm">{{ post.status }}</app-badge>
+                      }
                     </div>
                     <div
                       class="flex items-center gap-4 text-xs text-aquamarine-600 dark:text-aquamarine-400"
@@ -559,13 +567,13 @@
         }
       </div>
       <div class="p-4 border-t border-aquamarine-200 dark:border-aquamarine-800 flex justify-end">
-        <button
-          type="button"
-          class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors"
-          (click)="closePreviewUserModal()"
+        <app-text-button
+          variant="secondary"
+          size="md"
+          (btnClick)="closePreviewUserModal()"
         >
           {{ 'modal.close' | translate }}
-        </button>
+        </app-text-button>
       </div>
     </div>
   </div>
@@ -653,23 +661,22 @@
           />
         </div>
         <div class="flex justify-end gap-3 pt-2">
-          <button
-            type="button"
-            class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors"
-            (click)="closeEditUserModal()"
+          <app-text-button
+            variant="secondary"
+            size="md"
+            (btnClick)="closeEditUserModal()"
           >
             {{ 'modal.cancel' | translate }}
-          </button>
-          <button
+          </app-text-button>
+          <app-text-button
+            variant="primary"
+            size="md"
             type="submit"
-            class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-aquamarine-600 hover:bg-aquamarine-700 disabled:opacity-50 transition-colors flex items-center gap-2"
+            [loading]="isSubmittingEdit()"
             [disabled]="isSubmittingEdit()"
           >
-            @if (isSubmittingEdit()) {
-              <i class="bi bi-arrow-repeat animate-spin"></i>
-            }
             {{ 'common.save' | translate }}
-          </button>
+          </app-text-button>
         </div>
       </form>
     </div>
@@ -719,23 +726,24 @@
           ></textarea>
         </div>
         <div class="flex justify-end gap-3 pt-2">
-          <button
-            type="button"
-            class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors"
-            (click)="closeLockModal()"
+          <app-text-button
+            variant="secondary"
+            size="md"
+            (btnClick)="closeLockModal()"
           >
             {{ 'modal.cancel' | translate }}
-          </button>
-          <button
+          </app-text-button>
+          <app-icon-button
+            icon="bi bi-lock-fill"
+            color="yellow"
+            variant="solid"
+            size="md"
             type="submit"
-            class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-amber-600 hover:bg-amber-700 disabled:opacity-50 transition-colors flex items-center gap-2"
+            [loading]="isSubmittingLock()"
             [disabled]="!lockReason().trim() || isSubmittingLock()"
           >
-            @if (isSubmittingLock()) {
-              <i class="bi bi-arrow-repeat animate-spin"></i>
-            }
             {{ 'users.confirm_lock' | translate }}
-          </button>
+          </app-icon-button>
         </div>
       </form>
     </div>
@@ -779,23 +787,22 @@
           </select>
         </div>
         <div class="flex justify-end gap-3 pt-2">
-          <button
-            type="button"
-            class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors"
-            (click)="closeRoleModal()"
+          <app-text-button
+            variant="secondary"
+            size="md"
+            (btnClick)="closeRoleModal()"
           >
             {{ 'modal.cancel' | translate }}
-          </button>
-          <button
+          </app-text-button>
+          <app-text-button
+            variant="primary"
+            size="md"
             type="submit"
-            class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-aquamarine-600 hover:bg-aquamarine-700 disabled:opacity-50 transition-colors flex items-center gap-2"
+            [loading]="isSubmittingRole()"
             [disabled]="isSubmittingRole()"
           >
-            @if (isSubmittingRole()) {
-              <i class="bi bi-arrow-repeat animate-spin"></i>
-            }
             Cập nhật vai trò
-          </button>
+          </app-text-button>
         </div>
       </form>
     </div>

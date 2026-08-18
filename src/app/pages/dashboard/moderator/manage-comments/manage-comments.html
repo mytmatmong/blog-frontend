@@ -171,14 +171,14 @@
               <!-- Reporter -->
               <td class="p-4 text-aquamarine-800 dark:text-aquamarine-200">
                 <div class="flex items-center gap-2">
-                  @if (report.reporter?.avatarUrl) {
+                  @if (report.reporter.avatarUrl) {
                     <img [src]="report.reporter.avatarUrl" [alt]="report.reporter.username" class="w-6 h-6 rounded-full object-cover" />
                   } @else {
                     <div class="w-6 h-6 rounded-full bg-aquamarine-100 dark:bg-aquamarine-800 text-aquamarine-700 dark:text-aquamarine-300 text-xs font-bold flex items-center justify-center">
-                      {{ report.reporter?.username?.charAt(0)?.toUpperCase() || 'U' }}
+                      {{ report.reporter.username.charAt(0).toUpperCase() || 'U' }}
                     </div>
                   }
-                  <span class="font-medium text-xs">{{ report.reporter?.username || 'User #' + report.reporterId }}</span>
+                  <span class="font-medium text-xs">{{ report.reporter.username || 'User #' + report.reporterId }}</span>
                 </div>
               </td>
 
@@ -188,12 +188,12 @@
                   <div class="line-clamp-2 font-semibold text-xs text-aquamarine-900 dark:text-aquamarine-100">
                     {{ report.post.title }}
                   </div>
-                  <div class="text-[11px] text-aquamarine-500 mt-0.5">Tác giả: {{ report.post.author?.username }}</div>
+                  <div class="text-[11px] text-aquamarine-500 mt-0.5">Tác giả: {{ report.post.author.username }}</div>
                 } @else if (report.targetType === 'COMMENT' && report.comment) {
                   <div class="line-clamp-2 italic text-xs text-amber-900 dark:text-amber-200 bg-amber-50/50 dark:bg-amber-950/30 p-1.5 rounded border border-amber-200 dark:border-amber-900/50">
                     "{{ report.comment.content }}"
                   </div>
-                  <div class="text-[11px] text-aquamarine-500 mt-0.5">Viết bởi: {{ report.comment.user?.username }}</div>
+                  <div class="text-[11px] text-aquamarine-500 mt-0.5">Viết bởi: {{ report.comment.user.username }}</div>
                 } @else {
                   <span class="text-xs text-aquamarine-400 italic">Dữ liệu đối tượng đã bị gỡ</span>
                 }
@@ -363,7 +363,7 @@
           }
 
           <div class="text-[11px] text-amber-800 dark:text-amber-300 pl-7 flex flex-wrap gap-4 pt-1 border-t border-amber-200/50 dark:border-amber-800/50">
-            <span>Người báo cáo: <strong>{{ report.reporter?.username }}</strong> (#{{ report.reporterId }})</span>
+            <span>Người báo cáo: <strong>{{ report.reporter.username }}</strong> (#{{ report.reporterId }})</span>
             <span>Thời gian: {{ report.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
             @if (report.reviewedBy) {
               <span>Người duyệt: <strong>{{ report.reviewedBy.username }}</strong></span>
@@ -389,7 +389,7 @@
             <div class="p-4 rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/30 dark:bg-aquamarine-950/30 space-y-2">
               <h3 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">{{ report.post.title }}</h3>
               <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400">
-                Tác giả: <strong>{{ report.post.author?.username }}</strong> | Tạo ngày: {{ report.post.createdAt | date: 'dd/MM/yyyy HH:mm' }}
+                Tác giả: <strong>{{ report.post.author.username }}</strong> | Tạo ngày: {{ report.post.createdAt | date: 'dd/MM/yyyy HH:mm' }}
               </div>
               <div class="prose dark:prose-invert max-w-none text-xs text-aquamarine-800 dark:text-aquamarine-200 pt-2 border-t border-aquamarine-100 dark:border-aquamarine-800" [innerHTML]="report.post.content"></div>
             </div>
@@ -404,7 +404,7 @@
                 "{{ report.comment.content }}"
               </div>
               <div class="text-xs text-purple-700 dark:text-purple-300 flex items-center gap-2">
-                <span>Người viết bình luận: <strong>{{ report.comment.user?.username }}</strong></span>
+                <span>Người viết bình luận: <strong>{{ report.comment.user.username }}</strong></span>
                 <span>•</span>
                 <span>Tạo lúc: {{ report.comment.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
               </div>
@@ -416,7 +416,7 @@
                     Bình luận cha (Reply context):
                   </span>
                   <p class="italic text-aquamarine-900 dark:text-aquamarine-100">"{{ report.comment.parent.content }}"</p>
-                  <span class="text-[10px] text-aquamarine-500 mt-1 block">Bởi {{ report.comment.parent.user?.username }}</span>
+                  <span class="text-[10px] text-aquamarine-500 mt-1 block">Bởi {{ report.comment.parent.user.username }}</span>
                 </div>
               }
 
@@ -425,7 +425,7 @@
                 <div class="pt-2 border-t border-purple-100 dark:border-purple-900 text-xs">
                   <span class="font-semibold text-aquamarine-700 dark:text-aquamarine-300">Ngữ cảnh bài viết chứa bình luận:</span>
                   <h4 class="font-bold text-aquamarine-950 dark:text-aquamarine-50 mt-1">{{ report.comment.post.title }}</h4>
-                  <span class="text-aquamarine-500">Tác giả bài: {{ report.comment.post.author?.username }}</span>
+                  <span class="text-aquamarine-500">Tác giả bài: {{ report.comment.post.author.username }}</span>
                 </div>
               }
             </div>
