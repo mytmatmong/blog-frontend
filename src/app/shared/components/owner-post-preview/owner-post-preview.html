@@ -209,11 +209,11 @@
                 @if (post.media.length) {
                 <div class="post-preview-media">
                     @for (item of post.media; track item.id) {
-                        @if (item.mediaType === 'IMAGE') {
-                        <img [src]="item.mediaUrl" [alt]="post.title">
-                        } @else if (item.mediaType === 'VIDEO') {
-                        <video [src]="item.mediaUrl" controls></video>
-                        }
+                    @if (item.mediaType === 'IMAGE') {
+                    <img [src]="item.mediaUrl" [alt]="post.title">
+                    } @else if (item.mediaType === 'VIDEO') {
+                    <video [src]="item.mediaUrl" controls></video>
+                    }
                     }
                 </div>
                 }
@@ -221,30 +221,20 @@
         </div>
 
         <!-- FOOTER -->
-        <footer
-            class="post-preview-footer"
-            [class.post-preview-footer--moderation]="showModerationActions"
-        >
+        <footer class="post-preview-footer" [class.post-preview-footer--moderation]="showModerationActions">
             @if (
-                showModerationActions &&
-                post.status === 'PENDING_REVIEW'
+            showModerationActions &&
+            post.status === 'PENDING_REVIEW'
             ) {
-            <button
-                type="button"
-                class="post-preview-action post-preview-action--approve"
-                [disabled]="moderationBusy"
-                (click)="approveRequested.emit(post)"
-            >
-                <i class="bi" [class.bi-arrow-repeat]="moderationBusy" [class.post-preview-spin]="moderationBusy" [class.bi-check-circle]="!moderationBusy"></i>
+            <button type="button" class="post-preview-action post-preview-action--approve" [disabled]="moderationBusy"
+                (click)="approveRequested.emit(post)">
+                <i class="bi" [class.bi-arrow-repeat]="moderationBusy" [class.post-preview-spin]="moderationBusy"
+                    [class.bi-check-circle]="!moderationBusy"></i>
                 {{ 'requests.approve' | translate }}
             </button>
 
-            <button
-                type="button"
-                class="post-preview-action post-preview-action--reject"
-                [disabled]="moderationBusy"
-                (click)="rejectRequested.emit(post)"
-            >
+            <button type="button" class="post-preview-action post-preview-action--reject" [disabled]="moderationBusy"
+                (click)="rejectRequested.emit(post)">
                 <i class="bi bi-x-circle"></i>
                 {{ 'requests.reject' | translate }}
             </button>
@@ -264,7 +254,7 @@
     post-preview-action--primary
   " [routerLink]="[
     editRoute,
-    post.id
+    rootPostId() ?? post.id
   ]" (click)="close()">
                 <i class="bi bi-pencil-square"></i>
                 {{ 'comments.edit' | translate }}

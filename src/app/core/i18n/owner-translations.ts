@@ -98,6 +98,10 @@ export const OWNER_TRANSLATIONS_VI: Record<string, string> = {
   'post_form.update_submit_btn': 'Cập nhật và nộp duyệt',
   'post_form.update_submit_success': 'Đã cập nhật và nộp bài viết để duyệt.',
   'post_form.updated_post': 'Đã cập nhật bài viết',
+  'post_form.group_saved': 'Bài gốc và tất cả bản dịch đã được lưu nháp cùng nhau.',
+  'post_form.group_submitted': 'Bài gốc và tất cả bản dịch đã được nộp duyệt cùng nhau.',
+  'post_form.translation_submitted': 'Bản dịch đã được gửi duyệt cùng bài gốc.',
+  'post_form.update_success': 'Đã cập nhật bài gốc và đồng bộ các bản dịch ở trạng thái DRAFT.',
 };
 
 export const OWNER_TRANSLATIONS_EN: Record<string, string> = {
@@ -200,4 +204,8 @@ export const OWNER_TRANSLATIONS_EN: Record<string, string> = {
   'post_form.update_submit_btn': 'Update and submit',
   'post_form.update_submit_success': 'The article was updated and submitted for review.',
   'post_form.updated_post': 'Updated article',
+  'post_form.group_saved': 'The original post and all translations were saved as drafts together.',
+  'post_form.group_submitted': 'The original post and all translations were submitted for review together.',
+  'post_form.translation_submitted': 'The translation was submitted together with the original post.',
+  'post_form.update_success': 'The original post and all translations were updated as DRAFT.',
 };

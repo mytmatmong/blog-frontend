@@ -86,7 +86,11 @@ export class EditPost
    * tiếp tục chỉnh sửa bài.
    */
   override formLocked(): boolean {
-    return this.isSubmitting();
+    return (
+      this.isSubmitting() ||
+      this.editingPost()?.status ===
+        'PENDING_REVIEW'
+    );
   }
 
   /*
@@ -108,8 +112,13 @@ export class EditPost
    * Backend chỉ cho bài DRAFT nộp duyệt.
    */
   override showSubmitForReviewAction(): boolean {
+    const post =
+      this.editingPost();
+
     return (
-      this.editingPost()?.status === 'DRAFT'
+      post !== null &&
+      post.status !==
+        'PENDING_REVIEW'
     );
   }
 
@@ -146,14 +155,16 @@ export class EditPost
     submitForReview: boolean,
   ): Promise<void> {
     if (
-      this.isSubmitting() ||
+      this.formLocked() ||
       this.editingPostId === null
     ) {
       return;
     }
 
     const updateRequest =
-      this.buildUpdateRequest();
+      this.buildUpdateRequest(
+        submitForReview,
+      );
 
     if (!updateRequest) {
       return;
@@ -163,7 +174,11 @@ export class EditPost
     this.translationResults.set([]);
 
     try {
-      /* Không có ảnh mới thì gửi JSON, có ảnh mới thì gửi multipart. */
+      /**
+       * Flow mới: chỉ MỘT request update.
+       * Backend cập nhật root, tự dịch lại translations,
+       * tạo translation mới (nếu có) và set status cả group.
+       */
       const updateResponse =
         await firstValueFrom(
           this.api.updatePost(
@@ -172,88 +187,48 @@ export class EditPost
           ),
         );
 
-      let updatedPost =
+      const updatedPost =
         updateResponse.data;
 
-      /*
-       * Chỉ tạo thêm những bản dịch chưa tồn tại.
-       */
-      const existingLanguageIds =
-        new Set(
-          this.existingTranslationLanguageIds(),
-        );
+      this.editingPost.set(
+        updatedPost,
+      );
+      this.createdPost.set(
+        updatedPost,
+      );
 
-      const newTargetLanguageIds =
-        this
-          .selectedTranslationLanguageIds()
-          .map(Number)
+      /**
+       * Đồng bộ lại danh sách translation đã tồn tại từ
+       * response backend để các checkbox tiếp tục bị khóa
+       * không cho bỏ ở những lần sửa tiếp theo.
+       */
+      const translationLanguageIds =
+        (updatedPost.translations ?? [])
+          .map(
+            (translation) =>
+              Number(
+                translation.languageId,
+              ),
+          )
           .filter(
             (languageId) =>
               Number.isInteger(languageId) &&
               languageId > 0 &&
               languageId !==
-              updatedPost.languageId &&
-              !existingLanguageIds.has(
-                languageId,
-              ),
+                updatedPost.languageId,
           );
 
-      const translationResults =
-        await this.createTranslationDrafts(
-          updatedPost.id,
-          Array.from(
-            new Set(newTargetLanguageIds),
+      this.existingTranslationLanguageIds.set(
+        Array.from(
+          new Set(
+            translationLanguageIds,
           ),
-        );
-
-      this.translationResults.set(
-        translationResults,
+        ),
       );
 
-      const successfulLanguageIds =
-        translationResults
-          .filter(
-            (result) => result.success,
-          )
-          .map(
-            (result) =>
-              result.languageId,
-          );
-
-      if (
-        successfulLanguageIds.length > 0
-      ) {
-        this.existingTranslationLanguageIds.update(
-          (current) =>
-            Array.from(
-              new Set([
-                ...current,
-                ...successfulLanguageIds,
-              ]),
-            ),
-        );
-      }
-
-      /*
-       * Cập nhật xong mới nộp duyệt.
-       */
-      if (
-        submitForReview &&
-        updatedPost.status === 'DRAFT'
-      ) {
-        const submitResponse =
-          await firstValueFrom(
-            this.api.submitPost(
-              updatedPost.id,
-            ),
-          );
-
-        updatedPost =
-          submitResponse.data;
-      }
-
-      this.editingPost.set(updatedPost);
-      this.createdPost.set(updatedPost);
+      this.selectedTranslationLanguageIds.set(
+        this.existingTranslationLanguageIds(),
+      );
 
       this.existingThumbnailUrl.set(
         updatedPost.thumbnailUrl,
@@ -261,25 +236,37 @@ export class EditPost
       this.thumbnailFile.set(null);
       this.thumbnailPreviewUrl.set(null);
 
-      const failedTranslations =
-        translationResults.filter(
-          (result) =>
-            !result.success,
-        ).length;
-
-      if (failedTranslations > 0) {
-        this.toast.warning(
-          this.tr(
-            'post_form.update_partial_success',
+      const translationPostIdByLanguageId =
+        new Map<number, number>(
+          (updatedPost.translations ?? []).map(
+            (translation): [number, number] => [
+              translation.languageId,
+              translation.id,
+            ],
           ),
-          this.tr(
-            'post_form.partial_complete',
-          ),
-          6000,
         );
 
-        return;
-      }
+      this.translationResults.set(
+        this
+          .existingTranslationLanguageIds()
+          .map(
+            (languageId) => ({
+              languageId,
+              postId:
+                translationPostIdByLanguageId.get(
+                  languageId,
+                ),
+              success: true,
+              message: submitForReview
+                ? this.tr(
+                  'post_form.translation_submitted',
+                )
+                : this.tr(
+                  'post_form.translation_draft_created',
+                ),
+            }),
+          ),
+      );
 
       this.toast.success(
         submitForReview
@@ -307,7 +294,9 @@ export class EditPost
     }
   }
 
-  private buildUpdateRequest():
+  private buildUpdateRequest(
+    submitForReview: boolean,
+  ):
     | UpdateBlogOwnerPostRequest
     | FormData
     | null {
@@ -376,6 +365,22 @@ export class EditPost
       Array.from(
         tagMap.values(),
       ).slice(0, 5);
+
+    const translationLanguageIds =
+      Array.from(
+        new Set<number>(
+          this
+            .selectedTranslationLanguageIds()
+            .map(Number)
+            .filter(
+              (languageId) =>
+                Number.isInteger(languageId) &&
+                languageId > 0 &&
+                languageId !==
+                  this.originalLanguageId(),
+            ),
+        ),
+      );
 
     if (!title) {
       this.toast.error(
@@ -449,6 +454,9 @@ export class EditPost
           tagNames,
         }
         : {}),
+
+      translationLanguageIds,
+      submitForReview,
     };
 
     const thumbnail =
@@ -477,6 +485,21 @@ export class EditPost
         );
       }
     }
+
+    for (
+      const languageId of
+      translationLanguageIds
+    ) {
+      formData.append(
+        'translationLanguageIds',
+        String(languageId),
+      );
+    }
+
+    formData.append(
+      'submitForReview',
+      String(submitForReview),
+    );
 
     formData.append('thumbnail', thumbnail);
 
@@ -533,7 +556,6 @@ export class EditPost
       return;
     }
 
-    this.editingPostId = postId;
     this.isLoadingOptions.set(true);
 
     try {
@@ -556,8 +578,35 @@ export class EditPost
       const options: BlogOwnerOptions =
         optionsResponse.data;
 
-      const post =
+      let post =
         postResponse.data;
+
+      /**
+       * Nếu người dùng đi vào bằng URL cũ chứa translationId,
+       * luôn resolve lại về ROOT trước khi cho sửa.
+       */
+      if (post.parentPostId !== null) {
+        const rootResponse =
+          await firstValueFrom(
+            this.api.getPost(
+              post.parentPostId,
+            ),
+          );
+
+        post = rootResponse.data;
+
+        await this.router.navigate(
+          [
+            '/dashboard/owner/edit-post',
+            post.id,
+          ],
+          {
+            replaceUrl: true,
+          },
+        );
+      }
+
+      this.editingPostId = post.id;
 
       this.options.set(options);
       this.editingPost.set(post);
