@@ -88,6 +88,20 @@ export interface BlogOwnerPost {
   translations?: BlogOwnerTranslationSummary[];
 }
 
+/**
+ * The owner posts endpoint paginates multilingual post groups, not individual
+ * posts. Actions in the owner table still target the root post.
+ */
+export interface BlogOwnerPostGroup {
+  root: BlogOwnerPost;
+  translations: BlogOwnerPost[];
+  totals: {
+    views: number;
+    likes: number;
+  };
+  latestUpdatedAt: string;
+}
+
 export interface BlogOwnerPostsQuery {
   search?: string;
   categoryId?: number;
@@ -100,7 +114,7 @@ export interface BlogOwnerPostsQuery {
   limit?: number;
 }
 
-export type BlogOwnerPostsPage = PaginatedResponse<BlogOwnerPost>;
+export type BlogOwnerPostsPage = PaginatedResponse<BlogOwnerPostGroup>;
 
 export interface BlogOwnerDashboardPost {
   id: number;

@@ -18,6 +18,7 @@ import {
 
 import {
   BlogOwnerPost,
+  BlogOwnerPostGroup,
 } from '../../../../core/models/blog-owner.model';
 import {
   PostStatus,
@@ -158,23 +159,16 @@ export class Posts implements OnInit {
       status || undefined,
     )
       .pipe(
-        /*
-         * Chỉ giữ bài viết gốc.
-         *
-         * Bài gốc:
-         * parentPostId === null
-         *
-         * Bản dịch:
-         * parentPostId !== null
-         */
-        map((allPosts) =>
-          allPosts.filter(
-            (post) =>
-              post.parentPostId === null,
-          ),
-        ),
+        switchMap((postGroups) => {
+          /*
+           * API phân trang theo nhóm đa ngôn ngữ. Bảng quản lý thao tác trên
+           * bài gốc, đồng thời hiển thị tổng view/like của cả nhóm.
+           */
+          const rootPosts =
+            postGroups.map((group) =>
+              this.toListPost(group),
+            );
 
-        switchMap((rootPosts) => {
           const rootTotalItems =
             rootPosts.length;
 
@@ -240,8 +234,17 @@ export class Posts implements OnInit {
                 .getPost(post.id)
                 .pipe(
                   map(
-                    (response) =>
-                      response.data,
+                    (response) => ({
+                      ...response.data,
+
+                      // Giữ thống kê nhóm lấy từ API danh sách.
+                      viewCount:
+                        post.viewCount,
+                      likeCount:
+                        post.likeCount,
+                      updatedAt:
+                        post.updatedAt,
+                    }),
                   ),
 
                   /*
@@ -684,7 +687,7 @@ export class Posts implements OnInit {
   private fetchAllOwnerPosts(
     search?: string,
     status?: PostStatus,
-  ): Observable<BlogOwnerPost[]> {
+  ): Observable<BlogOwnerPostGroup[]> {
     const baseQuery = {
       limit: this.postsFetchLimit,
       search,
@@ -751,5 +754,16 @@ export class Posts implements OnInit {
           },
         ),
       );
+  }
+
+  private toListPost(
+    group: BlogOwnerPostGroup,
+  ): BlogOwnerPost {
+    return {
+      ...group.root,
+      viewCount: group.totals.views,
+      likeCount: group.totals.likes,
+      updatedAt: group.latestUpdatedAt,
+    };
   }
 }
