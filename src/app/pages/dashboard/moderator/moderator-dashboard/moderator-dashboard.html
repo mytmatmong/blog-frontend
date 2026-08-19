@@ -60,9 +60,6 @@
           <span class="text-xs font-semibold uppercase tracking-wider text-aquamarine-600 dark:text-aquamarine-400">
             {{ 'dashboard.pending_blogs' | translate }}
           </span>
-          <div class="w-9 h-9 rounded-xl bg-aquamarine-100 dark:bg-aquamarine-800 text-aquamarine-600 dark:text-aquamarine-300 flex items-center justify-center">
-            <i class="bi bi-journal-text text-lg"></i>
-          </div>
         </div>
         <div class="mt-3">
           <h3 class="font-bold text-3xl text-aquamarine-600 dark:text-aquamarine-400">
@@ -78,9 +75,6 @@
           <span class="text-xs font-semibold uppercase tracking-wider text-aquamarine-600 dark:text-aquamarine-400">
             Báo cáo chờ xử lý
           </span>
-          <div class="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-            <i class="bi bi-flag text-lg"></i>
-          </div>
         </div>
         <div class="mt-3">
           <h3 class="font-bold text-3xl text-amber-500">
@@ -98,9 +92,6 @@
           <span class="text-xs font-semibold uppercase tracking-wider text-aquamarine-600 dark:text-aquamarine-400">
             Đã xử lý hôm nay
           </span>
-          <div class="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-            <i class="bi bi-check-circle text-lg"></i>
-          </div>
         </div>
         <div class="mt-3">
           <h3 class="font-bold text-3xl text-emerald-500">
@@ -118,9 +109,6 @@
           <span class="text-xs font-semibold uppercase tracking-wider text-aquamarine-600 dark:text-aquamarine-400">
             {{ 'dashboard.categories' | translate }}
           </span>
-          <div class="w-9 h-9 rounded-xl bg-purple-100 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center">
-            <i class="bi bi-folder-check text-lg"></i>
-          </div>
         </div>
         <div class="mt-3">
           <h3 class="font-bold text-3xl text-aquamarine-950 dark:text-aquamarine-50">
@@ -132,56 +120,56 @@
     </div>
 
     <!-- Charts & Quick Actions -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div class="moderator-insights-grid">
       <!-- Stacked Bar Chart: Báo cáo vi phạm 7 ngày qua -->
-      <div class="lg:col-span-8">
-        <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm h-full flex flex-col justify-between">
-          <div class="flex items-center justify-between mb-4">
-            <h6 class="font-bold text-base text-aquamarine-950 dark:text-aquamarine-50">
+      <div class="moderator-trend-column">
+        <div class="moderator-dashboard-card moderator-dashboard-card--trend">
+          <div class="moderator-card-heading">
+            <h6 class="moderator-card-title">
               {{ 'dashboard.violation_reports_chart' | translate }}
             </h6>
-            <span class="text-xs px-2.5 py-1 rounded-full bg-aquamarine-100 dark:bg-aquamarine-800 text-aquamarine-700 dark:text-aquamarine-300 font-medium">
+            <span class="moderator-period-chip">
               7 ngày qua
             </span>
           </div>
-          <div class="h-64 relative">
+          <div class="moderator-chart-frame moderator-chart-frame--bar">
             <canvas id="reportsChart"></canvas>
           </div>
         </div>
       </div>
 
       <!-- Quick Actions -->
-      <div class="lg:col-span-4">
-        <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm h-full flex flex-col justify-between">
-          <h6 class="font-bold text-base text-aquamarine-950 dark:text-aquamarine-50 mb-4">
+      <div class="moderator-actions-column">
+        <div class="moderator-dashboard-card moderator-dashboard-card--actions">
+          <h6 class="moderator-card-title">
             {{ 'dashboard.quick_actions' | translate }}
           </h6>
-          <div class="flex flex-col gap-3">
-            <a routerLink="/dashboard/moderator/manage-blogs" class="flex items-center justify-between px-4 py-2.5 rounded-xl font-medium text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 transition-colors">
+          <div class="moderator-quick-actions">
+            <a routerLink="/dashboard/moderator/manage-blogs" class="moderator-quick-action moderator-quick-action--primary">
               <span class="flex items-center gap-2">
                 <i class="bi bi-journal-check"></i> Duyệt bài viết
               </span>
-              <span class="px-2 py-0.5 rounded-full text-xs bg-white/20 font-bold">
+              <span class="moderator-action-count">
                 {{ data.overview.pendingPosts }}
               </span>
             </a>
-            <a routerLink="/dashboard/moderator/manage-reports" class="flex items-center justify-between px-4 py-2.5 rounded-xl font-medium text-sm text-white bg-aquamarine-600 hover:bg-aquamarine-700 transition-colors">
+            <a routerLink="/dashboard/moderator/manage-reports" class="moderator-quick-action moderator-quick-action--primary">
               <span class="flex items-center gap-2">
                 <i class="bi bi-shield-exclamation"></i> Xử lý báo cáo
               </span>
-              <span class="px-2 py-0.5 rounded-full text-xs bg-white/20 font-bold">
+              <span class="moderator-action-count">
                 {{ data.overview.pendingReports }}
               </span>
             </a>
-            <a routerLink="/dashboard/moderator/manage-categories" class="flex items-center justify-between px-4 py-2.5 rounded-xl font-medium text-sm text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors">
+            <a routerLink="/dashboard/moderator/manage-categories" class="moderator-quick-action moderator-quick-action--secondary">
               <span class="flex items-center gap-2">
                 <i class="bi bi-folder-plus"></i> Quản lý Category
               </span>
-              <span class="px-2 py-0.5 rounded-full text-xs bg-aquamarine-100 dark:bg-aquamarine-800 font-bold">
+              <span class="moderator-action-count">
                 {{ data.overview.activeCategoryGroups }}
               </span>
             </a>
-            <a routerLink="/dashboard/moderator/manage-requests" class="flex items-center justify-between px-4 py-2.5 rounded-xl font-medium text-sm text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors">
+            <a routerLink="/dashboard/moderator/manage-requests" class="moderator-quick-action moderator-quick-action--secondary">
               <span class="flex items-center gap-2">
                 <i class="bi bi-person-check"></i> Duyệt yêu cầu tác giả
               </span>
@@ -193,29 +181,25 @@
     </div>
 
     <!-- Additional Charts Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div class="moderator-pie-grid">
       <!-- Report Reason Doughnut Chart -->
-      <div class="lg:col-span-6">
-        <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-          <h6 class="font-bold text-base text-aquamarine-950 dark:text-aquamarine-50 mb-4">
+      <div class="moderator-dashboard-card moderator-dashboard-card--pie">
+          <h6 class="moderator-card-title">
             Thống kê lý do báo cáo
           </h6>
-          <div class="h-64 relative">
+          <div class="moderator-chart-frame moderator-chart-frame--pie">
             <canvas id="moderationPieChart"></canvas>
           </div>
-        </div>
       </div>
 
       <!-- Report Status Pie Chart -->
-      <div class="lg:col-span-6">
-        <div class="p-5 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-          <h6 class="font-bold text-base text-aquamarine-950 dark:text-aquamarine-50 mb-4">
+      <div class="moderator-dashboard-card moderator-dashboard-card--pie">
+          <h6 class="moderator-card-title">
             Thống kê trạng thái báo cáo
           </h6>
-          <div class="h-64 relative">
+          <div class="moderator-chart-frame moderator-chart-frame--pie">
             <canvas id="statusPieChart"></canvas>
           </div>
-        </div>
       </div>
     </div>
   }

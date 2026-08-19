@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { TranslationService, SupportedLang } from '../../../core/services/translation.service';
@@ -16,6 +16,16 @@ export class DashboardHeader implements OnInit {
   private router = inject(Router);
 
   isLangDropdownOpen = signal<boolean>(false);
+
+  readonly userInitial = computed(() => {
+    const user = this.auth.currentUser();
+    const label =
+      user?.username?.trim() ||
+      user?.email?.trim() ||
+      '';
+
+    return Array.from(label)[0]?.toLocaleUpperCase() ?? '?';
+  });
 
   ngOnInit(): void {
     this.translationService.loadLanguages();

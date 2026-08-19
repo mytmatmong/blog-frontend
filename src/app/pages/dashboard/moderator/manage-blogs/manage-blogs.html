@@ -136,7 +136,7 @@
             <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">ID & Tiêu đề</th>
             <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">Tác giả</th>
             <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">Ngôn ngữ / Danh mục</th>
-            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">Trạng thái</th>
+            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center moderator-status-column">Trạng thái</th>
             <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">Thao tác</th>
           </tr>
         </thead>
@@ -196,49 +196,52 @@
               </td>
 
               <!-- Status -->
-              <td class="p-4 text-center">
+              <td class="p-4 text-center moderator-status-column">
                 @if (blog.status === 'PENDING_REVIEW') {
-                  <span class="inline-block px-2.5 py-1 text-xs font-semibold rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
+                  <span class="moderator-status-badge bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
                     Chờ duyệt
                   </span>
                 } @else if (blog.status === 'PUBLISH') {
-                  <span class="inline-block px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                  <span class="moderator-status-badge bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
                     Đã xuất bản
                   </span>
                 } @else if (blog.status === 'REJECT') {
-                  <span class="inline-block px-2.5 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300">
+                  <span class="moderator-status-badge bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300">
                     Từ chối
                   </span>
                 }
               </td>
 
               <!-- Actions -->
-              <td class="p-4 text-center">
-                <div class="flex items-center justify-center gap-2">
+              <td class="p-4 text-center moderator-actions-column">
+                <div class="moderator-action-group">
                   <button
                     (click)="setPreviewBlog(blog)"
-                    class="p-1.5 text-aquamarine-600 hover:bg-aquamarine-100 dark:hover:bg-aquamarine-800 rounded-lg transition-colors cursor-pointer"
+                    class="moderator-action-button"
                     title="Xem chi tiết"
                   >
-                    <i class="bi bi-eye text-base"></i>
+                    <i class="bi bi-eye"></i>
+                    <span>Xem</span>
                   </button>
 
                   @if (blog.status === 'PENDING_REVIEW') {
                     <button
                       (click)="approveBlog(blog)"
                       [disabled]="actionLoading()"
-                      class="p-1.5 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                      class="moderator-action-button"
                       title="Duyệt bài"
                     >
-                      <i class="bi bi-check-circle-fill text-base"></i>
+                      <i class="bi bi-check-circle"></i>
+                      <span>Duyệt</span>
                     </button>
                     <button
                       (click)="setRejectBlog(blog)"
                       [disabled]="actionLoading()"
-                      class="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                      class="moderator-action-button moderator-action-button--danger"
                       title="Từ chối bài"
                     >
-                      <i class="bi bi-x-circle-fill text-base"></i>
+                      <i class="bi bi-x-circle"></i>
+                      <span>Từ chối</span>
                     </button>
                   }
                 </div>

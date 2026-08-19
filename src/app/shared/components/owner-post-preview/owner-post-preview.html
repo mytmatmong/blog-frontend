@@ -221,7 +221,10 @@
         </div>
 
         <!-- FOOTER -->
-        <footer class="post-preview-footer">
+        <footer
+            class="post-preview-footer"
+            [class.post-preview-footer--moderation]="showModerationActions"
+        >
             @if (
                 showModerationActions &&
                 post.status === 'PENDING_REVIEW'
@@ -232,7 +235,7 @@
                 [disabled]="moderationBusy"
                 (click)="approveRequested.emit(post)"
             >
-                <i class="bi" [class.bi-arrow-repeat]="moderationBusy" [class.post-preview-spin]="moderationBusy" [class.bi-check-circle-fill]="!moderationBusy"></i>
+                <i class="bi" [class.bi-arrow-repeat]="moderationBusy" [class.post-preview-spin]="moderationBusy" [class.bi-check-circle]="!moderationBusy"></i>
                 {{ 'requests.approve' | translate }}
             </button>
 
@@ -242,7 +245,7 @@
                 [disabled]="moderationBusy"
                 (click)="rejectRequested.emit(post)"
             >
-                <i class="bi bi-x-circle-fill"></i>
+                <i class="bi bi-x-circle"></i>
                 {{ 'requests.reject' | translate }}
             </button>
             }

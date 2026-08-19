@@ -198,6 +198,8 @@
 
 .quick-links {
   display: grid;
+  width: 100%;
+  min-width: 0;
   gap: 8px;
   border-top: 1px solid var(--owner-border);
   padding-top: 14px;
@@ -205,7 +207,10 @@
 
 .quick-link {
   display: flex;
+  box-sizing: border-box;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
   align-items: center;
   gap: 10px;
   border: 1px solid var(--owner-border);
@@ -238,7 +243,7 @@
   color: #a5b4fc;
 }
 
-.quick-link > div { min-width: 0; flex: 1; }
+.quick-link > div { min-width: 0; overflow: hidden; flex: 1; }
 .quick-link strong, .quick-link small { display: block; }
 .quick-link strong { font-size: 12px; }
 .quick-link small { overflow: hidden; margin-top: 2px; color: var(--owner-muted); font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
@@ -268,9 +273,34 @@
   min-height: 34px;
   border: 0;
   background: transparent;
+  color-scheme: light;
   color: var(--owner-text);
   font-size: 12px;
   outline: none;
+}
+
+.sort-control select option {
+  background: #ffffff;
+  color: #10121c;
+}
+
+:host-context(.dark) .sort-control,
+:host-context(.dark-mode) .sort-control {
+  border-color: #373a57;
+  background: #171a28;
+  color: #a5b4fc;
+}
+
+:host-context(.dark) .sort-control select,
+:host-context(.dark-mode) .sort-control select {
+  color-scheme: dark;
+  color: #f8fafc;
+}
+
+:host-context(.dark) .sort-control select option,
+:host-context(.dark-mode) .sort-control select option {
+  background: #171a28;
+  color: #f8fafc;
 }
 
 .view-all-link { color: var(--owner-primary); font-size: 12px; font-weight: 600; text-decoration: none; }

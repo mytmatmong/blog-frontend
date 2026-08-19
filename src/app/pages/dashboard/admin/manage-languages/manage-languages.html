@@ -29,7 +29,7 @@
             <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'table.lang_code' | translate }}</th>
             <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'table.lang_name' | translate }}</th>
             <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.default' | translate }}</th>
-            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.status' | translate }}</th>
+            <th class="min-w-[118px] whitespace-nowrap p-4 text-center font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'table.status' | translate }}</th>
             <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.actions' | translate }}</th>
           </tr>
         </thead>
@@ -56,11 +56,11 @@
                   <span class="text-aquamarine-400">-</span>
                 }
               </td>
-              <td class="p-4 text-center">
+              <td class="min-w-[118px] whitespace-nowrap p-4 text-center">
                 @if (lang.isActive) {
-                  <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">ACTIVE</span>
+                  <span class="inline-flex items-center justify-center whitespace-nowrap rounded-full border border-emerald-200 bg-emerald-100 px-2.5 py-[5px] text-xs font-semibold leading-[1.2] text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">ACTIVE</span>
                 } @else {
-                  <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">INACTIVE</span>
+                  <span class="inline-flex items-center justify-center whitespace-nowrap rounded-full border border-slate-200 bg-slate-100 px-2.5 py-[5px] text-xs font-semibold leading-[1.2] text-slate-700 dark:border-slate-700 dark:bg-slate-800/70 dark:text-slate-300">INACTIVE</span>
                 }
               </td>
               <td class="p-4 text-center">

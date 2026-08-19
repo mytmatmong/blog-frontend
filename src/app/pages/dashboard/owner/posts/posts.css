@@ -38,13 +38,43 @@
 
 .select-field select {
   appearance: none;
+  color-scheme: light;
   padding-right: 20px;
+}
+
+.select-field select option {
+  background: #ffffff;
+  color: #10121c;
 }
 
 .select-field__arrow {
   position: absolute;
   right: 12px;
   pointer-events: none;
+}
+
+:host-context(.dark) .select-field,
+:host-context(.dark-mode) .select-field {
+  border-color: #373a57;
+  background: #171a28;
+  color: #a5b4fc;
+}
+
+:host-context(.dark) .select-field select,
+:host-context(.dark-mode) .select-field select {
+  color-scheme: dark;
+  color: #f8fafc;
+}
+
+:host-context(.dark) .select-field select option,
+:host-context(.dark-mode) .select-field select option {
+  background: #171a28;
+  color: #f8fafc;
+}
+
+:host-context(.dark) .select-field__arrow,
+:host-context(.dark-mode) .select-field__arrow {
+  color: #a5b4fc;
 }
 
 .search-field__clear {
@@ -69,10 +99,15 @@
 
 .posts-table {
   width: 100%;
-  min-width: 980px;
+  min-width: 900px;
   border-collapse: collapse;
   color: var(--owner-text);
   font-size: 13px;
+}
+
+.posts-table th:first-child,
+.posts-table td:first-child {
+  width: 30%;
 }
 
 .posts-table th,
@@ -106,16 +141,16 @@
 
 .post-cell {
   display: flex;
-  min-width: 270px;
+  min-width: 220px;
   align-items: center;
   gap: 11px;
 }
 
 .post-cell__thumbnail,
 .post-cell__image {
-  width: 52px;
-  height: 40px;
-  flex: 0 0 52px;
+  width: 46px;
+  height: 36px;
+  flex: 0 0 46px;
   border-radius: 8px;
 }
 
@@ -137,7 +172,7 @@
 .post-cell__title {
   display: block;
   overflow: hidden;
-  max-width: 340px;
+  max-width: 270px;
   color: var(--owner-text);
   font-size: 13px;
   text-overflow: ellipsis;
@@ -174,6 +209,7 @@
   padding: 5px 9px;
   font-size: 11px;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .language-chip {
@@ -225,7 +261,18 @@
   color: var(--owner-primary);
   font-size: 11px;
   font-weight: 600;
+  white-space: nowrap;
   cursor: pointer;
+}
+
+.posts-table th:nth-child(4),
+.posts-table td:nth-child(4) {
+  min-width: 104px;
+}
+
+.posts-table th:nth-child(5),
+.posts-table td:nth-child(5) {
+  min-width: 112px;
 }
 
 .submit-button:hover:not(:disabled) {
@@ -271,7 +318,6 @@
 .row-action--danger:hover:not(:disabled) { background: #ffe4e6; }
 .row-action:disabled { cursor: not-allowed; opacity: .5; }
 
-+
 /* Keep table actions local so Angular dev-server hot reloads these styles reliably. */
 .owner-actions-column {
   min-width: 230px;
