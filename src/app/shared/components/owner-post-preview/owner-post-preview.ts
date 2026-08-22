@@ -81,6 +81,9 @@ export class OwnerPostPreviewComponent
     readonly activePost =
         signal<BlogOwnerPost | null>(null);
 
+    readonly rootPostId =
+        signal<number | null>(null);
+
     readonly languageVersions =
         signal<OwnerPostPreviewVersion[]>([]);
 
@@ -103,6 +106,10 @@ export class OwnerPostPreviewComponent
              * sau đó gọi API lấy dữ liệu chi tiết.
              */
             this.activePost.set(this.post);
+            this.rootPostId.set(
+                this.post.parentPostId ??
+                this.post.id,
+            );
 
             this.languageVersions.set(
                 this.mergeLanguageVersions([], this.post),
@@ -373,6 +380,12 @@ export class OwnerPostPreviewComponent
 
                 const detailedPost = response.data;
 
+                this.rootPostId.set(
+                    detailedPost.parentPostId ??
+                    this.rootPostId() ??
+                    detailedPost.id,
+                );
+
                 this.activePost.set(detailedPost);
 
                 this.languageVersions.update(
@@ -458,6 +471,7 @@ export class OwnerPostPreviewComponent
 
     private resetPreview(): void {
         this.activePost.set(null);
+        this.rootPostId.set(null);
         this.languageVersions.set([]);
         this.loadingPostId.set(null);
         this.loadError.set(null);

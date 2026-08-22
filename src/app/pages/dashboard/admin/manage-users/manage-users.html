@@ -127,7 +127,7 @@
             {{ 'table.role' | translate }}
           </th>
           <th
-            class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center w-[15%] min-w-[110px]"
+            class="w-[15%] min-w-[118px] whitespace-nowrap p-4 text-center font-semibold text-aquamarine-900 dark:text-aquamarine-100"
           >
             {{ 'table.status' | translate }}
           </th>
@@ -192,7 +192,7 @@
                 {{ user.role }} <i class="bi bi-chevron-down text-[10px]"></i>
               </button>
             </td>
-            <td class="p-4 text-center whitespace-nowrap">
+            <td class="min-w-[118px] whitespace-nowrap p-4 text-center">
               @if (user.status === 'ACTIVE') {
                 <app-badge color="green" shape="pill" size="sm" dot>ACTIVE</app-badge>
               } @else if (user.status === 'LOCKED') {
@@ -484,7 +484,6 @@
               </p>
             </div>
             <div>
-              <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">Trạng thái</p>
               <div class="mt-1">
                 @if (activeUserDetail()?.status === 'ACTIVE') {
                   <app-badge color="green" shape="pill" size="sm" dot>ACTIVE</app-badge>

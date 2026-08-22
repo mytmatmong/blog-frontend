@@ -63,8 +63,8 @@
           <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 w-[8%] min-w-[60px]">ID</th>
           <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 w-[12%] min-w-[100px]">{{ 'requests.user_id' | translate }}</th>
           <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 w-[35%] min-w-[300px]">{{ 'requests.reason_topics' | translate }}</th>
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center w-[15%] min-w-[120px]">{{ 'table.status' | translate }}</th>
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center w-[30%] min-w-[220px]">{{ 'requests.actions_review' | translate }}</th>
+          <th class="w-[15%] min-w-[118px] whitespace-nowrap p-4 text-center font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'table.status' | translate }}</th>
+          <th class="w-[30%] min-w-[220px] whitespace-nowrap p-4 text-center font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'requests.actions_review' | translate }}</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-aquamarine-100 dark:divide-aquamarine-800">
@@ -97,7 +97,7 @@
                 <app-badge color="yellow" shape="pill" size="sm" dot>PENDING</app-badge>
               }
             </td>
-            <td class="p-4 text-center">
+            <td class="min-w-[220px] whitespace-nowrap p-4 text-center">
               @if (item.status === 'PENDING') {
                 <div class="flex items-center justify-center gap-2">
                   <app-icon-button
@@ -119,10 +119,9 @@
                     (btnClick)="openRejectModal(item)"
                   >
                     {{ 'requests.reject' | translate }}
-                  </app-icon-button>
                 </div>
               } @else {
-                <div class="text-xs space-y-0.5 text-aquamarine-700 dark:text-aquamarine-300">
+                <div class="grid gap-[3px] whitespace-normal text-[11px] text-[var(--text-muted,#64748b)]">
                   <div><i class="bi bi-calendar3"></i> {{ 'requests.reviewed_at' | translate }}: {{ formatDate(item.reviewedAt) }}</div>
                   @if (item.reviewedById) {
                     <div><i class="bi bi-person-badge"></i> {{ 'requests.by_reviewer' | translate }} #{{ item.reviewedById }}</div>

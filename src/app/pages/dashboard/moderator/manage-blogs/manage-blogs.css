@@ -1,0 +1,79 @@
+.moderator-status-column {
+  min-width: 118px;
+  white-space: nowrap;
+}
+
+.moderator-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.moderator-actions-column {
+  min-width: 250px;
+  white-space: nowrap;
+}
+
+.moderator-action-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.moderator-action-button {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  background: #eff6ff;
+  padding: 6px 9px;
+  color: #1d4ed8;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.moderator-action-button:hover:not(:disabled) {
+  background: #dbeafe;
+}
+
+.moderator-action-button--danger {
+  border-color: #fecdd3;
+  background: #fff1f2;
+  color: #e11d48;
+}
+
+.moderator-action-button--danger:hover:not(:disabled) {
+  background: #ffe4e6;
+}
+
+.moderator-action-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+:host-context(.dark) .moderator-action-button,
+:host-context(.dark-mode) .moderator-action-button {
+  border-color: #1e40af;
+  background: rgb(30 58 138 / 28%);
+  color: #bfdbfe;
+}
+
+:host-context(.dark) .moderator-action-button--danger,
+:host-context(.dark-mode) .moderator-action-button--danger {
+  border-color: rgb(159 18 57 / 55%);
+  background: rgb(136 19 55 / 24%);
+  color: #fda4af;
+}

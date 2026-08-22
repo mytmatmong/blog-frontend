@@ -185,7 +185,20 @@ export interface ModeratorReportPost {
 
 export interface ModeratorReportCommentParent {
   id: number;
+  postId: number;
   userId: number;
+  parentId?: number | null;
+  content: string;
+  createdAt: string;
+  user: ModeratorReportUser;
+  replies?: ModeratorReportCommentReply[];
+}
+
+export interface ModeratorReportCommentReply {
+  id: number;
+  postId: number;
+  userId: number;
+  parentId: number | null;
   content: string;
   createdAt: string;
   user: ModeratorReportUser;
@@ -201,6 +214,7 @@ export interface ModeratorReportComment {
   user: ModeratorReportUser;
   post?: ModeratorReportPost | null;
   parent?: ModeratorReportCommentParent | null;
+  replies?: ModeratorReportCommentReply[];
 }
 
 export interface ModeratorReportItem {

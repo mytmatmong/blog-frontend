@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, effect, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { ModeratorApiService } from '../../../../core/services/moderator-api.service';
@@ -14,7 +14,7 @@ declare var Chart: any;
   templateUrl: './moderator-dashboard.html',
   styleUrl: './moderator-dashboard.css',
 })
-export class ModeratorDashboard implements OnInit {
+export class ModeratorDashboard implements OnInit, OnDestroy {
   private readonly moderatorApiService = inject(ModeratorApiService);
   private readonly toast = inject(ToastService);
   readonly auth = inject(AuthService);
@@ -29,8 +29,22 @@ export class ModeratorDashboard implements OnInit {
   private reasonChartInstance: any = null;
   private statusChartInstance: any = null;
 
+  private readonly chartThemeEffect = effect(() => {
+    // Theo dõi cả dữ liệu lẫn theme để Chart.js đổi màu ngay lập tức.
+    this.auth.isDarkMode();
+    const data = this.dashboardData();
+
+    if (data) {
+      setTimeout(() => this.initCharts(data));
+    }
+  });
+
   ngOnInit() {
     this.loadDashboardData();
+  }
+
+  ngOnDestroy() {
+    this.destroyCharts();
   }
 
   loadDashboardData() {
@@ -43,10 +57,6 @@ export class ModeratorDashboard implements OnInit {
         this.loading.set(false);
         if (response.success && response.data) {
           this.dashboardData.set(response.data);
-          // Cho DOM cập nhật rồi mới vẽ chart
-          setTimeout(() => {
-            this.initCharts(response.data);
-          }, 50);
         } else {
           this.error.set('Không thể lấy dữ liệu Moderator Dashboard.');
         }
@@ -74,19 +84,24 @@ export class ModeratorDashboard implements OnInit {
   initCharts(data: ModeratorDashboardData) {
     if (typeof Chart === 'undefined') return;
 
-    // Hủy các chart cũ nếu đã được khởi tạo
-    if (this.reportsChartInstance) {
-      this.reportsChartInstance.destroy();
-      this.reportsChartInstance = null;
-    }
-    if (this.reasonChartInstance) {
-      this.reasonChartInstance.destroy();
-      this.reasonChartInstance = null;
-    }
-    if (this.statusChartInstance) {
-      this.statusChartInstance.destroy();
-      this.statusChartInstance = null;
-    }
+    this.destroyCharts();
+
+    const isDark = this.auth.isDarkMode();
+    const chartText = isDark ? '#cbd5e1' : '#64748b';
+    const chartGrid = isDark
+      ? 'rgba(148, 163, 184, 0.16)'
+      : 'rgba(100, 116, 139, 0.18)';
+    const chartBorder = isDark ? '#171a28' : '#ffffff';
+    const tooltipBackground = isDark ? '#0f172a' : '#111827';
+    const legendOptions = {
+      labels: {
+        color: chartText,
+        usePointStyle: true,
+        pointStyle: 'circle',
+        boxWidth: 8,
+        padding: 16,
+      },
+    };
 
     // 1. Stacked Bar Chart - Report 7 ngày qua
     const canvasBar = document.getElementById('reportsChart') as HTMLCanvasElement;
@@ -122,11 +137,27 @@ export class ModeratorDashboard implements OnInit {
           responsive: true,
           maintainAspectRatio: false,
           scales: {
-            y: { beginAtZero: true, stacked: true, ticks: { stepSize: 1 } },
-            x: { stacked: true },
+            y: {
+              beginAtZero: true,
+              stacked: true,
+              ticks: { color: chartText, stepSize: 1 },
+              grid: { color: chartGrid },
+              border: { color: chartGrid },
+            },
+            x: {
+              stacked: true,
+              ticks: { color: chartText },
+              grid: { color: chartGrid },
+              border: { color: chartGrid },
+            },
           },
           plugins: {
-            legend: { position: 'bottom' },
+            legend: { position: 'bottom', ...legendOptions },
+            tooltip: {
+              backgroundColor: tooltipBackground,
+              titleColor: '#f8fafc',
+              bodyColor: '#e2e8f0',
+            },
           },
         },
       });
@@ -168,6 +199,7 @@ export class ModeratorDashboard implements OnInit {
                 '#ec4899',
                 '#6b7280',
               ],
+              borderColor: chartBorder,
               borderWidth: 2,
             },
           ],
@@ -176,7 +208,12 @@ export class ModeratorDashboard implements OnInit {
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { position: 'bottom' },
+            legend: { position: 'bottom', ...legendOptions },
+            tooltip: {
+              backgroundColor: tooltipBackground,
+              titleColor: '#f8fafc',
+              bodyColor: '#e2e8f0',
+            },
           },
         },
       });
@@ -194,6 +231,7 @@ export class ModeratorDashboard implements OnInit {
             {
               data: [statuses.pending || 0, statuses.resolved || 0, statuses.rejected || 0],
               backgroundColor: ['#f59e0b', '#10b981', '#ef4444'],
+              borderColor: chartBorder,
               borderWidth: 2,
             },
           ],
@@ -202,10 +240,29 @@ export class ModeratorDashboard implements OnInit {
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { position: 'bottom' },
+            legend: { position: 'bottom', ...legendOptions },
+            tooltip: {
+              backgroundColor: tooltipBackground,
+              titleColor: '#f8fafc',
+              bodyColor: '#e2e8f0',
+            },
           },
         },
       });
     }
+  }
+
+  private destroyCharts(): void {
+    for (const chart of [
+      this.reportsChartInstance,
+      this.reasonChartInstance,
+      this.statusChartInstance,
+    ]) {
+      chart?.destroy();
+    }
+
+    this.reportsChartInstance = null;
+    this.reasonChartInstance = null;
+    this.statusChartInstance = null;
   }
 }

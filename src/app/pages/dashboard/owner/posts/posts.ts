@@ -7,17 +7,10 @@ import {
   signal,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import {
-  catchError,
-  forkJoin,
-  map,
-  Observable,
-  of,
-  switchMap,
-} from 'rxjs';
 
 import {
   BlogOwnerPost,
+  BlogOwnerPostGroup,
 } from '../../../../core/models/blog-owner.model';
 import {
   PostStatus,
@@ -107,8 +100,6 @@ export class Posts implements OnInit {
   readonly pendingDeletePost =
     signal<BlogOwnerPost | null>(null);
 
-  private readonly postsFetchLimit = 50;
-
   private postsRequestId = 0;
 
   readonly pageNumbers = computed(() => {
@@ -153,129 +144,21 @@ export class Posts implements OnInit {
     const status =
       this.statusFilter();
 
-    this.fetchAllOwnerPosts(
-      search || undefined,
-      status || undefined,
-    )
-      .pipe(
-        /*
-         * Chỉ giữ bài viết gốc.
-         *
-         * Bài gốc:
-         * parentPostId === null
-         *
-         * Bản dịch:
-         * parentPostId !== null
-         */
-        map((allPosts) =>
-          allPosts.filter(
-            (post) =>
-              post.parentPostId === null,
-          ),
-        ),
-
-        switchMap((rootPosts) => {
-          const rootTotalItems =
-            rootPosts.length;
-
-          const rootTotalPages =
-            Math.ceil(
-              rootTotalItems /
-              this.itemsPerPage,
-            );
-
-          let page =
-            this.currentPage();
-
-          if (rootTotalPages === 0) {
-            page = 1;
-          } else if (
-            page > rootTotalPages
-          ) {
-            page = rootTotalPages;
-          }
-
-          if (
-            page !== this.currentPage()
-          ) {
-            this.currentPage.set(page);
-          }
-
-          const startIndex =
-            (page - 1) *
-            this.itemsPerPage;
-
-          const pagePosts =
-            rootPosts.slice(
-              startIndex,
-              startIndex +
-              this.itemsPerPage,
-            );
-
-          if (
-            pagePosts.length === 0
-          ) {
-            return of({
-              items:
-                [] as BlogOwnerPost[],
-
-              totalItems:
-                rootTotalItems,
-
-              totalPages:
-                rootTotalPages,
-            });
-          }
-
-          /*
-           * API danh sách có thể không trả
-           * categories đầy đủ.
-           *
-           * Chỉ gọi chi tiết cho 8 bài
-           * của trang hiện tại.
-           */
-          return forkJoin(
-            pagePosts.map((post) =>
-              this.api
-                .getPost(post.id)
-                .pipe(
-                  map(
-                    (response) =>
-                      response.data,
-                  ),
-
-                  /*
-                   * Nếu chi tiết một bài lỗi,
-                   * vẫn dùng dữ liệu danh sách.
-                   */
-                  catchError(
-                    () => of(post),
-                  ),
-                ),
-            ),
-          ).pipe(
-            map((items) => ({
-              items,
-
-              totalItems:
-                rootTotalItems,
-
-              totalPages:
-                rootTotalPages,
-            })),
-          );
-        }),
-      )
+    /**
+     * Backend Step 7 đã paginate theo ROOT, nên frontend
+     * không fetch toàn bộ pages rồi tự phân trang nữa.
+     */
+    this.api
+      .getPosts({
+        search:
+          search || undefined,
+        status:
+          status || undefined,
+        page: this.currentPage(),
+        limit: this.itemsPerPage,
+      })
       .subscribe({
-        next: ({
-          items,
-          totalItems,
-          totalPages,
-        }) => {
-          /*
-           * Không nhận response cũ
-           * khi người dùng tìm kiếm liên tục.
-           */
+        next: (response) => {
           if (
             requestId !==
             this.postsRequestId
@@ -283,14 +166,26 @@ export class Posts implements OnInit {
             return;
           }
 
-          this.posts.set(items);
+          const page =
+            response.data;
 
-          this.totalItems.set(
-            totalItems,
+          this.posts.set(
+            page.items.map(
+              (group) =>
+                this.toListPost(
+                  group,
+                ),
+            ),
           );
 
+          this.totalItems.set(
+            page.meta.totalItems,
+          );
           this.totalPages.set(
-            totalPages,
+            page.meta.totalPages,
+          );
+          this.currentPage.set(
+            page.meta.currentPage,
           );
 
           this.isLoading.set(false);
@@ -427,20 +322,16 @@ export class Posts implements OnInit {
     this.api
       .submitPost(post.id)
       .subscribe({
-        next: (response) => {
-          this.posts.update(
-            (items) =>
-              items.map((item) =>
-                item.id === post.id
-                  ? response.data
-                  : item,
-              ),
-          );
-
+        next: () => {
           this.submittingPostId.set(
             null,
           );
           this.pendingSubmitPost.set(null);
+
+          /**
+           * Reload để giữ đúng totals của group và status filter.
+           */
+          this.loadPosts();
 
           this.toast.success(
             this.ts.translate(
@@ -541,9 +432,12 @@ export class Posts implements OnInit {
   }
 
   canEdit(
-    _post: BlogOwnerPost,
+    post: BlogOwnerPost,
   ): boolean {
-    return true;
+    return (
+      post.status !==
+      'PENDING_REVIEW'
+    );
   }
 
   canSubmit(
@@ -681,75 +575,15 @@ export class Posts implements OnInit {
     }
   }
 
-  private fetchAllOwnerPosts(
-    search?: string,
-    status?: PostStatus,
-  ): Observable<BlogOwnerPost[]> {
-    const baseQuery = {
-      limit: this.postsFetchLimit,
-      search,
-      status,
+
+  private toListPost(
+    group: BlogOwnerPostGroup,
+  ): BlogOwnerPost {
+    return {
+      ...group.root,
+      viewCount: group.totals.views,
+      likeCount: group.totals.likes,
+      updatedAt: group.latestUpdatedAt,
     };
-
-    return this.api
-      .getPosts({
-        ...baseQuery,
-        page: 1,
-      })
-      .pipe(
-        switchMap(
-          (firstResponse) => {
-            const firstPage =
-              firstResponse.data;
-
-            const apiTotalPages =
-              firstPage.meta.totalPages;
-
-            if (
-              apiTotalPages <= 1
-            ) {
-              return of(
-                firstPage.items,
-              );
-            }
-
-            const remainingRequests =
-              Array.from(
-                {
-                  length:
-                    apiTotalPages - 1,
-                },
-                (_, index) =>
-                  this.api
-                    .getPosts({
-                      ...baseQuery,
-                      page:
-                        index + 2,
-                    })
-                    .pipe(
-                      map(
-                        (response) =>
-                          response.data
-                            .items,
-                      ),
-                    ),
-              );
-
-            return forkJoin(
-              remainingRequests,
-            ).pipe(
-              map(
-                (
-                  remainingPages,
-                ) => [
-                    ...firstPage.items,
-
-                    ...remainingPages.flat(),
-                  ],
-              ),
-            );
-          },
-        ),
-      );
   }
 }

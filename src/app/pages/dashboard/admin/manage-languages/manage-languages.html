@@ -39,7 +39,7 @@
             <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'table.lang_code' | translate }}</th>
             <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'table.lang_name' | translate }}</th>
             <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.default' | translate }}</th>
-            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.status' | translate }}</th>
+            <th class="min-w-[118px] whitespace-nowrap p-4 text-center font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'table.status' | translate }}</th>
             <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.actions' | translate }}</th>
           </tr>
         </thead>
@@ -64,7 +64,7 @@
                   <span class="text-aquamarine-400">-</span>
                 }
               </td>
-              <td class="p-4 text-center">
+              <td class="min-w-[118px] whitespace-nowrap p-4 text-center">
                 @if (lang.isActive) {
                   <app-badge color="green" shape="pill" size="sm" dot>ACTIVE</app-badge>
                 } @else {

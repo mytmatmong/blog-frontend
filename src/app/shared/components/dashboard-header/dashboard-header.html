@@ -43,7 +43,20 @@
     </button>
 
     <!-- avatar-badge -->
-    <span class="w-8 h-8 grid place-items-center rounded-full bg-[var(--brand)] text-white text-xs font-bold shrink-0">S</span>
+    <span
+      class="w-8 h-8 grid place-items-center overflow-hidden rounded-full bg-[var(--brand)] text-white text-xs font-bold shrink-0"
+      [title]="auth.currentUser()?.username || auth.currentUser()?.email || ''"
+    >
+      @if (auth.currentUser()?.avatarUrl; as avatarUrl) {
+      <img
+        class="w-full h-full object-cover"
+        [src]="avatarUrl"
+        [alt]="auth.currentUser()?.username || 'Avatar'"
+      >
+      } @else {
+      {{ userInitial() }}
+      }
+    </span>
 
     <!-- logout-btn -->
     <button type="button" class="px-3 py-1.5 rounded-lg border border-[color-mix(in_srgb,var(--danger,#dc2626)_30%,var(--border-color))] text-[var(--danger,#dc2626)] hover:bg-[color-mix(in_srgb,var(--danger,#dc2626)_8%,transparent)] text-xs font-medium transition-colors" [title]="'dashboard.logout' | translate" (click)="onLogout()">

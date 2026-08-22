@@ -1034,6 +1034,11 @@ export class CreatePost implements OnInit {
     this.translationResults.set([]);
 
     try {
+      /**
+       * Flow mới: FE chỉ gọi MỘT request.
+       * Backend tự tạo root + tự dịch + tạo translations
+       * rồi đồng bộ cùng trạng thái.
+       */
       const createResponse =
         await firstValueFrom(
           this.api.createPost(
@@ -1047,77 +1052,70 @@ export class CreatePost implements OnInit {
       this.createdPost.set(post);
       this.editor?.enable(false);
 
+      /**
+       * Chỉ dùng kết quả backend để hiển thị trạng thái
+       * các ngôn ngữ; KHÔNG gọi translate-preview /
+       * createTranslation ở frontend nữa.
+       */
       const targetLanguageIds =
         Array.from(
-          new Set<number>(
-            this.selectedTranslationLanguageIds(),
+          new Set(
+            this
+              .selectedTranslationLanguageIds()
+              .map(Number)
+              .filter(
+                (languageId) =>
+                  Number.isInteger(languageId) &&
+                  languageId > 0 &&
+                  languageId !==
+                    post.languageId,
+              ),
           ),
-        ).filter(
-          (languageId) =>
-            languageId !==
-            post.languageId,
         );
 
-      const results =
-        await this.createTranslationDrafts(
-          post.id,
-          targetLanguageIds,
+      const translationPostIdByLanguageId =
+        new Map<number, number>(
+          (post.translations ?? []).map(
+            (translation): [number, number] => [
+              translation.languageId,
+              translation.id,
+            ],
+          ),
         );
 
       this.translationResults.set(
-        results,
+        targetLanguageIds.map(
+          (languageId) => ({
+            languageId,
+            postId:
+              translationPostIdByLanguageId.get(
+                languageId,
+              ),
+            success: true,
+            message: submitForReview
+              ? this.tr(
+                'post_form.translation_submitted',
+              )
+              : this.tr(
+                'post_form.translation_draft_created',
+              ),
+          }),
+        ),
       );
 
-      const failedCount =
-        results.filter(
-          (result) =>
-            !result.success,
-        ).length;
-
-      const translatedCount =
-        results.length -
-        failedCount;
-
-      const originalMessage =
-        post.status ===
-          'PENDING_REVIEW'
+      this.toast.success(
+        submitForReview
           ? this.tr(
-            'post_form.original_submitted',
+            'post_form.group_submitted',
           )
           : this.tr(
-            'post_form.original_saved',
-          );
-
-      if (failedCount > 0) {
-        this.toast.warning(
-          `${originalMessage} ${this.tr(
-            'post_form.translation_created_count',
-          )} ${translatedCount}/${results.length} ${this.tr(
-            'post_form.translation_draft_suffix',
-          )}`,
-          this.tr(
-            'post_form.partial_complete',
+            'post_form.group_saved',
           ),
-          6000,
-        );
-      } else {
-        const translationMessage =
-          results.length > 0
-            ? ` ${this.tr(
-              'post_form.created_translation_prefix',
-            )} ${results.length} ${this.tr(
-              'post_form.created_translation_suffix',
-            )}`
-            : '';
-
-        this.toast.success(
-          `${originalMessage}${translationMessage}`,
-          this.tr(
-            'post_form.create_success',
-          ),
-          5000,
-        );
-      }
+        this.tr(
+          'post_form.create_success',
+        ),
+        5000,
+      );
     } catch (error: unknown) {
       this.toast.error(
         getApiErrorMessage(error),
@@ -1211,6 +1209,24 @@ export class CreatePost implements OnInit {
 
     const tagNames =
       this.parseTagNames();
+
+    const translationLanguageIds =
+      Array.from(
+        new Set<number>(
+          this
+            .selectedTranslationLanguageIds()
+            .map(Number)
+            .filter(
+              (targetLanguageId) =>
+                Number.isInteger(
+                  targetLanguageId,
+                ) &&
+                targetLanguageId > 0 &&
+                targetLanguageId !==
+                  languageId,
+            ),
+        ),
+      );
 
     if (!languageId) {
       this.toast.error(
@@ -1328,6 +1344,7 @@ export class CreatePost implements OnInit {
           }
           : {}),
 
+        translationLanguageIds,
         submitForReview,
       };
     }
@@ -1357,6 +1374,16 @@ export class CreatePost implements OnInit {
       );
     }
 
+    for (
+      const targetLanguageId of
+      translationLanguageIds
+    ) {
+      formData.append(
+        'translationLanguageIds',
+        String(targetLanguageId),
+      );
+    }
+
     formData.append(
       'submitForReview',
       String(
@@ -1381,89 +1408,6 @@ export class CreatePost implements OnInit {
     return formData;
   }
 
-  protected async createTranslationDrafts(
-    sourcePostId: number,
-    targetLanguageIds: number[],
-  ): Promise<
-    TranslationCreationResult[]
-  > {
-    const results:
-      TranslationCreationResult[] = [];
-
-    for (
-      const targetLanguageId of
-      targetLanguageIds
-    ) {
-      const language =
-        this.translationLanguage(
-          targetLanguageId,
-        );
-
-      try {
-        const previewResponse =
-          await firstValueFrom(
-            this.api.translatePreview(
-              sourcePostId,
-              {
-                targetLanguageId,
-              },
-            ),
-          );
-
-        const saveResponse =
-          await firstValueFrom(
-            this.api.createTranslation(
-              sourcePostId,
-              {
-                targetLanguageId,
-
-                title:
-                  previewResponse
-                    .data
-                    .translation
-                    .title,
-
-                content:
-                  previewResponse
-                    .data
-                    .translation
-                    .content,
-              },
-            ),
-          );
-
-        results.push({
-          languageId:
-            targetLanguageId,
-
-          postId:
-            saveResponse.data.id,
-
-          success: true,
-
-          message: this.tr(
-            'post_form.translation_draft_created',
-          ),
-        });
-      } catch (error: unknown) {
-        results.push({
-          languageId:
-            targetLanguageId,
-
-          success: false,
-
-          message:
-            `${language?.name ??
-            targetLanguageId
-            }: ${getApiErrorMessage(
-              error,
-            )}`,
-        });
-      }
-    }
-
-    return results;
-  }
 
   protected parseTagNames():
     string[] {
