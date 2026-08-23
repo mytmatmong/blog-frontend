@@ -6,7 +6,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 import {
   BlogOwnerPost,
@@ -34,30 +34,30 @@ import { ConfirmDialog } from '../../../../shared/components/confirm-dialog/conf
 import {
   TranslatePipe,
 } from '../../../../shared/pipes/translate.pipe';
+import { BadgeComponent } from '../../../../shared/components/badge/badge';
+import { IconButtonComponent } from '../../../../shared/components/icon-button/icon-button';
+import { TextButtonComponent } from '../../../../shared/components/text-button/text-button';
 
 @Component({
   selector: 'app-posts',
-
   imports: [
     RouterLink,
     DecimalPipe,
     TranslatePipe,
     OwnerPostPreviewComponent,
     ConfirmDialog,
+    BadgeComponent,
+    IconButtonComponent,
+    TextButtonComponent,
   ],
-
   templateUrl: './posts.html',
   styleUrl: './posts.css',
 })
 export class Posts implements OnInit {
-  private readonly api =
-    inject(BlogOwnerApiService);
-
-  private readonly toast =
-    inject(ToastService);
-
-  protected readonly ts =
-    inject(TranslationService);
+  private readonly api = inject(BlogOwnerApiService);
+  private readonly toast = inject(ToastService);
+  protected readonly ts = inject(TranslationService);
+  private readonly router = inject(Router);
 
   readonly posts =
     signal<BlogOwnerPost[]>([]);
@@ -575,6 +575,27 @@ export class Posts implements OnInit {
     }
   }
 
+
+  statusBadgeColor(status: PostStatus): 'green' | 'yellow' | 'red' | 'blue' {
+    switch (status) {
+      case 'PUBLISH':
+        return 'green';
+      case 'PENDING_REVIEW':
+        return 'yellow';
+      case 'REJECT':
+        return 'red';
+      default:
+        return 'blue';
+    }
+  }
+
+  navigateToCreatePost(): void {
+    this.router.navigate(['/dashboard/owner/create-post']);
+  }
+
+  navigateToEdit(postId: number): void {
+    this.router.navigate(['/dashboard/owner/edit-post', postId]);
+  }
 
   private toListPost(
     group: BlogOwnerPostGroup,

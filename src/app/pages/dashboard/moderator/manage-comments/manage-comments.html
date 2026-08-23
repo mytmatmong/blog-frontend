@@ -14,7 +14,7 @@
         [class.hover:bg-aquamarine-100]="statusFilter() !== 'PENDING'"
         [class.dark:hover:bg-aquamarine-900]="statusFilter() !== 'PENDING'"
       >
-        <i class="bi bi-clock-history mr-1"></i> Chờ xử lý (PENDING)
+        <i class="bi bi-clock-history mr-1"></i> {{ 'filter.status.pending' | translate }}
       </button>
       <button
         type="button"
@@ -27,7 +27,7 @@
         [class.hover:bg-aquamarine-100]="statusFilter() !== 'RESOLVED'"
         [class.dark:hover:bg-aquamarine-900]="statusFilter() !== 'RESOLVED'"
       >
-        <i class="bi bi-check2-circle mr-1"></i> Đã xử lý (RESOLVED)
+        <i class="bi bi-check2-circle mr-1"></i> {{ 'filter.status.resolved' | translate }}
       </button>
       <button
         type="button"
@@ -40,7 +40,7 @@
         [class.hover:bg-aquamarine-100]="statusFilter() !== 'REJECTED'"
         [class.dark:hover:bg-aquamarine-900]="statusFilter() !== 'REJECTED'"
       >
-        <i class="bi bi-x-circle mr-1"></i> Bác bỏ (REJECTED)
+        <i class="bi bi-x-circle mr-1"></i> {{ 'filter.status.rejected' | translate }}
       </button>
     </div>
 
@@ -52,9 +52,9 @@
         (change)="onTargetTypeChange()"
         class="px-3 py-1.5 rounded-xl text-xs border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none focus:ring-2 focus:ring-aquamarine-500 cursor-pointer"
       >
-        <option value="">Tất cả loại (Bài / Bình luận)</option>
-        <option value="POST">Báo cáo Bài viết (POST)</option>
-        <option value="COMMENT">Báo cáo Bình luận (COMMENT)</option>
+        <option value="">{{ 'moderator.target_all' | translate }}</option>
+        <option value="POST">{{ 'moderator.target_post' | translate }}</option>
+        <option value="COMMENT">{{ 'moderator.target_comment' | translate }}</option>
       </select>
 
       <!-- Reason Filter -->
@@ -63,13 +63,13 @@
         (change)="onReasonChange()"
         class="px-3 py-1.5 rounded-xl text-xs border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none focus:ring-2 focus:ring-aquamarine-500 cursor-pointer"
       >
-        <option value="">Tất cả lý do vi phạm</option>
-        <option value="SPAM">Spam / Quảng cáo</option>
-        <option value="HARASSMENT">Xúc phạm / Bắt nạt</option>
-        <option value="INAPPROPRIATE">Nội dung không phù hợp</option>
-        <option value="COPYRIGHT">Vi phạm bản quyền</option>
-        <option value="MISINFORMATION">Thông tin sai lệch</option>
-        <option value="OTHER">Lý do khác</option>
+        <option value="">{{ 'moderator.reason_all' | translate }}</option>
+        <option value="SPAM">{{ 'report.reason.SPAM' | translate }}</option>
+        <option value="HARASSMENT">{{ 'report.reason.HARASSMENT' | translate }}</option>
+        <option value="INAPPROPRIATE">{{ 'report.reason.INAPPROPRIATE' | translate }}</option>
+        <option value="COPYRIGHT">{{ 'report.reason.COPYRIGHT' | translate }}</option>
+        <option value="MISINFORMATION">{{ 'report.reason.MISINFORMATION' | translate }}</option>
+        <option value="OTHER">{{ 'report.reason.OTHER' | translate }}</option>
       </select>
     </div>
   </div>
@@ -78,14 +78,14 @@
   @if (loading()) {
     <div class="flex flex-col items-center justify-center py-16 text-aquamarine-600 dark:text-aquamarine-400">
       <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-aquamarine-600 border-r-transparent mb-3"></div>
-      <p class="text-sm font-medium">Đang tải danh sách báo cáo vi phạm...</p>
+      <p class="text-sm font-medium">{{ 'moderator.loading_reports' | translate }}</p>
     </div>
   } @else if (error()) {
     <!-- Error State -->
     <div class="p-6 rounded-2xl border border-red-200 dark:border-red-900/50 bg-red-50/50 dark:bg-red-950/20 text-center max-w-2xl mx-auto my-6">
       <i class="bi bi-shield-lock text-4xl text-red-500 mb-3 inline-block"></i>
       <h4 class="font-bold text-lg text-red-700 dark:text-red-400 mb-2">
-        {{ isForbidden() ? 'Không có quyền truy cập (403 Forbidden)' : 'Không thể tải danh sách báo cáo' }}
+        {{ isForbidden() ? ('moderator.forbidden_title' | translate) : ('moderator.cannot_load_reports' | translate) }}
       </h4>
       <p class="text-sm text-red-600 dark:text-red-300 mb-4 leading-relaxed">
         {{ error() }}
@@ -94,16 +94,16 @@
       @if (isForbidden()) {
         <div class="p-4 mb-5 rounded-xl bg-white dark:bg-aquamarine-900/80 border border-red-200 dark:border-red-800 text-left text-xs space-y-2">
           <div class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-50 flex items-center gap-2">
-            <i class="bi bi-info-circle text-aquamarine-600"></i> Hướng dẫn tài khoản kiểm thử Moderator:
+            <i class="bi bi-info-circle text-aquamarine-600"></i> {{ 'moderator.test_account_guide' | translate }}
           </div>
           <p class="text-[var(--text-muted)]">
-            Chỉ tài khoản thuộc vai trò <code class="px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-bold">CONTENT_MODERATOR</code> mới có thể truy cập danh sách báo cáo vi phạm.
+            {{ 'moderator.test_account_report_desc' | translate }}
           </p>
           <div class="pt-1">
-            <span class="font-semibold text-aquamarine-900 dark:text-aquamarine-100">Tài khoản Moderator mẫu:</span>
+            <span class="font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'moderator.sample_account' | translate }}</span>
             <ul class="list-disc list-inside mt-1 space-y-1 font-mono text-[11px] text-aquamarine-700 dark:text-aquamarine-300">
               <li>Email: <strong class="select-all">moderator.001@seed.local</strong></li>
-              <li>Mật khẩu: <strong class="select-all">Test123!</strong></li>
+              <li>{{ 'users.mod_password' | translate }}: <strong class="select-all">Test123!</strong></li>
             </ul>
           </div>
         </div>
@@ -115,14 +115,14 @@
             (click)="logoutAndSwitchAccount()"
             class="px-4 py-2 bg-aquamarine-600 hover:bg-aquamarine-700 text-white font-medium text-sm rounded-xl transition-colors inline-flex items-center gap-2 cursor-pointer shadow-sm"
           >
-            <i class="bi bi-box-arrow-right"></i> Đăng xuất & Đăng nhập Moderator
+            <i class="bi bi-box-arrow-right"></i> {{ 'moderator.logout_and_switch' | translate }}
           </button>
         }
         <button
           (click)="loadReports()"
           class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium text-sm rounded-xl transition-colors inline-flex items-center gap-2 cursor-pointer"
         >
-          <i class="bi bi-arrow-clockwise"></i> Thử lại
+          <i class="bi bi-arrow-clockwise"></i> {{ 'common.retry' | translate }}
         </button>
       </div>
     </div>
@@ -130,9 +130,9 @@
     <!-- Empty State -->
     <div class="p-12 text-center rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
       <i class="bi bi-shield-check text-4xl text-aquamarine-400 mb-3 inline-block"></i>
-      <h4 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">Không có báo cáo nào</h4>
+      <h4 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">{{ 'moderator.no_reports_title' | translate }}</h4>
       <p class="text-sm text-aquamarine-600 dark:text-aquamarine-400 mt-1">
-        Không tìm thấy báo cáo vi phạm nào phù hợp với bộ lọc hiện tại.
+        {{ 'moderator.no_reports_desc' | translate }}
       </p>
     </div>
   } @else {
@@ -141,12 +141,12 @@
       <table class="w-full text-left border-collapse text-sm">
         <thead>
           <tr class="border-b border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950/50">
-            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">ID & Đối tượng</th>
-            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">Người báo cáo</th>
-            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">Nội dung bị báo cáo</th>
-            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">Lý do vi phạm</th>
-            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">Trạng thái</th>
-            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">Thao tác</th>
+            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'moderator.id_and_target' | translate }}</th>
+            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'moderator.reporter' | translate }}</th>
+            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'moderator.reported_content' | translate }}</th>
+            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'moderator.violation_reason' | translate }}</th>
+            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.status' | translate }}</th>
+            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.actions' | translate }}</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-aquamarine-100 dark:divide-aquamarine-800">
@@ -158,11 +158,11 @@
                   <span class="text-xs font-mono font-bold text-aquamarine-500">#{{ report.id }}</span>
                   @if (report.targetType === 'POST') {
                     <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/50 px-2 py-0.5 rounded-md w-fit border border-indigo-200 dark:border-indigo-800">
-                      <i class="bi bi-file-post"></i> Bài viết
+                      <i class="bi bi-file-post"></i> {{ 'moderator.reported_post_title' | translate }}
                     </span>
                   } @else {
                     <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/50 px-2 py-0.5 rounded-md w-fit border border-purple-200 dark:border-purple-800">
-                      <i class="bi bi-chat-left-text"></i> Bình luận
+                      <i class="bi bi-chat-left-text"></i> {{ 'moderator.reported_comment_title' | translate }}
                     </span>
                   }
                 </div>
@@ -188,12 +188,12 @@
                   <div class="line-clamp-2 font-semibold text-xs text-aquamarine-900 dark:text-aquamarine-100">
                     {{ report.post.title }}
                   </div>
-                  <div class="text-[11px] text-aquamarine-500 mt-0.5">Tác giả: {{ report.post.author.username }}</div>
+                  <div class="text-[11px] text-aquamarine-500 mt-0.5">{{ 'moderator.post_author' | translate }} {{ report.post.author.username }}</div>
                 } @else if (report.targetType === 'COMMENT' && report.comment) {
                   <div class="line-clamp-2 italic text-xs text-amber-900 dark:text-amber-200 bg-amber-50/50 dark:bg-amber-950/30 p-1.5 rounded border border-amber-200 dark:border-amber-900/50">
                     "{{ report.comment.content }}"
                   </div>
-                  <div class="text-[11px] text-aquamarine-500 mt-0.5">Viết bởi: {{ report.comment.user.username }}</div>
+                  <div class="text-[11px] text-aquamarine-500 mt-0.5">{{ 'moderator.commenter' | translate }} {{ report.comment.user.username }}</div>
                 } @else {
                   <span class="text-xs text-aquamarine-400 italic">Dữ liệu đối tượng đã bị gỡ</span>
                 }
@@ -215,15 +215,15 @@
               <td class="p-4 text-center">
                 @if (report.status === 'PENDING') {
                   <span class="inline-block px-2.5 py-1 text-xs font-semibold rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
-                    Chờ xử lý
+                    {{ 'status.pending' | translate }}
                   </span>
                 } @else if (report.status === 'RESOLVED') {
                   <span class="inline-block px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-                    Đã xử lý
+                    {{ 'status.resolved' | translate }}
                   </span>
                 } @else if (report.status === 'REJECTED') {
                   <span class="inline-block px-2.5 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300">
-                    Bác bỏ
+                    {{ 'status.rejected' | translate }}
                   </span>
                 }
               </td>
@@ -234,7 +234,7 @@
                   <button
                     (click)="setPreviewReport(report)"
                     class="p-1.5 text-aquamarine-600 hover:bg-aquamarine-100 dark:hover:bg-aquamarine-800 rounded-lg transition-colors cursor-pointer"
-                    title="Xem chi tiết báo cáo"
+                    [title]="'action.view' | translate"
                   >
                     <i class="bi bi-eye text-base"></i>
                   </button>
@@ -244,7 +244,7 @@
                       (click)="setResolveReport(report)"
                       [disabled]="actionLoading()"
                       class="p-1.5 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
-                      title="Xác nhận vi phạm & Ẩn nội dung"
+                      [title]="'action.resolve' | translate"
                     >
                       <i class="bi bi-check-circle-fill text-base"></i>
                     </button>
@@ -252,7 +252,7 @@
                       (click)="setRejectReport(report)"
                       [disabled]="actionLoading()"
                       class="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
-                      title="Bác bỏ báo cáo"
+                      [title]="'action.reject' | translate"
                     >
                       <i class="bi bi-x-circle-fill text-base"></i>
                     </button>
@@ -269,7 +269,7 @@
     @if (meta() && (meta()?.totalPages || 0) > 1) {
       <div class="mt-6 flex justify-between items-center text-xs text-aquamarine-700 dark:text-aquamarine-300">
         <div>
-          Hiển thị <strong>{{ meta()?.itemCount }}</strong> / <strong>{{ meta()?.totalItems }}</strong> báo cáo
+          {{ 'moderator.showing' | translate }} <strong>{{ meta()?.itemCount }}</strong> / <strong>{{ meta()?.totalItems }}</strong> {{ 'moderator.reports_unit' | translate }}
         </div>
         <ul class="inline-flex items-center space-x-1 text-sm">
           <li>
@@ -325,14 +325,14 @@
       @if (loadingDetail()) {
         <div class="absolute inset-0 bg-white/70 dark:bg-aquamarine-900/70 z-10 flex flex-col items-center justify-center rounded-2xl">
           <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-aquamarine-600 border-r-transparent mb-2"></div>
-          <span class="text-xs font-medium text-aquamarine-700 dark:text-aquamarine-300">Đang tải dữ liệu chi tiết báo cáo...</span>
+          <span class="text-xs font-medium text-aquamarine-700 dark:text-aquamarine-300">{{ 'moderator.loading_report_detail' | translate }}</span>
         </div>
       }
 
       <!-- Modal Header -->
       <div class="flex justify-between items-center p-5 border-b border-aquamarine-200 dark:border-aquamarine-800">
         <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50 flex items-center gap-2">
-          <span>Chi tiết báo cáo vi phạm:</span>
+          <span>{{ 'moderator.report_detail_title' | translate }}</span>
           <span class="text-aquamarine-600 dark:text-aquamarine-400">#{{ report.id }}</span>
         </h5>
         <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer" (click)="closePreviewReport()">
@@ -348,34 +348,34 @@
             <div class="flex items-center gap-2">
               <i class="bi bi-exclamation-triangle-fill text-amber-600 text-lg"></i>
               <span class="font-bold text-sm text-amber-900 dark:text-amber-200">
-                Lý do báo cáo: {{ getReasonLabel(report.reason) }}
+                {{ 'moderator.report_reason_label' | translate }} {{ getReasonLabel(report.reason) }}
               </span>
             </div>
             <span class="text-xs px-2.5 py-0.5 rounded-full font-semibold bg-amber-200 text-amber-900 dark:bg-amber-800 dark:text-amber-100">
-              Trạng thái: {{ report.status }}
+              {{ 'moderator.status_label' | translate }} {{ report.status }}
             </span>
           </div>
 
           @if (report.description) {
             <p class="text-xs text-amber-950 dark:text-amber-100 pl-7 leading-relaxed">
-              <strong>Mô tả chi tiết từ người gửi:</strong> {{ report.description }}
+              <strong>{{ 'moderator.detailed_desc_from_reporter' | translate }}</strong> {{ report.description }}
             </p>
           }
 
           <div class="text-[11px] text-amber-800 dark:text-amber-300 pl-7 flex flex-wrap gap-4 pt-1 border-t border-amber-200/50 dark:border-amber-800/50">
-            <span>Người báo cáo: <strong>{{ report.reporter.username }}</strong> (#{{ report.reporterId }})</span>
-            <span>Thời gian: {{ report.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+            <span>{{ 'moderator.reporter' | translate }}: <strong>{{ report.reporter.username }}</strong> (#{{ report.reporterId }})</span>
+            <span>{{ 'moderator.created_at' | translate }}: {{ report.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
             @if (report.reviewedBy) {
-              <span>Người duyệt: <strong>{{ report.reviewedBy.username }}</strong></span>
+              <span>{{ 'moderator.reviewed_by' | translate }} <strong>{{ report.reviewedBy.username }}</strong></span>
             }
             @if (report.reviewedAt) {
-              <span>Xử lý lúc: {{ report.reviewedAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+              <span>{{ 'moderator.reviewed_at' | translate }} {{ report.reviewedAt | date: 'dd/MM/yyyy HH:mm' }}</span>
             }
           </div>
 
           @if (report.resolutionNote) {
             <div class="mt-2 text-xs text-amber-950 dark:text-amber-100 pl-7">
-              <strong>Ghi chú xử lý:</strong> {{ report.resolutionNote }}
+              <strong>{{ 'moderator.resolution_note_label' | translate }}</strong> {{ report.resolutionNote }}
             </div>
           }
         </div>
@@ -384,12 +384,12 @@
         @if (report.targetType === 'POST' && report.post) {
           <div class="space-y-3">
             <h5 class="font-bold text-sm text-indigo-700 dark:text-indigo-300 flex items-center gap-2">
-              <i class="bi bi-file-post"></i> Bài viết bị báo cáo (#{{ report.post.id }})
+              <i class="bi bi-file-post"></i> {{ 'moderator.reported_post_title' | translate }} (#{{ report.post.id }})
             </h5>
             <div class="p-4 rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/30 dark:bg-aquamarine-950/30 space-y-2">
               <h3 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">{{ report.post.title }}</h3>
               <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400">
-                Tác giả: <strong>{{ report.post.author.username }}</strong> | Tạo ngày: {{ report.post.createdAt | date: 'dd/MM/yyyy HH:mm' }}
+                {{ 'table.author' | translate }}: <strong>{{ report.post.author.username }}</strong> | {{ 'moderator.created_at' | translate }}: {{ report.post.createdAt | date: 'dd/MM/yyyy HH:mm' }}
               </div>
               <div class="prose dark:prose-invert max-w-none text-xs text-aquamarine-800 dark:text-aquamarine-200 pt-2 border-t border-aquamarine-100 dark:border-aquamarine-800" [innerHTML]="report.post.content"></div>
             </div>
@@ -397,35 +397,35 @@
         } @else if (report.targetType === 'COMMENT' && report.comment) {
           <div class="space-y-3">
             <h5 class="font-bold text-sm text-purple-700 dark:text-purple-300 flex items-center gap-2">
-              <i class="bi bi-chat-left-text"></i> Bình luận bị báo cáo (#{{ report.comment.id }})
+              <i class="bi bi-chat-left-text"></i> {{ 'moderator.reported_comment_title' | translate }} (#{{ report.comment.id }})
             </h5>
             <div class="p-4 rounded-xl border border-purple-200 dark:border-purple-900 bg-purple-50/30 dark:bg-purple-950/30 space-y-3">
               <div class="text-sm text-purple-950 dark:text-purple-100 font-medium">
                 "{{ report.comment.content }}"
               </div>
               <div class="text-xs text-purple-700 dark:text-purple-300 flex items-center gap-2">
-                <span>Người viết bình luận: <strong>{{ report.comment.user.username }}</strong></span>
+                <span>{{ 'moderator.commenter' | translate }} <strong>{{ report.comment.user.username }}</strong></span>
                 <span>•</span>
-                <span>Tạo lúc: {{ report.comment.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+                <span>{{ 'moderator.created_at' | translate }}: {{ report.comment.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
               </div>
 
               <!-- Parent Comment Context if present -->
               @if (report.comment.parent) {
                 <div class="p-3 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white/60 dark:bg-aquamarine-900/60 text-xs">
                   <span class="font-semibold text-aquamarine-700 dark:text-aquamarine-300 block mb-1">
-                    Bình luận cha (Reply context):
+                    {{ 'moderator.parent_comment_context' | translate }}
                   </span>
                   <p class="italic text-aquamarine-900 dark:text-aquamarine-100">"{{ report.comment.parent.content }}"</p>
-                  <span class="text-[10px] text-aquamarine-500 mt-1 block">Bởi {{ report.comment.parent.user.username }}</span>
+                  <span class="text-[10px] text-aquamarine-500 mt-1 block">{{ 'moderator.commenter' | translate }} {{ report.comment.parent.user.username }}</span>
                 </div>
               }
 
               <!-- Post Context for Comment -->
               @if (report.comment.post) {
                 <div class="pt-2 border-t border-purple-100 dark:border-purple-900 text-xs">
-                  <span class="font-semibold text-aquamarine-700 dark:text-aquamarine-300">Ngữ cảnh bài viết chứa bình luận:</span>
+                  <span class="font-semibold text-aquamarine-700 dark:text-aquamarine-300">{{ 'moderator.post_context' | translate }}</span>
                   <h4 class="font-bold text-aquamarine-950 dark:text-aquamarine-50 mt-1">{{ report.comment.post.title }}</h4>
-                  <span class="text-aquamarine-500">Tác giả bài: {{ report.comment.post.author.username }}</span>
+                  <span class="text-aquamarine-500">{{ 'moderator.post_author' | translate }} {{ report.comment.post.author.username }}</span>
                 </div>
               }
             </div>
@@ -442,7 +442,7 @@
             [disabled]="actionLoading()"
             class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 transition-colors cursor-pointer inline-flex items-center gap-2"
           >
-            <i class="bi bi-check-circle-fill"></i> Xác nhận vi phạm & Ẩn nội dung
+            <i class="bi bi-check-circle-fill"></i> {{ 'action.resolve' | translate }}
           </button>
           <button
             type="button"
@@ -450,10 +450,10 @@
             [disabled]="actionLoading()"
             class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 transition-colors cursor-pointer inline-flex items-center gap-2"
           >
-            <i class="bi bi-x-circle-fill"></i> Bác bỏ báo cáo
+            <i class="bi bi-x-circle-fill"></i> {{ 'action.reject' | translate }}
           </button>
         }
-        <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer" (click)="closePreviewReport()">{{ 'modal.close' | translate }}</button>
+        <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer" (click)="closePreviewReport()">{{ 'action.close' | translate }}</button>
       </div>
     </div>
   </div>
@@ -465,7 +465,7 @@
     <div class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-md p-6">
       <div class="flex justify-between items-center mb-4">
         <h5 class="font-bold text-lg text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
-          <i class="bi bi-shield-check"></i> Xác nhận báo cáo vi phạm
+          <i class="bi bi-shield-check"></i> {{ 'moderator.confirm_violation_modal_title' | translate }}
         </h5>
         <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer" (click)="closeResolveModal()">
           <i class="bi bi-x-lg text-lg"></i>
@@ -473,28 +473,28 @@
       </div>
       <form (submit)="$event.preventDefault(); submitResolve()" class="space-y-4">
         <p class="text-xs text-aquamarine-700 dark:text-aquamarine-300 leading-relaxed">
-          Bạn đang xử lý báo cáo <strong>#{{ report.id }}</strong> (Loại: <strong>{{ report.targetType }}</strong>). Xử lý này sẽ tự động ẩn nội dung vi phạm khỏi hệ thống.
+          {{ 'moderator.confirm_violation_desc_prefix' | translate }} <strong>#{{ report.id }}</strong> ({{ 'table.type' | translate }}: <strong>{{ report.targetType }}</strong>){{ 'moderator.confirm_violation_desc_suffix' | translate }}
         </p>
         <div>
-          <label for="resolutionNote" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">Ghi chú xử lý (Tối đa 1000 ký tự)</label>
+          <label for="resolutionNote" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'moderator.resolution_note_label' | translate }}</label>
           <textarea
             class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 p-3 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
             id="resolutionNote"
             name="note"
             [(ngModel)]="resolutionNote"
             rows="3"
-            placeholder="Nhập lý do xử lý vi phạm..."
+            [placeholder]="'moderator.resolution_note_placeholder' | translate"
             required
             maxlength="1000"
           ></textarea>
         </div>
         <div class="flex justify-end gap-3 pt-2">
-          <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer" (click)="closeResolveModal()">Hủy</button>
+          <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer" (click)="closeResolveModal()">{{ 'action.cancel' | translate }}</button>
           <button type="submit" class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 transition-colors cursor-pointer inline-flex items-center gap-2" [disabled]="actionLoading() || !resolutionNote.trim()">
             @if (actionLoading()) {
               <span class="inline-block animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-r-transparent"></span>
             }
-            Xác nhận & Ẩn nội dung
+            {{ 'action.resolve' | translate }}
           </button>
         </div>
       </form>
@@ -508,7 +508,7 @@
     <div class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-md p-6">
       <div class="flex justify-between items-center mb-4">
         <h5 class="font-bold text-lg text-red-600 dark:text-red-400 flex items-center gap-2">
-          <i class="bi bi-x-circle"></i> Bác bỏ báo cáo vi phạm
+          <i class="bi bi-x-circle"></i> {{ 'moderator.reject_report_modal_title' | translate }}
         </h5>
         <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer" (click)="closeRejectReportModal()">
           <i class="bi bi-x-lg text-lg"></i>
@@ -516,28 +516,28 @@
       </div>
       <form (submit)="$event.preventDefault(); submitRejectReport()" class="space-y-4">
         <p class="text-xs text-aquamarine-700 dark:text-aquamarine-300 leading-relaxed">
-          Bạn đang bác bỏ báo cáo <strong>#{{ report.id }}</strong>. Nội dung bị báo cáo sẽ được <strong>giữ nguyên</strong> trên hệ thống.
+          {{ 'moderator.reject_report_desc_prefix' | translate }} <strong>#{{ report.id }}</strong>{{ 'moderator.reject_report_desc_suffix' | translate }}
         </p>
         <div>
-          <label for="rejectReportNote" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">Lý do bác bỏ (Tối đa 1000 ký tự)</label>
+          <label for="rejectReportNote" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'moderator.reject_reason_label' | translate }}</label>
           <textarea
             class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 p-3 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-red-500"
             id="rejectReportNote"
             name="rejectNote"
             [(ngModel)]="rejectReportNote"
             rows="3"
-            placeholder="Nhập lý do bác bỏ..."
+            [placeholder]="'moderator.reject_reason_placeholder' | translate"
             required
             maxlength="1000"
           ></textarea>
         </div>
         <div class="flex justify-end gap-3 pt-2">
-          <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer" (click)="closeRejectReportModal()">Hủy</button>
+          <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer" (click)="closeRejectReportModal()">{{ 'action.cancel' | translate }}</button>
           <button type="submit" class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 transition-colors cursor-pointer inline-flex items-center gap-2" [disabled]="actionLoading() || !rejectReportNote.trim()">
             @if (actionLoading()) {
               <span class="inline-block animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-r-transparent"></span>
             }
-            Xác nhận Bác bỏ
+            {{ 'action.reject' | translate }}
           </button>
         </div>
       </form>

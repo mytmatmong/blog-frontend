@@ -11,11 +11,15 @@
       </p>
     </div>
 
-    <a routerLink="/dashboard/owner/create-post" class="create-post-button">
-      <i class="bi bi-plus-lg"></i>
-
-      <span>{{ 'dashboard.create_post' | translate }}</span>
-    </a>
+    <app-icon-button
+      icon="bi bi-plus-lg"
+      color="primary"
+      variant="solid"
+      size="md"
+      (btnClick)="navigateToCreatePost()"
+    >
+      {{ 'dashboard.create_post' | translate }}
+    </app-icon-button>
   </header>
 
   <!-- FILTER -->
@@ -63,15 +67,25 @@
         <i class="bi bi-chevron-down select-field__arrow"></i>
       </label>
 
-      <button type="button" class="filter-button filter-button--primary" (click)="applySearch()">
-        <i class="bi bi-search"></i>
-        <span>{{ 'common.search' | translate }}</span>
-      </button>
+      <app-icon-button
+        icon="bi bi-search"
+        color="primary"
+        variant="solid"
+        size="sm"
+        (btnClick)="applySearch()"
+      >
+        {{ 'common.search' | translate }}
+      </app-icon-button>
 
-      <button type="button" class="filter-button filter-button--secondary" (click)="clearFilters()">
-        <i class="bi bi-arrow-counterclockwise"></i>
-        <span>{{ 'common.clear_search' | translate }}</span>
-      </button>
+      <app-icon-button
+        icon="bi bi-arrow-counterclockwise"
+        color="primary"
+        variant="soft"
+        size="sm"
+        (btnClick)="clearFilters()"
+      >
+        {{ 'common.clear_search' | translate }}
+      </app-icon-button>
     </div>
   </article>
 
@@ -82,9 +96,13 @@
 
     <span>{{ loadError() }}</span>
 
-    <button type="button" (click)="loadPosts()">
-      {{ 'common.retry' | translate }}
-    </button>
+    <app-text-button
+      variant="secondary"
+      size="sm"
+      (btnClick)="loadPosts()"
+    >
+      <i class="bi bi-arrow-clockwise mr-1"></i> {{ 'common.retry' | translate }}
+    </app-text-button>
   </div>
   }
 
@@ -169,23 +187,28 @@
 
             <!-- LANGUAGE -->
             <td>
-              <span class="language-chip">
+              <app-badge color="blue" shape="pill" size="sm">
                 {{ languageLabel(post) }}
-              </span>
+              </app-badge>
             </td>
 
             <!-- STATUS -->
             <td>
               <div class="status-cell">
-                <span class="post-status {{ statusClass(post.status) }}">
+                <app-badge
+                  [color]="statusBadgeColor(post.status)"
+                  shape="pill"
+                  size="sm"
+                  dot
+                >
                   {{ statusLabel(post.status) }}
-                </span>
+                </app-badge>
 
                 @if (
                 post.status === 'REJECT' &&
                 post.rejectionReason
                 ) {
-                <span class="reject-reason" [title]="post.rejectionReason">
+                <span class="reject-reason text-xs text-red-600 dark:text-red-400 mt-1 block" [title]="post.rejectionReason">
                   {{ post.rejectionReason }}
                 </span>
                 }
@@ -194,69 +217,58 @@
 
             <!-- SUBMIT -->
             <td>
-              <button type="button" class="submit-button" (click)="submitPost(post)" [disabled]="
-                      !canSubmit(post) ||
-                      submittingPostId() !== null
-                    " [title]="
-                      canSubmit(post)
-                        ? ('posts.submit' | translate)
-                        : ('posts.submit_disabled' | translate)
-                    ">
-                <i class="bi" [class.bi-arrow-repeat]="
-                        submittingPostId() === post.id
-                      " [class.spin]="
-                        submittingPostId() === post.id
-                      " [class.bi-send]="
-                        submittingPostId() !== post.id
-                      "></i>
-
-                <span>
-                  {{
-                  submittingPostId() === post.id
-                  ? ('common.sending' | translate)
-                  : ('posts.submit' | translate)
-                  }}
-                </span>
-              </button>
+              <app-icon-button
+                icon="bi bi-send"
+                color="blue"
+                variant="soft"
+                size="sm"
+                [disabled]="!canSubmit(post) || submittingPostId() !== null"
+                [loading]="submittingPostId() === post.id"
+                [title]="canSubmit(post) ? ('posts.submit' | translate) : ('posts.submit_disabled' | translate)"
+                (btnClick)="submitPost(post)"
+              >
+                {{ submittingPostId() === post.id ? ('common.sending' | translate) : ('posts.submit' | translate) }}
+              </app-icon-button>
             </td>
 
             <!-- ACTIONS -->
             <td class="owner-actions-column">
-              <div class="owner-action-group">
-                <button type="button" class="owner-action-button" (click)="setPreviewPost(post)"
-                  [title]="'common.view' | translate">
-                  <i class="bi bi-eye"></i>
-                  <span>{{ 'common.view' | translate }}</span>
-                </button>
+              <div class="flex items-center justify-center gap-2">
+                <app-icon-button
+                  icon="bi bi-eye"
+                  color="primary"
+                  variant="soft"
+                  size="sm"
+                  [title]="'common.view' | translate"
+                  (btnClick)="setPreviewPost(post)"
+                >
+                  {{ 'common.view' | translate }}
+                </app-icon-button>
 
-                @if (canEdit(post)) {
-                <a class="owner-action-button" [routerLink]="[
-    '/dashboard/owner/edit-post',
-    post.id
-  ]" [title]="'comments.edit' | translate">
-                  <i class="bi bi-pencil-square"></i>
-                  <span>{{ 'comments.edit' | translate }}</span>
-                </a>
-                } @else {
-                <button type="button" class="owner-action-button" disabled [title]="
-                          'posts.edit_disabled' | translate
-                        ">
-                  <i class="bi bi-pencil-square"></i>
-                  <span>{{ 'comments.edit' | translate }}</span>
-                </button>
-                }
+                <app-icon-button
+                  icon="bi bi-pencil-square"
+                  color="blue"
+                  variant="soft"
+                  size="sm"
+                  [disabled]="!canEdit(post)"
+                  [title]="canEdit(post) ? ('comments.edit' | translate) : ('posts.edit_disabled' | translate)"
+                  (btnClick)="navigateToEdit(post.id)"
+                >
+                  {{ 'comments.edit' | translate }}
+                </app-icon-button>
 
-                <button type="button" class="owner-action-button owner-action-button--danger" (click)="deletePost(post)"
-                  [disabled]="deletingPostId() !== null" [title]="'comments.delete' | translate">
-                  <i class="bi" [class.bi-arrow-repeat]="
-                          deletingPostId() === post.id
-                        " [class.spin]="
-                          deletingPostId() === post.id
-                        " [class.bi-trash3]="
-                          deletingPostId() !== post.id
-                        "></i>
-                  <span>{{ 'comments.delete' | translate }}</span>
-                </button>
+                <app-icon-button
+                  icon="bi bi-trash3"
+                  color="red"
+                  variant="soft"
+                  size="sm"
+                  [disabled]="deletingPostId() !== null"
+                  [loading]="deletingPostId() === post.id"
+                  [title]="'comments.delete' | translate"
+                  (btnClick)="deletePost(post)"
+                >
+                  {{ 'comments.delete' | translate }}
+                </app-icon-button>
               </div>
             </td>
           </tr>
@@ -275,25 +287,34 @@
         {{ currentPage() }} / {{ totalPages() }}
       </span>
 
-      <div class="posts-pagination__buttons">
-        <button type="button" [disabled]="currentPage() === 1 || isLoading()" (click)="setPage(currentPage() - 1)">
-          <i class="bi bi-chevron-left"></i>
-          <span>{{ 'pagination.prev' | translate }}</span>
-        </button>
+      <div class="posts-pagination__buttons flex items-center space-x-1">
+        <app-text-button
+          variant="secondary"
+          size="sm"
+          [disabled]="currentPage() === 1 || isLoading()"
+          (btnClick)="setPage(currentPage() - 1)"
+        >
+          <i class="bi bi-chevron-left mr-1"></i> {{ 'pagination.prev' | translate }}
+        </app-text-button>
 
         @for (page of pageNumbers(); track page) {
-        <button type="button" class="page-number" [class.is-active]="currentPage() === page" (click)="setPage(page)">
-          {{ page }}
-        </button>
+          <app-text-button
+            [variant]="currentPage() === page ? 'primary' : 'secondary'"
+            size="sm"
+            (btnClick)="setPage(page)"
+          >
+            {{ page }}
+          </app-text-button>
         }
 
-        <button type="button" [disabled]="
-              currentPage() === totalPages() ||
-              isLoading()
-            " (click)="setPage(currentPage() + 1)">
-          <span>{{ 'pagination.next' | translate }}</span>
-          <i class="bi bi-chevron-right"></i>
-        </button>
+        <app-text-button
+          variant="secondary"
+          size="sm"
+          [disabled]="currentPage() === totalPages() || isLoading()"
+          (btnClick)="setPage(currentPage() + 1)"
+        >
+          {{ 'pagination.next' | translate }} <i class="bi bi-chevron-right ml-1"></i>
+        </app-text-button>
       </div>
     </nav>
     }

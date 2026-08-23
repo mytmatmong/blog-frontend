@@ -59,16 +59,16 @@
               </td>
               <td class="p-4 text-center">
                 @if (lang.isDefault) {
-                  <app-badge color="blue" shape="rounded" size="sm" icon="bi bi-star-fill">Default</app-badge>
+                  <app-badge color="blue" shape="rounded" size="sm" icon="bi bi-star-fill">{{ 'table.default' | translate }}</app-badge>
                 } @else {
                   <span class="text-aquamarine-400">-</span>
                 }
               </td>
               <td class="min-w-[118px] whitespace-nowrap p-4 text-center">
                 @if (lang.isActive) {
-                  <app-badge color="green" shape="pill" size="sm" dot>ACTIVE</app-badge>
+                  <app-badge color="green" shape="pill" size="sm" dot>{{ 'status.active' | translate }}</app-badge>
                 } @else {
-                  <app-badge color="gray" shape="pill" size="sm" dot>INACTIVE</app-badge>
+                  <app-badge color="gray" shape="pill" size="sm" dot>{{ 'status.inactive' | translate }}</app-badge>
                 }
               </td>
               <td class="p-4 text-center">
@@ -101,7 +101,7 @@
           } @empty {
             <tr>
               <td colspan="5" class="p-8 text-center text-sm text-aquamarine-500 italic">
-                Chưa có ngôn ngữ nào.
+                {{ 'languages.empty_list' | translate }}
               </td>
             </tr>
           }

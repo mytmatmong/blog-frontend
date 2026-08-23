@@ -270,15 +270,7 @@ export class ManageComments implements OnInit {
   }
 
   getReasonLabel(reason: ModeratorReportReason): string {
-    const map: Record<ModeratorReportReason, string> = {
-      SPAM: 'Spam / Quảng cáo',
-      HARASSMENT: 'Xúc phạm / Bắt nạt',
-      INAPPROPRIATE: 'Nội dung không phù hợp',
-      COPYRIGHT: 'Vi phạm bản quyền',
-      MISINFORMATION: 'Thông tin sai lệch',
-      OTHER: 'Lý do khác',
-    };
-    return map[reason] || reason;
+    return this.ts.translate('report.reason.' + reason);
   }
 
   logoutAndSwitchAccount() {

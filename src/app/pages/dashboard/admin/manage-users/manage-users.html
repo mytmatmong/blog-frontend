@@ -54,10 +54,10 @@
           class="px-3 py-2 rounded-xl text-sm border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none focus:ring-2 focus:ring-aquamarine-500 transition-all cursor-pointer"
         >
           <option value="ALL">{{ 'users.all_roles' | translate }}</option>
-          <option value="NORMAL">Normal User</option>
-          <option value="BLOG_OWNER">Blog Owner</option>
-          <option value="CONTENT_MODERATOR">Content Moderator</option>
-          <option value="SUPER_ADMIN">Super Admin</option>
+          <option value="NORMAL">{{ 'role.NORMAL' | translate }}</option>
+          <option value="BLOG_OWNER">{{ 'role.BLOG_OWNER' | translate }}</option>
+          <option value="CONTENT_MODERATOR">{{ 'role.CONTENT_MODERATOR' | translate }}</option>
+          <option value="SUPER_ADMIN">{{ 'role.SUPER_ADMIN' | translate }}</option>
         </select>
       </div>
 
@@ -73,8 +73,8 @@
           class="px-3 py-2 rounded-xl text-sm border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none focus:ring-2 focus:ring-aquamarine-500 transition-all cursor-pointer"
         >
           <option value="ALL">{{ 'users.all_statuses' | translate }}</option>
-          <option value="ACTIVE">ACTIVE</option>
-          <option value="LOCKED">LOCKED</option>
+          <option value="ACTIVE">{{ 'status.active' | translate }}</option>
+          <option value="LOCKED">{{ 'status.locked' | translate }}</option>
         </select>
       </div>
 
@@ -189,21 +189,21 @@
                 [className]="getRoleClass(user.role)"
                 title="Đổi vai trò"
               >
-                {{ user.role }} <i class="bi bi-chevron-down text-[10px]"></i>
+                {{ ('role.' + user.role) | translate }} <i class="bi bi-chevron-down text-[10px]"></i>
               </button>
             </td>
             <td class="min-w-[118px] whitespace-nowrap p-4 text-center">
               @if (user.status === 'ACTIVE') {
-                <app-badge color="green" shape="pill" size="sm" dot>ACTIVE</app-badge>
+                <app-badge color="green" shape="pill" size="sm" dot>{{ 'status.active' | translate }}</app-badge>
               } @else if (user.status === 'LOCKED') {
                 <app-badge
                   color="yellow"
                   shape="pill"
                   size="sm"
                   dot
-                  [title]="user.lockReason ? 'Lý do: ' + user.lockReason : 'Đã bị khóa'"
+                  [title]="user.lockReason ? ('users.lock_reason_label' | translate) + ': ' + user.lockReason : ('status.locked' | translate)"
                 >
-                  LOCKED
+                  {{ 'status.locked' | translate }}
                 </app-badge>
               }
             </td>
@@ -271,7 +271,7 @@
       class="mt-6 flex flex-wrap justify-between items-center gap-3 text-sm text-aquamarine-700 dark:text-aquamarine-300"
     >
       <div>
-        Tổng cộng <strong>{{ totalItems() }}</strong> người dùng
+        {{ 'users.total_users' | translate }} <strong>{{ totalItems() }}</strong> {{ 'users.users_unit' | translate }}
       </div>
       <ul class="inline-flex flex-wrap items-center justify-end gap-1">
         <li>
@@ -322,7 +322,7 @@
     >
       <div class="flex justify-between items-center mb-4">
         <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">
-          Tạo mới Content Moderator
+          {{ 'users.create_mod_title' | translate }}
         </h5>
         <button
           type="button"
@@ -337,7 +337,7 @@
           <label
             for="modUsername"
             class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1"
-            >Username <span class="text-rose-500">*</span></label
+            >{{ 'profile.username_label' | translate }} <span class="text-rose-500">*</span></label
           >
           <input
             type="text"
@@ -353,7 +353,7 @@
           <label
             for="modEmail"
             class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1"
-            >Email <span class="text-rose-500">*</span></label
+            >{{ 'table.email' | translate }} <span class="text-rose-500">*</span></label
           >
           <input
             type="email"
@@ -369,7 +369,7 @@
           <label
             for="modPassword"
             class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1"
-            >Mật khẩu <span class="text-rose-500">*</span></label
+            >{{ 'users.mod_password' | translate }} <span class="text-rose-500">*</span></label
           >
           <input
             type="password"
@@ -377,7 +377,7 @@
             id="modPassword"
             name="password"
             [(ngModel)]="modPassword"
-            placeholder="Tối thiểu 6 ký tự..."
+            [placeholder]="'users.min_6_chars' | translate"
             required
           />
         </div>
@@ -385,7 +385,7 @@
           <label
             for="modBio"
             class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1"
-            >Tiểu sử / Bio (Tùy chọn)</label
+            >{{ 'users.bio_optional' | translate }}</label
           >
           <textarea
             class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 p-3 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500"
@@ -393,7 +393,7 @@
             name="bio"
             [(ngModel)]="modBio"
             rows="2"
-            placeholder="Ví dụ: Kiểm duyệt bài viết mảng công nghệ..."
+            [placeholder]="'users.bio_placeholder_example' | translate"
           ></textarea>
         </div>
         <div class="flex justify-end gap-3 pt-2">
@@ -431,7 +431,7 @@
         class="flex justify-between items-center p-5 border-b border-aquamarine-200 dark:border-aquamarine-800"
       >
         <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">
-          Chi tiết Người dùng:
+          {{ 'users.user_detail_title' | translate }}
           <span class="text-aquamarine-600 dark:text-aquamarine-400">{{
             activePreviewUser()?.username || activePreviewUser()?.email
           }}</span>
@@ -450,26 +450,26 @@
             class="flex items-center justify-center py-10 text-aquamarine-600 dark:text-aquamarine-400 gap-3"
           >
             <i class="bi bi-arrow-repeat animate-spin text-2xl"></i>
-            <span>Đang tải thông tin chi tiết & bài viết...</span>
+            <span>{{ 'users.loading_detail' | translate }}</span>
           </div>
         } @else if (activeUserDetail()) {
           <div
             class="grid grid-cols-2 gap-4 bg-aquamarine-50/50 dark:bg-aquamarine-950/50 p-4 rounded-xl border border-aquamarine-100 dark:border-aquamarine-800 text-sm"
           >
             <div>
-              <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">ID Người dùng</p>
+              <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ 'connections.user_id' | translate }}</p>
               <p class="font-bold text-aquamarine-950 dark:text-aquamarine-50">
                 #{{ activeUserDetail()?.id }}
               </p>
             </div>
             <div>
-              <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">Username</p>
+              <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ 'profile.username_label' | translate }}</p>
               <p class="font-bold text-aquamarine-950 dark:text-aquamarine-50">
                 {{ activeUserDetail()?.username }}
               </p>
             </div>
             <div>
-              <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">Email</p>
+              <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ 'table.email' | translate }}</p>
               <p
                 class="font-bold text-aquamarine-950 dark:text-aquamarine-50 truncate"
                 [title]="activeUserDetail()?.email"
@@ -478,29 +478,29 @@
               </p>
             </div>
             <div>
-              <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">Vai trò / Role</p>
+              <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ 'profile.role' | translate }}</p>
               <p class="font-bold" [className]="getRoleClass(activeUserDetail()!.role)">
-                {{ activeUserDetail()?.role }}
+                {{ ('role.' + activeUserDetail()?.role) | translate }}
               </p>
             </div>
             <div>
               <div class="mt-1">
                 @if (activeUserDetail()?.status === 'ACTIVE') {
-                  <app-badge color="green" shape="pill" size="sm" dot>ACTIVE</app-badge>
+                  <app-badge color="green" shape="pill" size="sm" dot>{{ 'status.active' | translate }}</app-badge>
                 } @else {
-                  <app-badge color="yellow" shape="pill" size="sm" dot>LOCKED</app-badge>
+                  <app-badge color="yellow" shape="pill" size="sm" dot>{{ 'status.locked' | translate }}</app-badge>
                 }
               </div>
             </div>
             <div>
-              <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">Ngày tham gia</p>
+              <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ 'users.joined_date' | translate }}</p>
               <p class="font-medium text-aquamarine-900 dark:text-aquamarine-100">
                 {{ formatDate(activeUserDetail()?.createdAt) }}
               </p>
             </div>
             @if (activeUserDetail()?.bio) {
               <div class="col-span-2">
-                <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">Tiểu sử / Bio</p>
+                <p class="text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ 'profile.bio_label' | translate }}</p>
                 <p class="text-xs italic text-aquamarine-900 dark:text-aquamarine-100 mt-0.5">
                   {{ activeUserDetail()?.bio }}
                 </p>
@@ -510,7 +510,7 @@
               <div
                 class="col-span-2 bg-amber-100/60 dark:bg-amber-950/40 p-2.5 rounded-lg border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300"
               >
-                <p class="text-xs font-bold">Lý do khóa tài khoản:</p>
+                <p class="text-xs font-bold">{{ 'users.lock_reason_heading' | translate }}</p>
                 <p class="text-xs">{{ activeUserDetail()?.lockReason }}</p>
               </div>
             }
@@ -521,7 +521,7 @@
               class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-50 pb-2 border-b border-aquamarine-200 dark:border-aquamarine-800 mb-3 flex items-center justify-between"
             >
               <span
-                >Danh sách bài viết tác giả đã đăng ({{
+                >{{ 'users.author_posts_list' | translate }} ({{
                   activeUserDetail()?.posts?.length || 0
                 }})</span
               >
@@ -529,7 +529,7 @@
             <div class="space-y-3 max-h-[300px] overflow-y-auto pr-1">
               @if (!activeUserDetail()?.posts || activeUserDetail()?.posts?.length === 0) {
                 <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400 text-center py-6">
-                  Người dùng này chưa có bài viết nào trong hệ thống.
+                  {{ 'users.no_posts_in_system' | translate }}
                 </div>
               } @else {
                 @for (post of activeUserDetail()?.posts; track post.id) {
@@ -543,9 +543,13 @@
                         {{ post.title }}
                       </h6>
                       @if (post.status === 'PUBLISHED') {
-                        <app-badge color="green" shape="rounded" size="sm">PUBLISHED</app-badge>
+                        <app-badge color="green" shape="rounded" size="sm">{{ 'status.published' | translate }}</app-badge>
                       } @else if (post.status === 'PENDING') {
-                        <app-badge color="yellow" shape="rounded" size="sm">{{ post.status }}</app-badge>
+                        <app-badge color="yellow" shape="rounded" size="sm">{{ 'status.pending' | translate }}</app-badge>
+                      } @else if (post.status === 'DRAFT') {
+                        <app-badge color="gray" shape="rounded" size="sm">{{ 'status.draft' | translate }}</app-badge>
+                      } @else if (post.status === 'REJECTED') {
+                        <app-badge color="red" shape="rounded" size="sm">{{ 'status.rejected' | translate }}</app-badge>
                       } @else {
                         <app-badge color="gray" shape="rounded" size="sm">{{ post.status }}</app-badge>
                       }
@@ -553,9 +557,9 @@
                     <div
                       class="flex items-center gap-4 text-xs text-aquamarine-600 dark:text-aquamarine-400"
                     >
-                      <span><i class="bi bi-eye"></i> {{ post.viewCount }} lượt xem</span>
-                      <span><i class="bi bi-hand-thumbs-up"></i> {{ post.likeCount }} thích</span>
-                      <span><i class="bi bi-chat-dots"></i> {{ post.commentCount }} bình luận</span>
+                      <span><i class="bi bi-eye"></i> {{ post.viewCount }} {{ 'users.views_count' | translate }}</span>
+                      <span><i class="bi bi-hand-thumbs-up"></i> {{ post.likeCount }} {{ 'users.likes_count' | translate }}</span>
+                      <span><i class="bi bi-chat-dots"></i> {{ post.commentCount }} {{ 'users.comments_count' | translate }}</span>
                       <span><i class="bi bi-calendar3"></i> {{ formatDate(post.createdAt) }}</span>
                     </div>
                   </div>
@@ -757,7 +761,7 @@
     >
       <div class="flex justify-between items-center mb-4">
         <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">
-          Đổi vai trò người dùng
+          {{ 'users.change_role_modal_title' | translate }}
         </h5>
         <button
           type="button"
@@ -769,7 +773,7 @@
       </div>
       <form (submit)="$event.preventDefault(); submitChangeRole()" class="space-y-4">
         <p class="text-sm text-aquamarine-800 dark:text-aquamarine-200">
-          Chọn vai trò mới cho tài khoản
+          {{ 'users.select_new_role_desc' | translate }}
           <strong>{{ activeRoleUser()?.username || activeRoleUser()?.email }}</strong
           >:
         </p>
@@ -779,10 +783,10 @@
             (change)="selectedNewRole.set($any($event.target).value)"
             class="w-full px-4 py-2.5 rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 text-aquamarine-950 dark:text-aquamarine-50 font-semibold focus:outline-none focus:ring-2 focus:ring-aquamarine-500 cursor-pointer"
           >
-            <option value="NORMAL">NORMAL (Người dùng thông thường)</option>
-            <option value="BLOG_OWNER">BLOG_OWNER (Tác giả bài viết)</option>
-            <option value="CONTENT_MODERATOR">CONTENT_MODERATOR (Kiểm duyệt viên)</option>
-            <option value="SUPER_ADMIN">SUPER_ADMIN (Quản trị viên tối cao)</option>
+            <option value="NORMAL">{{ 'role.NORMAL' | translate }}</option>
+            <option value="BLOG_OWNER">{{ 'role.BLOG_OWNER' | translate }}</option>
+            <option value="CONTENT_MODERATOR">{{ 'role.CONTENT_MODERATOR' | translate }}</option>
+            <option value="SUPER_ADMIN">{{ 'role.SUPER_ADMIN' | translate }}</option>
           </select>
         </div>
         <div class="flex justify-end gap-3 pt-2">
@@ -800,7 +804,7 @@
             [loading]="isSubmittingRole()"
             [disabled]="isSubmittingRole()"
           >
-            Cập nhật vai trò
+            {{ 'users.update_role_submit' | translate }}
           </app-text-button>
         </div>
       </form>

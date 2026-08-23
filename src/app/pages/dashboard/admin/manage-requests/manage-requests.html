@@ -90,11 +90,11 @@
             </td>
             <td class="p-4 text-center whitespace-nowrap">
               @if (item.status === 'APPROVED') {
-                <app-badge color="green" shape="pill" size="sm" dot>APPROVED</app-badge>
+                <app-badge color="green" shape="pill" size="sm" dot>{{ 'requests.approved' | translate }}</app-badge>
               } @else if (item.status === 'REJECTED') {
-                <app-badge color="red" shape="pill" size="sm" dot>REJECTED</app-badge>
+                <app-badge color="red" shape="pill" size="sm" dot>{{ 'requests.rejected' | translate }}</app-badge>
               } @else {
-                <app-badge color="yellow" shape="pill" size="sm" dot>PENDING</app-badge>
+                <app-badge color="yellow" shape="pill" size="sm" dot>{{ 'requests.pending' | translate }}</app-badge>
               }
             </td>
             <td class="min-w-[220px] whitespace-nowrap p-4 text-center">

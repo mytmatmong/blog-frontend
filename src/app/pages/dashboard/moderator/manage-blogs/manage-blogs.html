@@ -3,45 +3,33 @@
   <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 p-4 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
     <!-- Status Filter Tabs -->
     <div class="flex items-center gap-1 overflow-x-auto p-1 rounded-xl bg-aquamarine-50 dark:bg-aquamarine-950 border border-aquamarine-200 dark:border-aquamarine-800">
-      <button
-        type="button"
-        (click)="onStatusChange('PENDING_REVIEW')"
-        class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap cursor-pointer"
-        [class.bg-aquamarine-600]="statusFilter() === 'PENDING_REVIEW'"
-        [class.text-white]="statusFilter() === 'PENDING_REVIEW'"
-        [class.text-aquamarine-800]="statusFilter() !== 'PENDING_REVIEW'"
-        [class.dark:text-aquamarine-200]="statusFilter() !== 'PENDING_REVIEW'"
-        [class.hover:bg-aquamarine-100]="statusFilter() !== 'PENDING_REVIEW'"
-        [class.dark:hover:bg-aquamarine-900]="statusFilter() !== 'PENDING_REVIEW'"
+      <app-icon-button
+        icon="bi bi-clock-history"
+        color="primary"
+        [variant]="statusFilter() === 'PENDING_REVIEW' ? 'solid' : 'soft'"
+        size="sm"
+        (btnClick)="onStatusChange('PENDING_REVIEW')"
       >
-        <i class="bi bi-clock-history mr-1"></i> Chờ duyệt
-      </button>
-      <button
-        type="button"
-        (click)="onStatusChange('PUBLISH')"
-        class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap cursor-pointer"
-        [class.bg-emerald-600]="statusFilter() === 'PUBLISH'"
-        [class.text-white]="statusFilter() === 'PUBLISH'"
-        [class.text-aquamarine-800]="statusFilter() !== 'PUBLISH'"
-        [class.dark:text-aquamarine-200]="statusFilter() !== 'PUBLISH'"
-        [class.hover:bg-aquamarine-100]="statusFilter() !== 'PUBLISH'"
-        [class.dark:hover:bg-aquamarine-900]="statusFilter() !== 'PUBLISH'"
+        {{ 'filter.status.pending_review' | translate }}
+      </app-icon-button>
+      <app-icon-button
+        icon="bi bi-check2-circle"
+        [color]="statusFilter() === 'PUBLISH' ? 'green' : 'primary'"
+        [variant]="statusFilter() === 'PUBLISH' ? 'solid' : 'soft'"
+        size="sm"
+        (btnClick)="onStatusChange('PUBLISH')"
       >
-        <i class="bi bi-check2-circle mr-1"></i> Đã xuất bản
-      </button>
-      <button
-        type="button"
-        (click)="onStatusChange('REJECT')"
-        class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap cursor-pointer"
-        [class.bg-red-600]="statusFilter() === 'REJECT'"
-        [class.text-white]="statusFilter() === 'REJECT'"
-        [class.text-aquamarine-800]="statusFilter() !== 'REJECT'"
-        [class.dark:text-aquamarine-200]="statusFilter() !== 'REJECT'"
-        [class.hover:bg-aquamarine-100]="statusFilter() !== 'REJECT'"
-        [class.dark:hover:bg-aquamarine-900]="statusFilter() !== 'REJECT'"
+        {{ 'filter.status.published' | translate }}
+      </app-icon-button>
+      <app-icon-button
+        icon="bi bi-x-circle"
+        [color]="statusFilter() === 'REJECT' ? 'red' : 'primary'"
+        [variant]="statusFilter() === 'REJECT' ? 'solid' : 'soft'"
+        size="sm"
+        (btnClick)="onStatusChange('REJECT')"
       >
-        <i class="bi bi-x-circle mr-1"></i> Từ chối
-      </button>
+        {{ 'filter.status.rejected' | translate }}
+      </app-icon-button>
     </div>
 
     <!-- Search Input -->
@@ -50,7 +38,7 @@
         type="text"
         [(ngModel)]="searchQuery"
         (keyup.enter)="onSearch()"
-        placeholder="Tìm kiếm tiêu đề bài viết..."
+        [placeholder]="'moderator.search_blog_placeholder' | translate"
         class="w-full pl-9 pr-8 py-2 rounded-xl text-xs border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500"
       />
       <i class="bi bi-search absolute left-3 top-2.5 text-aquamarine-500 text-xs"></i>
@@ -70,14 +58,14 @@
   @if (loading()) {
     <div class="flex flex-col items-center justify-center py-16 text-aquamarine-600 dark:text-aquamarine-400">
       <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-aquamarine-600 border-r-transparent mb-3"></div>
-      <p class="text-sm font-medium">Đang tải danh sách bài viết...</p>
+      <p class="text-sm font-medium">{{ 'moderator.loading_blogs' | translate }}</p>
     </div>
   } @else if (error()) {
     <!-- Error State -->
     <div class="p-6 rounded-2xl border border-red-200 dark:border-red-900/50 bg-red-50/50 dark:bg-red-950/20 text-center max-w-2xl mx-auto my-6">
       <i class="bi bi-shield-lock text-4xl text-red-500 mb-3 inline-block"></i>
       <h4 class="font-bold text-lg text-red-700 dark:text-red-400 mb-2">
-        {{ isForbidden() ? 'Không có quyền truy cập (403 Forbidden)' : 'Không thể tải danh sách bài viết' }}
+        {{ isForbidden() ? ('moderator.forbidden_title' | translate) : ('moderator.cannot_load_blogs' | translate) }}
       </h4>
       <p class="text-sm text-red-600 dark:text-red-300 mb-4 leading-relaxed">
         {{ error() }}
@@ -86,16 +74,16 @@
       @if (isForbidden()) {
         <div class="p-4 mb-5 rounded-xl bg-white dark:bg-aquamarine-900/80 border border-red-200 dark:border-red-800 text-left text-xs space-y-2">
           <div class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-50 flex items-center gap-2">
-            <i class="bi bi-info-circle text-aquamarine-600"></i> Hướng dẫn tài khoản kiểm thử Moderator:
+            <i class="bi bi-info-circle text-aquamarine-600"></i> {{ 'moderator.test_account_guide' | translate }}
           </div>
           <p class="text-[var(--text-muted)]">
-            Chỉ tài khoản thuộc vai trò <code class="px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-bold">CONTENT_MODERATOR</code> mới có thể xem danh sách kiểm duyệt bài viết.
+            {{ 'moderator.test_account_blog_desc' | translate }}
           </p>
           <div class="pt-1">
-            <span class="font-semibold text-aquamarine-900 dark:text-aquamarine-100">Tài khoản Moderator mẫu:</span>
+            <span class="font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'moderator.sample_account' | translate }}</span>
             <ul class="list-disc list-inside mt-1 space-y-1 font-mono text-[11px] text-aquamarine-700 dark:text-aquamarine-300">
               <li>Email: <strong class="select-all">moderator.001@seed.local</strong></li>
-              <li>Mật khẩu: <strong class="select-all">Test123!</strong></li>
+              <li>{{ 'users.mod_password' | translate }}: <strong class="select-all">Test123!</strong></li>
             </ul>
           </div>
         </div>
@@ -103,28 +91,32 @@
 
       <div class="flex items-center justify-center gap-3">
         @if (isForbidden()) {
-          <button
-            (click)="logoutAndSwitchAccount()"
-            class="px-4 py-2 bg-aquamarine-600 hover:bg-aquamarine-700 text-white font-medium text-sm rounded-xl transition-colors inline-flex items-center gap-2 cursor-pointer shadow-sm"
+          <app-icon-button
+            icon="bi bi-box-arrow-right"
+            color="primary"
+            variant="solid"
+            size="sm"
+            (btnClick)="logoutAndSwitchAccount()"
           >
-            <i class="bi bi-box-arrow-right"></i> Đăng xuất & Đăng nhập Moderator
-          </button>
+            {{ 'moderator.logout_and_switch' | translate }}
+          </app-icon-button>
         }
-        <button
-          (click)="loadPosts()"
-          class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium text-sm rounded-xl transition-colors inline-flex items-center gap-2 cursor-pointer"
+        <app-text-button
+          variant="secondary"
+          size="sm"
+          (btnClick)="loadPosts()"
         >
-          <i class="bi bi-arrow-clockwise"></i> Thử lại
-        </button>
+          <i class="bi bi-arrow-clockwise mr-1"></i> {{ 'common.retry' | translate }}
+        </app-text-button>
       </div>
     </div>
   } @else if (posts().length === 0) {
     <!-- Empty State -->
     <div class="p-12 text-center rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
       <i class="bi bi-journal-x text-4xl text-aquamarine-400 mb-3 inline-block"></i>
-      <h4 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">Không có bài viết nào</h4>
+      <h4 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">{{ 'moderator.no_blogs_title' | translate }}</h4>
       <p class="text-sm text-aquamarine-600 dark:text-aquamarine-400 mt-1">
-        Không tìm thấy bài viết nào phù hợp với bộ lọc hiện tại.
+        {{ 'moderator.no_blogs_desc' | translate }}
       </p>
     </div>
   } @else {
@@ -133,11 +125,11 @@
       <table class="w-full text-left border-collapse text-sm">
         <thead>
           <tr class="border-b border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950/50">
-            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">ID & Tiêu đề</th>
-            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">Tác giả</th>
-            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">Ngôn ngữ / Danh mục</th>
-            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center moderator-status-column">Trạng thái</th>
-            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">Thao tác</th>
+            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'moderator.id_and_title' | translate }}</th>
+            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'table.author' | translate }}</th>
+            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'moderator.lang_and_cat' | translate }}</th>
+            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center moderator-status-column">{{ 'table.status' | translate }}</th>
+            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.actions' | translate }}</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-aquamarine-100 dark:divide-aquamarine-800">
@@ -156,7 +148,7 @@
                       {{ blog.title }}
                     </a>
                     <div class="text-[11px] text-aquamarine-500 mt-0.5">
-                      Tạo lúc: {{ blog.createdAt | date: 'dd/MM/yyyy HH:mm' }}
+                      {{ 'moderator.created_at' | translate }}: {{ blog.createdAt | date: 'dd/MM/yyyy HH:mm' }}
                     </div>
                   </div>
                 </div>
@@ -186,9 +178,7 @@
                   @if (blog.categories && blog.categories.length > 0) {
                     <div class="flex flex-wrap gap-1">
                       @for (cat of blog.categories; track cat.id) {
-                        <span class="px-1.5 py-0.5 text-[10px] rounded bg-aquamarine-100 dark:bg-aquamarine-800 text-aquamarine-800 dark:text-aquamarine-200">
-                          {{ cat.name }}
-                        </span>
+                        <app-badge color="blue" shape="rounded" size="sm">{{ cat.name }}</app-badge>
                       }
                     </div>
                   }
@@ -198,51 +188,57 @@
               <!-- Status -->
               <td class="p-4 text-center moderator-status-column">
                 @if (blog.status === 'PENDING_REVIEW') {
-                  <span class="moderator-status-badge bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
-                    Chờ duyệt
-                  </span>
+                  <app-badge color="yellow" shape="pill" size="sm" dot>
+                    {{ 'status.pending_review' | translate }}
+                  </app-badge>
                 } @else if (blog.status === 'PUBLISH') {
-                  <span class="moderator-status-badge bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-                    Đã xuất bản
-                  </span>
+                  <app-badge color="green" shape="pill" size="sm" dot>
+                    {{ 'status.published' | translate }}
+                  </app-badge>
                 } @else if (blog.status === 'REJECT') {
-                  <span class="moderator-status-badge bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300">
-                    Từ chối
-                  </span>
+                  <app-badge color="red" shape="pill" size="sm" dot>
+                    {{ 'status.rejected' | translate }}
+                  </app-badge>
                 }
               </td>
 
               <!-- Actions -->
               <td class="p-4 text-center moderator-actions-column">
-                <div class="moderator-action-group">
-                  <button
-                    (click)="setPreviewBlog(blog)"
-                    class="moderator-action-button"
-                    title="Xem chi tiết"
+                <div class="flex items-center justify-center gap-2">
+                  <app-icon-button
+                    icon="bi bi-eye"
+                    color="primary"
+                    variant="soft"
+                    size="sm"
+                    [title]="'action.view' | translate"
+                    (btnClick)="setPreviewBlog(blog)"
                   >
-                    <i class="bi bi-eye"></i>
-                    <span>Xem</span>
-                  </button>
+                    {{ 'action.view' | translate }}
+                  </app-icon-button>
 
                   @if (blog.status === 'PENDING_REVIEW') {
-                    <button
-                      (click)="approveBlog(blog)"
+                    <app-icon-button
+                      icon="bi bi-check-circle"
+                      color="green"
+                      variant="soft"
+                      size="sm"
+                      [title]="'action.approve' | translate"
                       [disabled]="actionLoading()"
-                      class="moderator-action-button"
-                      title="Duyệt bài"
+                      (btnClick)="approveBlog(blog)"
                     >
-                      <i class="bi bi-check-circle"></i>
-                      <span>Duyệt</span>
-                    </button>
-                    <button
-                      (click)="setRejectBlog(blog)"
+                      {{ 'action.approve' | translate }}
+                    </app-icon-button>
+                    <app-icon-button
+                      icon="bi bi-x-circle"
+                      color="red"
+                      variant="soft"
+                      size="sm"
+                      [title]="'action.reject' | translate"
                       [disabled]="actionLoading()"
-                      class="moderator-action-button moderator-action-button--danger"
-                      title="Từ chối bài"
+                      (btnClick)="setRejectBlog(blog)"
                     >
-                      <i class="bi bi-x-circle"></i>
-                      <span>Từ chối</span>
-                    </button>
+                      {{ 'action.reject' | translate }}
+                    </app-icon-button>
                   }
                 </div>
               </td>
@@ -256,47 +252,39 @@
     @if (meta() && (meta()?.totalPages || 0) > 1) {
       <div class="mt-6 flex justify-between items-center text-xs text-aquamarine-700 dark:text-aquamarine-300">
         <div>
-          Hiển thị <strong>{{ meta()?.itemCount }}</strong> / <strong>{{ meta()?.totalItems }}</strong> bài viết
+          {{ 'moderator.showing' | translate }} <strong>{{ meta()?.itemCount }}</strong> / <strong>{{ meta()?.totalItems }}</strong> {{ 'moderator.posts_unit' | translate }}
         </div>
         <ul class="inline-flex items-center space-x-1 text-sm">
           <li>
-            <button
+            <app-text-button
+              variant="secondary"
+              size="sm"
               [disabled]="currentPage() === 1"
-              [class.opacity-50]="currentPage() === 1"
-              class="px-3 py-1.5 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer"
-              (click)="setPage(currentPage() - 1)"
+              (btnClick)="setPage(currentPage() - 1)"
             >
               {{ 'pagination.prev' | translate }}
-            </button>
+            </app-text-button>
           </li>
           @for (p of pageNumbers(); track p) {
             <li>
-              <button
-                class="px-3 py-1.5 rounded-lg font-semibold transition-colors cursor-pointer text-xs"
-                [class.bg-aquamarine-600]="currentPage() === p"
-                [class.text-white]="currentPage() === p"
-                [class.border]="currentPage() !== p"
-                [class.border-aquamarine-200]="currentPage() !== p"
-                [class.dark:border-aquamarine-800]="currentPage() !== p"
-                [class.bg-white]="currentPage() !== p"
-                [class.dark:bg-aquamarine-900]="currentPage() !== p"
-                [class.text-aquamarine-800]="currentPage() !== p"
-                [class.dark:text-aquamarine-200]="currentPage() !== p"
-                (click)="setPage(p)"
+              <app-text-button
+                [variant]="currentPage() === p ? 'primary' : 'secondary'"
+                size="sm"
+                (btnClick)="setPage(p)"
               >
                 {{ p }}
-              </button>
+              </app-text-button>
             </li>
           }
           <li>
-            <button
+            <app-text-button
+              variant="secondary"
+              size="sm"
               [disabled]="currentPage() === (meta()?.totalPages || 1)"
-              [class.opacity-50]="currentPage() === (meta()?.totalPages || 1)"
-              class="px-3 py-1.5 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer"
-              (click)="setPage(currentPage() + 1)"
+              (btnClick)="setPage(currentPage() + 1)"
             >
               {{ 'pagination.next' | translate }}
-            </button>
+            </app-text-button>
           </li>
         </ul>
       </div>
@@ -327,20 +315,31 @@
       </div>
       <form (submit)="$event.preventDefault(); submitReject()" class="space-y-4">
         <p class="text-xs text-aquamarine-700 dark:text-aquamarine-300">
-          Từ chối bài viết: <strong class="text-aquamarine-950 dark:text-aquamarine-50">{{ blog.title }}</strong>
+          {{ 'moderator.reject_blog_confirm_prefix' | translate }} <strong class="text-aquamarine-950 dark:text-aquamarine-50">{{ blog.title }}</strong>
         </p>
         <div>
           <label for="rejectReason" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'table.reason' | translate }}</label>
           <textarea class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 p-3 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" id="rejectReason" name="reason" [(ngModel)]="rejectReason" rows="3" [placeholder]="'modal.reject_placeholder' | translate" required></textarea>
         </div>
         <div class="flex justify-end gap-3 pt-2">
-          <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer" (click)="closeRejectModal()">{{ 'modal.cancel' | translate }}</button>
-          <button type="submit" class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 transition-colors cursor-pointer inline-flex items-center gap-2" [disabled]="actionLoading() || !rejectReason.trim()">
-            @if (actionLoading()) {
-              <span class="inline-block animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-r-transparent"></span>
-            }
+          <app-text-button
+            variant="secondary"
+            size="md"
+            (btnClick)="closeRejectModal()"
+          >
+            {{ 'modal.cancel' | translate }}
+          </app-text-button>
+          <app-icon-button
+            icon="bi bi-x-circle"
+            color="red"
+            variant="solid"
+            size="md"
+            type="submit"
+            [loading]="actionLoading()"
+            [disabled]="actionLoading() || !rejectReason.trim()"
+          >
             {{ 'modal.confirm' | translate }}
-          </button>
+          </app-icon-button>
         </div>
       </form>
     </div>

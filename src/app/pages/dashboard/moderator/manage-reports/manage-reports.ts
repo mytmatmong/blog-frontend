@@ -16,9 +16,20 @@ import {
   ModeratorReportTargetType,
 } from '../../../../core/models/moderator-api.model';
 
+import { BadgeComponent } from '../../../../shared/components/badge/badge';
+import { IconButtonComponent } from '../../../../shared/components/icon-button/icon-button';
+import { TextButtonComponent } from '../../../../shared/components/text-button/text-button';
+
 @Component({
   selector: 'app-manage-reports',
-  imports: [FormsModule, DatePipe, TranslatePipe],
+  imports: [
+    FormsModule,
+    DatePipe,
+    TranslatePipe,
+    BadgeComponent,
+    IconButtonComponent,
+    TextButtonComponent,
+  ],
   templateUrl: './manage-reports.html',
   styleUrl: './manage-reports.css',
 })
@@ -276,15 +287,7 @@ export class ManageReports implements OnInit {
   }
 
   getReasonLabel(reason: ModeratorReportReason): string {
-    const map: Record<ModeratorReportReason, string> = {
-      SPAM: 'Spam / Quảng cáo',
-      HARASSMENT: 'Xúc phạm / Bắt nạt',
-      INAPPROPRIATE: 'Nội dung không phù hợp',
-      COPYRIGHT: 'Vi phạm bản quyền',
-      MISINFORMATION: 'Thông tin sai lệch',
-      OTHER: 'Lý do khác',
-    };
-    return map[reason] || reason;
+    return this.ts.translate('report.reason.' + reason);
   }
 
   logoutAndSwitchAccount() {

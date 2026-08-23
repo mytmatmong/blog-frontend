@@ -1,6 +1,9 @@
 import { Component, signal, computed, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslationService } from '../../../../core/services/translation.service';
+import { BadgeComponent } from '../../../../shared/components/badge/badge';
+import { IconButtonComponent } from '../../../../shared/components/icon-button/icon-button';
+import { TextButtonComponent } from '../../../../shared/components/text-button/text-button';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 interface CategoryItem {
@@ -13,7 +16,13 @@ interface CategoryItem {
 
 @Component({
   selector: 'app-manage-categories',
-  imports: [FormsModule, TranslatePipe],
+  imports: [
+    FormsModule,
+    TranslatePipe,
+    BadgeComponent,
+    IconButtonComponent,
+    TextButtonComponent,
+  ],
   templateUrl: './manage-categories.html',
   styleUrl: './manage-categories.css',
 })

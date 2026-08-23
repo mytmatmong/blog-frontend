@@ -14,10 +14,21 @@ import {
 } from '../../../../core/models/moderator-api.model';
 import { BlogOwnerPost } from '../../../../core/models/blog-owner.model';
 import { OwnerPostPreviewComponent } from '../../../../shared/components/owner-post-preview/owner-post-preview';
+import { BadgeComponent } from '../../../../shared/components/badge/badge';
+import { IconButtonComponent } from '../../../../shared/components/icon-button/icon-button';
+import { TextButtonComponent } from '../../../../shared/components/text-button/text-button';
 
 @Component({
   selector: 'app-manage-blogs',
-  imports: [FormsModule, DatePipe, TranslatePipe, OwnerPostPreviewComponent],
+  imports: [
+    FormsModule,
+    DatePipe,
+    TranslatePipe,
+    OwnerPostPreviewComponent,
+    BadgeComponent,
+    IconButtonComponent,
+    TextButtonComponent,
+  ],
   templateUrl: './manage-blogs.html',
   styleUrl: './manage-blogs.css',
 })
