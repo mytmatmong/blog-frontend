@@ -29,7 +29,7 @@ export class ManageBlogs implements OnInit {
   private readonly router = inject(Router);
 
   readonly loading = signal<boolean>(true);
-  readonly loadingDetail = signal<boolean>(false);
+  readonly loadingPreviewPostId =signal<number | null>(null);
   readonly actionLoading = signal<boolean>(false);
   readonly error = signal<string | null>(null);
   readonly isForbidden = signal<boolean>(false);
@@ -137,36 +137,74 @@ export class ManageBlogs implements OnInit {
   });
 
   setPreviewBlog(blog: ModeratorPostItem) {
-    this.activePreviewBlog.set(blog);
-    this.loadingDetail.set(true);
+  /**
+   * Hiện dữ liệu list trước để modal mở ngay.
+   */
+  this.activePreviewBlog.set(blog);
 
-    this.moderatorApiService.getModeratorPostDetail(blog.id).subscribe({
+  /**
+   * Sau đó lấy detail ROOT.
+   */
+  this.loadPreviewVersion(blog.id);
+}
+
+loadPreviewVersion(postId: number) {
+  /**
+   * Không gọi lại version đang active.
+   */
+  if (
+    this.activePreviewBlog()?.id === postId &&
+    this.activePreviewBlog()?.translations?.length
+  ) {
+    return;
+  }
+
+  this.loadingPreviewPostId.set(postId);
+
+  this.moderatorApiService
+    .getModeratorPostDetail(postId)
+    .subscribe({
       next: (res) => {
-        this.loadingDetail.set(false);
+        this.loadingPreviewPostId.set(null);
+
         if (res.success && res.data) {
+          /**
+           * res.data có thể là:
+           * - ROOT
+           * - EN
+           * - JA
+           * - KO...
+           *
+           * Và luôn có translations summary của cả group.
+           */
           this.activePreviewBlog.set(res.data);
         }
       },
+
       error: (err) => {
-        this.loadingDetail.set(false);
-        const errMsg = err?.error?.message || 'Không thể lấy chi tiết bài viết.';
+        this.loadingPreviewPostId.set(null);
+
+        const errMsg =
+          err?.error?.message ||
+          'Không thể lấy chi tiết phiên bản bài viết.';
+
         this.toast.show(
           'error',
           'Lỗi',
           typeof errMsg === 'string'
             ? errMsg
             : Array.isArray(errMsg)
-            ? errMsg.join(', ')
-            : 'Lỗi kết nối.',
+              ? errMsg.join(', ')
+              : 'Lỗi kết nối.',
         );
       },
     });
-  }
+}
 
   closePreviewBlog() {
-    this.activePreviewBlog.set(null);
-    this.loadingDetail.set(false);
-  }
+  this.activePreviewBlog.set(null);
+  this.loadingPreviewPostId.set(null);
+}
 
   private toPreviewPost(blog: ModeratorPostItem): BlogOwnerPost {
     return {
@@ -214,6 +252,26 @@ export class ManageBlogs implements OnInit {
         publicId: item.publicId,
         createdAt: item.createdAt,
       })),
+      translations: (blog.translations ?? []).map(
+  (version) => ({
+    id: version.id,
+    title: version.title,
+    thumbnailUrl:
+      version.thumbnailUrl ?? null,
+    status: version.status,
+    parentPostId:
+      version.parentPostId ?? null,
+    languageId: version.languageId,
+
+    language: {
+      id: version.language.id,
+      code: version.language.code,
+      name: version.language.name,
+      flag:
+        version.language.flag ?? null,
+    },
+  }),
+),
     };
   }
 
@@ -228,13 +286,24 @@ export class ManageBlogs implements OnInit {
   }
 
   approveBlog(blog: ModeratorPostItem) {
-    if (confirm(`Bạn có chắc chắn muốn duyệt bài viết "${blog.title}"?`)) {
-      this.actionLoading.set(true);
-      this.moderatorApiService.approvePost(blog.id).subscribe({
+  const rootPostId =
+    blog.parentPostId ?? blog.id;
+
+  if (
+    confirm(
+      `Bạn có chắc chắn muốn duyệt bài viết "${blog.title}" và tất cả bản dịch?`,
+    )
+  ) {
+    this.actionLoading.set(true);
+
+    this.moderatorApiService
+      .approvePost(rootPostId)
+      .subscribe({
         next: (res) => {
           this.actionLoading.set(false);
           if (res.success) {
             this.toast.show('success', 'Thành công', `Đã duyệt bài viết "${blog.title}" thành công.`);
+            this.closePreviewBlog();
             if (this.activePreviewBlog()?.id === blog.id) {
               this.activePreviewBlog.set(res.data);
             }
@@ -261,7 +330,15 @@ export class ManageBlogs implements OnInit {
     const blog = this.activeRejectBlog();
     if (blog) {
       this.actionLoading.set(true);
-      this.moderatorApiService.rejectPost(blog.id, { rejectionReason: reason }).subscribe({
+      const rootPostId =
+  blog.parentPostId ?? blog.id;
+
+this.moderatorApiService.rejectPost(
+  rootPostId,
+  {
+    rejectionReason: reason,
+  },
+).subscribe({
         next: (res) => {
           this.actionLoading.set(false);
           if (res.success) {
