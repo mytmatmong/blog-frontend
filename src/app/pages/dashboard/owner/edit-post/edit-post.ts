@@ -160,7 +160,7 @@ export class EditPost
     ) {
       return;
     }
-
+    this.addManualHashtags();
     const updateRequest =
       this.buildUpdateRequest(
         submitForReview,
@@ -449,11 +449,7 @@ export class EditPost
        */
       categoryIds,
 
-      ...(tagNames.length > 0
-        ? {
-          tagNames,
-        }
-        : {}),
+      tagNames,
 
       translationLanguageIds,
       submitForReview,
@@ -477,14 +473,7 @@ export class EditPost
       );
     }
 
-    if (tagNames.length) {
-      for (const tagName of tagNames) {
-        formData.append(
-          'tagNames',
-          tagName,
-        );
-      }
-    }
+    formData.append('tagNames', JSON.stringify(tagNames));
 
     for (
       const languageId of

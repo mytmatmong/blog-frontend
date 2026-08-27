@@ -1021,6 +1021,8 @@ export class CreatePost implements OnInit {
       return;
     }
 
+     this.addManualHashtags();
+
     const request =
       this.buildCreateRequest(
         submitForReview,
