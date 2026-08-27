@@ -6,8 +6,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
-  ActivatedRoute,
-  Router,
+  ActivatedRoute
 } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
@@ -41,9 +40,6 @@ export class EditPost
   implements OnInit {
   private readonly route =
     inject(ActivatedRoute);
-
-  private readonly router =
-    inject(Router);
 
   readonly editingPost =
     signal<BlogOwnerPost | null>(null);

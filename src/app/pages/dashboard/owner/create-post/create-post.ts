@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
-
+import { Router } from '@angular/router';
 import {
   BlogOwnerCategory,
   BlogOwnerLanguage,
@@ -66,6 +66,9 @@ export class CreatePost implements OnInit {
 
   protected readonly translation =
     inject(TranslationService);
+
+  protected readonly router =
+    inject(Router);
 
   readonly options =
     signal<BlogOwnerOptions | null>(null);
@@ -1118,6 +1121,7 @@ export class CreatePost implements OnInit {
         ),
         5000,
       );
+      await this.router.navigate(['/dashboard/owner/posts']);
     } catch (error: unknown) {
       this.toast.error(
         getApiErrorMessage(error),

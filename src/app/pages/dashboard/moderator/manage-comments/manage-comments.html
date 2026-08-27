@@ -1,45 +1,35 @@
 <section class="space-y-6">
   <!-- Filter & Search Toolbar -->
-  <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 p-4 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
+  <div
+    class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 p-4 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
     <!-- Status Filter Tabs -->
-    <div class="flex items-center gap-1 overflow-x-auto p-1 rounded-xl bg-aquamarine-50 dark:bg-aquamarine-950 border border-aquamarine-200 dark:border-aquamarine-800">
-      <button
-        type="button"
-        (click)="onStatusChange('PENDING')"
+    <div
+      class="flex items-center gap-1 overflow-x-auto p-1 rounded-xl bg-aquamarine-50 dark:bg-aquamarine-950 border border-aquamarine-200 dark:border-aquamarine-800">
+      <button type="button" (click)="onStatusChange('PENDING')"
         class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap cursor-pointer"
-        [class.bg-aquamarine-600]="statusFilter() === 'PENDING'"
-        [class.text-white]="statusFilter() === 'PENDING'"
+        [class.bg-aquamarine-600]="statusFilter() === 'PENDING'" [class.text-white]="statusFilter() === 'PENDING'"
         [class.text-aquamarine-800]="statusFilter() !== 'PENDING'"
         [class.dark:text-aquamarine-200]="statusFilter() !== 'PENDING'"
         [class.hover:bg-aquamarine-100]="statusFilter() !== 'PENDING'"
-        [class.dark:hover:bg-aquamarine-900]="statusFilter() !== 'PENDING'"
-      >
+        [class.dark:hover:bg-aquamarine-900]="statusFilter() !== 'PENDING'">
         <i class="bi bi-clock-history mr-1"></i> Chờ xử lý (PENDING)
       </button>
-      <button
-        type="button"
-        (click)="onStatusChange('RESOLVED')"
+      <button type="button" (click)="onStatusChange('RESOLVED')"
         class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap cursor-pointer"
-        [class.bg-emerald-600]="statusFilter() === 'RESOLVED'"
-        [class.text-white]="statusFilter() === 'RESOLVED'"
+        [class.bg-emerald-600]="statusFilter() === 'RESOLVED'" [class.text-white]="statusFilter() === 'RESOLVED'"
         [class.text-aquamarine-800]="statusFilter() !== 'RESOLVED'"
         [class.dark:text-aquamarine-200]="statusFilter() !== 'RESOLVED'"
         [class.hover:bg-aquamarine-100]="statusFilter() !== 'RESOLVED'"
-        [class.dark:hover:bg-aquamarine-900]="statusFilter() !== 'RESOLVED'"
-      >
+        [class.dark:hover:bg-aquamarine-900]="statusFilter() !== 'RESOLVED'">
         <i class="bi bi-check2-circle mr-1"></i> Đã xử lý (RESOLVED)
       </button>
-      <button
-        type="button"
-        (click)="onStatusChange('REJECTED')"
+      <button type="button" (click)="onStatusChange('REJECTED')"
         class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap cursor-pointer"
-        [class.bg-red-600]="statusFilter() === 'REJECTED'"
-        [class.text-white]="statusFilter() === 'REJECTED'"
+        [class.bg-red-600]="statusFilter() === 'REJECTED'" [class.text-white]="statusFilter() === 'REJECTED'"
         [class.text-aquamarine-800]="statusFilter() !== 'REJECTED'"
         [class.dark:text-aquamarine-200]="statusFilter() !== 'REJECTED'"
         [class.hover:bg-aquamarine-100]="statusFilter() !== 'REJECTED'"
-        [class.dark:hover:bg-aquamarine-900]="statusFilter() !== 'REJECTED'"
-      >
+        [class.dark:hover:bg-aquamarine-900]="statusFilter() !== 'REJECTED'">
         <i class="bi bi-x-circle mr-1"></i> Bác bỏ (REJECTED)
       </button>
     </div>
@@ -47,22 +37,16 @@
     <!-- TargetType & Reason Selectors -->
     <div class="flex items-center gap-2">
       <!-- Target Type Filter -->
-      <select
-        [(ngModel)]="targetTypeFilter"
-        (change)="onTargetTypeChange()"
-        class="px-3 py-1.5 rounded-xl text-xs border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none focus:ring-2 focus:ring-aquamarine-500 cursor-pointer"
-      >
+      <select [(ngModel)]="targetTypeFilter" (change)="onTargetTypeChange()"
+        class="px-3 py-1.5 rounded-xl text-xs border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none focus:ring-2 focus:ring-aquamarine-500 cursor-pointer">
         <option value="">Tất cả loại (Bài / Bình luận)</option>
         <option value="POST">Báo cáo Bài viết (POST)</option>
         <option value="COMMENT">Báo cáo Bình luận (COMMENT)</option>
       </select>
 
       <!-- Reason Filter -->
-      <select
-        [(ngModel)]="reasonFilter"
-        (change)="onReasonChange()"
-        class="px-3 py-1.5 rounded-xl text-xs border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none focus:ring-2 focus:ring-aquamarine-500 cursor-pointer"
-      >
+      <select [(ngModel)]="reasonFilter" (change)="onReasonChange()"
+        class="px-3 py-1.5 rounded-xl text-xs border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none focus:ring-2 focus:ring-aquamarine-500 cursor-pointer">
         <option value="">Tất cả lý do vi phạm</option>
         <option value="SPAM">Spam / Quảng cáo</option>
         <option value="HARASSMENT">Xúc phạm / Bắt nạt</option>
@@ -76,471 +60,485 @@
 
   <!-- Loading State -->
   @if (loading()) {
-    <div class="flex flex-col items-center justify-center py-16 text-aquamarine-600 dark:text-aquamarine-400">
-      <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-aquamarine-600 border-r-transparent mb-3"></div>
-      <p class="text-sm font-medium">Đang tải danh sách báo cáo vi phạm...</p>
+  <div class="flex flex-col items-center justify-center py-16 text-aquamarine-600 dark:text-aquamarine-400">
+    <div
+      class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-aquamarine-600 border-r-transparent mb-3">
     </div>
+    <p class="text-sm font-medium">Đang tải danh sách báo cáo vi phạm...</p>
+  </div>
   } @else if (error()) {
-    <!-- Error State -->
-    <div class="p-6 rounded-2xl border border-red-200 dark:border-red-900/50 bg-red-50/50 dark:bg-red-950/20 text-center max-w-2xl mx-auto my-6">
-      <i class="bi bi-shield-lock text-4xl text-red-500 mb-3 inline-block"></i>
-      <h4 class="font-bold text-lg text-red-700 dark:text-red-400 mb-2">
-        {{ isForbidden() ? 'Không có quyền truy cập (403 Forbidden)' : 'Không thể tải danh sách báo cáo' }}
-      </h4>
-      <p class="text-sm text-red-600 dark:text-red-300 mb-4 leading-relaxed">
-        {{ error() }}
-      </p>
+  <!-- Error State -->
+  <div
+    class="p-6 rounded-2xl border border-red-200 dark:border-red-900/50 bg-red-50/50 dark:bg-red-950/20 text-center max-w-2xl mx-auto my-6">
+    <i class="bi bi-shield-lock text-4xl text-red-500 mb-3 inline-block"></i>
+    <h4 class="font-bold text-lg text-red-700 dark:text-red-400 mb-2">
+      {{ isForbidden() ? 'Không có quyền truy cập (403 Forbidden)' : 'Không thể tải danh sách báo cáo' }}
+    </h4>
+    <p class="text-sm text-red-600 dark:text-red-300 mb-4 leading-relaxed">
+      {{ error() }}
+    </p>
 
-      @if (isForbidden()) {
-        <div class="p-4 mb-5 rounded-xl bg-white dark:bg-aquamarine-900/80 border border-red-200 dark:border-red-800 text-left text-xs space-y-2">
-          <div class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-50 flex items-center gap-2">
-            <i class="bi bi-info-circle text-aquamarine-600"></i> Hướng dẫn tài khoản kiểm thử Moderator:
-          </div>
-          <p class="text-[var(--text-muted)]">
-            Chỉ tài khoản thuộc vai trò <code class="px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-bold">CONTENT_MODERATOR</code> mới có thể truy cập danh sách báo cáo vi phạm.
-          </p>
-          <div class="pt-1">
-            <span class="font-semibold text-aquamarine-900 dark:text-aquamarine-100">Tài khoản Moderator mẫu:</span>
-            <ul class="list-disc list-inside mt-1 space-y-1 font-mono text-[11px] text-aquamarine-700 dark:text-aquamarine-300">
-              <li>Email: <strong class="select-all">moderator.001@seed.local</strong></li>
-              <li>Mật khẩu: <strong class="select-all">Test123!</strong></li>
-            </ul>
-          </div>
-        </div>
-      }
-
-      <div class="flex items-center justify-center gap-3">
-        @if (isForbidden()) {
-          <button
-            (click)="logoutAndSwitchAccount()"
-            class="px-4 py-2 bg-aquamarine-600 hover:bg-aquamarine-700 text-white font-medium text-sm rounded-xl transition-colors inline-flex items-center gap-2 cursor-pointer shadow-sm"
-          >
-            <i class="bi bi-box-arrow-right"></i> Đăng xuất & Đăng nhập Moderator
-          </button>
-        }
-        <button
-          (click)="loadReports()"
-          class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium text-sm rounded-xl transition-colors inline-flex items-center gap-2 cursor-pointer"
-        >
-          <i class="bi bi-arrow-clockwise"></i> Thử lại
-        </button>
+    @if (isForbidden()) {
+    <div
+      class="p-4 mb-5 rounded-xl bg-white dark:bg-aquamarine-900/80 border border-red-200 dark:border-red-800 text-left text-xs space-y-2">
+      <div class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-50 flex items-center gap-2">
+        <i class="bi bi-info-circle text-aquamarine-600"></i> Hướng dẫn tài khoản kiểm thử Moderator:
       </div>
-    </div>
-  } @else if (reports().length === 0) {
-    <!-- Empty State -->
-    <div class="p-12 text-center rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
-      <i class="bi bi-shield-check text-4xl text-aquamarine-400 mb-3 inline-block"></i>
-      <h4 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">Không có báo cáo nào</h4>
-      <p class="text-sm text-aquamarine-600 dark:text-aquamarine-400 mt-1">
-        Không tìm thấy báo cáo vi phạm nào phù hợp với bộ lọc hiện tại.
+      <p class="text-[var(--text-muted)]">
+        Chỉ tài khoản thuộc vai trò <code
+          class="px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-bold">CONTENT_MODERATOR</code>
+        mới có thể truy cập danh sách báo cáo vi phạm.
       </p>
-    </div>
-  } @else {
-    <!-- Reports Table -->
-    <div class="rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm overflow-x-auto">
-      <table class="w-full text-left border-collapse text-sm">
-        <thead>
-          <tr class="border-b border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950/50">
-            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">ID & Đối tượng</th>
-            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">Người báo cáo</th>
-            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">Nội dung bị báo cáo</th>
-            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">Lý do vi phạm</th>
-            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">Trạng thái</th>
-            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">Thao tác</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-aquamarine-100 dark:divide-aquamarine-800">
-          @for (report of reports(); track report.id) {
-            <tr class="hover:bg-aquamarine-50/30 dark:hover:bg-aquamarine-950/30 transition-colors">
-              <!-- ID & TargetType -->
-              <td class="p-4 font-medium">
-                <div class="flex flex-col gap-1">
-                  <span class="text-xs font-mono font-bold text-aquamarine-500">#{{ report.id }}</span>
-                  @if (report.targetType === 'POST') {
-                    <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/50 px-2 py-0.5 rounded-md w-fit border border-indigo-200 dark:border-indigo-800">
-                      <i class="bi bi-file-post"></i> Bài viết
-                    </span>
-                  } @else {
-                    <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/50 px-2 py-0.5 rounded-md w-fit border border-purple-200 dark:border-purple-800">
-                      <i class="bi bi-chat-left-text"></i> Bình luận
-                    </span>
-                  }
-                </div>
-              </td>
-
-              <!-- Reporter -->
-              <td class="p-4 text-aquamarine-800 dark:text-aquamarine-200">
-                <div class="flex items-center gap-2">
-                  @if (report.reporter?.avatarUrl) {
-                    <img [src]="report.reporter.avatarUrl" [alt]="report.reporter.username" class="w-6 h-6 rounded-full object-cover" />
-                  } @else {
-                    <div class="w-6 h-6 rounded-full bg-aquamarine-100 dark:bg-aquamarine-800 text-aquamarine-700 dark:text-aquamarine-300 text-xs font-bold flex items-center justify-center">
-                      {{ report.reporter?.username?.charAt(0)?.toUpperCase() || 'U' }}
-                    </div>
-                  }
-                  <span class="font-medium text-xs">{{ report.reporter?.username || 'User #' + report.reporterId }}</span>
-                </div>
-              </td>
-
-              <!-- Reported Content Snippet -->
-              <td class="p-4 max-w-xs text-aquamarine-950 dark:text-aquamarine-50">
-                @if (report.targetType === 'POST' && report.post) {
-                  <div class="line-clamp-2 font-semibold text-xs text-aquamarine-900 dark:text-aquamarine-100">
-                    {{ report.post.title }}
-                  </div>
-                  <div class="text-[11px] text-aquamarine-500 mt-0.5">Tác giả: {{ report.post.author?.username }}</div>
-                } @else if (report.targetType === 'COMMENT' && report.comment) {
-                  <div class="line-clamp-2 italic text-xs text-amber-900 dark:text-amber-200 bg-amber-50/50 dark:bg-amber-950/30 p-1.5 rounded border border-amber-200 dark:border-amber-900/50">
-                    "{{ report.comment.content }}"
-                  </div>
-                  <div class="text-[11px] text-aquamarine-500 mt-0.5">Viết bởi: {{ report.comment.user?.username }}</div>
-                } @else {
-                  <span class="text-xs text-aquamarine-400 italic">Dữ liệu đối tượng đã bị gỡ</span>
-                }
-              </td>
-
-              <!-- Reason -->
-              <td class="p-4">
-                <span class="px-2.5 py-1 text-xs font-semibold rounded-md bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
-                  {{ getReasonLabel(report.reason) }}
-                </span>
-                @if (report.description) {
-                  <p class="text-[11px] text-aquamarine-600 dark:text-aquamarine-400 mt-1 line-clamp-1">
-                    {{ report.description }}
-                  </p>
-                }
-              </td>
-
-              <!-- Status -->
-              <td class="p-4 text-center">
-                @if (report.status === 'PENDING') {
-                  <span class="inline-block px-2.5 py-1 text-xs font-semibold rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
-                    Chờ xử lý
-                  </span>
-                } @else if (report.status === 'RESOLVED') {
-                  <span class="inline-block px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-                    Đã xử lý
-                  </span>
-                } @else if (report.status === 'REJECTED') {
-                  <span class="inline-block px-2.5 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300">
-                    Bác bỏ
-                  </span>
-                }
-              </td>
-
-              <!-- Actions -->
-              <td class="p-4 text-center">
-                <div class="flex items-center justify-center gap-2">
-                  <button
-                    (click)="setPreviewReport(report)"
-                    class="p-1.5 text-aquamarine-600 hover:bg-aquamarine-100 dark:hover:bg-aquamarine-800 rounded-lg transition-colors cursor-pointer"
-                    title="Xem chi tiết báo cáo"
-                  >
-                    <i class="bi bi-eye text-base"></i>
-                  </button>
-
-                  @if (report.status === 'PENDING') {
-                    <button
-                      (click)="setResolveReport(report)"
-                      [disabled]="actionLoading()"
-                      class="p-1.5 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
-                      title="Xác nhận vi phạm & Ẩn nội dung"
-                    >
-                      <i class="bi bi-check-circle-fill text-base"></i>
-                    </button>
-                    <button
-                      (click)="setRejectReport(report)"
-                      [disabled]="actionLoading()"
-                      class="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
-                      title="Bác bỏ báo cáo"
-                    >
-                      <i class="bi bi-x-circle-fill text-base"></i>
-                    </button>
-                  }
-                </div>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Pagination -->
-    @if (meta() && (meta()?.totalPages || 0) > 1) {
-      <div class="mt-6 flex justify-between items-center text-xs text-aquamarine-700 dark:text-aquamarine-300">
-        <div>
-          Hiển thị <strong>{{ meta()?.itemCount }}</strong> / <strong>{{ meta()?.totalItems }}</strong> báo cáo
-        </div>
-        <ul class="inline-flex items-center space-x-1 text-sm">
-          <li>
-            <button
-              [disabled]="currentPage() === 1"
-              [class.opacity-50]="currentPage() === 1"
-              class="px-3 py-1.5 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer"
-              (click)="setPage(currentPage() - 1)"
-            >
-              {{ 'pagination.prev' | translate }}
-            </button>
-          </li>
-          @for (p of pageNumbers(); track p) {
-            <li>
-              <button
-                class="px-3 py-1.5 rounded-lg font-semibold transition-colors cursor-pointer text-xs"
-                [class.bg-aquamarine-600]="currentPage() === p"
-                [class.text-white]="currentPage() === p"
-                [class.border]="currentPage() !== p"
-                [class.border-aquamarine-200]="currentPage() !== p"
-                [class.dark:border-aquamarine-800]="currentPage() !== p"
-                [class.bg-white]="currentPage() !== p"
-                [class.dark:bg-aquamarine-900]="currentPage() !== p"
-                [class.text-aquamarine-800]="currentPage() !== p"
-                [class.dark:text-aquamarine-200]="currentPage() !== p"
-                (click)="setPage(p)"
-              >
-                {{ p }}
-              </button>
-            </li>
-          }
-          <li>
-            <button
-              [disabled]="currentPage() === (meta()?.totalPages || 1)"
-              [class.opacity-50]="currentPage() === (meta()?.totalPages || 1)"
-              class="px-3 py-1.5 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer"
-              (click)="setPage(currentPage() + 1)"
-            >
-              {{ 'pagination.next' | translate }}
-            </button>
-          </li>
+      <div class="pt-1">
+        <span class="font-semibold text-aquamarine-900 dark:text-aquamarine-100">Tài khoản Moderator mẫu:</span>
+        <ul
+          class="list-disc list-inside mt-1 space-y-1 font-mono text-[11px] text-aquamarine-700 dark:text-aquamarine-300">
+          <li>Email: <strong class="select-all">moderator.001@seed.local</strong></li>
+          <li>Mật khẩu: <strong class="select-all">Test123!</strong></li>
         </ul>
       </div>
+    </div>
     }
+
+    <div class="flex items-center justify-center gap-3">
+      @if (isForbidden()) {
+      <button (click)="logoutAndSwitchAccount()"
+        class="px-4 py-2 bg-aquamarine-600 hover:bg-aquamarine-700 text-white font-medium text-sm rounded-xl transition-colors inline-flex items-center gap-2 cursor-pointer shadow-sm">
+        <i class="bi bi-box-arrow-right"></i> Đăng xuất & Đăng nhập Moderator
+      </button>
+      }
+      <button (click)="loadReports()"
+        class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium text-sm rounded-xl transition-colors inline-flex items-center gap-2 cursor-pointer">
+        <i class="bi bi-arrow-clockwise"></i> Thử lại
+      </button>
+    </div>
+  </div>
+  } @else if (reports().length === 0) {
+  <!-- Empty State -->
+  <div
+    class="p-12 text-center rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
+    <i class="bi bi-shield-check text-4xl text-aquamarine-400 mb-3 inline-block"></i>
+    <h4 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">Không có báo cáo nào</h4>
+    <p class="text-sm text-aquamarine-600 dark:text-aquamarine-400 mt-1">
+      Không tìm thấy báo cáo vi phạm nào phù hợp với bộ lọc hiện tại.
+    </p>
+  </div>
+  } @else {
+  <!-- Reports Table -->
+  <div
+    class="rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm overflow-x-auto">
+    <table class="w-full text-left border-collapse text-sm">
+      <thead>
+        <tr
+          class="border-b border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950/50">
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">ID & Đối tượng</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">Người báo cáo</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">Nội dung bị báo cáo</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">Lý do vi phạm</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">Trạng thái</th>
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">Thao tác</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-aquamarine-100 dark:divide-aquamarine-800">
+        @for (report of reports(); track report.id) {
+        <tr class="hover:bg-aquamarine-50/30 dark:hover:bg-aquamarine-950/30 transition-colors">
+          <!-- ID & TargetType -->
+          <td class="p-4 font-medium">
+            <div class="flex flex-col gap-1">
+              <span class="text-xs font-mono font-bold text-aquamarine-500">#{{ report.id }}</span>
+              @if (report.targetType === 'POST') {
+              <span
+                class="inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/50 px-2 py-0.5 rounded-md w-fit border border-indigo-200 dark:border-indigo-800">
+                <i class="bi bi-file-post"></i> Bài viết
+              </span>
+              } @else {
+              <span
+                class="inline-flex items-center gap-1 text-[11px] font-semibold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/50 px-2 py-0.5 rounded-md w-fit border border-purple-200 dark:border-purple-800">
+                <i class="bi bi-chat-left-text"></i> Bình luận
+              </span>
+              }
+            </div>
+          </td>
+
+          <!-- Reporter -->
+          <td class="p-4 text-aquamarine-800 dark:text-aquamarine-200">
+            <div class="flex items-center gap-2">
+              @if (report.reporter.avatarUrl) {
+              <img [src]="report.reporter.avatarUrl" [alt]="report.reporter.username"
+                class="w-6 h-6 rounded-full object-cover" />
+              } @else {
+              <div
+                class="w-6 h-6 rounded-full bg-aquamarine-100 dark:bg-aquamarine-800 text-aquamarine-700 dark:text-aquamarine-300 text-xs font-bold flex items-center justify-center">
+                {{ report.reporter?.username?.charAt(0)?.toUpperCase() || 'U' }}
+              </div>
+              }
+              <span class="font-medium text-xs">{{ report.reporter.username || 'User #' + report.reporterId }}</span>
+            </div>
+          </td>
+
+          <!-- Reported Content Snippet -->
+          <td class="p-4 max-w-xs text-aquamarine-950 dark:text-aquamarine-50">
+            @if (report.targetType === 'POST' && report.post) {
+            <div class="line-clamp-2 font-semibold text-xs text-aquamarine-900 dark:text-aquamarine-100">
+              {{ report.post.title }}
+            </div>
+            <div class="text-[11px] text-aquamarine-500 mt-0.5">Tác giả: {{ report.post.author.username }}</div>
+            } @else if (report.targetType === 'COMMENT' && report.comment) {
+            <div
+              class="line-clamp-2 italic text-xs text-amber-900 dark:text-amber-200 bg-amber-50/50 dark:bg-amber-950/30 p-1.5 rounded border border-amber-200 dark:border-amber-900/50">
+              "{{ report.comment.content }}"
+            </div>
+            <div class="text-[11px] text-aquamarine-500 mt-0.5">Viết bởi: {{ report.comment.user?.username }}</div>
+            } @else {
+            <span class="text-xs text-aquamarine-400 italic">Dữ liệu đối tượng đã bị gỡ</span>
+            }
+          </td>
+
+          <!-- Reason -->
+          <td class="p-4">
+            <span
+              class="px-2.5 py-1 text-xs font-semibold rounded-md bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
+              {{ getReasonLabel(report.reason) }}
+            </span>
+            @if (report.description) {
+            <p class="text-[11px] text-aquamarine-600 dark:text-aquamarine-400 mt-1 line-clamp-1">
+              {{ report.description }}
+            </p>
+            }
+          </td>
+
+          <!-- Status -->
+          <td class="p-4 text-center">
+            @if (report.status === 'PENDING') {
+            <span
+              class="inline-block px-2.5 py-1 text-xs font-semibold rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
+              Chờ xử lý
+            </span>
+            } @else if (report.status === 'RESOLVED') {
+            <span
+              class="inline-block px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+              Đã xử lý
+            </span>
+            } @else if (report.status === 'REJECTED') {
+            <span
+              class="inline-block px-2.5 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300">
+              Bác bỏ
+            </span>
+            }
+          </td>
+
+          <!-- Actions -->
+          <td class="p-4 text-center">
+            <div class="flex items-center justify-center gap-2">
+              <button (click)="setPreviewReport(report)"
+                class="p-1.5 text-aquamarine-600 hover:bg-aquamarine-100 dark:hover:bg-aquamarine-800 rounded-lg transition-colors cursor-pointer"
+                title="Xem chi tiết báo cáo">
+                <i class="bi bi-eye text-base"></i>
+              </button>
+
+              @if (report.status === 'PENDING') {
+              <button (click)="setResolveReport(report)" [disabled]="actionLoading()"
+                class="p-1.5 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                title="Xác nhận vi phạm & Ẩn nội dung">
+                <i class="bi bi-check-circle-fill text-base"></i>
+              </button>
+              <button (click)="setRejectReport(report)" [disabled]="actionLoading()"
+                class="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                title="Bác bỏ báo cáo">
+                <i class="bi bi-x-circle-fill text-base"></i>
+              </button>
+              }
+            </div>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  @if (meta() && (meta()?.totalPages || 0) > 1) {
+  <div class="mt-6 flex justify-between items-center text-xs text-aquamarine-700 dark:text-aquamarine-300">
+    <div>
+      Hiển thị <strong>{{ meta()?.itemCount }}</strong> / <strong>{{ meta()?.totalItems }}</strong> báo cáo
+    </div>
+    <ul class="inline-flex items-center space-x-1 text-sm">
+      <li>
+        <button [disabled]="currentPage() === 1" [class.opacity-50]="currentPage() === 1"
+          class="px-3 py-1.5 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer"
+          (click)="setPage(currentPage() - 1)">
+          {{ 'pagination.prev' | translate }}
+        </button>
+      </li>
+      @for (p of pageNumbers(); track p) {
+      <li>
+        <button class="px-3 py-1.5 rounded-lg font-semibold transition-colors cursor-pointer text-xs"
+          [class.bg-aquamarine-600]="currentPage() === p" [class.text-white]="currentPage() === p"
+          [class.border]="currentPage() !== p" [class.border-aquamarine-200]="currentPage() !== p"
+          [class.dark:border-aquamarine-800]="currentPage() !== p" [class.bg-white]="currentPage() !== p"
+          [class.dark:bg-aquamarine-900]="currentPage() !== p" [class.text-aquamarine-800]="currentPage() !== p"
+          [class.dark:text-aquamarine-200]="currentPage() !== p" (click)="setPage(p)">
+          {{ p }}
+        </button>
+      </li>
+      }
+      <li>
+        <button [disabled]="currentPage() === (meta()?.totalPages || 1)"
+          [class.opacity-50]="currentPage() === (meta()?.totalPages || 1)"
+          class="px-3 py-1.5 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer"
+          (click)="setPage(currentPage() + 1)">
+          {{ 'pagination.next' | translate }}
+        </button>
+      </li>
+    </ul>
+  </div>
+  }
   }
 </section>
 
 <!-- Modal Xem chi tiết báo cáo vi phạm (API M07) -->
 @if (activePreviewReport(); as report) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-    <div class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-3xl max-h-[85vh] flex flex-col relative">
-      <!-- Loading overlay khi đang fetch API M07 -->
-      @if (loadingDetail()) {
-        <div class="absolute inset-0 bg-white/70 dark:bg-aquamarine-900/70 z-10 flex flex-col items-center justify-center rounded-2xl">
-          <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-aquamarine-600 border-r-transparent mb-2"></div>
-          <span class="text-xs font-medium text-aquamarine-700 dark:text-aquamarine-300">Đang tải dữ liệu chi tiết báo cáo...</span>
-        </div>
-      }
-
-      <!-- Modal Header -->
-      <div class="flex justify-between items-center p-5 border-b border-aquamarine-200 dark:border-aquamarine-800">
-        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50 flex items-center gap-2">
-          <span>Chi tiết báo cáo vi phạm:</span>
-          <span class="text-aquamarine-600 dark:text-aquamarine-400">#{{ report.id }}</span>
-        </h5>
-        <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer" (click)="closePreviewReport()">
-          <i class="bi bi-x-lg text-lg"></i>
-        </button>
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+  <div
+    class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-3xl max-h-[85vh] flex flex-col relative">
+    <!-- Loading overlay khi đang fetch API M07 -->
+    @if (loadingDetail()) {
+    <div
+      class="absolute inset-0 bg-white/70 dark:bg-aquamarine-900/70 z-10 flex flex-col items-center justify-center rounded-2xl">
+      <div
+        class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-aquamarine-600 border-r-transparent mb-2">
       </div>
+      <span class="text-xs font-medium text-aquamarine-700 dark:text-aquamarine-300">Đang tải dữ liệu chi tiết báo
+        cáo...</span>
+    </div>
+    }
 
-      <!-- Modal Body -->
-      <div class="p-6 overflow-y-auto space-y-5">
-        <!-- Reporter & Reason info box -->
-        <div class="p-4 rounded-xl border border-amber-200 dark:border-amber-900 bg-amber-50/60 dark:bg-amber-950/30 space-y-2">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <i class="bi bi-exclamation-triangle-fill text-amber-600 text-lg"></i>
-              <span class="font-bold text-sm text-amber-900 dark:text-amber-200">
-                Lý do báo cáo: {{ getReasonLabel(report.reason) }}
-              </span>
-            </div>
-            <span class="text-xs px-2.5 py-0.5 rounded-full font-semibold bg-amber-200 text-amber-900 dark:bg-amber-800 dark:text-amber-100">
-              Trạng thái: {{ report.status }}
+    <!-- Modal Header -->
+    <div class="flex justify-between items-center p-5 border-b border-aquamarine-200 dark:border-aquamarine-800">
+      <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50 flex items-center gap-2">
+        <span>Chi tiết báo cáo vi phạm:</span>
+        <span class="text-aquamarine-600 dark:text-aquamarine-400">#{{ report.id }}</span>
+      </h5>
+      <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"
+        (click)="closePreviewReport()">
+        <i class="bi bi-x-lg text-lg"></i>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="p-6 overflow-y-auto space-y-5">
+      <!-- Reporter & Reason info box -->
+      <div
+        class="p-4 rounded-xl border border-amber-200 dark:border-amber-900 bg-amber-50/60 dark:bg-amber-950/30 space-y-2">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i class="bi bi-exclamation-triangle-fill text-amber-600 text-lg"></i>
+            <span class="font-bold text-sm text-amber-900 dark:text-amber-200">
+              Lý do báo cáo: {{ getReasonLabel(report.reason) }}
             </span>
           </div>
+          <span
+            class="text-xs px-2.5 py-0.5 rounded-full font-semibold bg-amber-200 text-amber-900 dark:bg-amber-800 dark:text-amber-100">
+            Trạng thái: {{ report.status }}
+          </span>
+        </div>
 
-          @if (report.description) {
-            <p class="text-xs text-amber-950 dark:text-amber-100 pl-7 leading-relaxed">
-              <strong>Mô tả chi tiết từ người gửi:</strong> {{ report.description }}
-            </p>
+        @if (report.description) {
+        <p class="text-xs text-amber-950 dark:text-amber-100 pl-7 leading-relaxed">
+          <strong>Mô tả chi tiết từ người gửi:</strong> {{ report.description }}
+        </p>
+        }
+
+        <div
+          class="text-[11px] text-amber-800 dark:text-amber-300 pl-7 flex flex-wrap gap-4 pt-1 border-t border-amber-200/50 dark:border-amber-800/50">
+          <span>Người báo cáo: <strong>{{ report.reporter?.username }}</strong> (#{{ report.reporterId }})</span>
+          <span>Thời gian: {{ report.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+          @if (report.reviewedBy) {
+          <span>Người duyệt: <strong>{{ report.reviewedBy.username }}</strong></span>
           }
-
-          <div class="text-[11px] text-amber-800 dark:text-amber-300 pl-7 flex flex-wrap gap-4 pt-1 border-t border-amber-200/50 dark:border-amber-800/50">
-            <span>Người báo cáo: <strong>{{ report.reporter?.username }}</strong> (#{{ report.reporterId }})</span>
-            <span>Thời gian: {{ report.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
-            @if (report.reviewedBy) {
-              <span>Người duyệt: <strong>{{ report.reviewedBy.username }}</strong></span>
-            }
-            @if (report.reviewedAt) {
-              <span>Xử lý lúc: {{ report.reviewedAt | date: 'dd/MM/yyyy HH:mm' }}</span>
-            }
-          </div>
-
-          @if (report.resolutionNote) {
-            <div class="mt-2 text-xs text-amber-950 dark:text-amber-100 pl-7">
-              <strong>Ghi chú xử lý:</strong> {{ report.resolutionNote }}
-            </div>
+          @if (report.reviewedAt) {
+          <span>Xử lý lúc: {{ report.reviewedAt | date: 'dd/MM/yyyy HH:mm' }}</span>
           }
         </div>
 
-        <!-- Target Content Details -->
-        @if (report.targetType === 'POST' && report.post) {
-          <div class="space-y-3">
-            <h5 class="font-bold text-sm text-indigo-700 dark:text-indigo-300 flex items-center gap-2">
-              <i class="bi bi-file-post"></i> Bài viết bị báo cáo (#{{ report.post.id }})
-            </h5>
-            <div class="p-4 rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/30 dark:bg-aquamarine-950/30 space-y-2">
-              <h3 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">{{ report.post.title }}</h3>
-              <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400">
-                Tác giả: <strong>{{ report.post.author?.username }}</strong> | Tạo ngày: {{ report.post.createdAt | date: 'dd/MM/yyyy HH:mm' }}
-              </div>
-              <div class="prose dark:prose-invert max-w-none text-xs text-aquamarine-800 dark:text-aquamarine-200 pt-2 border-t border-aquamarine-100 dark:border-aquamarine-800" [innerHTML]="report.post.content"></div>
-            </div>
-          </div>
-        } @else if (report.targetType === 'COMMENT' && report.comment) {
-          <div class="space-y-3">
-            <h5 class="font-bold text-sm text-purple-700 dark:text-purple-300 flex items-center gap-2">
-              <i class="bi bi-chat-left-text"></i> Bình luận bị báo cáo (#{{ report.comment.id }})
-            </h5>
-            <div class="p-4 rounded-xl border border-purple-200 dark:border-purple-900 bg-purple-50/30 dark:bg-purple-950/30 space-y-3">
-              <div class="text-sm text-purple-950 dark:text-purple-100 font-medium">
-                "{{ report.comment.content }}"
-              </div>
-              <div class="text-xs text-purple-700 dark:text-purple-300 flex items-center gap-2">
-                <span>Người viết bình luận: <strong>{{ report.comment.user?.username }}</strong></span>
-                <span>•</span>
-                <span>Tạo lúc: {{ report.comment.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
-              </div>
-
-              <!-- Parent Comment Context if present -->
-              @if (report.comment.parent) {
-                <div class="p-3 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white/60 dark:bg-aquamarine-900/60 text-xs">
-                  <span class="font-semibold text-aquamarine-700 dark:text-aquamarine-300 block mb-1">
-                    Bình luận cha (Reply context):
-                  </span>
-                  <p class="italic text-aquamarine-900 dark:text-aquamarine-100">"{{ report.comment.parent.content }}"</p>
-                  <span class="text-[10px] text-aquamarine-500 mt-1 block">Bởi {{ report.comment.parent.user?.username }}</span>
-                </div>
-              }
-
-              <!-- Post Context for Comment -->
-              @if (report.comment.post) {
-                <div class="pt-2 border-t border-purple-100 dark:border-purple-900 text-xs">
-                  <span class="font-semibold text-aquamarine-700 dark:text-aquamarine-300">Ngữ cảnh bài viết chứa bình luận:</span>
-                  <h4 class="font-bold text-aquamarine-950 dark:text-aquamarine-50 mt-1">{{ report.comment.post.title }}</h4>
-                  <span class="text-aquamarine-500">Tác giả bài: {{ report.comment.post.author?.username }}</span>
-                </div>
-              }
-            </div>
-          </div>
+        @if (report.resolutionNote) {
+        <div class="mt-2 text-xs text-amber-950 dark:text-amber-100 pl-7">
+          <strong>Ghi chú xử lý:</strong> {{ report.resolutionNote }}
+        </div>
         }
       </div>
 
-      <!-- Modal Footer -->
-      <div class="p-4 border-t border-aquamarine-200 dark:border-aquamarine-800 flex justify-end gap-3">
-        @if (report.status === 'PENDING') {
-          <button
-            type="button"
-            (click)="setResolveReport(report)"
-            [disabled]="actionLoading()"
-            class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 transition-colors cursor-pointer inline-flex items-center gap-2"
-          >
-            <i class="bi bi-check-circle-fill"></i> Xác nhận vi phạm & Ẩn nội dung
-          </button>
-          <button
-            type="button"
-            (click)="setRejectReport(report)"
-            [disabled]="actionLoading()"
-            class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 transition-colors cursor-pointer inline-flex items-center gap-2"
-          >
-            <i class="bi bi-x-circle-fill"></i> Bác bỏ báo cáo
-          </button>
-        }
-        <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer" (click)="closePreviewReport()">{{ 'modal.close' | translate }}</button>
+      <!-- Target Content Details -->
+      @if (report.targetType === 'POST' && report.post) {
+      <div class="space-y-3">
+        <h5 class="font-bold text-sm text-indigo-700 dark:text-indigo-300 flex items-center gap-2">
+          <i class="bi bi-file-post"></i> Bài viết bị báo cáo (#{{ report.post.id }})
+        </h5>
+        <div
+          class="p-4 rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/30 dark:bg-aquamarine-950/30 space-y-2">
+          <h3 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">{{ report.post.title }}</h3>
+          <div class="text-xs text-aquamarine-600 dark:text-aquamarine-400">
+            Tác giả: <strong>{{ report.post.author?.username }}</strong> | Tạo ngày: {{ report.post.createdAt | date:
+            'dd/MM/yyyy HH:mm' }}
+          </div>
+          <div
+            class="prose dark:prose-invert max-w-none text-xs text-aquamarine-800 dark:text-aquamarine-200 pt-2 border-t border-aquamarine-100 dark:border-aquamarine-800"
+            [innerHTML]="report.post.content"></div>
+        </div>
       </div>
+      } @else if (report.targetType === 'COMMENT' && report.comment) {
+      <div class="space-y-3">
+        <h5 class="font-bold text-sm text-purple-700 dark:text-purple-300 flex items-center gap-2">
+          <i class="bi bi-chat-left-text"></i> Bình luận bị báo cáo (#{{ report.comment.id }})
+        </h5>
+        <div
+          class="p-4 rounded-xl border border-purple-200 dark:border-purple-900 bg-purple-50/30 dark:bg-purple-950/30 space-y-3">
+          <div class="text-sm text-purple-950 dark:text-purple-100 font-medium">
+            "{{ report.comment.content }}"
+          </div>
+          <div class="text-xs text-purple-700 dark:text-purple-300 flex items-center gap-2">
+            <span>Người viết bình luận: <strong>{{ report.comment.user?.username }}</strong></span>
+            <span>•</span>
+            <span>Tạo lúc: {{ report.comment.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+
+          <!-- Parent Comment Context if present -->
+          @if (report.comment.parent) {
+          <div
+            class="p-3 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white/60 dark:bg-aquamarine-900/60 text-xs">
+            <span class="font-semibold text-aquamarine-700 dark:text-aquamarine-300 block mb-1">
+              Bình luận cha (Reply context):
+            </span>
+            <p class="italic text-aquamarine-900 dark:text-aquamarine-100">"{{ report.comment.parent.content }}"</p>
+            <span class="text-[10px] text-aquamarine-500 mt-1 block">Bởi {{ report.comment.parent.user?.username
+              }}</span>
+          </div>
+          }
+
+          <!-- Post Context for Comment -->
+          @if (report.comment.post) {
+          <div class="pt-2 border-t border-purple-100 dark:border-purple-900 text-xs">
+            <span class="font-semibold text-aquamarine-700 dark:text-aquamarine-300">Ngữ cảnh bài viết chứa bình
+              luận:</span>
+            <h4 class="font-bold text-aquamarine-950 dark:text-aquamarine-50 mt-1">{{ report.comment.post.title }}</h4>
+            <span class="text-aquamarine-500">Tác giả bài: {{ report.comment.post.author?.username }}</span>
+          </div>
+          }
+        </div>
+      </div>
+      }
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="p-4 border-t border-aquamarine-200 dark:border-aquamarine-800 flex justify-end gap-3">
+      @if (report.status === 'PENDING') {
+      <button type="button" (click)="setResolveReport(report)" [disabled]="actionLoading()"
+        class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 transition-colors cursor-pointer inline-flex items-center gap-2">
+        <i class="bi bi-check-circle-fill"></i> Xác nhận vi phạm & Ẩn nội dung
+      </button>
+      <button type="button" (click)="setRejectReport(report)" [disabled]="actionLoading()"
+        class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 transition-colors cursor-pointer inline-flex items-center gap-2">
+        <i class="bi bi-x-circle-fill"></i> Bác bỏ báo cáo
+      </button>
+      }
+      <button type="button"
+        class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer"
+        (click)="closePreviewReport()">{{ 'modal.close' | translate }}</button>
     </div>
   </div>
+</div>
 }
 
 <!-- Modal Xác nhận vi phạm & Ẩn nội dung (API M08) -->
 @if (activeResolveReport(); as report) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-    <div class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-md p-6">
-      <div class="flex justify-between items-center mb-4">
-        <h5 class="font-bold text-lg text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
-          <i class="bi bi-shield-check"></i> Xác nhận báo cáo vi phạm
-        </h5>
-        <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer" (click)="closeResolveModal()">
-          <i class="bi bi-x-lg text-lg"></i>
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+  <div
+    class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-md p-6">
+    <div class="flex justify-between items-center mb-4">
+      <h5 class="font-bold text-lg text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
+        <i class="bi bi-shield-check"></i> Xác nhận báo cáo vi phạm
+      </h5>
+      <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"
+        (click)="closeResolveModal()">
+        <i class="bi bi-x-lg text-lg"></i>
+      </button>
+    </div>
+    <form (submit)="$event.preventDefault(); submitResolve()" class="space-y-4">
+      <p class="text-xs text-aquamarine-700 dark:text-aquamarine-300 leading-relaxed">
+        Bạn đang xử lý báo cáo <strong>#{{ report.id }}</strong> (Loại: <strong>{{ report.targetType }}</strong>). Xử lý
+        này sẽ tự động ẩn nội dung vi phạm khỏi hệ thống.
+      </p>
+      <div>
+        <label for="resolutionNote"
+          class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">Ghi chú xử lý (Tối đa
+          1000 ký tự)</label>
+        <textarea
+          class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 p-3 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          id="resolutionNote" name="note" [(ngModel)]="resolutionNote" rows="3"
+          placeholder="Nhập lý do xử lý vi phạm..." required maxlength="1000"></textarea>
+      </div>
+      <div class="flex justify-end gap-3 pt-2">
+        <button type="button"
+          class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer"
+          (click)="closeResolveModal()">Hủy</button>
+        <button type="submit"
+          class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 transition-colors cursor-pointer inline-flex items-center gap-2"
+          [disabled]="actionLoading() || !resolutionNote.trim()">
+          @if (actionLoading()) {
+          <span
+            class="inline-block animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-r-transparent"></span>
+          }
+          Xác nhận & Ẩn nội dung
         </button>
       </div>
-      <form (submit)="$event.preventDefault(); submitResolve()" class="space-y-4">
-        <p class="text-xs text-aquamarine-700 dark:text-aquamarine-300 leading-relaxed">
-          Bạn đang xử lý báo cáo <strong>#{{ report.id }}</strong> (Loại: <strong>{{ report.targetType }}</strong>). Xử lý này sẽ tự động ẩn nội dung vi phạm khỏi hệ thống.
-        </p>
-        <div>
-          <label for="resolutionNote" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">Ghi chú xử lý (Tối đa 1000 ký tự)</label>
-          <textarea
-            class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 p-3 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-            id="resolutionNote"
-            name="note"
-            [(ngModel)]="resolutionNote"
-            rows="3"
-            placeholder="Nhập lý do xử lý vi phạm..."
-            required
-            maxlength="1000"
-          ></textarea>
-        </div>
-        <div class="flex justify-end gap-3 pt-2">
-          <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer" (click)="closeResolveModal()">Hủy</button>
-          <button type="submit" class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 transition-colors cursor-pointer inline-flex items-center gap-2" [disabled]="actionLoading() || !resolutionNote.trim()">
-            @if (actionLoading()) {
-              <span class="inline-block animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-r-transparent"></span>
-            }
-            Xác nhận & Ẩn nội dung
-          </button>
-        </div>
-      </form>
-    </div>
+    </form>
   </div>
+</div>
 }
 
 <!-- Modal Bác bỏ báo cáo vi phạm (API M09) -->
 @if (activeRejectReportItem(); as report) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-    <div class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-md p-6">
-      <div class="flex justify-between items-center mb-4">
-        <h5 class="font-bold text-lg text-red-600 dark:text-red-400 flex items-center gap-2">
-          <i class="bi bi-x-circle"></i> Bác bỏ báo cáo vi phạm
-        </h5>
-        <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer" (click)="closeRejectReportModal()">
-          <i class="bi bi-x-lg text-lg"></i>
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+  <div
+    class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-md p-6">
+    <div class="flex justify-between items-center mb-4">
+      <h5 class="font-bold text-lg text-red-600 dark:text-red-400 flex items-center gap-2">
+        <i class="bi bi-x-circle"></i> Bác bỏ báo cáo vi phạm
+      </h5>
+      <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"
+        (click)="closeRejectReportModal()">
+        <i class="bi bi-x-lg text-lg"></i>
+      </button>
+    </div>
+    <form (submit)="$event.preventDefault(); submitRejectReport()" class="space-y-4">
+      <p class="text-xs text-aquamarine-700 dark:text-aquamarine-300 leading-relaxed">
+        Bạn đang bác bỏ báo cáo <strong>#{{ report.id }}</strong>. Nội dung bị báo cáo sẽ được <strong>giữ
+          nguyên</strong> trên hệ thống.
+      </p>
+      <div>
+        <label for="rejectReportNote"
+          class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">Lý do bác bỏ (Tối đa
+          1000 ký tự)</label>
+        <textarea
+          class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 p-3 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-red-500"
+          id="rejectReportNote" name="rejectNote" [(ngModel)]="rejectReportNote" rows="3"
+          placeholder="Nhập lý do bác bỏ..." required maxlength="1000"></textarea>
+      </div>
+      <div class="flex justify-end gap-3 pt-2">
+        <button type="button"
+          class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer"
+          (click)="closeRejectReportModal()">Hủy</button>
+        <button type="submit"
+          class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 transition-colors cursor-pointer inline-flex items-center gap-2"
+          [disabled]="actionLoading() || !rejectReportNote.trim()">
+          @if (actionLoading()) {
+          <span
+            class="inline-block animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-r-transparent"></span>
+          }
+          Xác nhận Bác bỏ
         </button>
       </div>
-      <form (submit)="$event.preventDefault(); submitRejectReport()" class="space-y-4">
-        <p class="text-xs text-aquamarine-700 dark:text-aquamarine-300 leading-relaxed">
-          Bạn đang bác bỏ báo cáo <strong>#{{ report.id }}</strong>. Nội dung bị báo cáo sẽ được <strong>giữ nguyên</strong> trên hệ thống.
-        </p>
-        <div>
-          <label for="rejectReportNote" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">Lý do bác bỏ (Tối đa 1000 ký tự)</label>
-          <textarea
-            class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 p-3 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-red-500"
-            id="rejectReportNote"
-            name="rejectNote"
-            [(ngModel)]="rejectReportNote"
-            rows="3"
-            placeholder="Nhập lý do bác bỏ..."
-            required
-            maxlength="1000"
-          ></textarea>
-        </div>
-        <div class="flex justify-end gap-3 pt-2">
-          <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer" (click)="closeRejectReportModal()">Hủy</button>
-          <button type="submit" class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 transition-colors cursor-pointer inline-flex items-center gap-2" [disabled]="actionLoading() || !rejectReportNote.trim()">
-            @if (actionLoading()) {
-              <span class="inline-block animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-r-transparent"></span>
-            }
-            Xác nhận Bác bỏ
-          </button>
-        </div>
-      </form>
-    </div>
+    </form>
   </div>
+</div>
 }
