@@ -1,6 +1,9 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component,OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-
+import {
+  ActivatedRoute,
+  Router,
+} from '@angular/router';
 import {
   AdminBlogOwnerRequestItem,
   BlogOwnerRequestStatus,
@@ -17,11 +20,12 @@ import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
   imports: [FormsModule, TranslatePipe, ConfirmDialog],
   templateUrl: './manage-requests.html',
 })
-export class ManageRequests {
+export class ManageRequests implements OnInit {
   protected readonly ts = inject(TranslationService);
   private readonly adminApi = inject(AdminApiService);
   private readonly toast = inject(ToastService);
-
+  private readonly route =inject(ActivatedRoute);
+private readonly router =inject(Router);
   readonly requests = signal<AdminBlogOwnerRequestItem[]>([]);
   readonly isLoading = signal<boolean>(false);
   readonly currentPage = signal<number>(1);
@@ -38,9 +42,50 @@ export class ManageRequests {
   readonly rejectionReason = signal<string>('');
   readonly isSubmitting = signal<boolean>(false);
 
-  constructor() {
-    this.loadRequests();
-  }
+  ngOnInit(): void {
+  this.route.queryParamMap.subscribe(
+    (params) => {
+      // =====================
+      // PAGE
+      // =====================
+
+      const rawPage =
+        Number(params.get('page'));
+
+      this.currentPage.set(
+        Number.isInteger(rawPage) &&
+        rawPage > 0
+          ? rawPage
+          : 1,
+      );
+
+      // =====================
+      // STATUS
+      // =====================
+
+      const rawStatus =
+        params.get('status');
+
+      const validStatuses = [
+        'PENDING',
+        'APPROVED',
+        'REJECTED',
+        'ALL',
+      ];
+
+      this.statusFilter.set(
+        rawStatus &&
+        validStatuses.includes(
+          rawStatus,
+        )
+          ? rawStatus
+          : 'PENDING',
+      );
+
+      this.loadRequests();
+    },
+  );
+}
 
   loadRequests(): void {
     this.isLoading.set(true);
@@ -71,18 +116,47 @@ export class ManageRequests {
     });
   }
 
-  onStatusChange(status: string): void {
-    this.statusFilter.set(status);
-    this.currentPage.set(1);
-    this.loadRequests();
+  onStatusChange(
+  status: string,
+): void {
+  if (
+    status === this.statusFilter()
+  ) {
+    return;
   }
 
+  this.router.navigate([], {
+    relativeTo: this.route,
+
+    queryParams: {
+      page: 1,
+      status,
+    },
+
+    queryParamsHandling: 'merge',
+  });
+}
+
   setPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages() && page !== this.currentPage()) {
-      this.currentPage.set(page);
-      this.loadRequests();
-    }
+  if (
+    page < 1 ||
+    page > this.totalPages() ||
+    page === this.currentPage() ||
+    this.isLoading()
+  ) {
+    return;
   }
+
+  this.router.navigate([], {
+    relativeTo: this.route,
+
+    queryParams: {
+      page,
+    },
+
+    queryParamsHandling: 'merge',
+  });
+}
 
   get pageNumbers(): number[] {
     const pages: number[] = [];

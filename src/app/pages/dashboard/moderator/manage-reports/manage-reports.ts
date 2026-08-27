@@ -1,7 +1,7 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute,Router } from '@angular/router';
 import { TranslationService } from '../../../../core/services/translation.service';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { ModeratorApiService } from '../../../../core/services/moderator-api.service';
@@ -28,6 +28,7 @@ export class ManageReports implements OnInit {
   private readonly toast = inject(ToastService);
   readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   readonly loading = signal<boolean>(true);
   readonly loadingDetail = signal<boolean>(false);
@@ -50,9 +51,104 @@ export class ManageReports implements OnInit {
   resolutionNote = '';
   rejectReportNote = '';
 
-  ngOnInit() {
-    this.loadReports();
-  }
+  ngOnInit(): void {
+  this.route.queryParamMap.subscribe(
+    (params) => {
+      // =====================
+      // PAGE
+      // =====================
+
+      const rawPage =
+        Number(params.get('page'));
+
+      this.currentPage.set(
+        Number.isInteger(rawPage) &&
+        rawPage > 0
+          ? rawPage
+          : 1,
+      );
+
+      // =====================
+      // STATUS
+      // =====================
+
+      const rawStatus =
+        params.get('status');
+
+      const validStatuses:
+        ModeratorReportStatus[] = [
+          'PENDING',
+          'RESOLVED',
+          'REJECTED',
+        ];
+
+      this.statusFilter.set(
+        rawStatus &&
+        validStatuses.includes(
+          rawStatus as
+            ModeratorReportStatus,
+        )
+          ? (rawStatus as
+              ModeratorReportStatus)
+          : 'PENDING',
+      );
+
+      // =====================
+      // TARGET TYPE
+      // =====================
+
+      const rawTarget =
+        params.get('targetType');
+
+      const validTargets:
+        ModeratorReportTargetType[] = [
+          'POST',
+          'COMMENT',
+        ];
+
+      this.targetTypeFilter.set(
+        rawTarget &&
+        validTargets.includes(
+          rawTarget as
+            ModeratorReportTargetType,
+        )
+          ? (rawTarget as
+              ModeratorReportTargetType)
+          : '',
+      );
+
+      // =====================
+      // REASON
+      // =====================
+
+      const rawReason =
+        params.get('reason');
+
+      const validReasons:
+        ModeratorReportReason[] = [
+          'SPAM',
+          'HARASSMENT',
+          'INAPPROPRIATE',
+          'COPYRIGHT',
+          'MISINFORMATION',
+          'OTHER',
+        ];
+
+      this.reasonFilter.set(
+        rawReason &&
+        validReasons.includes(
+          rawReason as
+            ModeratorReportReason,
+        )
+          ? (rawReason as
+              ModeratorReportReason)
+          : '',
+      );
+
+      this.loadReports();
+    },
+  );
+}
 
   loadReports() {
     this.loading.set(true);
@@ -100,31 +196,86 @@ export class ManageReports implements OnInit {
     });
   }
 
-  onStatusChange(status: ModeratorReportStatus) {
-    if (this.statusFilter() !== status) {
-      this.statusFilter.set(status);
-      this.currentPage.set(1);
-      this.loadReports();
-    }
+  onStatusChange(
+  status:
+    ModeratorReportStatus,
+): void {
+  if (
+    this.statusFilter() ===
+    status
+  ) {
+    return;
   }
 
-  onTargetTypeChange() {
-    this.currentPage.set(1);
-    this.loadReports();
+  this.router.navigate([], {
+    relativeTo: this.route,
+
+    queryParams: {
+      page: 1,
+      status,
+    },
+
+    queryParamsHandling: 'merge',
+  });
+}
+
+  onTargetTypeChange(): void {
+  const targetType =
+    this.targetTypeFilter();
+
+  this.router.navigate([], {
+    relativeTo: this.route,
+
+    queryParams: {
+      page: 1,
+
+      targetType:
+        targetType || null,
+    },
+
+    queryParamsHandling: 'merge',
+  });
+}
+
+  onReasonChange(): void {
+  const reason =
+    this.reasonFilter();
+
+  this.router.navigate([], {
+    relativeTo: this.route,
+
+    queryParams: {
+      page: 1,
+      reason: reason || null,
+    },
+
+    queryParamsHandling: 'merge',
+  });
+}
+
+  setPage(page: number): void {
+  const total =
+    this.meta()?.totalPages ?? 1;
+
+  if (
+    page < 1 ||
+    page > total ||
+    page === this.currentPage() ||
+    this.loading()
+  ) {
+    return;
   }
 
-  onReasonChange() {
-    this.currentPage.set(1);
-    this.loadReports();
-  }
+  this.router.navigate([], {
+    relativeTo: this.route,
 
-  setPage(page: number) {
-    const total = this.meta()?.totalPages || 1;
-    if (page >= 1 && page <= total && page !== this.currentPage()) {
-      this.currentPage.set(page);
-      this.loadReports();
-    }
-  }
+    queryParams: {
+      page,
+    },
+
+    queryParamsHandling: 'merge',
+  });
+}
 
   readonly pageNumbers = computed(() => {
     const totalPages = this.meta()?.totalPages || 1;

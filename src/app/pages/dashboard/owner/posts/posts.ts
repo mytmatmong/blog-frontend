@@ -6,7 +6,11 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import {
+  ActivatedRoute,
+  Router,
+  RouterLink,
+} from '@angular/router';
 
 import {
   BlogOwnerPost,
@@ -55,6 +59,12 @@ export class Posts implements OnInit {
 
   private readonly toast =
     inject(ToastService);
+
+  private readonly route =
+    inject(ActivatedRoute);
+
+  private readonly router =
+    inject(Router);
 
   protected readonly ts =
     inject(TranslationService);
@@ -128,8 +138,73 @@ export class Posts implements OnInit {
   });
 
   ngOnInit(): void {
-    this.loadPosts();
-  }
+  /**
+   * URL là nguồn state cho:
+   * - page
+   * - search
+   * - status
+   *
+   * Nhờ vậy:
+   * F5 / Back / Forward vẫn giữ đúng trạng thái.
+   */
+  this.route.queryParamMap.subscribe(
+    (params) => {
+      // =====================
+      // PAGE
+      // =====================
+
+      const rawPage =
+        Number(params.get('page'));
+
+      const page =
+        Number.isInteger(rawPage) &&
+        rawPage > 0
+          ? rawPage
+          : 1;
+
+      this.currentPage.set(page);
+
+      // =====================
+      // SEARCH
+      // =====================
+
+      this.search.set(
+        params.get('search') ?? '',
+      );
+
+      // =====================
+      // STATUS
+      // =====================
+
+      const rawStatus =
+        params.get('status');
+
+      const validStatuses:
+        PostStatus[] = [
+          'DRAFT',
+          'PENDING_REVIEW',
+          'PUBLISH',
+          'REJECT',
+        ];
+
+      const status =
+        rawStatus &&
+        validStatuses.includes(
+          rawStatus as PostStatus,
+        )
+          ? (rawStatus as PostStatus)
+          : '';
+
+      this.statusFilter.set(status);
+
+      // =====================
+      // LOAD
+      // =====================
+
+      this.loadPosts();
+    },
+  );
+}
 
   loadPosts(): void {
     const requestId =
@@ -227,9 +302,19 @@ export class Posts implements OnInit {
   }
 
   applySearch(): void {
-    this.currentPage.set(1);
-    this.loadPosts();
-  }
+  const search =this.search().trim();
+
+  this.router.navigate([], {
+    relativeTo: this.route,
+
+    queryParams: {
+      page: 1,
+      search: search || null,
+    },
+
+    queryParamsHandling: 'merge',
+  });
+}
 
   onSearchKeydown(
     event: KeyboardEvent,
@@ -240,40 +325,60 @@ export class Posts implements OnInit {
     }
   }
 
-  onStatusChange(event: Event): void {
-    const value = (
-      event.target as
-      HTMLSelectElement
-    ).value;
+  onStatusChange(event: Event,): void {
+      const value = (
+        event.target as
+        HTMLSelectElement
+      ).value as PostStatus | '';
 
-    this.statusFilter.set(
-      value as PostStatus | '',
-    );
+  this.router.navigate([], {
+    relativeTo: this.route,
 
-    this.currentPage.set(1);
-    this.loadPosts();
-  }
+    queryParams: {
+      page: 1,
+
+      status:
+        value || null,
+    },
+
+    queryParamsHandling: 'merge',
+  });
+}
 
   clearFilters(): void {
-    this.search.set('');
-    this.statusFilter.set('');
-    this.currentPage.set(1);
-    this.loadPosts();
-  }
+  this.router.navigate([], {
+    relativeTo: this.route,
+
+    queryParams: {
+      page: 1,
+      search: null,
+      status: null,
+    },
+
+    queryParamsHandling: 'merge',
+  });
+}
 
   setPage(page: number): void {
-    if (
-      page < 1 ||
-      page > this.totalPages() ||
-      page === this.currentPage() ||
-      this.isLoading()
-    ) {
-      return;
-    }
-
-    this.currentPage.set(page);
-    this.loadPosts();
+  if (
+    page < 1 ||
+    page > this.totalPages() ||
+    page === this.currentPage() ||
+    this.isLoading()
+  ) {
+    return;
   }
+
+  this.router.navigate([], {
+    relativeTo: this.route,
+
+    queryParams: {
+      page,
+    },
+
+    queryParamsHandling: 'merge',
+  });
+}
 
   setPreviewPost(
     post: BlogOwnerPost,

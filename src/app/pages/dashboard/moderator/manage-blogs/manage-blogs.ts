@@ -1,7 +1,10 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import {
+  ActivatedRoute,
+  Router,
+} from '@angular/router';
 import { TranslationService } from '../../../../core/services/translation.service';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { ModeratorApiService } from '../../../../core/services/moderator-api.service';
@@ -27,6 +30,7 @@ export class ManageBlogs implements OnInit {
   private readonly toast = inject(ToastService);
   readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   readonly loading = signal<boolean>(true);
   readonly loadingPreviewPostId =signal<number | null>(null);
@@ -49,9 +53,61 @@ export class ManageBlogs implements OnInit {
   readonly activeRejectBlog = signal<ModeratorPostItem | null>(null);
   rejectReason = '';
 
-  ngOnInit() {
-    this.loadPosts();
-  }
+  ngOnInit(): void {
+  this.route.queryParamMap.subscribe(
+    (params) => {
+      // =====================
+      // PAGE
+      // =====================
+
+      const rawPage =
+        Number(params.get('page'));
+
+      this.currentPage.set(
+        Number.isInteger(rawPage) &&
+        rawPage > 0
+          ? rawPage
+          : 1,
+      );
+
+      // =====================
+      // SEARCH
+      // =====================
+
+      this.searchQuery.set(
+        params.get('search') ?? '',
+      );
+
+      // =====================
+      // STATUS
+      // =====================
+
+      const rawStatus =
+        params.get('status');
+
+      const validStatuses:
+        ModeratorPostStatus[] = [
+          'PENDING_REVIEW',
+          'PUBLISH',
+          'REJECT',
+        ];
+
+      const status =
+        rawStatus &&
+        validStatuses.includes(
+          rawStatus as
+            ModeratorPostStatus,
+        )
+          ? (rawStatus as
+              ModeratorPostStatus)
+          : 'PENDING_REVIEW';
+
+      this.statusFilter.set(status);
+
+      this.loadPosts();
+    },
+  );
+}
 
   loadPosts() {
     this.loading.set(true);
@@ -98,34 +154,81 @@ export class ManageBlogs implements OnInit {
       });
   }
 
-  onStatusChange(status: ModeratorPostStatus) {
-    if (this.statusFilter() !== status) {
-      this.statusFilter.set(status);
-      this.currentPage.set(1);
-      this.loadPosts();
-    }
+  onStatusChange(status: ModeratorPostStatus): void {
+  if (
+    this.statusFilter() === status
+  ) {
+    return;
   }
 
-  onSearch() {
-    this.currentPage.set(1);
-    this.loadPosts();
+  this.router.navigate([], {
+    relativeTo: this.route,
+
+    queryParams: {
+      page: 1,
+      status,
+    },
+
+    queryParamsHandling: 'merge',
+  });
+}
+
+  onSearch(): void {
+  const search =
+    this.searchQuery().trim();
+
+  this.router.navigate([], {
+    relativeTo: this.route,
+
+    queryParams: {
+      page: 1,
+      search: search || null,
+    },
+
+    queryParamsHandling: 'merge',
+  });
+}
+
+  clearSearch(): void {
+  if (!this.searchQuery()) {
+    return;
   }
 
-  clearSearch() {
-    if (this.searchQuery()) {
-      this.searchQuery.set('');
-      this.currentPage.set(1);
-      this.loadPosts();
-    }
+  this.router.navigate([], {
+    relativeTo: this.route,
+
+    queryParams: {
+      page: 1,
+      search: null,
+    },
+
+    queryParamsHandling: 'merge',
+  });
+}
+
+  setPage(page: number): void {
+  const total =
+    this.meta()?.totalPages ?? 1;
+
+  if (
+    page < 1 ||
+    page > total ||
+    page === this.currentPage() ||
+    this.loading()
+  ) {
+    return;
   }
 
-  setPage(page: number) {
-    const total = this.meta()?.totalPages || 1;
-    if (page >= 1 && page <= total && page !== this.currentPage()) {
-      this.currentPage.set(page);
-      this.loadPosts();
-    }
-  }
+  this.router.navigate([], {
+    relativeTo: this.route,
+
+    queryParams: {
+      page,
+    },
+
+    queryParamsHandling: 'merge',
+  });
+}
 
   readonly pageNumbers = computed(() => {
     const totalPages = this.meta()?.totalPages || 1;
