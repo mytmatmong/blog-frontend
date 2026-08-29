@@ -112,12 +112,32 @@ export class ManageLanguages implements OnInit {
     return total > 0 ? total : 1;
   });
 
-  pageNumbers = computed(() => {
-    const pages: number[] = [];
-    for (let i = 1; i <= this.totalPages(); i++) {
-      pages.push(i);
+  pageItems = computed(() => {
+    const total = this.totalPages();
+    const current = this.currentPage();
+
+    if (total <= 5) {
+      return Array.from({ length: total }, (_, i) => ({ type: 'page' as const, value: i + 1 }));
     }
-    return pages;
+
+    let start = Math.max(1, current - 2);
+    let end = start + 4;
+    if (end > total) {
+      end = total;
+      start = Math.max(1, end - 4);
+    }
+
+    const items: Array<{ type: 'page' | 'ellipsis'; value: number | null }> = [];
+    if (start > 1) {
+      items.push({ type: 'ellipsis', value: null });
+    }
+    for (let p = start; p <= end; p++) {
+      items.push({ type: 'page', value: p });
+    }
+    if (end < total) {
+      items.push({ type: 'ellipsis', value: null });
+    }
+    return items;
   });
 
   paginatedLanguages = computed(() => {

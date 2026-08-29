@@ -234,7 +234,7 @@
             }
           </div>
 
-          @if (connectionsTotalPages() > 1) {
+          @if (connectionsTotalItems() > 0) {
           <div class="author-connections__pagination">
             <app-pagination [totalItems]="connectionsTotalItems()" [itemsPerPage]="connectionsPerPage"
               [currentPage]="connectionsPage()" (currentPageChange)="onConnectionsPageChange($event)">
@@ -312,7 +312,7 @@
           }
         </div>
 
-        @if (totalPages() > 1) {
+        @if (totalItems() > 0) {
         <div class="author-pagination">
           <app-pagination [totalItems]="totalItems()" [itemsPerPage]="itemsPerPage" [currentPage]="currentPage()"
             (currentPageChange)="onPageChange($event)">

@@ -72,27 +72,13 @@
                   <span class="required">*</span>
                 </label>
 
-                <div class="native-select language-select">
-                  <span class="flag">
-                    {{ sourceLanguage()?.flag || '🌐' }}
-                  </span>
-
-                  <select id="source-language" name="sourceLanguage" [ngModel]="originalLanguageId()" (ngModelChange)="
-    changeOriginalLanguage($event)
-  " [disabled]="sourceLanguageLocked()">
-                    @for (
-                    language of languages();
-                    track language.id
-                    ) {
-                    <option [ngValue]="language.id">
-                      {{ languageDisplayName(language) }}
-                      ({{ language.code.toUpperCase() }})
-                    </option>
-                    }
-                  </select>
-
-                  <i class="bi bi-chevron-down"></i>
-                </div>
+                <app-single-dropdown
+                  [options]="sourceLanguageOptions()"
+                  [value]="originalLanguageId()"
+                  [disabled]="sourceLanguageLocked() || formLocked()"
+                  [placeholder]="'post_form.select_language' | translate"
+                  (selectionChange)="changeOriginalLanguage($event)"
+                />
               </div>
 
               <!-- NGÔN NGỮ DỊCH -->
@@ -105,92 +91,13 @@
                   </span>
                 </label>
 
-                <div class="multi-select" (click)="keepDropdownOpen($event)">
-                  <button type="button" class="multi-select-trigger" [class.open]="languageDropdownOpen()"
-                    (click)="toggleLanguageDropdown($event)" [attr.aria-label]="
-                  'post_form.target_language_aria' | translate
-                ">
-                    <span class="selected-values">
-                      @for (
-                      language of selectedTranslationLanguages();
-                      track language.id
-                      ) {
-                      <span class="selection-chip">
-                        <span>
-                          {{ language.flag || '🌐' }}
-                        </span>
-
-                        <span class="selection-chip__text">
-                          {{ languageDisplayName(language) }}
-                          ({{ language.code.toUpperCase() }})
-                        </span>
-
-                        <span class="chip-remove" role="button" tabindex="0" (click)="
-                          removeTranslationLanguage(
-                            language.id,
-                            $event
-                          )
-                        " [attr.aria-label]="
-                          ('post_form.remove_language' | translate) +
-                          ' ' +
-                          languageDisplayName(language)
-                        ">
-                          <i class="bi bi-x"></i>
-                        </span>
-                      </span>
-                      } @empty {
-                      <span class="placeholder">
-                        {{ 'post_form.no_translation' | translate }}
-                      </span>
-                      }
-                    </span>
-
-                    <i class="bi bi-chevron-down trigger-chevron"></i>
-                  </button>
-
-                  @if (languageDropdownOpen()) {
-                  <div class="dropdown-panel language-options">
-                    <div class="dropdown-title">
-                      {{ 'post_form.source_excluded' | translate }}
-                    </div>
-
-                    @for (
-                    language of availableTranslationLanguages();
-                    track language.id
-                    ) {
-                    <label class="dropdown-option">
-                      <input type="checkbox" [checked]="
-                          isTranslationLanguageSelected(language.id)
-                        " (change)="
-                          toggleTranslationLanguage(
-                            language.id,
-                            $any($event.target).checked
-                          )
-                        ">
-
-                      <span class="option-flag">
-                        {{ language.flag || '🌐' }}
-                      </span>
-
-                      <span class="option-name">
-                        {{ languageDisplayName(language) }}
-                      </span>
-
-                      <span class="option-code">
-                        {{ language.code.toUpperCase() }}
-                      </span>
-                    </label>
-                    } @empty {
-                    <div class="empty-option">
-                      {{
-                      'post_form.no_target_language'
-                      | translate
-                      }}
-                    </div>
-                    }
-                  </div>
-                  }
-                </div>
+                <app-multi-dropdown
+                  [options]="translationLanguageOptions()"
+                  [values]="selectedTranslationLanguageIds()"
+                  [placeholder]="'post_form.no_translation' | translate"
+                  [disabled]="formLocked()"
+                  (selectionChange)="onTranslationLanguageSelectionChange($event)"
+                />
               </div>
             </div>
           </article>
@@ -272,67 +179,13 @@
                   <span class="required">*</span>
                 </label>
 
-                <div class="multi-select" (click)="keepDropdownOpen($event)">
-                  <button type="button" class="multi-select-trigger compact" [class.open]="categoryDropdownOpen()"
-                    (click)="toggleCategoryDropdown($event)">
-                    <span class="selected-values">
-                      @for (
-                      category of selectedCategories();
-                      track category.id
-                      ) {
-                      <span class="selection-chip category-chip">
-                        {{ category.name }}
-                      </span>
-                      } @empty {
-                      <span class="placeholder">
-                        {{ 'post_form.select_category' | translate }}
-                      </span>
-                      }
-                    </span>
-
-                    <i class="bi bi-chevron-down trigger-chevron"></i>
-                  </button>
-
-                  @if (categoryDropdownOpen()) {
-                  <div class="dropdown-panel category-options">
-                    @for (
-                    category of categoriesForSourceLanguage();
-                    track category.id
-                    ) {
-                    <label class="dropdown-option">
-                      <input type="checkbox" [checked]="isCategorySelected(category.id)" (change)="
-                          toggleCategory(
-                            category.id,
-                            $any($event.target).checked
-                          )
-                        ">
-
-                      <span class="option-name">
-                        {{ category.name }}
-                      </span>
-
-                      <span class="option-code">
-                        {{
-                        category.categoryGroup?.code ||
-                        (
-                        ('post_form.group' | translate) +
-                        ' #' +
-                        category.categoryGroupId
-                        )
-                        }}
-                      </span>
-                    </label>
-                    } @empty {
-                    <div class="empty-option">
-                      {{
-                      'post_form.no_category_for_language'
-                      | translate
-                      }}
-                    </div>
-                    }
-                  </div>
-                  }
-                </div>
+                <app-multi-dropdown
+                  [options]="categoryOptions()"
+                  [values]="selectedCategoryIds()"
+                  [placeholder]="'post_form.select_category' | translate"
+                  [disabled]="formLocked()"
+                  (selectionChange)="selectedCategoryIds.set($event)"
+                />
 
                 <small>
                   {{ 'post_form.only_source_categories' | translate }}
@@ -384,7 +237,6 @@
                   <button type="button" class="hashtag-v3__toggle" (click)="toggleHashtagPicker($event)"
                     [attr.aria-expanded]="hashtagPickerOpen()"
                     [attr.aria-label]="'post_form.hashtag_picker_open' | translate">
-                    <i class="bi bi-hash"></i>
                     <i class="bi bi-chevron-down" [class.is-rotated]="hashtagPickerOpen()"></i>
                   </button>
                 </div>
@@ -412,20 +264,18 @@
               !isHashtagSelected(tag.name) &&
               selectedHashtagNames().length >= 5
             " (click)="toggleHashtag(tag.name)">
+                      <!-- Checkbox Box bên trái -->
+                      @if (isHashtagSelected(tag.name)) {
+                        <span class="w-4 h-4 rounded bg-aquamarine-600 dark:bg-aquamarine-500 text-white flex items-center justify-center shrink-0 shadow-2xs">
+                          <i class="bi bi-check-lg text-xs font-bold"></i>
+                        </span>
+                      } @else {
+                        <span class="w-4 h-4 rounded border border-aquamarine-300 dark:border-aquamarine-600 bg-white dark:bg-aquamarine-950 shrink-0"></span>
+                      }
+
                       <span class="hashtag-v3__option-name">
                         #{{ normalizeHashtagName(tag.name) }}
                       </span>
-
-                      @if (isHashtagSelected(tag.name)) {
-                      <span class="hashtag-v3__option-state">
-                        <i class="bi bi-check-lg"></i>
-                        Đã chọn
-                      </span>
-                      } @else {
-                      <span class="hashtag-v3__option-state">
-                        Chọn
-                      </span>
-                      }
                     </button>
                     } @empty {
                     <div class="hashtag-v3__empty">
@@ -466,10 +316,17 @@
                 <div class="current-thumbnail selected-thumbnail">
                   <img [src]="previewUrl" [alt]="thumbnailFile()?.name || titleModel">
 
-                  <span>
-                    <i class="bi bi-check-circle"></i>
-                    {{ 'post_form.thumbnail_new_preview' | translate }}
-                  </span>
+                  <div class="thumbnail-bar flex items-center justify-between px-3 py-2">
+                    <span class="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                      <i class="bi bi-check-circle"></i>
+                      {{ 'post_form.thumbnail_new_preview' | translate }}
+                    </span>
+
+                    <button type="button" (click)="removeThumbnail($event)" class="text-xs font-semibold text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 flex items-center gap-1 hover:underline cursor-pointer">
+                      <i class="bi bi-trash"></i>
+                      {{ 'post_form.remove_thumbnail' | translate }}
+                    </button>
+                  </div>
                 </div>
                 } @else if (
                 existingThumbnailUrl() &&
@@ -478,27 +335,30 @@
                 <div class="current-thumbnail">
                   <img [src]="existingThumbnailUrl()!" [alt]="titleModel">
 
-                  <span>
-                    <i class="bi bi-image"></i>
+                  <div class="thumbnail-bar flex items-center justify-between px-3 py-2">
+                    <span class="flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-400">
+                      <i class="bi bi-image"></i>
+                      {{ 'post_form.thumbnail_current' | translate }}
+                    </span>
 
-                    {{
-                    'post_form.thumbnail_current'
-                    | translate
-                    }}
-                  </span>
+                    <button type="button" (click)="removeThumbnail($event)" class="text-xs font-semibold text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 flex items-center gap-1 hover:underline cursor-pointer">
+                      <i class="bi bi-trash"></i>
+                      {{ 'post_form.remove_thumbnail' | translate }}
+                    </button>
+                  </div>
                 </div>
                 }
 
-                <label class="file-input" for="thumbnail">
+                <label class="file-input mt-2" for="thumbnail">
                   <span class="file-button">
                     <i class="bi bi-upload"></i>
-                    {{ 'post_form.choose_file' | translate }}
+                    {{ (hasThumbnail() ? 'post_form.change_file' : 'post_form.choose_file') | translate }}
                   </span>
 
                   <span class="file-name">
                     {{
                     thumbnailFile()?.name ||
-                    ('post_form.no_file_selected' | translate)
+                    (hasThumbnail() ? ('post_form.file_prefix' | translate) + ': Image' : ('post_form.no_file_selected' | translate))
                     }}
                   </span>
                 </label>

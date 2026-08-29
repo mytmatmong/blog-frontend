@@ -58,17 +58,14 @@
                 ) {
                 <button type="button" class="post-preview-language" [class.is-active]="
                   version.id === post.id
-                " [disabled]="
-                  loadingPostId() !== null
+                " [disabled]="isLanguageSwitchBusy()
                 " [attr.aria-pressed]="
                   version.id === post.id
                 " [title]="version.title" (click)="
                   switchLanguage(version.id)
                 ">
                     <span class="post-preview-language__flag">
-                        @if (
-                        loadingPostId() === version.id
-                        ) {
+                        @if (isLanguageLoading(version.id)) {
                         <i class="
                         bi bi-arrow-repeat
                         post-preview-spin

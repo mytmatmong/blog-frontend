@@ -140,40 +140,75 @@
   </div>
 
   <!-- Pagination -->
-  @if (totalPages() > 1) {
+  @if (!isLoading() && totalItems() > 0) {
     <div class="mt-6 flex justify-between items-center text-sm text-aquamarine-700 dark:text-aquamarine-300">
       <div>{{ 'requests.total' | translate }} <strong>{{ totalItems() }}</strong> {{ 'requests.items' | translate }}</div>
       <ul class="inline-flex items-center space-x-1">
+        <!-- Trang đầu << -->
         <li>
-          <app-text-button
-            variant="secondary"
+          <app-icon-button
+            icon="bi bi-chevron-double-left"
+            color="primary"
+            variant="soft"
+            size="sm"
+            [disabled]="currentPage() === 1"
+            (btnClick)="setPage(1)"
+          />
+        </li>
+        <!-- Trang trước < -->
+        <li>
+          <app-icon-button
+            icon="bi bi-chevron-left"
+            color="primary"
+            variant="soft"
             size="sm"
             [disabled]="currentPage() === 1"
             (btnClick)="setPage(currentPage() - 1)"
-          >
-            {{ 'pagination.prev' | translate }}
-          </app-text-button>
+          />
         </li>
-        @for (p of pageNumbers; track p) {
-          <li>
-            <app-text-button
-              [variant]="currentPage() === p ? 'primary' : 'secondary'"
-              size="sm"
-              (btnClick)="setPage(p)"
-            >
-              {{ p }}
-            </app-text-button>
-          </li>
+
+        <!-- Các trang & Dấu 3 chấm -->
+        @for (item of pageItems; track $index) {
+          @if (item.type === 'page') {
+            <li>
+              <app-text-button
+                [variant]="currentPage() === item.value ? 'primary' : 'secondary'"
+                size="sm"
+                (btnClick)="setPage(item.value!)"
+              >
+                {{ item.value }}
+              </app-text-button>
+            </li>
+          } @else {
+            <li>
+              <span class="inline-flex min-w-6 h-8 items-center justify-center text-xs font-bold text-aquamarine-500 select-none">
+                ...
+              </span>
+            </li>
+          }
         }
+
+        <!-- Trang sau > -->
         <li>
-          <app-text-button
-            variant="secondary"
+          <app-icon-button
+            icon="bi bi-chevron-right"
+            color="primary"
+            variant="soft"
             size="sm"
             [disabled]="currentPage() === totalPages()"
             (btnClick)="setPage(currentPage() + 1)"
-          >
-            {{ 'pagination.next' | translate }}
-          </app-text-button>
+          />
+        </li>
+        <!-- Trang cuối >> -->
+        <li>
+          <app-icon-button
+            icon="bi bi-chevron-double-right"
+            color="primary"
+            variant="soft"
+            size="sm"
+            [disabled]="currentPage() === totalPages()"
+            (btnClick)="setPage(totalPages())"
+          />
         </li>
       </ul>
     </div>

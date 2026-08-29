@@ -1,7 +1,10 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import {
+  ActivatedRoute,
+  Router,
+} from '@angular/router';
 import { TranslationService } from '../../../../core/services/translation.service';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { ModeratorApiService } from '../../../../core/services/moderator-api.service';
@@ -17,6 +20,12 @@ import { OwnerPostPreviewComponent } from '../../../../shared/components/owner-p
 import { BadgeComponent } from '../../../../shared/components/badge/badge';
 import { IconButtonComponent } from '../../../../shared/components/icon-button/icon-button';
 import { TextButtonComponent } from '../../../../shared/components/text-button/text-button';
+import { TextSearchComponent } from '../../../../shared/components/text-search/text-search';
+import { DropdownOption } from '../../../../shared/components/single-dropdown/single-dropdown';
+import {
+  LanguageBadgesComponent,
+  PostLanguageItem,
+} from '../../../../shared/components/language-badges/language-badges';
 
 @Component({
   selector: 'app-manage-blogs',
@@ -28,6 +37,8 @@ import { TextButtonComponent } from '../../../../shared/components/text-button/t
     BadgeComponent,
     IconButtonComponent,
     TextButtonComponent,
+    TextSearchComponent,
+    LanguageBadgesComponent,
   ],
   templateUrl: './manage-blogs.html',
   styleUrl: './manage-blogs.css',
@@ -38,9 +49,10 @@ export class ManageBlogs implements OnInit {
   private readonly toast = inject(ToastService);
   readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   readonly loading = signal<boolean>(true);
-  readonly loadingDetail = signal<boolean>(false);
+  readonly loadingPreviewPostId =signal<number | null>(null);
   readonly actionLoading = signal<boolean>(false);
   readonly error = signal<string | null>(null);
   readonly isForbidden = signal<boolean>(false);
@@ -52,6 +64,15 @@ export class ManageBlogs implements OnInit {
   readonly currentPage = signal<number>(1);
   readonly limit = 10;
 
+  readonly statusOptions = computed<DropdownOption[]>(() => {
+    this.ts.currentLang();
+    return [
+      { label: this.ts.translate('filter.status.pending_review'), value: 'PENDING_REVIEW', icon: 'bi bi-clock-history' },
+      { label: this.ts.translate('filter.status.published'), value: 'PUBLISH', icon: 'bi bi-check2-circle' },
+      { label: this.ts.translate('filter.status.rejected'), value: 'REJECT', icon: 'bi bi-x-circle' },
+    ];
+  });
+
   readonly activePreviewBlog = signal<ModeratorPostItem | null>(null);
   readonly activePreviewPost = computed<BlogOwnerPost | null>(() => {
     const blog = this.activePreviewBlog();
@@ -60,9 +81,61 @@ export class ManageBlogs implements OnInit {
   readonly activeRejectBlog = signal<ModeratorPostItem | null>(null);
   rejectReason = '';
 
-  ngOnInit() {
-    this.loadPosts();
-  }
+  ngOnInit(): void {
+  this.route.queryParamMap.subscribe(
+    (params) => {
+      // =====================
+      // PAGE
+      // =====================
+
+      const rawPage =
+        Number(params.get('page'));
+
+      this.currentPage.set(
+        Number.isInteger(rawPage) &&
+        rawPage > 0
+          ? rawPage
+          : 1,
+      );
+
+      // =====================
+      // SEARCH
+      // =====================
+
+      this.searchQuery.set(
+        params.get('search') ?? '',
+      );
+
+      // =====================
+      // STATUS
+      // =====================
+
+      const rawStatus =
+        params.get('status');
+
+      const validStatuses:
+        ModeratorPostStatus[] = [
+          'PENDING_REVIEW',
+          'PUBLISH',
+          'REJECT',
+        ];
+
+      const status =
+        rawStatus &&
+        validStatuses.includes(
+          rawStatus as
+            ModeratorPostStatus,
+        )
+          ? (rawStatus as
+              ModeratorPostStatus)
+          : 'PENDING_REVIEW';
+
+      this.statusFilter.set(status);
+
+      this.loadPosts();
+    },
+  );
+}
 
   loadPosts() {
     this.loading.set(true);
@@ -109,75 +182,179 @@ export class ManageBlogs implements OnInit {
       });
   }
 
-  onStatusChange(status: ModeratorPostStatus) {
-    if (this.statusFilter() !== status) {
-      this.statusFilter.set(status);
-      this.currentPage.set(1);
-      this.loadPosts();
-    }
+  onStatusChange(status: ModeratorPostStatus): void {
+  if (
+    this.statusFilter() === status
+  ) {
+    return;
   }
 
-  onSearch() {
-    this.currentPage.set(1);
-    this.loadPosts();
+  this.router.navigate([], {
+    relativeTo: this.route,
+
+    queryParams: {
+      page: 1,
+      status,
+    },
+
+    queryParamsHandling: 'merge',
+  });
+}
+
+  onSearch(): void {
+  const search =
+    this.searchQuery().trim();
+
+  this.router.navigate([], {
+    relativeTo: this.route,
+
+    queryParams: {
+      page: 1,
+      search: search || null,
+    },
+
+    queryParamsHandling: 'merge',
+  });
+}
+
+  clearSearch(): void {
+  if (!this.searchQuery()) {
+    return;
   }
 
-  clearSearch() {
-    if (this.searchQuery()) {
-      this.searchQuery.set('');
-      this.currentPage.set(1);
-      this.loadPosts();
-    }
+  this.router.navigate([], {
+    relativeTo: this.route,
+
+    queryParams: {
+      page: 1,
+      search: null,
+    },
+
+    queryParamsHandling: 'merge',
+  });
+}
+
+  setPage(page: number): void {
+  const total =
+    this.meta()?.totalPages ?? 1;
+
+  if (
+    page < 1 ||
+    page > total ||
+    page === this.currentPage() ||
+    this.loading()
+  ) {
+    return;
   }
 
-  setPage(page: number) {
-    const total = this.meta()?.totalPages || 1;
-    if (page >= 1 && page <= total && page !== this.currentPage()) {
-      this.currentPage.set(page);
-      this.loadPosts();
-    }
-  }
+  this.router.navigate([], {
+    relativeTo: this.route,
 
-  readonly pageNumbers = computed(() => {
+    queryParams: {
+      page,
+    },
+
+    queryParamsHandling: 'merge',
+  });
+}
+
+  readonly pageItems = computed(() => {
     const totalPages = this.meta()?.totalPages || 1;
-    const pages: number[] = [];
-    for (let i = 1; i <= totalPages; i++) {
-      pages.push(i);
+    const current = this.currentPage();
+
+    if (totalPages <= 5) {
+      return Array.from({ length: totalPages }, (_, i) => ({ type: 'page' as const, value: i + 1 }));
     }
-    return pages;
+
+    let start = Math.max(1, current - 2);
+    let end = start + 4;
+    if (end > totalPages) {
+      end = totalPages;
+      start = Math.max(1, end - 4);
+    }
+
+    const items: Array<{ type: 'page' | 'ellipsis'; value: number | null }> = [];
+    if (start > 1) {
+      items.push({ type: 'ellipsis', value: null });
+    }
+    for (let p = start; p <= end; p++) {
+      items.push({ type: 'page', value: p });
+    }
+    if (end < totalPages) {
+      items.push({ type: 'ellipsis', value: null });
+    }
+    return items;
   });
 
   setPreviewBlog(blog: ModeratorPostItem) {
-    this.activePreviewBlog.set(blog);
-    this.loadingDetail.set(true);
+  /**
+   * Hiện dữ liệu list trước để modal mở ngay.
+   */
+  this.activePreviewBlog.set(blog);
 
-    this.moderatorApiService.getModeratorPostDetail(blog.id).subscribe({
+  /**
+   * Sau đó lấy detail ROOT.
+   */
+  this.loadPreviewVersion(blog.id);
+}
+
+loadPreviewVersion(postId: number) {
+  /**
+   * Không gọi lại version đang active.
+   */
+  if (
+    this.activePreviewBlog()?.id === postId &&
+    this.activePreviewBlog()?.translations?.length
+  ) {
+    return;
+  }
+
+  this.loadingPreviewPostId.set(postId);
+
+  this.moderatorApiService
+    .getModeratorPostDetail(postId)
+    .subscribe({
       next: (res) => {
-        this.loadingDetail.set(false);
+        this.loadingPreviewPostId.set(null);
+
         if (res.success && res.data) {
+          /**
+           * res.data có thể là:
+           * - ROOT
+           * - EN
+           * - JA
+           * - KO...
+           *
+           * Và luôn có translations summary của cả group.
+           */
           this.activePreviewBlog.set(res.data);
         }
       },
+
       error: (err) => {
-        this.loadingDetail.set(false);
-        const errMsg = err?.error?.message || 'Không thể lấy chi tiết bài viết.';
+        this.loadingPreviewPostId.set(null);
+
+        const errMsg =
+          err?.error?.message ||
+          'Không thể lấy chi tiết phiên bản bài viết.';
+
         this.toast.show(
           'error',
           'Lỗi',
           typeof errMsg === 'string'
             ? errMsg
             : Array.isArray(errMsg)
-            ? errMsg.join(', ')
-            : 'Lỗi kết nối.',
+              ? errMsg.join(', ')
+              : 'Lỗi kết nối.',
         );
       },
     });
-  }
+}
 
   closePreviewBlog() {
-    this.activePreviewBlog.set(null);
-    this.loadingDetail.set(false);
-  }
+  this.activePreviewBlog.set(null);
+  this.loadingPreviewPostId.set(null);
+}
 
   private toPreviewPost(blog: ModeratorPostItem): BlogOwnerPost {
     return {
@@ -225,6 +402,26 @@ export class ManageBlogs implements OnInit {
         publicId: item.publicId,
         createdAt: item.createdAt,
       })),
+      translations: (blog.translations ?? []).map(
+  (version) => ({
+    id: version.id,
+    title: version.title,
+    thumbnailUrl:
+      version.thumbnailUrl ?? null,
+    status: version.status,
+    parentPostId:
+      version.parentPostId ?? null,
+    languageId: version.languageId,
+
+    language: {
+      id: version.language.id,
+      code: version.language.code,
+      name: version.language.name,
+      flag:
+        version.language.flag ?? null,
+    },
+  }),
+),
     };
   }
 
@@ -239,13 +436,24 @@ export class ManageBlogs implements OnInit {
   }
 
   approveBlog(blog: ModeratorPostItem) {
-    if (confirm(`Bạn có chắc chắn muốn duyệt bài viết "${blog.title}"?`)) {
-      this.actionLoading.set(true);
-      this.moderatorApiService.approvePost(blog.id).subscribe({
+  const rootPostId =
+    blog.parentPostId ?? blog.id;
+
+  if (
+    confirm(
+      `Bạn có chắc chắn muốn duyệt bài viết "${blog.title}" và tất cả bản dịch?`,
+    )
+  ) {
+    this.actionLoading.set(true);
+
+    this.moderatorApiService
+      .approvePost(rootPostId)
+      .subscribe({
         next: (res) => {
           this.actionLoading.set(false);
           if (res.success) {
             this.toast.show('success', 'Thành công', `Đã duyệt bài viết "${blog.title}" thành công.`);
+            this.closePreviewBlog();
             if (this.activePreviewBlog()?.id === blog.id) {
               this.activePreviewBlog.set(res.data);
             }
@@ -272,7 +480,15 @@ export class ManageBlogs implements OnInit {
     const blog = this.activeRejectBlog();
     if (blog) {
       this.actionLoading.set(true);
-      this.moderatorApiService.rejectPost(blog.id, { rejectionReason: reason }).subscribe({
+      const rootPostId =
+  blog.parentPostId ?? blog.id;
+
+this.moderatorApiService.rejectPost(
+  rootPostId,
+  {
+    rejectionReason: reason,
+  },
+).subscribe({
         next: (res) => {
           this.actionLoading.set(false);
           if (res.success) {
@@ -292,6 +508,43 @@ export class ManageBlogs implements OnInit {
         },
       });
     }
+  }
+
+  getPostLanguages(blog: ModeratorPostItem): PostLanguageItem[] {
+    const list: PostLanguageItem[] = [];
+
+    if (blog.language) {
+      list.push({
+        id: blog.language.id,
+        code: blog.language.code,
+        name: blog.language.name,
+        flag: blog.language.flag,
+        isOriginal: !blog.parentPostId,
+        status: blog.status,
+      });
+    }
+
+    if (blog.translations && blog.translations.length > 0) {
+      for (const t of blog.translations) {
+        if (
+          t.language &&
+          !list.some(
+            (item) => item.code.toLowerCase() === t.language.code.toLowerCase(),
+          )
+        ) {
+          list.push({
+            id: t.language.id,
+            code: t.language.code,
+            name: t.language.name,
+            flag: t.language.flag,
+            isOriginal: false,
+            status: t.status,
+          });
+        }
+      }
+    }
+
+    return list;
   }
 
   logoutAndSwitchAccount() {

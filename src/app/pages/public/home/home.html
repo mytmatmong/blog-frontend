@@ -238,7 +238,7 @@
       </div>
       }
 
-      @if (totalPages() > 1) {
+      @if (totalItems() > 0) {
       <app-pagination [totalItems]="totalItems()" [itemsPerPage]="itemsPerPage" [currentPage]="currentPage()" (currentPageChange)="onPageChange($event)">
       </app-pagination>
       }

@@ -15,6 +15,11 @@ import {
   RejectModeratorPostDto,
   RejectModeratorReportDto,
   ResolveModeratorReportDto,
+  CreateModeratorCategoryGroupDto,
+  GetModeratorCategoryGroupsQuery,
+  ModeratorCategoryGroup,
+  ModeratorCategoryGroupsPaginatedResponse,
+  UpdateModeratorCategoryGroupDto,
 } from '../models/moderator-api.model';
 
 @Injectable({ providedIn: 'root' })
@@ -121,6 +126,100 @@ export class ModeratorApiService {
       dto,
     );
   }
+
+  /**
+ * GET /api/v1/moderator/category-groups
+ */
+getModeratorCategoryGroups(
+  query?: GetModeratorCategoryGroupsQuery,
+): Observable<
+  ApiResponse<ModeratorCategoryGroupsPaginatedResponse>
+> {
+  let params = new HttpParams();
+
+  if (query?.search?.trim()) {
+    params = params.set(
+      'search',
+      query.search.trim(),
+    );
+  }
+
+  if (query?.page != null) {
+    params = params.set(
+      'page',
+      query.page.toString(),
+    );
+  }
+
+  if (query?.limit != null) {
+    params = params.set(
+      'limit',
+      query.limit.toString(),
+    );
+  }
+
+  return this.http.get<
+    ApiResponse<ModeratorCategoryGroupsPaginatedResponse>
+  >(
+    `${this.apiUrl}/moderator/category-groups`,
+    { params },
+  );
+}
+
+/**
+ * GET /api/v1/moderator/category-groups/:groupId
+ */
+getModeratorCategoryGroupDetail(
+  groupId: number,
+): Observable<ApiResponse<ModeratorCategoryGroup>> {
+  return this.http.get<
+    ApiResponse<ModeratorCategoryGroup>
+  >(
+    `${this.apiUrl}/moderator/category-groups/${groupId}`,
+  );
+}
+
+/**
+ * POST /api/v1/moderator/category-groups
+ */
+createModeratorCategoryGroup(
+  dto: CreateModeratorCategoryGroupDto,
+): Observable<ApiResponse<ModeratorCategoryGroup>> {
+  return this.http.post<
+    ApiResponse<ModeratorCategoryGroup>
+  >(
+    `${this.apiUrl}/moderator/category-groups`,
+    dto,
+  );
+}
+
+/**
+ * PATCH /api/v1/moderator/category-groups/:groupId
+ */
+updateModeratorCategoryGroup(
+  groupId: number,
+  dto: UpdateModeratorCategoryGroupDto,
+): Observable<ApiResponse<ModeratorCategoryGroup>> {
+  return this.http.patch<
+    ApiResponse<ModeratorCategoryGroup>
+  >(
+    `${this.apiUrl}/moderator/category-groups/${groupId}`,
+    dto,
+  );
+}
+
+/**
+ * DELETE /api/v1/moderator/category-groups/:groupId
+ */
+deleteModeratorCategoryGroup(
+  groupId: number,
+): Observable<ApiResponse<ModeratorCategoryGroup>> {
+  return this.http.delete<
+    ApiResponse<ModeratorCategoryGroup>
+  >(
+    `${this.apiUrl}/moderator/category-groups/${groupId}`,
+  );
+}
 
   /**
    * M06 — GET /api/v1/moderator/reports

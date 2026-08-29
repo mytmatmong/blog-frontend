@@ -1,7 +1,7 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute,Router } from '@angular/router';
 import { TranslationService } from '../../../../core/services/translation.service';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { ModeratorApiService } from '../../../../core/services/moderator-api.service';
@@ -16,9 +16,9 @@ import {
   ModeratorReportTargetType,
 } from '../../../../core/models/moderator-api.model';
 
-import { BadgeComponent } from '../../../../shared/components/badge/badge';
 import { IconButtonComponent } from '../../../../shared/components/icon-button/icon-button';
 import { TextButtonComponent } from '../../../../shared/components/text-button/text-button';
+import { SingleDropdownComponent, DropdownOption } from '../../../../shared/components/single-dropdown/single-dropdown';
 
 @Component({
   selector: 'app-manage-reports',
@@ -26,9 +26,9 @@ import { TextButtonComponent } from '../../../../shared/components/text-button/t
     FormsModule,
     DatePipe,
     TranslatePipe,
-    BadgeComponent,
     IconButtonComponent,
     TextButtonComponent,
+    SingleDropdownComponent,
   ],
   templateUrl: './manage-reports.html',
   styleUrl: './manage-reports.css',
@@ -39,6 +39,7 @@ export class ManageReports implements OnInit {
   private readonly toast = inject(ToastService);
   readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   readonly loading = signal<boolean>(true);
   readonly loadingDetail = signal<boolean>(false);
@@ -54,6 +55,28 @@ export class ManageReports implements OnInit {
   readonly currentPage = signal<number>(1);
   readonly limit = 10;
 
+  readonly targetTypeOptions = computed<DropdownOption[]>(() => {
+    this.ts.currentLang();
+    return [
+      { label: this.ts.translate('moderator.target_all'), value: '' },
+      { label: this.ts.translate('moderator.target_post'), value: 'POST', icon: 'bi bi-file-post' },
+      { label: this.ts.translate('moderator.target_comment'), value: 'COMMENT', icon: 'bi bi-chat-left-text' },
+    ];
+  });
+
+  readonly reasonOptions = computed<DropdownOption[]>(() => {
+    this.ts.currentLang();
+    return [
+      { label: this.ts.translate('moderator.reason_all'), value: '' },
+      { label: this.ts.translate('report.reason.SPAM'), value: 'SPAM' },
+      { label: this.ts.translate('report.reason.HARASSMENT'), value: 'HARASSMENT' },
+      { label: this.ts.translate('report.reason.INAPPROPRIATE'), value: 'INAPPROPRIATE' },
+      { label: this.ts.translate('report.reason.COPYRIGHT'), value: 'COPYRIGHT' },
+      { label: this.ts.translate('report.reason.MISINFORMATION'), value: 'MISINFORMATION' },
+      { label: this.ts.translate('report.reason.OTHER'), value: 'OTHER' },
+    ];
+  });
+
   readonly activePreviewReport = signal<ModeratorReportItem | null>(null);
   readonly activeResolveReport = signal<ModeratorReportItem | null>(null);
   readonly activeRejectReportItem = signal<ModeratorReportItem | null>(null);
@@ -61,9 +84,104 @@ export class ManageReports implements OnInit {
   resolutionNote = '';
   rejectReportNote = '';
 
-  ngOnInit() {
-    this.loadReports();
-  }
+  ngOnInit(): void {
+  this.route.queryParamMap.subscribe(
+    (params) => {
+      // =====================
+      // PAGE
+      // =====================
+
+      const rawPage =
+        Number(params.get('page'));
+
+      this.currentPage.set(
+        Number.isInteger(rawPage) &&
+        rawPage > 0
+          ? rawPage
+          : 1,
+      );
+
+      // =====================
+      // STATUS
+      // =====================
+
+      const rawStatus =
+        params.get('status');
+
+      const validStatuses:
+        ModeratorReportStatus[] = [
+          'PENDING',
+          'RESOLVED',
+          'REJECTED',
+        ];
+
+      this.statusFilter.set(
+        rawStatus &&
+        validStatuses.includes(
+          rawStatus as
+            ModeratorReportStatus,
+        )
+          ? (rawStatus as
+              ModeratorReportStatus)
+          : 'PENDING',
+      );
+
+      // =====================
+      // TARGET TYPE
+      // =====================
+
+      const rawTarget =
+        params.get('targetType');
+
+      const validTargets:
+        ModeratorReportTargetType[] = [
+          'POST',
+          'COMMENT',
+        ];
+
+      this.targetTypeFilter.set(
+        rawTarget &&
+        validTargets.includes(
+          rawTarget as
+            ModeratorReportTargetType,
+        )
+          ? (rawTarget as
+              ModeratorReportTargetType)
+          : '',
+      );
+
+      // =====================
+      // REASON
+      // =====================
+
+      const rawReason =
+        params.get('reason');
+
+      const validReasons:
+        ModeratorReportReason[] = [
+          'SPAM',
+          'HARASSMENT',
+          'INAPPROPRIATE',
+          'COPYRIGHT',
+          'MISINFORMATION',
+          'OTHER',
+        ];
+
+      this.reasonFilter.set(
+        rawReason &&
+        validReasons.includes(
+          rawReason as
+            ModeratorReportReason,
+        )
+          ? (rawReason as
+              ModeratorReportReason)
+          : '',
+      );
+
+      this.loadReports();
+    },
+  );
+}
 
   loadReports() {
     this.loading.set(true);
@@ -111,39 +229,117 @@ export class ManageReports implements OnInit {
     });
   }
 
-  onStatusChange(status: ModeratorReportStatus) {
-    if (this.statusFilter() !== status) {
-      this.statusFilter.set(status);
-      this.currentPage.set(1);
-      this.loadReports();
+  onStatusChange(
+  status:
+    ModeratorReportStatus,
+): void {
+  if (
+    this.statusFilter() ===
+    status
+  ) {
+    return;
+  }
+
+  this.router.navigate([], {
+    relativeTo: this.route,
+
+    queryParams: {
+      page: 1,
+      status,
+    },
+
+    queryParamsHandling: 'merge',
+  });
+}
+
+  onTargetTypeChange(val?: string): void {
+    if (val !== undefined) {
+      this.targetTypeFilter.set(val as ModeratorReportTargetType | '');
     }
+    const targetType = this.targetTypeFilter();
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+
+      queryParams: {
+        page: 1,
+
+        targetType:
+          targetType || null,
+      },
+
+      queryParamsHandling: 'merge',
+    });
   }
 
-  onTargetTypeChange() {
-    this.currentPage.set(1);
-    this.loadReports();
-  }
-
-  onReasonChange() {
-    this.currentPage.set(1);
-    this.loadReports();
-  }
-
-  setPage(page: number) {
-    const total = this.meta()?.totalPages || 1;
-    if (page >= 1 && page <= total && page !== this.currentPage()) {
-      this.currentPage.set(page);
-      this.loadReports();
+  onReasonChange(val?: string): void {
+    if (val !== undefined) {
+      this.reasonFilter.set(val as ModeratorReportReason | '');
     }
+    const reason = this.reasonFilter();
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+
+      queryParams: {
+        page: 1,
+        reason: reason || null,
+      },
+
+      queryParamsHandling: 'merge',
+    });
   }
 
-  readonly pageNumbers = computed(() => {
+  setPage(page: number): void {
+  const total =
+    this.meta()?.totalPages ?? 1;
+
+  if (
+    page < 1 ||
+    page > total ||
+    page === this.currentPage() ||
+    this.loading()
+  ) {
+    return;
+  }
+
+  this.router.navigate([], {
+    relativeTo: this.route,
+
+    queryParams: {
+      page,
+    },
+
+    queryParamsHandling: 'merge',
+  });
+}
+
+  readonly pageItems = computed(() => {
     const totalPages = this.meta()?.totalPages || 1;
-    const pages: number[] = [];
-    for (let i = 1; i <= totalPages; i++) {
-      pages.push(i);
+    const current = this.currentPage();
+
+    if (totalPages <= 5) {
+      return Array.from({ length: totalPages }, (_, i) => ({ type: 'page' as const, value: i + 1 }));
     }
-    return pages;
+
+    let start = Math.max(1, current - 2);
+    let end = start + 4;
+    if (end > totalPages) {
+      end = totalPages;
+      start = Math.max(1, end - 4);
+    }
+
+    const items: Array<{ type: 'page' | 'ellipsis'; value: number | null }> = [];
+    if (start > 1) {
+      items.push({ type: 'ellipsis', value: null });
+    }
+    for (let p = start; p <= end; p++) {
+      items.push({ type: 'page', value: p });
+    }
+    if (end < totalPages) {
+      items.push({ type: 'ellipsis', value: null });
+    }
+    return items;
   });
 
   setPreviewReport(report: ModeratorReportItem) {

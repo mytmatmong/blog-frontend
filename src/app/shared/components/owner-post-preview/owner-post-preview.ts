@@ -62,7 +62,13 @@ export class OwnerPostPreviewComponent
 
     /** Disable the owner-only detail request when another role supplies it. */
     @Input() loadDetails = true;
-
+    /**
+     * Khi component được dùng bởi Moderator,
+     * parent sẽ tự gọi Moderator API.
+     *
+     * Giá trị này dùng để disable tab + hiện spinner.
+     */
+    @Input() externalLoadingPostId: number | null = null;
     @Input() showModerationActions = false;
 
     @Input() moderationBusy = false;
@@ -77,6 +83,15 @@ export class OwnerPostPreviewComponent
     @Output() approveRequested = new EventEmitter<BlogOwnerPost>();
 
     @Output() rejectRequested = new EventEmitter<BlogOwnerPost>();
+    /**
+     * Dùng cho role khác Blog Owner.
+     *
+     * Ví dụ Moderator:
+     * click EN
+     * → emit EN postId
+     * → ManageBlogs gọi Moderator API.
+     */
+    @Output() languageRequested = new EventEmitter<number>();
 
     readonly activePost =
         signal<BlogOwnerPost | null>(null);
@@ -150,18 +165,48 @@ export class OwnerPostPreviewComponent
     }
 
     switchLanguage(postId: number): void {
-        const activePostId = this.activePost()?.id;
+    const activePostId =
+        this.activePost()?.id;
 
-        if (
-            postId === activePostId ||
-            this.loadingPostId() !== null
-        ) {
-            return;
-        }
-
-        this.loadPost(postId);
+    if (
+        postId === activePostId ||
+        this.loadingPostId() !== null ||
+        this.externalLoadingPostId !== null
+    ) {
+        return;
     }
 
+    /**
+     * Blog Owner:
+     * component tự gọi BlogOwner API như trước.
+     */
+    if (this.loadDetails) {
+        this.loadPost(postId);
+        return;
+    }
+
+    /**
+     * Moderator:
+     * không được gọi BlogOwner API.
+     *
+     * Chỉ emit ID ra parent.
+     */
+    this.languageRequested.emit(postId);
+    }
+
+    isLanguageLoading(postId: number): boolean {
+  return (
+    this.loadingPostId() === postId ||
+    this.externalLoadingPostId === postId
+  );
+}
+
+    isLanguageSwitchBusy(): boolean {
+    return (
+        this.loadingPostId() !== null ||
+        this.externalLoadingPostId !== null
+    );
+    }
     statusClass(
         status: BlogOwnerPost['status'],
     ): string {

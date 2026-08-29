@@ -16,9 +16,20 @@ import {
   ModeratorReportTargetType,
 } from '../../../../core/models/moderator-api.model';
 
+import { IconButtonComponent } from '../../../../shared/components/icon-button/icon-button';
+import { TextButtonComponent } from '../../../../shared/components/text-button/text-button';
+import { SingleDropdownComponent, DropdownOption } from '../../../../shared/components/single-dropdown/single-dropdown';
+
 @Component({
   selector: 'app-manage-comments',
-  imports: [FormsModule, DatePipe, TranslatePipe],
+  imports: [
+    FormsModule,
+    DatePipe,
+    TranslatePipe,
+    IconButtonComponent,
+    TextButtonComponent,
+    SingleDropdownComponent,
+  ],
   templateUrl: './manage-comments.html',
   styleUrl: './manage-comments.css',
 })
@@ -42,6 +53,28 @@ export class ManageComments implements OnInit {
   readonly reasonFilter = signal<ModeratorReportReason | ''>('');
   readonly currentPage = signal<number>(1);
   readonly limit = 10;
+
+  readonly targetTypeOptions = computed<DropdownOption[]>(() => {
+    this.ts.currentLang();
+    return [
+      { label: this.ts.translate('moderator.target_all'), value: '' },
+      { label: this.ts.translate('moderator.target_post'), value: 'POST', icon: 'bi bi-file-post' },
+      { label: this.ts.translate('moderator.target_comment'), value: 'COMMENT', icon: 'bi bi-chat-left-text' },
+    ];
+  });
+
+  readonly reasonOptions = computed<DropdownOption[]>(() => {
+    this.ts.currentLang();
+    return [
+      { label: this.ts.translate('moderator.reason_all'), value: '' },
+      { label: this.ts.translate('report.reason.SPAM'), value: 'SPAM' },
+      { label: this.ts.translate('report.reason.HARASSMENT'), value: 'HARASSMENT' },
+      { label: this.ts.translate('report.reason.INAPPROPRIATE'), value: 'INAPPROPRIATE' },
+      { label: this.ts.translate('report.reason.COPYRIGHT'), value: 'COPYRIGHT' },
+      { label: this.ts.translate('report.reason.MISINFORMATION'), value: 'MISINFORMATION' },
+      { label: this.ts.translate('report.reason.OTHER'), value: 'OTHER' },
+    ];
+  });
 
   readonly activePreviewReport = signal<ModeratorReportItem | null>(null);
   readonly activeResolveReport = signal<ModeratorReportItem | null>(null);
@@ -126,13 +159,32 @@ export class ManageComments implements OnInit {
     }
   }
 
-  readonly pageNumbers = computed(() => {
+  readonly pageItems = computed(() => {
     const totalPages = this.meta()?.totalPages || 1;
-    const pages: number[] = [];
-    for (let i = 1; i <= totalPages; i++) {
-      pages.push(i);
+    const current = this.currentPage();
+
+    if (totalPages <= 5) {
+      return Array.from({ length: totalPages }, (_, i) => ({ type: 'page' as const, value: i + 1 }));
     }
-    return pages;
+
+    let start = Math.max(1, current - 2);
+    let end = start + 4;
+    if (end > totalPages) {
+      end = totalPages;
+      start = Math.max(1, end - 4);
+    }
+
+    const items: Array<{ type: 'page' | 'ellipsis'; value: number | null }> = [];
+    if (start > 1) {
+      items.push({ type: 'ellipsis', value: null });
+    }
+    for (let p = start; p <= end; p++) {
+      items.push({ type: 'page', value: p });
+    }
+    if (end < totalPages) {
+      items.push({ type: 'ellipsis', value: null });
+    }
+    return items;
   });
 
   setPreviewReport(report: ModeratorReportItem) {

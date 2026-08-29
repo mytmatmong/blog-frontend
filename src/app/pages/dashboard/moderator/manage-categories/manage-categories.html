@@ -1,6 +1,16 @@
 <section class="space-y-6">
-  <div class="flex justify-between items-center">
-    <h3 class="font-bold text-xl text-aquamarine-950 dark:text-aquamarine-50">{{ 'dashboard.categories' | translate }}</h3>
+  <!-- HEADER -->
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h3 class="font-bold text-xl text-aquamarine-950 dark:text-aquamarine-50">
+        Quản lý danh mục
+      </h3>
+
+      <p class="text-sm text-aquamarine-600 dark:text-aquamarine-400 mt-1">
+        Quản lý Category Group và các phiên bản ngôn ngữ.
+      </p>
+    </div>
+
     <app-icon-button
       icon="bi bi-plus-circle"
       color="primary"
@@ -8,220 +18,437 @@
       size="md"
       (btnClick)="openAddCategoryModal()"
     >
-      {{ 'modal.add_category_title' | translate }}
+      Thêm nhóm danh mục
     </app-icon-button>
   </div>
 
-  <div class="rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm overflow-x-auto">
+  <!-- SEARCH -->
+  <div class="max-w-md">
+    <app-text-search
+      [value]="searchQuery"
+      (searchChange)="searchQuery = $event; onSearch()"
+      placeholder="Tìm theo code hoặc tên bản dịch..."
+    />
+  </div>
+
+  <!-- ERROR -->
+  @if (error()) {
+  <div
+    class="p-4 rounded-xl border border-red-200 bg-red-50 text-red-700 dark:bg-red-950/30 dark:border-red-900 dark:text-red-300">
+    {{ error() }}
+  </div>
+  }
+
+  <!-- TABLE -->
+  <div
+    class="rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm overflow-x-auto">
     <table class="w-full text-left border-collapse text-sm">
+
       <thead>
-        <tr class="border-b border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950/50">
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'table.category' | translate }}</th>
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.lang_name' | translate }}</th>
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.post_title' | translate }}</th>
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.actions' | translate }}</th>
+        <tr
+          class="border-b border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950/50">
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">
+            Code
+          </th>
+
+          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">
+            Các bản dịch
+          </th>
+
+          <th class="p-4 text-center font-semibold text-aquamarine-900 dark:text-aquamarine-100">
+            Số bản dịch
+          </th>
+
+          <th class="p-4 text-center font-semibold text-aquamarine-900 dark:text-aquamarine-100">
+            Thao tác
+          </th>
         </tr>
       </thead>
+
       <tbody class="divide-y divide-aquamarine-100 dark:divide-aquamarine-800">
-        @for (cat of paginatedCategories; track cat.id) {
-          <tr class="hover:bg-aquamarine-50/30 dark:hover:bg-aquamarine-950/30 transition-colors">
-            <td class="p-4 font-medium">
-              <a href="#" (click)="$event.preventDefault(); showCategoryPosts(cat.name)" class="text-aquamarine-950 dark:text-aquamarine-50 hover:text-aquamarine-600 dark:hover:text-aquamarine-400 transition-colors">
-                {{ cat.name }}
-              </a>
-            </td>
-            <td class="p-4 text-center">
-              <app-badge color="blue" shape="pill" size="sm">
-                <img [src]="'https://flagcdn.com/w20/' + cat.langFlag + '.png'" [alt]="cat.lang" class="w-4 h-3 rounded-sm object-cover inline-block mr-1">
-                {{ cat.lang }}
-              </app-badge>
-            </td>
-            <td class="p-4 text-center text-aquamarine-800 dark:text-aquamarine-200">{{ cat.postCount }}</td>
-            <td class="p-4 text-center">
-              <div class="flex items-center justify-center gap-2">
-                <app-icon-button
-                  icon="bi bi-pencil-square"
-                  color="blue"
-                  variant="soft"
-                  size="sm"
-                  [title]="'action.edit' | translate"
-                  (btnClick)="setEditCategory(cat)"
-                >
-                  {{ 'action.edit' | translate }}
-                </app-icon-button>
-                <app-icon-button
-                  icon="bi bi-trash3-fill"
-                  color="red"
-                  variant="soft"
-                  size="sm"
-                  [title]="'action.delete' | translate"
-                  (btnClick)="deleteCategory(cat)"
-                >
-                  {{ 'action.delete' | translate }}
-                </app-icon-button>
-              </div>
-            </td>
-          </tr>
+        @if (loading()) {
+        <tr>
+          <td colspan="4" class="p-10 text-center text-aquamarine-600">
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Đang tải danh mục...
+          </td>
+        </tr>
+        }
+
+        @if (!loading() && categories().length === 0) {
+        <tr>
+          <td colspan="4" class="p-10 text-center text-aquamarine-500">
+            Chưa có nhóm danh mục phù hợp.
+          </td>
+        </tr>
+        }
+
+        @for (
+        category of categories();
+        track category.id
+        ) {
+        <tr class="hover:bg-aquamarine-50/30 dark:hover:bg-aquamarine-950/30">
+
+          <!-- CODE -->
+          <td class="p-4">
+            <div class="font-semibold text-aquamarine-950 dark:text-aquamarine-50">
+              {{ category.code }}
+            </div>
+
+            <div class="text-xs text-aquamarine-500 mt-1">
+              ID: {{ category.id }}
+            </div>
+          </td>
+
+          <!-- TRANSLATIONS -->
+          <td class="p-4">
+            <div class="flex flex-wrap gap-2">
+              @for (
+              translation of category.translations;
+              track translation.id
+              ) {
+              <span
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border border-aquamarine-200 dark:border-aquamarine-700 bg-aquamarine-50 dark:bg-aquamarine-950">
+                <span>
+                  {{
+                  translation.language?.flag
+                  || '🌐'
+                  }}
+                </span>
+
+                <strong>
+                  {{
+                  translation.language?.code
+                  || translation.languageId
+                  }}
+                </strong>
+
+                <span>
+                  {{ translation.name }}
+                </span>
+              </span>
+              }
+            </div>
+          </td>
+
+          <!-- COUNT -->
+          <td class="p-4 text-center">
+            <span
+              class="inline-flex min-w-8 justify-center rounded-full bg-aquamarine-100 dark:bg-aquamarine-800 px-2.5 py-1 font-semibold text-aquamarine-800 dark:text-aquamarine-100">
+              {{ category.translationCount }}
+            </span>
+          </td>
+
+          <!-- ACTION -->
+          <td class="p-4">
+            <div class="flex justify-center gap-2">
+              <app-icon-button
+                icon="bi bi-pencil-square"
+                color="blue"
+                variant="soft"
+                size="sm"
+                [title]="'action.edit' | translate"
+                (btnClick)="setEditCategory(category)"
+              >
+                {{ 'action.edit' | translate }}
+              </app-icon-button>
+              <app-icon-button
+                icon="bi bi-trash3-fill"
+                color="red"
+                variant="soft"
+                size="sm"
+                [title]="'action.delete' | translate"
+                (btnClick)="deleteCategory(category)"
+              >
+                {{ 'action.delete' | translate }}
+              </app-icon-button>
+            </div>
+          </td>
+
+        </tr>
         }
       </tbody>
     </table>
   </div>
 
-  <div class="mt-6 flex justify-center">
-    <ul class="inline-flex items-center space-x-1 text-sm">
+  <!-- PAGINATION -->
+  @if (
+  !loading() &&
+  (meta()?.totalItems ?? 0) > 0
+  ) {
+  <div class="mt-6 flex justify-between items-center text-xs text-aquamarine-700 dark:text-aquamarine-300">
+    <div>
+      {{ 'moderator.showing' | translate }} <strong>{{ meta()?.itemCount }}</strong> / <strong>{{ meta()?.totalItems }}</strong> {{ 'dashboard.categories' | translate }}
+    </div>
+    <ul class="inline-flex items-center gap-1 text-sm">
+
+      <!-- Trang đầu << -->
       <li>
-        <app-text-button
-          variant="secondary"
+        <app-icon-button
+          icon="bi bi-chevron-double-left"
+          color="primary"
+          variant="soft"
+          size="sm"
+          [disabled]="currentPage() === 1"
+          (btnClick)="setPage(1)"
+        />
+      </li>
+
+      <!-- Trang trước < -->
+      <li>
+        <app-icon-button
+          icon="bi bi-chevron-left"
+          color="primary"
+          variant="soft"
           size="sm"
           [disabled]="currentPage() === 1"
           (btnClick)="setPage(currentPage() - 1)"
-        >
-          {{ 'pagination.prev' | translate }}
-        </app-text-button>
+        />
       </li>
-      @for (p of pageNumbers; track p) {
-        <li>
-          <app-text-button
-            [variant]="currentPage() === p ? 'primary' : 'secondary'"
-            size="sm"
-            (btnClick)="setPage(p)"
-          >
-            {{ p }}
-          </app-text-button>
-        </li>
+
+      <!-- Các trang & Dấu 3 chấm -->
+      @for (item of pageItems(); track $index) {
+        @if (item.type === 'page') {
+          <li>
+            <app-text-button
+              [variant]="currentPage() === item.value ? 'primary' : 'secondary'"
+              size="sm"
+              (btnClick)="setPage(item.value!)"
+            >
+              {{ item.value }}
+            </app-text-button>
+          </li>
+        } @else {
+          <li>
+            <span class="inline-flex min-w-6 h-8 items-center justify-center text-xs font-bold text-aquamarine-500 select-none">
+              ...
+            </span>
+          </li>
+        }
       }
+
+      <!-- Trang sau > -->
       <li>
-        <app-text-button
-          variant="secondary"
+        <app-icon-button
+          icon="bi bi-chevron-right"
+          color="primary"
+          variant="soft"
           size="sm"
-          [disabled]="currentPage() === totalPages()"
+          [disabled]="currentPage() === (meta()?.totalPages ?? 1)"
           (btnClick)="setPage(currentPage() + 1)"
-        >
-          {{ 'pagination.next' | translate }}
-        </app-text-button>
+        />
       </li>
+
+      <!-- Trang cuối >> -->
+      <li>
+        <app-icon-button
+          icon="bi bi-chevron-double-right"
+          color="primary"
+          variant="soft"
+          size="sm"
+          [disabled]="currentPage() === (meta()?.totalPages ?? 1)"
+          (btnClick)="setPage(meta()?.totalPages ?? 1)"
+        />
+      </li>
+
     </ul>
   </div>
+  }
+
 </section>
 
-<!-- Modal Danh sách bài viết của Category -->
-@if (activeCategoryPosts()) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-    <div class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-2xl max-h-[85vh] flex flex-col">
-      <div class="flex justify-between items-center p-5 border-b border-aquamarine-200 dark:border-aquamarine-800">
-        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">{{ 'category.post_list_title' | translate }}: <span class="text-aquamarine-600 dark:text-aquamarine-400">{{ activeCategoryPosts() }}</span></h5>
-        <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" (click)="closeCategoryPostsModal()">
-          <i class="bi bi-x-lg text-lg"></i>
-        </button>
+
+<!-- ========================= -->
+<!-- CREATE MODAL -->
+<!-- ========================= -->
+
+@if (isAddModalOpen()) {
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+  <div
+    class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6">
+
+    <div class="flex justify-between items-center mb-5">
+      <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">
+        Thêm nhóm danh mục
+      </h5>
+
+      <button type="button" (click)="closeAddCategoryModal()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <form class="space-y-5" (submit)="$event.preventDefault(); submitAddCategory()">
+
+      <!-- CODE -->
+      <div>
+        <label class="block text-sm font-semibold mb-1">
+          Code
+        </label>
+
+        <input type="text" name="newCode" [(ngModel)]="newCode" placeholder="Ví dụ: technology" maxlength="50"
+          class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5" />
+
+        <p class="text-xs text-aquamarine-500 mt-1">
+          Chỉ dùng chữ thường không dấu,
+          số, dấu - hoặc _.
+        </p>
       </div>
-      <div class="p-6 overflow-y-auto space-y-3">
-        @for (i of [1, 2, 3]; track i) {
-          <a href="#" (click)="$event.preventDefault()" class="p-4 rounded-xl border border-aquamarine-100 dark:border-aquamarine-800 flex justify-between items-center hover:bg-aquamarine-50/50 dark:hover:bg-aquamarine-950/50 transition-colors">
-            <div>
-              <h6 class="font-bold text-sm text-aquamarine-950 dark:text-aquamarine-50 mb-1">{{ 'modal.preview_cat_post' | translate }} #{{ i }} ({{ activeCategoryPosts() }})</h6>
-              <small class="text-xs text-aquamarine-600 dark:text-aquamarine-400">{{ 'table.author' | translate }}: DevMaster | {{ 'post.published' | translate }}: 20/07/2026</small>
-            </div>
-            <app-badge color="blue" shape="pill" size="sm">14 views</app-badge>
-          </a>
+
+      <!-- TRANSLATIONS -->
+      <div class="space-y-3">
+
+        <div class="flex justify-between items-center">
+          <label class="font-semibold">
+            Các bản dịch
+          </label>
+
+          <button type="button" class="text-sm font-semibold text-aquamarine-600" (click)="addNewTranslationRow()">
+            <i class="bi bi-plus-lg"></i>
+            Thêm ngôn ngữ
+          </button>
+        </div>
+
+        @for (
+        row of newTranslations;
+        track $index;
+        let index = $index
+        ) {
+        <div class="grid grid-cols-[160px_1fr_auto] gap-2 items-center">
+
+          <select [name]="'newLanguage' + index" [(ngModel)]="row.languageId"
+            class="rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 px-3 py-2.5">
+            <option [ngValue]="null">
+              Chọn ngôn ngữ
+            </option>
+
+            @for (
+            language of languages;
+            track language.id
+            ) {
+            <option [ngValue]="language.id" [disabled]="isLanguageUsed(language.id, newTranslations, index)">
+              {{ language.flag }} {{ language.name }}
+            </option>
+            }
+          </select>
+
+          <input type="text" [name]="'newTranslationName' + index" [(ngModel)]="row.name" maxlength="100"
+            placeholder="Tên danh mục"
+            class="rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 px-3 py-2.5" />
+
+          <button type="button" class="p-2 text-red-600 disabled:opacity-30" [disabled]="newTranslations.length === 1"
+            (click)="removeNewTranslationRow(index)">
+            <i class="bi bi-trash"></i>
+          </button>
+
+        </div>
         }
       </div>
-      <div class="p-4 border-t border-aquamarine-200 dark:border-aquamarine-800 flex justify-end">
-        <app-text-button
-          variant="secondary"
-          size="md"
-          (btnClick)="closeCategoryPostsModal()"
-        >
-          {{ 'modal.close' | translate }}
+
+      <div class="flex justify-end gap-3 pt-3">
+        <app-text-button variant="secondary" size="md" [disabled]="actionLoading()" (btnClick)="closeAddCategoryModal()">
+          Hủy
+        </app-text-button>
+
+        <app-text-button variant="primary" size="md" type="submit" [disabled]="actionLoading()" [loading]="actionLoading()">
+          Tạo danh mục
         </app-text-button>
       </div>
-    </div>
+
+    </form>
   </div>
+</div>
 }
 
-<!-- Modal Chỉnh sửa Category -->
+
+<!-- ========================= -->
+<!-- EDIT MODAL -->
+<!-- ========================= -->
+
 @if (activeEditCategory()) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-    <div class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-md p-6">
-      <div class="flex justify-between items-center mb-4">
-        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">{{ 'modal.edit_category_title' | translate }}</h5>
-        <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" (click)="closeEditCategoryModal()">
-          <i class="bi bi-x-lg text-lg"></i>
-        </button>
-      </div>
-      <form (submit)="$event.preventDefault(); submitEditCategory()" class="space-y-4">
-        <div>
-          <label for="editCategoryName" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'modal.category_name' | translate }}</label>
-          <input type="text" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" id="editCategoryName" name="editName" [(ngModel)]="editCatName" required>
-        </div>
-        <div>
-          <label for="editCategoryLang" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'table.lang_name' | translate }}</label>
-          <select class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-3 py-2 text-sm text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" id="editCategoryLang" name="editLang" [(ngModel)]="editCatLang">
-            <option value="VI">{{ 'lang.vietnamese' | translate }} (VI)</option>
-            <option value="EN">{{ 'lang.english' | translate }} (EN)</option>
-          </select>
-        </div>
-        <div class="flex justify-end gap-3 pt-2">
-          <app-text-button
-            variant="secondary"
-            size="md"
-            (btnClick)="closeEditCategoryModal()"
-          >
-            {{ 'modal.cancel' | translate }}
-          </app-text-button>
-          <app-text-button
-            variant="primary"
-            size="md"
-            type="submit"
-            [disabled]="!editCatName.trim()"
-          >
-            {{ 'modal.save' | translate }}
-          </app-text-button>
-        </div>
-      </form>
-    </div>
-  </div>
-}
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+  <div
+    class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6">
 
-<!-- Modal Thêm Category Mới -->
-@if (isAddModalOpen()) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-    <div class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-md p-6">
-      <div class="flex justify-between items-center mb-4">
-        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">{{ 'modal.add_category_title' | translate }}</h5>
-        <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" (click)="closeAddCategoryModal()">
-          <i class="bi bi-x-lg text-lg"></i>
-        </button>
-      </div>
-      <form (submit)="$event.preventDefault(); submitAddCategory()" class="space-y-4">
-        <div>
-          <label for="categoryName" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'modal.category_name' | translate }}</label>
-          <input type="text" class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" id="categoryName" name="newName" [(ngModel)]="newCatName" [placeholder]="'modal.category_name_placeholder' | translate" required>
-        </div>
-        <div>
-          <label for="categoryLang" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'table.lang_name' | translate }}</label>
-          <select class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-3 py-2 text-sm text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" id="categoryLang" name="newLang" [(ngModel)]="newCatLang">
-            <option value="VI">{{ 'lang.vietnamese' | translate }} (VI)</option>
-            <option value="EN">{{ 'lang.english' | translate }} (EN)</option>
-          </select>
-        </div>
-        <div class="flex justify-end gap-3 pt-2">
-          <app-text-button
-            variant="secondary"
-            size="md"
-            (btnClick)="closeAddCategoryModal()"
-          >
-            {{ 'modal.cancel' | translate }}
-          </app-text-button>
-          <app-text-button
-            variant="primary"
-            size="md"
-            type="submit"
-            [disabled]="!newCatName.trim()"
-          >
-            {{ 'modal.save' | translate }}
-          </app-text-button>
-        </div>
-      </form>
+    <div class="flex justify-between items-center mb-5">
+      <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">
+        Chỉnh sửa nhóm danh mục
+      </h5>
+
+      <button type="button" (click)="closeEditCategoryModal()">
+        <i class="bi bi-x-lg"></i>
+      </button>
     </div>
+
+    <form class="space-y-5" (submit)="$event.preventDefault(); submitEditCategory()">
+
+      <div>
+        <label class="block text-sm font-semibold mb-1">
+          Code
+        </label>
+
+        <input type="text" name="editCode" [(ngModel)]="editCode" maxlength="50"
+          class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5" />
+      </div>
+
+      <div class="space-y-3">
+
+        <div class="flex justify-between items-center">
+          <label class="font-semibold">
+            Các bản dịch
+          </label>
+
+          <button type="button" class="text-sm font-semibold text-aquamarine-600" (click)="addEditTranslationRow()">
+            <i class="bi bi-plus-lg"></i>
+            Thêm ngôn ngữ
+          </button>
+        </div>
+
+        @for (
+        row of editTranslations;
+        track $index;
+        let index = $index
+        ) {
+        <div class="grid grid-cols-[160px_1fr_auto] gap-2 items-center">
+
+          <select [name]="'editLanguage' + index" [(ngModel)]="row.languageId"
+            class="rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 px-3 py-2.5">
+            <option [ngValue]="null">
+              Chọn ngôn ngữ
+            </option>
+
+            @for (
+            language of languages;
+            track language.id
+            ) {
+            <option [ngValue]="language.id" [disabled]="isLanguageUsed(language.id, editTranslations, index)">
+              {{ language.flag }} {{ language.name }}
+            </option>
+            }
+          </select>
+
+          <input type="text" [name]="'editTranslationName' + index" [(ngModel)]="row.name" maxlength="100"
+            placeholder="Tên danh mục"
+            class="rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 px-3 py-2.5" />
+
+          <button type="button" class="p-2 text-red-600" title="Xóa dòng" (click)="removeEditTranslationRow(index)">
+            <i class="bi bi-trash"></i>
+          </button>
+
+        </div>
+        }
+      </div>
+
+      <div class="flex justify-end gap-3 pt-3">
+        <app-text-button variant="secondary" size="md" [disabled]="actionLoading()" (btnClick)="closeEditCategoryModal()">
+          Hủy
+        </app-text-button>
+
+        <app-text-button variant="primary" size="md" type="submit" [disabled]="actionLoading()" [loading]="actionLoading()">
+          Lưu thay đổi
+        </app-text-button>
+      </div>
+
+    </form>
   </div>
+</div>
 }

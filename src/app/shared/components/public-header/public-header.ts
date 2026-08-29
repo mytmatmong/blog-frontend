@@ -1,5 +1,5 @@
 import { NgClass } from '@angular/common';
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, ElementRef, HostListener, inject, OnInit, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map } from 'rxjs';
@@ -17,6 +17,7 @@ export class PublicHeader implements OnInit {
   protected readonly auth = inject(AuthService);
   protected readonly ts = inject(TranslationService);
   private readonly router = inject(Router);
+  private readonly elementRef = inject(ElementRef);
 
   protected isMobileMenuOpen = signal(false);
   protected isUserDropdownOpen = signal(false);
@@ -36,6 +37,14 @@ export class PublicHeader implements OnInit {
     return url.startsWith('/auth') || url.includes('/auth');
   });
 
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.elementRef.nativeElement.contains(event.target as Node)) {
+      this.isLangDropdownOpen.set(false);
+      this.isUserDropdownOpen.set(false);
+    }
+  }
+
   ngOnInit(): void {
     this.ts.loadLanguages();
   }
@@ -44,12 +53,14 @@ export class PublicHeader implements OnInit {
     this.isMobileMenuOpen.update((value) => !value);
   }
 
-  toggleUserDropdown(): void {
+  toggleUserDropdown(event?: MouseEvent): void {
+    event?.stopPropagation();
     this.isLangDropdownOpen.set(false);
     this.isUserDropdownOpen.update((value) => !value);
   }
 
-  toggleLangDropdown(): void {
+  toggleLangDropdown(event?: MouseEvent): void {
+    event?.stopPropagation();
     this.isUserDropdownOpen.set(false);
     this.isLangDropdownOpen.update((value) => !value);
   }

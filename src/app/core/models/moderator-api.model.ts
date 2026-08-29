@@ -97,6 +97,21 @@ export interface ModeratorPostTag {
   name: string;
 }
 
+export interface ModeratorPostTranslationSummary {
+  id: number;
+  title: string;
+  thumbnailUrl?: string | null;
+  status: ModeratorPostStatus;
+  parentPostId?: number | null;
+  languageId: number;
+
+  language: {
+    id: number;
+    code: string;
+    name: string;
+    flag?: string | null;
+  };
+}
 export interface ModeratorPostItem {
   id: number;
   title: string;
@@ -118,6 +133,7 @@ export interface ModeratorPostItem {
   media: ModeratorPostMedia[];
   categories: ModeratorPostCategory[];
   tags: ModeratorPostTag[];
+  translations?: ModeratorPostTranslationSummary[];
 }
 
 export interface ModeratorPaginationMeta {
@@ -258,4 +274,63 @@ export interface ResolveModeratorReportDto {
 
 export interface RejectModeratorReportDto {
   resolutionNote: string;
+}
+
+// --- Moderator Category Groups ---
+
+export interface ModeratorCategoryLanguage {
+  id: number;
+  code: string;
+  name: string;
+  flag?: string | null;
+  isDefault?: boolean;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ModeratorCategoryTranslation {
+  id: number;
+  name: string;
+  languageId: number;
+  createdAt: string;
+  updatedAt: string;
+  language?: ModeratorCategoryLanguage;
+}
+
+export interface ModeratorCategoryGroup {
+  id: number;
+  code: string;
+  createdAt: string;
+  updatedAt: string;
+
+  translationCount: number;
+
+  translations: ModeratorCategoryTranslation[];
+}
+
+export interface GetModeratorCategoryGroupsQuery {
+  search?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface ModeratorCategoryGroupsPaginatedResponse {
+  items: ModeratorCategoryGroup[];
+  meta: ModeratorPaginationMeta;
+}
+
+export interface ModeratorCategoryTranslationRequest {
+  languageId: number;
+  name: string;
+}
+
+export interface CreateModeratorCategoryGroupDto {
+  code: string;
+  translations: ModeratorCategoryTranslationRequest[];
+}
+
+export interface UpdateModeratorCategoryGroupDto {
+  code?: string;
+  translations?: ModeratorCategoryTranslationRequest[];
 }

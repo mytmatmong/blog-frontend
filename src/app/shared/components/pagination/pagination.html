@@ -14,112 +14,94 @@
 
     <div class="max-w-full overflow-x-auto pb-1">
       <ul class="inline-flex items-center gap-1 text-sm whitespace-nowrap">
-        <!-- Trang trước -->
+        <!-- Nút Trang đầu << -->
         <li>
-          <button type="button"
-            class="min-h-10 px-3 py-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-black text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            [disabled]="
-              normalizedCurrentPage() === 1
-            " [attr.aria-label]="
-              'pagination.prev_aria' | translate
-            " (click)="
-              goToPage(
-                normalizedCurrentPage() - 1
-              )
-            ">
-            <i class="bi bi-chevron-left sm:me-1" aria-hidden="true"></i>
+          <button
+            type="button"
+            class="min-w-9 min-h-9 px-2 py-1 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-black text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-900 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center"
+            [disabled]="normalizedCurrentPage() === 1"
+            title="Trang đầu"
+            aria-label="First page"
+            (click)="goToPage(1)"
+          >
+            <i class="bi bi-chevron-double-left" aria-hidden="true"></i>
+          </button>
+        </li>
 
-            <span class="hidden sm:inline">
-              {{ 'pagination.prev' | translate }}
-            </span>
+        <!-- Nút Trang trước < -->
+        <li>
+          <button
+            type="button"
+            class="min-w-9 min-h-9 px-2 py-1 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-black text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-900 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center"
+            [disabled]="normalizedCurrentPage() === 1"
+            title="Trang trước"
+            aria-label="Previous page"
+            (click)="goToPage(normalizedCurrentPage() - 1)"
+          >
+            <i class="bi bi-chevron-left" aria-hidden="true"></i>
           </button>
         </li>
 
         <!-- Các trang -->
-        @for (
-        item of pageItems();
-        track item.key
-        ) {
-        @if (item.type === 'page') {
+        @for (item of pageItems(); track item.key) {
+          @if (item.type === 'page') {
+            <li>
+              <button
+                type="button"
+                class="min-w-9 min-h-9 px-3 py-1 rounded-lg font-semibold border transition-colors cursor-pointer text-xs flex items-center justify-center"
+                [class.bg-aquamarine-600]="normalizedCurrentPage() === item.value"
+                [class.border-aquamarine-600]="normalizedCurrentPage() === item.value"
+                [class.text-white]="normalizedCurrentPage() === item.value"
+                [class.bg-white]="normalizedCurrentPage() !== item.value"
+                [class.dark:bg-black]="normalizedCurrentPage() !== item.value"
+                [class.border-aquamarine-200]="normalizedCurrentPage() !== item.value"
+                [class.dark:border-aquamarine-800]="normalizedCurrentPage() !== item.value"
+                [class.text-aquamarine-800]="normalizedCurrentPage() !== item.value"
+                [class.dark:text-aquamarine-200]="normalizedCurrentPage() !== item.value"
+                [class.hover:bg-aquamarine-50]="normalizedCurrentPage() !== item.value"
+                [class.dark:hover:bg-aquamarine-900]="normalizedCurrentPage() !== item.value"
+                [attr.aria-current]="normalizedCurrentPage() === item.value ? 'page' : null"
+                [attr.aria-label]="normalizedCurrentPage() === item.value ? ('pagination.current_page' | translate) + item.value : ('pagination.go_to_page' | translate) + item.value"
+                (click)="goToItem(item)"
+              >
+                {{ item.value }}
+              </button>
+            </li>
+          } @else {
+            <!-- Dấu ba chấm -->
+            <li aria-hidden="true">
+              <span class="inline-flex min-w-7 min-h-9 items-center justify-center px-1 text-aquamarine-500 dark:text-aquamarine-400 select-none font-bold">
+                ...
+              </span>
+            </li>
+          }
+        }
+
+        <!-- Nút Trang sau > -->
         <li>
-          <button type="button" class="min-w-10 min-h-10 px-3 py-2 rounded-lg font-semibold border transition-colors"
-            [class.bg-aquamarine-600]="
-                  normalizedCurrentPage() ===
-                  item.value
-                " [class.border-aquamarine-600]="
-                  normalizedCurrentPage() ===
-                  item.value
-                " [class.text-white]="
-                  normalizedCurrentPage() ===
-                  item.value
-                " [class.bg-white]="
-                  normalizedCurrentPage() !==
-                  item.value
-                " [class.dark:bg-black]="
-                  normalizedCurrentPage() !==
-                  item.value
-                " [class.border-aquamarine-200]="
-                  normalizedCurrentPage() !==
-                  item.value
-                " [class.dark:border-aquamarine-800]="
-                  normalizedCurrentPage() !==
-                  item.value
-                " [class.text-aquamarine-800]="
-                  normalizedCurrentPage() !==
-                  item.value
-                " [class.dark:text-aquamarine-200]="
-                  normalizedCurrentPage() !==
-                  item.value
-                " [class.hover:bg-aquamarine-50]="
-                  normalizedCurrentPage() !==
-                  item.value
-                " [class.dark:hover:bg-aquamarine-900]="
-                  normalizedCurrentPage() !==
-                  item.value
-                " [attr.aria-current]="
-                  normalizedCurrentPage() ===
-                  item.value
-                    ? 'page'
-                    : null
-                " [attr.aria-label]="
-                  normalizedCurrentPage() ===
-                  item.value
-                    ? ('pagination.current_page' | translate) + item.value
-                    : ('pagination.go_to_page' | translate) + item.value
-                " (click)="goToItem(item)">
-            {{ item.value }}
+          <button
+            type="button"
+            class="min-w-9 min-h-9 px-2 py-1 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-black text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-900 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center"
+            [disabled]="normalizedCurrentPage() === totalPages()"
+            title="Trang sau"
+            aria-label="Next page"
+            (click)="goToPage(normalizedCurrentPage() + 1)"
+          >
+            <i class="bi bi-chevron-right" aria-hidden="true"></i>
           </button>
         </li>
-        } @else {
-        <!-- Dấu ba chấm không phải button -->
-        <li aria-hidden="true">
-          <span
-            class="inline-flex min-w-8 min-h-10 items-center justify-center px-1 text-aquamarine-500 dark:text-aquamarine-400 select-none">
-            …
-          </span>
-        </li>
-        }
-        }
 
-        <!-- Trang sau -->
+        <!-- Nút Trang cuối >> -->
         <li>
-          <button type="button"
-            class="min-h-10 px-3 py-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-black text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            [disabled]="
-              normalizedCurrentPage() ===
-              totalPages()
-            " [attr.aria-label]="
-              'pagination.next_aria' | translate
-            " (click)="
-              goToPage(
-                normalizedCurrentPage() + 1
-              )
-            ">
-            <span class="hidden sm:inline">
-              {{ 'pagination.next' | translate }}
-            </span>
-
-            <i class="bi bi-chevron-right sm:ms-1" aria-hidden="true"></i>
+          <button
+            type="button"
+            class="min-w-9 min-h-9 px-2 py-1 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-black text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-900 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center"
+            [disabled]="normalizedCurrentPage() === totalPages()"
+            title="Trang cuối"
+            aria-label="Last page"
+            (click)="goToPage(totalPages())"
+          >
+            <i class="bi bi-chevron-double-right" aria-hidden="true"></i>
           </button>
         </li>
       </ul>

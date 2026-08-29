@@ -16,6 +16,8 @@ import { ConfirmDialog } from '../../../../shared/components/confirm-dialog/conf
 import { BadgeComponent } from '../../../../shared/components/badge/badge';
 import { IconButtonComponent } from '../../../../shared/components/icon-button/icon-button';
 import { TextButtonComponent } from '../../../../shared/components/text-button/text-button';
+import { TextSearchComponent } from '../../../../shared/components/text-search/text-search';
+import { SingleDropdownComponent, DropdownOption } from '../../../../shared/components/single-dropdown/single-dropdown';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 @Component({
@@ -27,6 +29,8 @@ import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
     BadgeComponent,
     IconButtonComponent,
     TextButtonComponent,
+    TextSearchComponent,
+    SingleDropdownComponent,
   ],
   templateUrl: './manage-users.html',
   styleUrl: './manage-users.css',
@@ -48,6 +52,26 @@ export class ManageUsers {
   readonly searchQuery = signal<string>('');
   readonly roleFilter = signal<string>('ALL');
   readonly statusFilter = signal<string>('ALL');
+
+  readonly roleOptions = computed<DropdownOption[]>(() => {
+    this.ts.currentLang();
+    return [
+      { label: this.ts.translate('users.role_all'), value: 'ALL' },
+      { label: this.ts.translate('role.NORMAL'), value: 'NORMAL' },
+      { label: this.ts.translate('role.BLOG_OWNER'), value: 'BLOG_OWNER' },
+      { label: this.ts.translate('role.CONTENT_MODERATOR'), value: 'CONTENT_MODERATOR' },
+      { label: this.ts.translate('role.SUPER_ADMIN'), value: 'SUPER_ADMIN' },
+    ];
+  });
+
+  readonly statusOptions = computed<DropdownOption[]>(() => {
+    this.ts.currentLang();
+    return [
+      { label: this.ts.translate('users.all_statuses'), value: 'ALL' },
+      { label: this.ts.translate('status.active_title'), value: 'ACTIVE' },
+      { label: this.ts.translate('status.locked_title'), value: 'LOCKED' },
+    ];
+  });
 
   // Modals & Active State Signals
   readonly isCreateModModalOpen = signal<boolean>(false);
@@ -167,35 +191,32 @@ export class ManageUsers {
     }
   }
 
-  get pageNumbers(): Array<number | 'ellipsis'> {
+  get pageItems(): Array<{ type: 'page' | 'ellipsis'; value: number | null }> {
     const total = this.totalPages();
     const current = this.currentPage();
 
-    if (total <= 7) {
-      return Array.from({ length: total }, (_, index) => index + 1);
+    if (total <= 5) {
+      return Array.from({ length: total }, (_, i) => ({ type: 'page', value: i + 1 }));
     }
 
-    const visiblePages = new Set<number>([
-      1,
-      total,
-      current - 1,
-      current,
-      current + 1,
-    ]);
-    const sortedPages = [...visiblePages]
-      .filter((page) => page >= 1 && page <= total)
-      .sort((left, right) => left - right);
-    const result: Array<number | 'ellipsis'> = [];
+    let start = Math.max(1, current - 2);
+    let end = start + 4;
+    if (end > total) {
+      end = total;
+      start = Math.max(1, end - 4);
+    }
 
-    sortedPages.forEach((page, index) => {
-      const previousPage = sortedPages[index - 1];
-      if (previousPage && page - previousPage > 1) {
-        result.push('ellipsis');
-      }
-      result.push(page);
-    });
-
-    return result;
+    const items: Array<{ type: 'page' | 'ellipsis'; value: number | null }> = [];
+    if (start > 1) {
+      items.push({ type: 'ellipsis', value: null });
+    }
+    for (let p = start; p <= end; p++) {
+      items.push({ type: 'page', value: p });
+    }
+    if (end < total) {
+      items.push({ type: 'ellipsis', value: null });
+    }
+    return items;
   }
 
   // --- Preview Detail Modal (A11) ---

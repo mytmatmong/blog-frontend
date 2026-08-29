@@ -1,6 +1,7 @@
 <section class="space-y-6">
   <!-- Filter & Search Toolbar -->
-  <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 p-4 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
+  <div
+    class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 p-4 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
     <!-- Status Filter Tabs -->
     <div class="flex items-center gap-1 overflow-x-auto p-1 rounded-xl bg-aquamarine-50 dark:bg-aquamarine-950 border border-aquamarine-200 dark:border-aquamarine-800">
       <app-icon-button
@@ -33,32 +34,22 @@
     </div>
 
     <!-- TargetType & Reason Selectors -->
-    <div class="flex items-center gap-2">
+    <div class="flex flex-wrap items-center gap-2">
       <!-- Target Type Filter -->
-      <select
-        [(ngModel)]="targetTypeFilter"
-        (change)="onTargetTypeChange()"
-        class="px-3 py-1.5 rounded-xl text-xs border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none focus:ring-2 focus:ring-aquamarine-500 cursor-pointer"
-      >
-        <option value="">{{ 'moderator.target_all' | translate }}</option>
-        <option value="POST">{{ 'moderator.target_post' | translate }}</option>
-        <option value="COMMENT">{{ 'moderator.target_comment' | translate }}</option>
-      </select>
+      <app-single-dropdown
+        [options]="targetTypeOptions()"
+        [value]="targetTypeFilter()"
+        (selectionChange)="onTargetTypeChange($event)"
+        [placeholder]="'moderator.target_all' | translate"
+      />
 
       <!-- Reason Filter -->
-      <select
-        [(ngModel)]="reasonFilter"
-        (change)="onReasonChange()"
-        class="px-3 py-1.5 rounded-xl text-xs border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none focus:ring-2 focus:ring-aquamarine-500 cursor-pointer"
-      >
-        <option value="">{{ 'moderator.reason_all' | translate }}</option>
-        <option value="SPAM">{{ 'report.reason.SPAM' | translate }}</option>
-        <option value="HARASSMENT">{{ 'report.reason.HARASSMENT' | translate }}</option>
-        <option value="INAPPROPRIATE">{{ 'report.reason.INAPPROPRIATE' | translate }}</option>
-        <option value="COPYRIGHT">{{ 'report.reason.COPYRIGHT' | translate }}</option>
-        <option value="MISINFORMATION">{{ 'report.reason.MISINFORMATION' | translate }}</option>
-        <option value="OTHER">{{ 'report.reason.OTHER' | translate }}</option>
-      </select>
+      <app-single-dropdown
+        [options]="reasonOptions()"
+        [value]="reasonFilter()"
+        (selectionChange)="onReasonChange($event)"
+        [placeholder]="'moderator.reason_all' | translate"
+      />
     </div>
   </div>
 
@@ -103,19 +94,21 @@
             icon="bi bi-box-arrow-right"
             color="primary"
             variant="solid"
-            size="sm"
+            size="md"
             (btnClick)="logoutAndSwitchAccount()"
           >
             {{ 'moderator.logout_and_switch' | translate }}
           </app-icon-button>
         }
-        <app-text-button
-          variant="secondary"
-          size="sm"
+        <app-icon-button
+          icon="bi bi-arrow-clockwise"
+          color="red"
+          variant="solid"
+          size="md"
           (btnClick)="loadReports()"
         >
-          <i class="bi bi-arrow-clockwise mr-1"></i> {{ 'common.retry' | translate }}
-        </app-text-button>
+          {{ 'common.retry' | translate }}
+        </app-icon-button>
       </div>
     </div>
   } @else if (reports().length === 0) {
@@ -137,7 +130,7 @@
             <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'moderator.reporter' | translate }}</th>
             <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'moderator.reported_content' | translate }}</th>
             <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'moderator.violation_reason' | translate }}</th>
-            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center moderator-status-column">{{ 'table.status' | translate }}</th>
+            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.status' | translate }}</th>
             <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.actions' | translate }}</th>
           </tr>
         </thead>
@@ -149,9 +142,13 @@
                 <div class="flex flex-col gap-1">
                   <span class="text-xs font-mono font-bold text-aquamarine-500">#{{ report.id }}</span>
                   @if (report.targetType === 'POST') {
-                    <app-badge color="blue" shape="rounded" size="sm" icon="bi bi-file-post">{{ 'moderator.reported_post_title' | translate }}</app-badge>
+                    <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/50 px-2 py-0.5 rounded-md w-fit border border-indigo-200 dark:border-indigo-800">
+                      <i class="bi bi-file-post"></i> {{ 'moderator.reported_post_title' | translate }}
+                    </span>
                   } @else {
-                    <app-badge color="purple" shape="rounded" size="sm" icon="bi bi-chat-left-text">{{ 'moderator.reported_comment_title' | translate }}</app-badge>
+                    <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/50 px-2 py-0.5 rounded-md w-fit border border-purple-200 dark:border-purple-800">
+                      <i class="bi bi-chat-left-text"></i> {{ 'moderator.reported_comment_title' | translate }}
+                    </span>
                   }
                 </div>
               </td>
@@ -189,9 +186,9 @@
 
               <!-- Reason -->
               <td class="p-4">
-                <app-badge color="yellow" shape="rounded" size="sm">
+                <span class="px-2.5 py-1 text-xs font-semibold rounded-md bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
                   {{ getReasonLabel(report.reason) }}
-                </app-badge>
+                </span>
                 @if (report.description) {
                   <p class="text-[11px] text-aquamarine-600 dark:text-aquamarine-400 mt-1 line-clamp-1">
                     {{ report.description }}
@@ -200,31 +197,30 @@
               </td>
 
               <!-- Status -->
-              <td class="p-4 text-center moderator-status-column">
+              <td class="p-4 text-center">
                 @if (report.status === 'PENDING') {
-                  <app-badge color="yellow" shape="pill" size="sm" dot>
+                  <span class="inline-block px-2.5 py-1 text-xs font-semibold rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
                     {{ 'status.pending' | translate }}
-                  </app-badge>
+                  </span>
                 } @else if (report.status === 'RESOLVED') {
-                  <app-badge color="green" shape="pill" size="sm" dot>
+                  <span class="inline-block px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
                     {{ 'status.resolved' | translate }}
-                  </app-badge>
+                  </span>
                 } @else if (report.status === 'REJECTED') {
-                  <app-badge color="red" shape="pill" size="sm" dot>
+                  <span class="inline-block px-2.5 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300">
                     {{ 'status.rejected' | translate }}
-                  </app-badge>
+                  </span>
                 }
               </td>
 
               <!-- Actions -->
-              <td class="p-4 text-center moderator-actions-column">
+              <td class="p-4 text-center">
                 <div class="flex items-center justify-center gap-2">
                   <app-icon-button
                     icon="bi bi-eye"
                     color="primary"
                     variant="soft"
                     size="sm"
-                    [title]="'action.view' | translate"
                     (btnClick)="setPreviewReport(report)"
                   >
                     {{ 'action.view' | translate }}
@@ -232,22 +228,20 @@
 
                   @if (report.status === 'PENDING') {
                     <app-icon-button
-                      icon="bi bi-check-circle"
+                      icon="bi bi-check-circle-fill"
                       color="green"
                       variant="soft"
                       size="sm"
-                      [title]="'action.resolve' | translate"
                       [disabled]="actionLoading()"
                       (btnClick)="setResolveReport(report)"
                     >
                       {{ 'action.resolve' | translate }}
                     </app-icon-button>
                     <app-icon-button
-                      icon="bi bi-x-circle"
+                      icon="bi bi-x-circle-fill"
                       color="red"
                       variant="soft"
                       size="sm"
-                      [title]="'action.reject' | translate"
                       [disabled]="actionLoading()"
                       (btnClick)="setRejectReport(report)"
                     >
@@ -263,42 +257,89 @@
     </div>
 
     <!-- Pagination -->
-    @if (meta() && (meta()?.totalPages || 0) > 1) {
+    @if (meta() && (meta()?.totalItems || 0) > 0) {
       <div class="mt-6 flex justify-between items-center text-xs text-aquamarine-700 dark:text-aquamarine-300">
         <div>
           {{ 'moderator.showing' | translate }} <strong>{{ meta()?.itemCount }}</strong> / <strong>{{ meta()?.totalItems }}</strong> {{ 'moderator.reports_unit' | translate }}
         </div>
         <ul class="inline-flex items-center space-x-1 text-sm">
+          <!-- Trang đầu << -->
           <li>
-            <app-text-button
-              variant="secondary"
-              size="sm"
+            <button
               [disabled]="currentPage() === 1"
-              (btnClick)="setPage(currentPage() - 1)"
+              [class.opacity-40]="currentPage() === 1"
+              class="min-w-8 h-8 px-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer disabled:cursor-not-allowed flex items-center justify-center text-xs"
+              title="Trang đầu"
+              (click)="setPage(1)"
             >
-              {{ 'pagination.prev' | translate }}
-            </app-text-button>
+              <i class="bi bi-chevron-double-left"></i>
+            </button>
           </li>
-          @for (p of pageNumbers(); track p) {
-            <li>
-              <app-text-button
-                [variant]="currentPage() === p ? 'primary' : 'secondary'"
-                size="sm"
-                (btnClick)="setPage(p)"
-              >
-                {{ p }}
-              </app-text-button>
-            </li>
-          }
+          <!-- Trang trước < -->
           <li>
-            <app-text-button
-              variant="secondary"
-              size="sm"
-              [disabled]="currentPage() === (meta()?.totalPages || 1)"
-              (btnClick)="setPage(currentPage() + 1)"
+            <button
+              [disabled]="currentPage() === 1"
+              [class.opacity-40]="currentPage() === 1"
+              class="min-w-8 h-8 px-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer disabled:cursor-not-allowed flex items-center justify-center text-xs"
+              title="Trang trước"
+              (click)="setPage(currentPage() - 1)"
             >
-              {{ 'pagination.next' | translate }}
-            </app-text-button>
+              <i class="bi bi-chevron-left"></i>
+            </button>
+          </li>
+
+          <!-- Các trang & Dấu 3 chấm -->
+          @for (item of pageItems(); track $index) {
+            @if (item.type === 'page') {
+              <li>
+                <button
+                  class="min-w-8 h-8 px-2.5 rounded-lg font-semibold transition-colors cursor-pointer text-xs flex items-center justify-center"
+                  [class.bg-aquamarine-600]="currentPage() === item.value"
+                  [class.text-white]="currentPage() === item.value"
+                  [class.border]="currentPage() !== item.value"
+                  [class.border-aquamarine-200]="currentPage() !== item.value"
+                  [class.dark:border-aquamarine-800]="currentPage() !== item.value"
+                  [class.bg-white]="currentPage() !== item.value"
+                  [class.dark:bg-aquamarine-900]="currentPage() !== item.value"
+                  [class.text-aquamarine-800]="currentPage() !== item.value"
+                  [class.dark:text-aquamarine-200]="currentPage() !== item.value"
+                  (click)="setPage(item.value!)"
+                >
+                  {{ item.value }}
+                </button>
+              </li>
+            } @else {
+              <li>
+                <span class="inline-flex min-w-6 h-8 items-center justify-center text-xs font-bold text-aquamarine-500 select-none">
+                  ...
+                </span>
+              </li>
+            }
+          }
+
+          <!-- Trang sau > -->
+          <li>
+            <button
+              [disabled]="currentPage() === (meta()?.totalPages || 1)"
+              [class.opacity-40]="currentPage() === (meta()?.totalPages || 1)"
+              class="min-w-8 h-8 px-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer disabled:cursor-not-allowed flex items-center justify-center text-xs"
+              title="Trang sau"
+              (click)="setPage(currentPage() + 1)"
+            >
+              <i class="bi bi-chevron-right"></i>
+            </button>
+          </li>
+          <!-- Trang cuối >> -->
+          <li>
+            <button
+              [disabled]="currentPage() === (meta()?.totalPages || 1)"
+              [class.opacity-40]="currentPage() === (meta()?.totalPages || 1)"
+              class="min-w-8 h-8 px-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer disabled:cursor-not-allowed flex items-center justify-center text-xs"
+              title="Trang cuối"
+              (click)="setPage(meta()?.totalPages || 1)"
+            >
+              <i class="bi bi-chevron-double-right"></i>
+            </button>
           </li>
         </ul>
       </div>
@@ -324,9 +365,13 @@
           <span>{{ 'moderator.report_detail_title' | translate }}</span>
           <span class="text-aquamarine-600 dark:text-aquamarine-400">#{{ report.id }}</span>
         </h5>
-        <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer" (click)="closePreviewReport()">
-          <i class="bi bi-x-lg text-lg"></i>
-        </button>
+        <app-icon-button
+          icon="bi bi-x-lg"
+          color="primary"
+          variant="soft"
+          size="sm"
+          (btnClick)="closePreviewReport()"
+        />
       </header>
 
       <!-- Modal Body -->

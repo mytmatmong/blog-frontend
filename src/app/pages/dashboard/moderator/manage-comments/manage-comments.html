@@ -1,76 +1,55 @@
 <section class="space-y-6">
   <!-- Filter & Search Toolbar -->
-  <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 p-4 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
+  <div
+    class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 p-4 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
     <!-- Status Filter Tabs -->
     <div class="flex items-center gap-1 overflow-x-auto p-1 rounded-xl bg-aquamarine-50 dark:bg-aquamarine-950 border border-aquamarine-200 dark:border-aquamarine-800">
-      <button
-        type="button"
-        (click)="onStatusChange('PENDING')"
-        class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap cursor-pointer"
-        [class.bg-aquamarine-600]="statusFilter() === 'PENDING'"
-        [class.text-white]="statusFilter() === 'PENDING'"
-        [class.text-aquamarine-800]="statusFilter() !== 'PENDING'"
-        [class.dark:text-aquamarine-200]="statusFilter() !== 'PENDING'"
-        [class.hover:bg-aquamarine-100]="statusFilter() !== 'PENDING'"
-        [class.dark:hover:bg-aquamarine-900]="statusFilter() !== 'PENDING'"
+      <app-icon-button
+        icon="bi bi-clock-history"
+        color="primary"
+        [variant]="statusFilter() === 'PENDING' ? 'solid' : 'soft'"
+        size="sm"
+        (btnClick)="onStatusChange('PENDING')"
       >
-        <i class="bi bi-clock-history mr-1"></i> {{ 'filter.status.pending' | translate }}
-      </button>
-      <button
-        type="button"
-        (click)="onStatusChange('RESOLVED')"
-        class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap cursor-pointer"
-        [class.bg-emerald-600]="statusFilter() === 'RESOLVED'"
-        [class.text-white]="statusFilter() === 'RESOLVED'"
-        [class.text-aquamarine-800]="statusFilter() !== 'RESOLVED'"
-        [class.dark:text-aquamarine-200]="statusFilter() !== 'RESOLVED'"
-        [class.hover:bg-aquamarine-100]="statusFilter() !== 'RESOLVED'"
-        [class.dark:hover:bg-aquamarine-900]="statusFilter() !== 'RESOLVED'"
+        {{ 'filter.status.pending' | translate }}
+      </app-icon-button>
+      <app-icon-button
+        icon="bi bi-check2-circle"
+        [color]="statusFilter() === 'RESOLVED' ? 'green' : 'primary'"
+        [variant]="statusFilter() === 'RESOLVED' ? 'solid' : 'soft'"
+        size="sm"
+        (btnClick)="onStatusChange('RESOLVED')"
       >
-        <i class="bi bi-check2-circle mr-1"></i> {{ 'filter.status.resolved' | translate }}
-      </button>
-      <button
-        type="button"
-        (click)="onStatusChange('REJECTED')"
-        class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap cursor-pointer"
-        [class.bg-red-600]="statusFilter() === 'REJECTED'"
-        [class.text-white]="statusFilter() === 'REJECTED'"
-        [class.text-aquamarine-800]="statusFilter() !== 'REJECTED'"
-        [class.dark:text-aquamarine-200]="statusFilter() !== 'REJECTED'"
-        [class.hover:bg-aquamarine-100]="statusFilter() !== 'REJECTED'"
-        [class.dark:hover:bg-aquamarine-900]="statusFilter() !== 'REJECTED'"
+        {{ 'filter.status.resolved' | translate }}
+      </app-icon-button>
+      <app-icon-button
+        icon="bi bi-x-circle"
+        [color]="statusFilter() === 'REJECTED' ? 'red' : 'primary'"
+        [variant]="statusFilter() === 'REJECTED' ? 'solid' : 'soft'"
+        size="sm"
+        (btnClick)="onStatusChange('REJECTED')"
       >
-        <i class="bi bi-x-circle mr-1"></i> {{ 'filter.status.rejected' | translate }}
-      </button>
+        {{ 'filter.status.rejected' | translate }}
+      </app-icon-button>
     </div>
 
     <!-- TargetType & Reason Selectors -->
-    <div class="flex items-center gap-2">
+    <div class="flex flex-wrap items-center gap-2">
       <!-- Target Type Filter -->
-      <select
-        [(ngModel)]="targetTypeFilter"
-        (change)="onTargetTypeChange()"
-        class="px-3 py-1.5 rounded-xl text-xs border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none focus:ring-2 focus:ring-aquamarine-500 cursor-pointer"
-      >
-        <option value="">{{ 'moderator.target_all' | translate }}</option>
-        <option value="POST">{{ 'moderator.target_post' | translate }}</option>
-        <option value="COMMENT">{{ 'moderator.target_comment' | translate }}</option>
-      </select>
+      <app-single-dropdown
+        [options]="targetTypeOptions()"
+        [value]="targetTypeFilter()"
+        (selectionChange)="targetTypeFilter.set($any($event)); onTargetTypeChange()"
+        [placeholder]="'moderator.target_all' | translate"
+      />
 
       <!-- Reason Filter -->
-      <select
-        [(ngModel)]="reasonFilter"
-        (change)="onReasonChange()"
-        class="px-3 py-1.5 rounded-xl text-xs border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 text-aquamarine-950 dark:text-aquamarine-50 focus:outline-none focus:ring-2 focus:ring-aquamarine-500 cursor-pointer"
-      >
-        <option value="">{{ 'moderator.reason_all' | translate }}</option>
-        <option value="SPAM">{{ 'report.reason.SPAM' | translate }}</option>
-        <option value="HARASSMENT">{{ 'report.reason.HARASSMENT' | translate }}</option>
-        <option value="INAPPROPRIATE">{{ 'report.reason.INAPPROPRIATE' | translate }}</option>
-        <option value="COPYRIGHT">{{ 'report.reason.COPYRIGHT' | translate }}</option>
-        <option value="MISINFORMATION">{{ 'report.reason.MISINFORMATION' | translate }}</option>
-        <option value="OTHER">{{ 'report.reason.OTHER' | translate }}</option>
-      </select>
+      <app-single-dropdown
+        [options]="reasonOptions()"
+        [value]="reasonFilter()"
+        (selectionChange)="reasonFilter.set($any($event)); onReasonChange()"
+        [placeholder]="'moderator.reason_all' | translate"
+      />
     </div>
   </div>
 
@@ -231,31 +210,34 @@
               <!-- Actions -->
               <td class="p-4 text-center">
                 <div class="flex items-center justify-center gap-2">
-                  <button
-                    (click)="setPreviewReport(report)"
-                    class="p-1.5 text-aquamarine-600 hover:bg-aquamarine-100 dark:hover:bg-aquamarine-800 rounded-lg transition-colors cursor-pointer"
+                  <app-icon-button
+                    icon="bi bi-eye"
+                    color="primary"
+                    variant="soft"
+                    size="sm"
                     [title]="'action.view' | translate"
-                  >
-                    <i class="bi bi-eye text-base"></i>
-                  </button>
+                    (btnClick)="setPreviewReport(report)"
+                  />
 
                   @if (report.status === 'PENDING') {
-                    <button
-                      (click)="setResolveReport(report)"
+                    <app-icon-button
+                      icon="bi bi-check-circle-fill"
+                      color="green"
+                      variant="soft"
+                      size="sm"
                       [disabled]="actionLoading()"
-                      class="p-1.5 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
                       [title]="'action.resolve' | translate"
-                    >
-                      <i class="bi bi-check-circle-fill text-base"></i>
-                    </button>
-                    <button
-                      (click)="setRejectReport(report)"
+                      (btnClick)="setResolveReport(report)"
+                    />
+                    <app-icon-button
+                      icon="bi bi-x-circle-fill"
+                      color="red"
+                      variant="soft"
+                      size="sm"
                       [disabled]="actionLoading()"
-                      class="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
                       [title]="'action.reject' | translate"
-                    >
-                      <i class="bi bi-x-circle-fill text-base"></i>
-                    </button>
+                      (btnClick)="setRejectReport(report)"
+                    />
                   }
                 </div>
               </td>
@@ -266,49 +248,88 @@
     </div>
 
     <!-- Pagination -->
-    @if (meta() && (meta()?.totalPages || 0) > 1) {
+    @if (meta() && (meta()?.totalItems || 0) > 0) {
       <div class="mt-6 flex justify-between items-center text-xs text-aquamarine-700 dark:text-aquamarine-300">
         <div>
           {{ 'moderator.showing' | translate }} <strong>{{ meta()?.itemCount }}</strong> / <strong>{{ meta()?.totalItems }}</strong> {{ 'moderator.reports_unit' | translate }}
         </div>
         <ul class="inline-flex items-center space-x-1 text-sm">
+          <!-- Trang đầu << -->
           <li>
             <button
               [disabled]="currentPage() === 1"
-              [class.opacity-50]="currentPage() === 1"
-              class="px-3 py-1.5 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer"
-              (click)="setPage(currentPage() - 1)"
+              [class.opacity-40]="currentPage() === 1"
+              class="min-w-8 h-8 px-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer disabled:cursor-not-allowed flex items-center justify-center text-xs"
+              title="Trang đầu"
+              (click)="setPage(1)"
             >
-              {{ 'pagination.prev' | translate }}
+              <i class="bi bi-chevron-double-left"></i>
             </button>
           </li>
-          @for (p of pageNumbers(); track p) {
-            <li>
-              <button
-                class="px-3 py-1.5 rounded-lg font-semibold transition-colors cursor-pointer text-xs"
-                [class.bg-aquamarine-600]="currentPage() === p"
-                [class.text-white]="currentPage() === p"
-                [class.border]="currentPage() !== p"
-                [class.border-aquamarine-200]="currentPage() !== p"
-                [class.dark:border-aquamarine-800]="currentPage() !== p"
-                [class.bg-white]="currentPage() !== p"
-                [class.dark:bg-aquamarine-900]="currentPage() !== p"
-                [class.text-aquamarine-800]="currentPage() !== p"
-                [class.dark:text-aquamarine-200]="currentPage() !== p"
-                (click)="setPage(p)"
-              >
-                {{ p }}
-              </button>
-            </li>
+          <!-- Trang trước < -->
+          <li>
+            <button
+              [disabled]="currentPage() === 1"
+              [class.opacity-40]="currentPage() === 1"
+              class="min-w-8 h-8 px-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer disabled:cursor-not-allowed flex items-center justify-center text-xs"
+              title="Trang trước"
+              (click)="setPage(currentPage() - 1)"
+            >
+              <i class="bi bi-chevron-left"></i>
+            </button>
+          </li>
+
+          <!-- Các trang & Dấu 3 chấm -->
+          @for (item of pageItems(); track $index) {
+            @if (item.type === 'page') {
+              <li>
+                <button
+                  class="min-w-8 h-8 px-2.5 rounded-lg font-semibold transition-colors cursor-pointer text-xs flex items-center justify-center"
+                  [class.bg-aquamarine-600]="currentPage() === item.value"
+                  [class.text-white]="currentPage() === item.value"
+                  [class.border]="currentPage() !== item.value"
+                  [class.border-aquamarine-200]="currentPage() !== item.value"
+                  [class.dark:border-aquamarine-800]="currentPage() !== item.value"
+                  [class.bg-white]="currentPage() !== item.value"
+                  [class.dark:bg-aquamarine-900]="currentPage() !== item.value"
+                  [class.text-aquamarine-800]="currentPage() !== item.value"
+                  [class.dark:text-aquamarine-200]="currentPage() !== item.value"
+                  (click)="setPage(item.value!)"
+                >
+                  {{ item.value }}
+                </button>
+              </li>
+            } @else {
+              <li>
+                <span class="inline-flex min-w-6 h-8 items-center justify-center text-xs font-bold text-aquamarine-500 select-none">
+                  ...
+                </span>
+              </li>
+            }
           }
+
+          <!-- Trang sau > -->
           <li>
             <button
               [disabled]="currentPage() === (meta()?.totalPages || 1)"
-              [class.opacity-50]="currentPage() === (meta()?.totalPages || 1)"
-              class="px-3 py-1.5 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer"
+              [class.opacity-40]="currentPage() === (meta()?.totalPages || 1)"
+              class="min-w-8 h-8 px-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer disabled:cursor-not-allowed flex items-center justify-center text-xs"
+              title="Trang sau"
               (click)="setPage(currentPage() + 1)"
             >
-              {{ 'pagination.next' | translate }}
+              <i class="bi bi-chevron-right"></i>
+            </button>
+          </li>
+          <!-- Trang cuối >> -->
+          <li>
+            <button
+              [disabled]="currentPage() === (meta()?.totalPages || 1)"
+              [class.opacity-40]="currentPage() === (meta()?.totalPages || 1)"
+              class="min-w-8 h-8 px-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer disabled:cursor-not-allowed flex items-center justify-center text-xs"
+              title="Trang cuối"
+              (click)="setPage(meta()?.totalPages || 1)"
+            >
+              <i class="bi bi-chevron-double-right"></i>
             </button>
           </li>
         </ul>
@@ -319,8 +340,8 @@
 
 <!-- Modal Xem chi tiết báo cáo vi phạm (API M07) -->
 @if (activePreviewReport(); as report) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-    <div class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-3xl max-h-[85vh] flex flex-col relative">
+  <div class="report-preview-backdrop" (click)="closePreviewReport()">
+    <aside class="report-preview-sheet" role="dialog" aria-modal="true" [attr.aria-labelledby]="'report-preview-title-' + report.id" (click)="$event.stopPropagation()">
       <!-- Loading overlay khi đang fetch API M07 -->
       @if (loadingDetail()) {
         <div class="absolute inset-0 bg-white/70 dark:bg-aquamarine-900/70 z-10 flex flex-col items-center justify-center rounded-2xl">
@@ -330,18 +351,18 @@
       }
 
       <!-- Modal Header -->
-      <div class="flex justify-between items-center p-5 border-b border-aquamarine-200 dark:border-aquamarine-800">
-        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50 flex items-center gap-2">
+      <header class="report-preview-header">
+        <h5 [id]="'report-preview-title-' + report.id" class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50 flex items-center gap-2">
           <span>{{ 'moderator.report_detail_title' | translate }}</span>
           <span class="text-aquamarine-600 dark:text-aquamarine-400">#{{ report.id }}</span>
         </h5>
         <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer" (click)="closePreviewReport()">
           <i class="bi bi-x-lg text-lg"></i>
         </button>
-      </div>
+      </header>
 
       <!-- Modal Body -->
-      <div class="p-6 overflow-y-auto space-y-5">
+      <div class="report-preview-body space-y-5">
         <!-- Reporter & Reason info box -->
         <div class="p-4 rounded-xl border border-amber-200 dark:border-amber-900 bg-amber-50/60 dark:bg-amber-950/30 space-y-2">
           <div class="flex items-center justify-between">
@@ -395,67 +416,127 @@
             </div>
           </div>
         } @else if (report.targetType === 'COMMENT' && report.comment) {
-          <div class="space-y-3">
-            <h5 class="font-bold text-sm text-purple-700 dark:text-purple-300 flex items-center gap-2">
-              <i class="bi bi-chat-left-text"></i> {{ 'moderator.reported_comment_title' | translate }} (#{{ report.comment.id }})
-            </h5>
-            <div class="p-4 rounded-xl border border-purple-200 dark:border-purple-900 bg-purple-50/30 dark:bg-purple-950/30 space-y-3">
-              <div class="text-sm text-purple-950 dark:text-purple-100 font-medium">
-                "{{ report.comment.content }}"
-              </div>
-              <div class="text-xs text-purple-700 dark:text-purple-300 flex items-center gap-2">
-                <span>{{ 'moderator.commenter' | translate }} <strong>{{ report.comment.user.username }}</strong></span>
-                <span>•</span>
-                <span>{{ 'moderator.created_at' | translate }}: {{ report.comment.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+          <div class="report-context-stack">
+            @if (report.comment.post; as post) {
+              <section class="report-context-post">
+                <div class="report-context-section-title">
+                  <i class="bi bi-file-earmark-text"></i>
+                  <span>{{ 'moderator.post_context' | translate }}</span>
+                  <span class="report-context-id">#{{ post.id }}</span>
+                </div>
+
+                @if (post.thumbnailUrl) {
+                  <img class="report-context-post-thumbnail" [src]="post.thumbnailUrl" [alt]="post.title" />
+                }
+
+                <h3 class="report-context-post-title">{{ post.title }}</h3>
+                <div class="report-context-meta">
+                  <span><i class="bi bi-person"></i> {{ post.author.username }}</span>
+                  <span><i class="bi bi-clock"></i> {{ (post.publishedAt || post.createdAt) | date: 'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+                <div class="report-context-post-content" [innerHTML]="post.content"></div>
+              </section>
+            }
+
+            <section class="report-context-thread">
+              <div class="report-context-section-title">
+                <i class="bi bi-chat-left-text"></i>
+                <span>{{ 'moderator.reply_context' | translate }}</span>
               </div>
 
-              <!-- Parent Comment Context if present -->
-              @if (report.comment.parent) {
-                <div class="p-3 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white/60 dark:bg-aquamarine-900/60 text-xs">
-                  <span class="font-semibold text-aquamarine-700 dark:text-aquamarine-300 block mb-1">
-                    {{ 'moderator.parent_comment_context' | translate }}
-                  </span>
-                  <p class="italic text-aquamarine-900 dark:text-aquamarine-100">"{{ report.comment.parent.content }}"</p>
-                  <span class="text-[10px] text-aquamarine-500 mt-1 block">{{ 'moderator.commenter' | translate }} {{ report.comment.parent.user.username }}</span>
-                </div>
-              }
+              <div class="report-context-thread-list">
+                @if (report.comment.parent; as rootComment) {
+                  <article class="report-context-comment report-context-comment--root">
+                    <div class="report-context-comment-head">
+                      <strong>{{ rootComment.user.username }}</strong>
+                      <span>{{ 'moderator.reply_context' | translate }}</span>
+                      <time>{{ rootComment.createdAt | date: 'dd/MM/yyyy HH:mm' }}</time>
+                    </div>
+                    <p>{{ rootComment.content }}</p>
+                  </article>
 
-              <!-- Post Context for Comment -->
-              @if (report.comment.post) {
-                <div class="pt-2 border-t border-purple-100 dark:border-purple-900 text-xs">
-                  <span class="font-semibold text-aquamarine-700 dark:text-aquamarine-300">{{ 'moderator.post_context' | translate }}</span>
-                  <h4 class="font-bold text-aquamarine-950 dark:text-aquamarine-50 mt-1">{{ report.comment.post.title }}</h4>
-                  <span class="text-aquamarine-500">{{ 'moderator.post_author' | translate }} {{ report.comment.post.author.username }}</span>
-                </div>
-              }
-            </div>
+                  @for (reply of rootComment.replies || []; track reply.id) {
+                    <article
+                      class="report-context-comment report-context-comment--reply"
+                      [class.report-context-comment--reported]="reply.id === report.comment.id"
+                    >
+                      <div class="report-context-comment-head">
+                        <strong>{{ reply.user.username }}</strong>
+                        @if (reply.id === report.comment.id) {
+                          <span class="report-context-reported-label"><i class="bi bi-flag-fill"></i> {{ 'moderator.reported_comment_title' | translate }}</span>
+                        } @else {
+                          <span>Reply</span>
+                        }
+                        <time>{{ reply.createdAt | date: 'dd/MM/yyyy HH:mm' }}</time>
+                      </div>
+                      <p>{{ reply.content }}</p>
+                    </article>
+                  } @empty {
+                    <article class="report-context-comment report-context-comment--reply report-context-comment--reported">
+                      <div class="report-context-comment-head">
+                        <strong>{{ report.comment.user.username }}</strong>
+                        <span class="report-context-reported-label"><i class="bi bi-flag-fill"></i> {{ 'moderator.reported_comment_title' | translate }}</span>
+                        <time>{{ report.comment.createdAt | date: 'dd/MM/yyyy HH:mm' }}</time>
+                      </div>
+                      <p>{{ report.comment.content }}</p>
+                    </article>
+                  }
+                } @else {
+                  <article class="report-context-comment report-context-comment--root report-context-comment--reported">
+                    <div class="report-context-comment-head">
+                      <strong>{{ report.comment.user.username }}</strong>
+                      <span class="report-context-reported-label"><i class="bi bi-flag-fill"></i> {{ 'moderator.reported_comment_title' | translate }}</span>
+                      <time>{{ report.comment.createdAt | date: 'dd/MM/yyyy HH:mm' }}</time>
+                    </div>
+                    <p>{{ report.comment.content }}</p>
+                  </article>
+
+                  @for (reply of report.comment.replies || []; track reply.id) {
+                    <article class="report-context-comment report-context-comment--reply">
+                      <div class="report-context-comment-head">
+                        <strong>{{ reply.user.username }}</strong>
+                        <span>Reply</span>
+                        <time>{{ reply.createdAt | date: 'dd/MM/yyyy HH:mm' }}</time>
+                      </div>
+                      <p>{{ reply.content }}</p>
+                    </article>
+                  }
+                }
+              </div>
+            </section>
           </div>
         }
       </div>
 
       <!-- Modal Footer -->
-      <div class="p-4 border-t border-aquamarine-200 dark:border-aquamarine-800 flex justify-end gap-3">
+      <footer class="report-preview-footer flex items-center justify-end gap-2 p-4 border-t border-aquamarine-200 dark:border-aquamarine-800">
         @if (report.status === 'PENDING') {
-          <button
-            type="button"
-            (click)="setResolveReport(report)"
+          <app-icon-button
+            icon="bi bi-check-circle"
+            color="green"
+            variant="solid"
+            size="sm"
             [disabled]="actionLoading()"
-            class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 transition-colors cursor-pointer inline-flex items-center gap-2"
+            (btnClick)="setResolveReport(report)"
           >
-            <i class="bi bi-check-circle-fill"></i> {{ 'action.resolve' | translate }}
-          </button>
-          <button
-            type="button"
-            (click)="setRejectReport(report)"
+            {{ 'action.resolve' | translate }}
+          </app-icon-button>
+          <app-icon-button
+            icon="bi bi-x-circle"
+            color="red"
+            variant="solid"
+            size="sm"
             [disabled]="actionLoading()"
-            class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 transition-colors cursor-pointer inline-flex items-center gap-2"
+            (btnClick)="setRejectReport(report)"
           >
-            <i class="bi bi-x-circle-fill"></i> {{ 'action.reject' | translate }}
-          </button>
+            {{ 'action.reject' | translate }}
+          </app-icon-button>
         }
-        <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer" (click)="closePreviewReport()">{{ 'action.close' | translate }}</button>
-      </div>
-    </div>
+        <app-text-button variant="secondary" size="sm" (btnClick)="closePreviewReport()">
+          <i class="bi bi-x-lg mr-1"></i>{{ 'action.close' | translate }}
+        </app-text-button>
+      </footer>
+    </aside>
   </div>
 }
 
@@ -489,13 +570,18 @@
           ></textarea>
         </div>
         <div class="flex justify-end gap-3 pt-2">
-          <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer" (click)="closeResolveModal()">{{ 'action.cancel' | translate }}</button>
-          <button type="submit" class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 transition-colors cursor-pointer inline-flex items-center gap-2" [disabled]="actionLoading() || !resolutionNote.trim()">
-            @if (actionLoading()) {
-              <span class="inline-block animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-r-transparent"></span>
-            }
+          <app-text-button variant="secondary" size="md" (btnClick)="closeResolveModal()">{{ 'action.cancel' | translate }}</app-text-button>
+          <app-icon-button
+            icon="bi bi-shield-check"
+            color="green"
+            variant="solid"
+            size="md"
+            type="submit"
+            [loading]="actionLoading()"
+            [disabled]="actionLoading() || !resolutionNote.trim()"
+          >
             {{ 'action.resolve' | translate }}
-          </button>
+          </app-icon-button>
         </div>
       </form>
     </div>
@@ -532,13 +618,18 @@
           ></textarea>
         </div>
         <div class="flex justify-end gap-3 pt-2">
-          <button type="button" class="px-4 py-2 rounded-xl text-sm font-medium text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-700 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer" (click)="closeRejectReportModal()">{{ 'action.cancel' | translate }}</button>
-          <button type="submit" class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 transition-colors cursor-pointer inline-flex items-center gap-2" [disabled]="actionLoading() || !rejectReportNote.trim()">
-            @if (actionLoading()) {
-              <span class="inline-block animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-r-transparent"></span>
-            }
+          <app-text-button variant="secondary" size="md" (btnClick)="closeRejectReportModal()">{{ 'action.cancel' | translate }}</app-text-button>
+          <app-icon-button
+            icon="bi bi-x-circle"
+            color="red"
+            variant="solid"
+            size="md"
+            type="submit"
+            [loading]="actionLoading()"
+            [disabled]="actionLoading() || !rejectReportNote.trim()"
+          >
             {{ 'action.reject' | translate }}
-          </button>
+          </app-icon-button>
         </div>
       </form>
     </div>

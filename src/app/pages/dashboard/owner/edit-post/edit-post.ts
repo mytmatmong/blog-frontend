@@ -6,8 +6,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
-  ActivatedRoute,
-  Router,
+  ActivatedRoute
 } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
@@ -19,6 +18,8 @@ import {
 import { getApiErrorMessage } from '../../../../core/utils/api-error.util';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { ConfirmDialog } from '../../../../shared/components/confirm-dialog/confirm-dialog';
+import { SingleDropdownComponent } from '../../../../shared/components/single-dropdown/single-dropdown';
+import { MultiDropdownComponent } from '../../../../shared/components/multi-dropdown/multi-dropdown';
 import { CreatePost } from '../create-post/create-post';
 
 @Component({
@@ -27,6 +28,8 @@ import { CreatePost } from '../create-post/create-post';
     FormsModule,
     TranslatePipe,
     ConfirmDialog,
+    SingleDropdownComponent,
+    MultiDropdownComponent,
   ],
 
   /*
@@ -41,9 +44,6 @@ export class EditPost
   implements OnInit {
   private readonly route =
     inject(ActivatedRoute);
-
-  private readonly router =
-    inject(Router);
 
   readonly editingPost =
     signal<BlogOwnerPost | null>(null);
@@ -151,6 +151,26 @@ export class EditPost
     );
   }
 
+  override onTranslationLanguageSelectionChange(newIds: any[]): void {
+    if (this.formLocked()) return;
+    const numericIds = newIds.map(Number);
+    const existing = this.existingTranslationLanguageIds();
+
+    for (const id of existing) {
+      if (!numericIds.includes(id)) {
+        this.toast.warning(
+          this.tr('post_form.existing_translation_cannot_remove'),
+          this.tr('common.invalid'),
+        );
+        const restored = Array.from(new Set([...numericIds, id]));
+        this.selectedTranslationLanguageIds.set(restored);
+        return;
+      }
+    }
+
+    super.onTranslationLanguageSelectionChange(numericIds);
+  }
+
   override async savePost(
     submitForReview: boolean,
   ): Promise<void> {
@@ -160,7 +180,7 @@ export class EditPost
     ) {
       return;
     }
-
+    this.addManualHashtags();
     const updateRequest =
       this.buildUpdateRequest(
         submitForReview,
@@ -449,11 +469,7 @@ export class EditPost
        */
       categoryIds,
 
-      ...(tagNames.length > 0
-        ? {
-          tagNames,
-        }
-        : {}),
+      tagNames,
 
       translationLanguageIds,
       submitForReview,
@@ -477,14 +493,7 @@ export class EditPost
       );
     }
 
-    if (tagNames.length) {
-      for (const tagName of tagNames) {
-        formData.append(
-          'tagNames',
-          tagName,
-        );
-      }
-    }
+    formData.append('tagNames', JSON.stringify(tagNames));
 
     for (
       const languageId of

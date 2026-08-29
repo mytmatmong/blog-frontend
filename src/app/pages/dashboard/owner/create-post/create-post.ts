@@ -1,5 +1,6 @@
 import {
   Component,
+  computed,
   effect,
   ElementRef,
   HostListener,
@@ -10,7 +11,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
-
+import { Router } from '@angular/router';
 import {
   BlogOwnerCategory,
   BlogOwnerLanguage,
@@ -24,6 +25,8 @@ import { TranslationService } from '../../../../core/services/translation.servic
 import { getApiErrorMessage } from '../../../../core/utils/api-error.util';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { ConfirmDialog } from '../../../../shared/components/confirm-dialog/confirm-dialog';
+import { SingleDropdownComponent, DropdownOption } from '../../../../shared/components/single-dropdown/single-dropdown';
+import { MultiDropdownComponent, MultiDropdownOption } from '../../../../shared/components/multi-dropdown/multi-dropdown';
 
 interface QuillConstructor {
   new(
@@ -53,6 +56,8 @@ export interface TranslationCreationResult {
     FormsModule,
     TranslatePipe,
     ConfirmDialog,
+    SingleDropdownComponent,
+    MultiDropdownComponent,
   ],
   templateUrl: './create-post.html',
   styleUrl: './create-post.css',
@@ -66,6 +71,9 @@ export class CreatePost implements OnInit {
 
   protected readonly translation =
     inject(TranslationService);
+
+  protected readonly router =
+    inject(Router);
 
   readonly options =
     signal<BlogOwnerOptions | null>(null);
@@ -402,8 +410,51 @@ export class CreatePost implements OnInit {
   }
 
   /* =======================================================
-     LANGUAGE
+     LANGUAGE & CATEGORY DROPDOWN OPTIONS
      ======================================================= */
+
+  readonly sourceLanguageOptions = computed<DropdownOption[]>(() => {
+    return this.languages().map((language) => ({
+      label: `${language.flag || '🌐'} ${this.languageDisplayName(language)} (${language.code.toUpperCase()})`,
+      value: language.id,
+    }));
+  });
+
+  readonly translationLanguageOptions = computed<MultiDropdownOption[]>(() => {
+    return this.availableTranslationLanguages().map((language) => ({
+      label: `${language.flag || '🌐'} ${this.languageDisplayName(language)} (${language.code.toUpperCase()})`,
+      value: language.id,
+    }));
+  });
+
+  readonly categoryOptions = computed<MultiDropdownOption[]>(() => {
+    return this.categoriesForSourceLanguage().map((category) => ({
+      label: category.name,
+      value: category.id,
+    }));
+  });
+
+  onTranslationLanguageSelectionChange(newIds: any[]): void {
+    if (this.formLocked()) {
+      return;
+    }
+
+    const numericIds = newIds.map(Number);
+    const sourceId = this.originalLanguageId();
+
+    if (sourceId !== null && numericIds.includes(sourceId)) {
+      this.toast.warning(
+        this.tr('post_form.source_cannot_be_target'),
+        this.tr('common.invalid')
+      );
+      this.selectedTranslationLanguageIds.set(
+        numericIds.filter((id) => id !== sourceId)
+      );
+      return;
+    }
+
+    this.selectedTranslationLanguageIds.set(numericIds);
+  }
 
   languages(): BlogOwnerLanguage[] {
     return (
@@ -941,6 +992,32 @@ export class CreatePost implements OnInit {
      FILE
      ======================================================= */
 
+  readonly hasThumbnail = computed<boolean>(() => {
+    return !!(
+      this.thumbnailFile() ||
+      this.thumbnailPreviewUrl() ||
+      this.existingThumbnailUrl()
+    );
+  });
+
+  removeThumbnail(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    if (this.formLocked()) {
+      return;
+    }
+    this.thumbnailFile.set(null);
+    this.thumbnailPreviewUrl.set(null);
+    this.existingThumbnailUrl.set(null);
+
+    const input = document.getElementById('thumbnail') as HTMLInputElement;
+    if (input) {
+      input.value = '';
+    }
+  }
+
   onThumbnailSelected(
     event: Event,
   ): void {
@@ -1020,6 +1097,8 @@ export class CreatePost implements OnInit {
     if (this.formLocked()) {
       return;
     }
+
+     this.addManualHashtags();
 
     const request =
       this.buildCreateRequest(
@@ -1116,6 +1195,7 @@ export class CreatePost implements OnInit {
         ),
         5000,
       );
+      await this.router.navigate(['/dashboard/owner/posts']);
     } catch (error: unknown) {
       this.toast.error(
         getApiErrorMessage(error),

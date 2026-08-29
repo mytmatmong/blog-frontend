@@ -24,48 +24,21 @@
 
   <!-- FILTER -->
   <article class="filter-panel" [attr.aria-label]="'common.search' | translate">
-    <div class="filter-grid">
-      <label class="search-field">
-        <i class="bi bi-search"></i>
+    <div class="filter-grid flex flex-wrap items-center gap-3">
+      <div class="flex-1 min-w-[240px]">
+        <app-text-search
+          [value]="search()"
+          (searchChange)="search.set($event)"
+          [placeholder]="'posts.search_placeholder' | translate"
+        />
+      </div>
 
-        <input type="search" [value]="search()" (input)="onSearchInput($event)" (keydown)="onSearchKeydown($event)"
-          [placeholder]="'posts.search_placeholder' | translate">
-
-        @if (search()) {
-        <button type="button" class="search-field__clear" (click)="clearFilters()"
-          [attr.aria-label]="'common.clear_search' | translate">
-          <i class="bi bi-x-lg"></i>
-        </button>
-        }
-      </label>
-
-      <label class="select-field">
-        <i class="bi bi-ui-checks"></i>
-
-        <select [value]="statusFilter()" (change)="onStatusChange($event)">
-          <option value="">
-            {{ 'posts.all_statuses' | translate }}
-          </option>
-
-          <option value="DRAFT">
-            {{ 'post_status.draft' | translate }}
-          </option>
-
-          <option value="PENDING_REVIEW">
-            {{ 'post_status.pending_review' | translate }}
-          </option>
-
-          <option value="PUBLISH">
-            {{ 'post_status.publish' | translate }}
-          </option>
-
-          <option value="REJECT">
-            {{ 'post_status.reject' | translate }}
-          </option>
-        </select>
-
-        <i class="bi bi-chevron-down select-field__arrow"></i>
-      </label>
+      <app-single-dropdown
+        [options]="statusOptions()"
+        [value]="statusFilter()"
+        (selectionChange)="onStatusChange($event)"
+        [placeholder]="'posts.all_statuses' | translate"
+      />
 
       <app-icon-button
         icon="bi bi-search"
@@ -187,9 +160,7 @@
 
             <!-- LANGUAGE -->
             <td>
-              <app-badge color="blue" shape="pill" size="sm">
-                {{ languageLabel(post) }}
-              </app-badge>
+              <app-language-badges [languages]="getPostLanguages(post)" />
             </td>
 
             <!-- STATUS -->
@@ -279,7 +250,7 @@
     </div>
 
     <!-- PAGINATION -->
-    @if (totalPages() > 1) {
+    @if (!isLoading() && posts().length > 0) {
     <nav class="posts-pagination" [attr.aria-label]="
           'pagination.nav_label' | translate
         ">
@@ -288,33 +259,60 @@
       </span>
 
       <div class="posts-pagination__buttons flex items-center space-x-1">
-        <app-text-button
-          variant="secondary"
+        <!-- Trang đầu << -->
+        <app-icon-button
+          icon="bi bi-chevron-double-left"
+          color="primary"
+          variant="soft"
+          size="sm"
+          [disabled]="currentPage() === 1 || isLoading()"
+          (btnClick)="setPage(1)"
+        />
+
+        <!-- Trang trước < -->
+        <app-icon-button
+          icon="bi bi-chevron-left"
+          color="primary"
+          variant="soft"
           size="sm"
           [disabled]="currentPage() === 1 || isLoading()"
           (btnClick)="setPage(currentPage() - 1)"
-        >
-          <i class="bi bi-chevron-left mr-1"></i> {{ 'pagination.prev' | translate }}
-        </app-text-button>
+        />
 
-        @for (page of pageNumbers(); track page) {
-          <app-text-button
-            [variant]="currentPage() === page ? 'primary' : 'secondary'"
-            size="sm"
-            (btnClick)="setPage(page)"
-          >
-            {{ page }}
-          </app-text-button>
+        <!-- Các trang & Dấu 3 chấm -->
+        @for (item of pageItems(); track $index) {
+          @if (item.type === 'page') {
+            <app-text-button
+              [variant]="currentPage() === item.value ? 'primary' : 'secondary'"
+              size="sm"
+              (btnClick)="setPage(item.value!)"
+            >
+              {{ item.value }}
+            </app-text-button>
+          } @else {
+            <span class="px-2 text-xs font-bold text-gray-500">...</span>
+          }
         }
 
-        <app-text-button
-          variant="secondary"
+        <!-- Trang sau > -->
+        <app-icon-button
+          icon="bi bi-chevron-right"
+          color="primary"
+          variant="soft"
           size="sm"
           [disabled]="currentPage() === totalPages() || isLoading()"
           (btnClick)="setPage(currentPage() + 1)"
-        >
-          {{ 'pagination.next' | translate }} <i class="bi bi-chevron-right ml-1"></i>
-        </app-text-button>
+        />
+
+        <!-- Trang cuối >> -->
+        <app-icon-button
+          icon="bi bi-chevron-double-right"
+          color="primary"
+          variant="soft"
+          size="sm"
+          [disabled]="currentPage() === totalPages() || isLoading()"
+          (btnClick)="setPage(totalPages())"
+        />
       </div>
     </nav>
     }

@@ -1,0 +1,96 @@
+<div class="relative inline-block text-left" [class]="minWidth()">
+  <!-- Label bên trên nếu có -->
+  @if (label()) {
+    <label class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">
+      {{ label() }}
+    </label>
+  }
+
+  <!-- Trigger Button -->
+  <button
+    type="button"
+    (click)="toggleOpen()"
+    [disabled]="disabled()"
+    class="w-full px-3.5 py-2 rounded-xl text-sm border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 text-aquamarine-950 dark:text-aquamarine-50 flex items-center justify-between gap-2 shadow-2xs hover:border-aquamarine-300 dark:hover:border-aquamarine-700 focus:outline-none focus:ring-2 focus:ring-aquamarine-500 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+  >
+    <span class="truncate font-medium text-sm">
+      {{ triggerText() }}
+    </span>
+
+    <div class="flex items-center gap-1.5 shrink-0">
+      @if (values().length > 0) {
+        <span
+          class="px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-aquamarine-600 text-white"
+        >
+          {{ values().length }}
+        </span>
+      }
+      <i
+        class="bi bi-chevron-down text-xs text-aquamarine-500 transition-transform duration-200"
+        [class.rotate-180]="isOpen()"
+      ></i>
+    </div>
+  </button>
+
+  <!-- Dropdown Menu Popover -->
+  @if (isOpen()) {
+    <div
+      class="absolute right-0 left-0 mt-1.5 z-50 min-w-full w-max max-w-[360px] rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-xl p-1.5 space-y-1 backdrop-blur-md"
+    >
+      <!-- Quick Actions (Tất cả / Bỏ chọn) -->
+      <div
+        class="flex items-center justify-between pb-1.5 px-2 border-b border-aquamarine-100 dark:border-aquamarine-800 text-xs"
+      >
+        <button
+          type="button"
+          (click)="selectAll()"
+          class="text-aquamarine-600 dark:text-aquamarine-400 hover:underline font-semibold cursor-pointer"
+        >
+          Chọn tất cả
+        </button>
+        <button
+          type="button"
+          (click)="clearAll()"
+          class="text-rose-500 hover:underline font-semibold cursor-pointer"
+        >
+          Bỏ chọn
+        </button>
+      </div>
+
+      <!-- Option Items with Checkboxes -->
+      <div class="max-h-60 overflow-y-auto space-y-0.5 pt-0.5">
+        @for (opt of options(); track opt.value) {
+          <label
+            (click)="toggleSelect(opt.value)"
+            class="w-full px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2.5 transition-colors cursor-pointer select-none"
+            [class.bg-aquamarine-50]="isSelected(opt.value)"
+            [class.dark:bg-aquamarine-950]="isSelected(opt.value)"
+            [class.text-aquamarine-950]="isSelected(opt.value)"
+            [class.dark:text-aquamarine-50]="isSelected(opt.value)"
+            [class.font-semibold]="isSelected(opt.value)"
+            [class.hover:bg-aquamarine-50\/60]="!isSelected(opt.value)"
+            [class.dark:hover:bg-aquamarine-800\/50]="!isSelected(opt.value)"
+            [class.text-aquamarine-800]="!isSelected(opt.value)"
+            [class.dark:text-aquamarine-200]="!isSelected(opt.value)"
+          >
+            <!-- Checkbox Box bên trái -->
+            @if (isSelected(opt.value)) {
+              <span class="w-4 h-4 rounded bg-aquamarine-600 dark:bg-aquamarine-500 text-white flex items-center justify-center shrink-0 shadow-2xs">
+                <i class="bi bi-check-lg text-xs font-bold"></i>
+              </span>
+            } @else {
+              <span class="w-4 h-4 rounded border border-aquamarine-300 dark:border-aquamarine-600 bg-white dark:bg-aquamarine-950 shrink-0"></span>
+            }
+
+            <span class="truncate flex-1">
+              @if (opt.icon) {
+                <i [class]="opt.icon" class="mr-1.5"></i>
+              }
+              {{ opt.label }}
+            </span>
+          </label>
+        }
+      </div>
+    </div>
+  }
+</div>

@@ -1,6 +1,7 @@
 <section class="space-y-6">
   <!-- Filter & Search Toolbar -->
-  <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 p-4 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
+  <div
+    class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 p-4 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm">
     <!-- Status Filter Tabs -->
     <div class="flex items-center gap-1 overflow-x-auto p-1 rounded-xl bg-aquamarine-50 dark:bg-aquamarine-950 border border-aquamarine-200 dark:border-aquamarine-800">
       <app-icon-button
@@ -33,24 +34,12 @@
     </div>
 
     <!-- Search Input -->
-    <div class="relative flex-1 max-w-xs">
-      <input
-        type="text"
-        [(ngModel)]="searchQuery"
-        (keyup.enter)="onSearch()"
+    <div class="max-w-xs flex-1">
+      <app-text-search
+        [value]="searchQuery()"
+        (searchChange)="searchQuery.set($event); onSearch()"
         [placeholder]="'moderator.search_blog_placeholder' | translate"
-        class="w-full pl-9 pr-8 py-2 rounded-xl text-xs border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500"
       />
-      <i class="bi bi-search absolute left-3 top-2.5 text-aquamarine-500 text-xs"></i>
-      @if (searchQuery()) {
-        <button
-          type="button"
-          (click)="clearSearch()"
-          class="absolute right-2.5 top-2 text-aquamarine-400 hover:text-aquamarine-600 dark:hover:text-aquamarine-200"
-        >
-          <i class="bi bi-x-circle-fill text-xs"></i>
-        </button>
-      }
     </div>
   </div>
 
@@ -170,11 +159,9 @@
 
               <!-- Language & Categories -->
               <td class="p-4 text-aquamarine-800 dark:text-aquamarine-200">
-                <div class="flex flex-col gap-1 text-xs">
-                  <span class="inline-flex items-center gap-1 font-medium">
-                    <span>{{ blog.language.flag || '🌐' }}</span>
-                    <span>{{ blog.language.name }}</span>
-                  </span>
+                <div class="flex flex-col gap-1.5 text-xs">
+                  <app-language-badges [languages]="getPostLanguages(blog)" />
+
                   @if (blog.categories && blog.categories.length > 0) {
                     <div class="flex flex-wrap gap-1">
                       @for (cat of blog.categories; track cat.id) {
@@ -249,42 +236,77 @@
     </div>
 
     <!-- Pagination -->
-    @if (meta() && (meta()?.totalPages || 0) > 1) {
+    @if (meta() && (meta()?.totalItems || 0) > 0) {
       <div class="mt-6 flex justify-between items-center text-xs text-aquamarine-700 dark:text-aquamarine-300">
         <div>
           {{ 'moderator.showing' | translate }} <strong>{{ meta()?.itemCount }}</strong> / <strong>{{ meta()?.totalItems }}</strong> {{ 'moderator.posts_unit' | translate }}
         </div>
         <ul class="inline-flex items-center space-x-1 text-sm">
+          <!-- Trang đầu << -->
           <li>
-            <app-text-button
-              variant="secondary"
+            <app-icon-button
+              icon="bi bi-chevron-double-left"
+              color="primary"
+              variant="soft"
+              size="sm"
+              [disabled]="currentPage() === 1"
+              (btnClick)="setPage(1)"
+            />
+          </li>
+          <!-- Trang trước < -->
+          <li>
+            <app-icon-button
+              icon="bi bi-chevron-left"
+              color="primary"
+              variant="soft"
               size="sm"
               [disabled]="currentPage() === 1"
               (btnClick)="setPage(currentPage() - 1)"
-            >
-              {{ 'pagination.prev' | translate }}
-            </app-text-button>
+            />
           </li>
-          @for (p of pageNumbers(); track p) {
-            <li>
-              <app-text-button
-                [variant]="currentPage() === p ? 'primary' : 'secondary'"
-                size="sm"
-                (btnClick)="setPage(p)"
-              >
-                {{ p }}
-              </app-text-button>
-            </li>
+
+          <!-- Các trang & Dấu 3 chấm -->
+          @for (item of pageItems(); track $index) {
+            @if (item.type === 'page') {
+              <li>
+                <app-text-button
+                  [variant]="currentPage() === item.value ? 'primary' : 'secondary'"
+                  size="sm"
+                  (btnClick)="setPage(item.value!)"
+                >
+                  {{ item.value }}
+                </app-text-button>
+              </li>
+            } @else {
+              <li>
+                <span class="inline-flex min-w-6 h-8 items-center justify-center text-xs font-bold text-aquamarine-500 select-none">
+                  ...
+                </span>
+              </li>
+            }
           }
+
+          <!-- Trang sau > -->
           <li>
-            <app-text-button
-              variant="secondary"
+            <app-icon-button
+              icon="bi bi-chevron-right"
+              color="primary"
+              variant="soft"
               size="sm"
               [disabled]="currentPage() === (meta()?.totalPages || 1)"
               (btnClick)="setPage(currentPage() + 1)"
-            >
-              {{ 'pagination.next' | translate }}
-            </app-text-button>
+            />
+          </li>
+          <!-- Trang cuối >> -->
+          <li>
+            <app-icon-button
+              icon="bi bi-chevron-double-right"
+              color="primary"
+              variant="soft"
+              size="sm"
+              [disabled]="currentPage() === (meta()?.totalPages || 1)"
+              (btnClick)="setPage(meta()?.totalPages || 1)"
+            />
           </li>
         </ul>
       </div>
@@ -292,56 +314,59 @@
   }
 </section>
 
-<app-owner-post-preview
-  [post]="activePreviewPost()"
-  [showEdit]="false"
-  [loadDetails]="false"
-  [showModerationActions]="true"
-  [moderationBusy]="actionLoading()"
-  (closed)="closePreviewBlog()"
-  (approveRequested)="approveBlog(activePreviewBlog()!)"
-  (rejectRequested)="setRejectBlog(activePreviewBlog()!); closePreviewBlog()"
-/>
+<app-owner-post-preview [post]="activePreviewPost()" [showEdit]="false" [loadDetails]="false" [externalLoadingPostId]="
+    loadingPreviewPostId()
+  " [showModerationActions]="true" [moderationBusy]="actionLoading()" (languageRequested)="
+    loadPreviewVersion($event)
+  " (closed)="closePreviewBlog()" (approveRequested)="
+    approveBlog(activePreviewBlog()!)
+  " (rejectRequested)="
+    setRejectBlog(activePreviewBlog()!);
+    closePreviewBlog()
+  " />
 
 <!-- Modal Từ chối bài viết (API M05) -->
 @if (activeRejectBlog(); as blog) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-    <div class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-md p-6">
-      <div class="flex justify-between items-center mb-4">
-        <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">{{ 'modal.reject_title' | translate }}</h5>
-        <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer" (click)="closeRejectModal()">
-          <i class="bi bi-x-lg text-lg"></i>
-        </button>
-      </div>
-      <form (submit)="$event.preventDefault(); submitReject()" class="space-y-4">
-        <p class="text-xs text-aquamarine-700 dark:text-aquamarine-300">
-          {{ 'moderator.reject_blog_confirm_prefix' | translate }} <strong class="text-aquamarine-950 dark:text-aquamarine-50">{{ blog.title }}</strong>
-        </p>
-        <div>
-          <label for="rejectReason" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'table.reason' | translate }}</label>
-          <textarea class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 p-3 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" id="rejectReason" name="reason" [(ngModel)]="rejectReason" rows="3" [placeholder]="'modal.reject_placeholder' | translate" required></textarea>
-        </div>
-        <div class="flex justify-end gap-3 pt-2">
-          <app-text-button
-            variant="secondary"
-            size="md"
-            (btnClick)="closeRejectModal()"
-          >
-            {{ 'modal.cancel' | translate }}
-          </app-text-button>
-          <app-icon-button
-            icon="bi bi-x-circle"
-            color="red"
-            variant="solid"
-            size="md"
-            type="submit"
-            [loading]="actionLoading()"
-            [disabled]="actionLoading() || !rejectReason.trim()"
-          >
-            {{ 'modal.confirm' | translate }}
-          </app-icon-button>
-        </div>
-      </form>
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+  <div
+    class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-md p-6">
+    <div class="flex justify-between items-center mb-4">
+      <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">{{ 'modal.reject_title' | translate }}
+      </h5>
+      <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"
+        (click)="closeRejectModal()">
+        <i class="bi bi-x-lg text-lg"></i>
+      </button>
     </div>
+    <form (submit)="$event.preventDefault(); submitReject()" class="space-y-4">
+      <p class="text-xs text-aquamarine-700 dark:text-aquamarine-300">
+        {{ 'moderator.reject_blog_confirm_prefix' | translate }} <strong class="text-aquamarine-950 dark:text-aquamarine-50">{{ blog.title }}</strong>
+      </p>
+      <div>
+        <label for="rejectReason" class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1">{{ 'table.reason' | translate }}</label>
+        <textarea class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 p-3 text-sm text-aquamarine-950 dark:text-aquamarine-50 placeholder-aquamarine-400 focus:outline-none focus:ring-2 focus:ring-aquamarine-500" id="rejectReason" name="reason" [(ngModel)]="rejectReason" rows="3" [placeholder]="'modal.reject_placeholder' | translate" required></textarea>
+      </div>
+      <div class="flex justify-end gap-3 pt-2">
+        <app-text-button
+          variant="secondary"
+          size="md"
+          (btnClick)="closeRejectModal()"
+        >
+          {{ 'modal.cancel' | translate }}
+        </app-text-button>
+        <app-icon-button
+          icon="bi bi-x-circle"
+          color="red"
+          variant="solid"
+          size="md"
+          type="submit"
+          [loading]="actionLoading()"
+          [disabled]="actionLoading() || !rejectReason.trim()"
+        >
+          {{ 'modal.confirm' | translate }}
+        </app-icon-button>
+      </div>
+    </form>
   </div>
+</div>
 }

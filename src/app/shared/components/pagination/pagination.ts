@@ -72,81 +72,58 @@ export class Pagination {
   });
 
   /**
-   * Danh sách nút cần hiển thị.
-   *
-   * Không render toàn bộ 45, 100 hay 1000 trang.
+   * Danh sách nút cần hiển thị (Tối đa 5 trang số).
    */
   readonly pageItems = computed<PaginationItem[]>(() => {
     const totalPages = this.totalPages();
-    const currentPage =
-      this.normalizedCurrentPage();
+    const currentPage = this.normalizedCurrentPage();
 
-    /**
-     * Có tối đa 7 trang thì hiện toàn bộ.
-     */
-    if (totalPages <= 7) {
-      return Array.from(
-        { length: totalPages },
-        (_, index): PaginationItem => {
-          const page = index + 1;
-
-          return {
-            type: 'page',
-            value: page,
-            key: `page-${page}`,
-          };
-        },
-      );
+    if (totalPages <= 5) {
+      return Array.from({ length: totalPages }, (_, index): PaginationItem => {
+        const page = index + 1;
+        return {
+          type: 'page',
+          value: page,
+          key: `page-${page}`,
+        };
+      });
     }
 
-    /**
-     * Đang ở đầu danh sách:
-     *
-     * 1 2 3 4 5 ... 45
-     */
-    if (currentPage <= 4) {
-      return [
-        this.createPageItem(1),
-        this.createPageItem(2),
-        this.createPageItem(3),
-        this.createPageItem(4),
-        this.createPageItem(5),
-        this.createEllipsisItem('right'),
-        this.createPageItem(totalPages),
-      ];
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = startPage + 4;
+
+    if (endPage > totalPages) {
+      endPage = totalPages;
+      startPage = Math.max(1, endPage - 4);
     }
 
-    /**
-     * Đang ở cuối danh sách:
-     *
-     * 1 ... 41 42 43 44 45
-     */
-    if (currentPage >= totalPages - 3) {
-      return [
-        this.createPageItem(1),
-        this.createEllipsisItem('left'),
-        this.createPageItem(totalPages - 4),
-        this.createPageItem(totalPages - 3),
-        this.createPageItem(totalPages - 2),
-        this.createPageItem(totalPages - 1),
-        this.createPageItem(totalPages),
-      ];
+    const items: PaginationItem[] = [];
+
+    if (startPage > 1) {
+      items.push({
+        type: 'ellipsis',
+        value: null,
+        key: 'ellipsis-left',
+      });
     }
 
-    /**
-     * Đang ở giữa:
-     *
-     * 1 ... 22 23 24 ... 45
-     */
-    return [
-      this.createPageItem(1),
-      this.createEllipsisItem('left'),
-      this.createPageItem(currentPage - 1),
-      this.createPageItem(currentPage),
-      this.createPageItem(currentPage + 1),
-      this.createEllipsisItem('right'),
-      this.createPageItem(totalPages),
-    ];
+    for (let page = startPage; page <= endPage; page++) {
+      items.push({
+        type: 'page',
+        value: page,
+        key: `page-${page}`,
+      });
+    }
+
+    if (endPage < totalPages) {
+      items.push({
+        type: 'ellipsis',
+        value: null,
+        key: 'ellipsis-right',
+      });
+    }
+
+    return items;
   });
 
   goToPage(page: number): void {
@@ -163,33 +140,10 @@ export class Pagination {
   }
 
   goToItem(item: PaginationItem): void {
-    if (
-      item.type !== 'page' ||
-      item.value === null
-    ) {
+    if (item.type !== 'page' || item.value === null) {
       return;
     }
 
     this.goToPage(item.value);
-  }
-
-  private createPageItem(
-    page: number,
-  ): PaginationItem {
-    return {
-      type: 'page',
-      value: page,
-      key: `page-${page}`,
-    };
-  }
-
-  private createEllipsisItem(
-    position: 'left' | 'right',
-  ): PaginationItem {
-    return {
-      type: 'ellipsis',
-      value: null,
-      key: `ellipsis-${position}`,
-    };
   }
 }

@@ -26,6 +26,11 @@ interface ApiLanguageRecord {
   isDefault: boolean;
 }
 
+const DEFAULT_LANGUAGES: LanguageOption[] = [
+  { id: 1, code: 'VI', name: 'Tiếng Việt', flag: '🇻🇳', isDefault: true },
+  { id: 2, code: 'EN', name: 'English', flag: '🇺🇸', isDefault: false },
+];
+
 @Injectable({
   providedIn: 'root',
 })
@@ -35,7 +40,7 @@ export class TranslationService {
   private languagesRequested = false;
 
   currentLang = signal<SupportedLang>('VI');
-  readonly languages = signal<LanguageOption[]>([]);
+  readonly languages = signal<LanguageOption[]>(DEFAULT_LANGUAGES);
   readonly languagesLoading = signal(false);
   readonly languagesLoadError = signal(false);
 
@@ -374,6 +379,19 @@ export class TranslationService {
       'filter.status.published': 'Đã xuất bản',
       'filter.status.rejected': 'Từ chối',
       'filter.status.resolved': 'Đã xử lý',
+      'filter.status.all': 'Tất cả trạng thái',
+      'filter.status.draft': 'Nháp',
+
+      'dropdown.select_multiple': 'Chọn nhiều mục...',
+      'dropdown.select_single': 'Chọn một lựa chọn...',
+      'dropdown.selected_count': 'Đã chọn {count} mục',
+      'search.placeholder': 'Tìm kiếm...',
+
+      'users.role_all': 'Tất cả vai trò',
+      'users.all_roles': 'Tất cả vai trò',
+      'users.all_statuses': 'Tất cả trạng thái',
+      'status.active_title': 'Hoạt động',
+      'status.locked_title': 'Đã khóa',
 
       'role.normal': 'Người dùng thông thường',
       'role.blog_owner': 'Tác giả bài viết',
@@ -472,10 +490,10 @@ export class TranslationService {
       'moderator.reject_reason_label': 'Lý do bác bỏ (Tối đa 1000 ký tự)',
       'moderator.reject_reason_placeholder': 'Nhập lý do bác bỏ...',
       'moderator.confirm_reject': 'Xác nhận Bác bỏ',
-      'moderator.target_all': 'Tất cả loại (Bài / Bình luận)',
-      'moderator.target_post': 'Báo cáo Bài viết (POST)',
-      'moderator.target_comment': 'Báo cáo Bình luận (COMMENT)',
-      'moderator.reason_all': 'Tất cả lý do vi phạm',
+      'moderator.target_all': 'Tất cả đối tượng',
+      'moderator.target_post': 'Bài viết',
+      'moderator.target_comment': 'Bình luận',
+      'moderator.reason_all': 'Tất cả lý do',
 
       'report.reason.SPAM': 'Spam / Quảng cáo',
       'report.reason.HARASSMENT': 'Xúc phạm / Bắt nạt',
@@ -503,8 +521,6 @@ export class TranslationService {
       'action.delete_user_title': 'Xóa mềm người dùng',
 
       'users.search_placeholder': 'Tìm kiếm username hoặc email...',
-      'users.all_roles': 'Tất cả vai trò',
-      'users.all_statuses': 'Tất cả trạng thái',
       'users.clear_filters': 'Xóa lọc',
       'users.loading': 'Đang tải danh sách người dùng...',
       'users.empty': 'Không tìm thấy người dùng phù hợp với điều kiện tìm kiếm.',
@@ -1129,6 +1145,19 @@ export class TranslationService {
       'filter.status.published': 'Published',
       'filter.status.rejected': 'Rejected',
       'filter.status.resolved': 'Resolved',
+      'filter.status.all': 'All Statuses',
+      'filter.status.draft': 'Draft',
+
+      'dropdown.select_multiple': 'Select items...',
+      'dropdown.select_single': 'Select an option...',
+      'dropdown.selected_count': '{count} selected',
+      'search.placeholder': 'Search...',
+
+      'users.role_all': 'All Roles',
+      'users.all_roles': 'All Roles',
+      'users.all_statuses': 'All Statuses',
+      'status.active_title': 'Active',
+      'status.locked_title': 'Locked',
 
       'role.normal': 'Normal User',
       'role.blog_owner': 'Blog Owner',
@@ -1227,10 +1256,10 @@ export class TranslationService {
       'moderator.reject_reason_label': 'Rejection reason (Max 1000 chars)',
       'moderator.reject_reason_placeholder': 'Enter rejection reason...',
       'moderator.confirm_reject': 'Confirm Rejection',
-      'moderator.target_all': 'All Targets (Post / Comment)',
-      'moderator.target_post': 'Post Reports (POST)',
-      'moderator.target_comment': 'Comment Reports (COMMENT)',
-      'moderator.reason_all': 'All Violation Reasons',
+      'moderator.target_all': 'All Targets',
+      'moderator.target_post': 'Post',
+      'moderator.target_comment': 'Comment',
+      'moderator.reason_all': 'All Reasons',
 
       'report.reason.SPAM': 'Spam / Advertising',
       'report.reason.HARASSMENT': 'Harassment / Bullying',
@@ -1258,8 +1287,6 @@ export class TranslationService {
       'action.delete_user_title': 'Soft delete user',
 
       'users.search_placeholder': 'Search username or email...',
-      'users.all_roles': 'All roles',
-      'users.all_statuses': 'All statuses',
       'users.clear_filters': 'Clear filters',
       'users.loading': 'Loading users...',
       'users.empty': 'No users match the current search criteria.',
@@ -1583,7 +1610,7 @@ export class TranslationService {
     this.getLanguagesFromApi()
       .subscribe({
         next: (languages) => {
-          const apiLanguages = languages
+          const apiLanguages = (languages || [])
             .map((language): LanguageOption => ({
               id: language.id,
               code: language.code.trim().toUpperCase(),
@@ -1592,24 +1619,31 @@ export class TranslationService {
               isDefault: language.isDefault,
             }));
 
-          this.languages.set(apiLanguages);
+          if (apiLanguages.length > 0) {
+            this.languages.set(apiLanguages);
+          } else if (this.languages().length === 0) {
+            this.languages.set(DEFAULT_LANGUAGES);
+          }
           this.languagesLoading.set(false);
 
-          if (!apiLanguages.some((language) => language.code === this.currentLang())) {
-            const defaultLanguage = languages.find(
+          const currentLangs = this.languages();
+          if (!currentLangs.some((language) => language.code === this.currentLang())) {
+            const defaultLanguage = currentLangs.find(
               (language) => language.isDefault,
             );
             const nextLanguage = defaultLanguage?.code.trim().toUpperCase();
 
             if (nextLanguage) {
               this.setLanguage(nextLanguage);
-            } else if (apiLanguages[0]) {
-              this.setLanguage(apiLanguages[0].code);
+            } else if (currentLangs[0]) {
+              this.setLanguage(currentLangs[0].code);
             }
           }
         },
         error: () => {
-          this.languages.set([]);
+          if (this.languages().length === 0) {
+            this.languages.set(DEFAULT_LANGUAGES);
+          }
           this.languagesLoading.set(false);
           this.languagesLoadError.set(true);
         },

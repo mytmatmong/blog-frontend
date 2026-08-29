@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, ElementRef, HostListener, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { TranslationService, SupportedLang } from '../../../core/services/translation.service';
@@ -14,6 +14,7 @@ export class DashboardHeader implements OnInit {
   auth = inject(AuthService);
   translationService = inject(TranslationService);
   private router = inject(Router);
+  private elementRef = inject(ElementRef);
 
   isLangDropdownOpen = signal<boolean>(false);
 
@@ -27,11 +28,19 @@ export class DashboardHeader implements OnInit {
     return Array.from(label)[0]?.toLocaleUpperCase() ?? '?';
   });
 
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.elementRef.nativeElement.contains(event.target as Node)) {
+      this.isLangDropdownOpen.set(false);
+    }
+  }
+
   ngOnInit(): void {
     this.translationService.loadLanguages();
   }
 
-  toggleLangDropdown() {
+  toggleLangDropdown(event?: MouseEvent) {
+    event?.stopPropagation();
     this.isLangDropdownOpen.update(v => !v);
   }
 

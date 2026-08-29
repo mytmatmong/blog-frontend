@@ -175,7 +175,7 @@
         }
       </div>
 
-      @if (totalPages() > 1) {
+      @if (totalItems() > 0) {
       <!-- hashtag-pagination -->
       <div class="mt-5">
         <app-pagination [totalItems]="totalItems()" [itemsPerPage]="itemsPerPage" [currentPage]="currentPage()" (currentPageChange)="onPageChange($event)">
@@ -211,7 +211,7 @@
         }
       </div>
 
-      @if (totalPages() > 1) {
+      @if (totalItems() > 0) {
       <!-- hashtag-pagination -->
       <div class="mt-5">
         <app-pagination [totalItems]="totalItems()" [itemsPerPage]="itemsPerPage" [currentPage]="currentPage()" (currentPageChange)="onPageChange($event)">

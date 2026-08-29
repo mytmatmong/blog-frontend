@@ -1,0 +1,77 @@
+<div class="relative inline-flex items-center gap-1.5 flex-wrap">
+  @for (lang of visibleLanguages(); track lang.code + '_' + $index) {
+    @if (lang.isOriginal) {
+      <span
+        class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-aquamarine-600 text-white dark:bg-aquamarine-500 shadow-2xs cursor-default transition-transform hover:scale-105"
+        [title]="('language.original' | translate) + ': ' + lang.name"
+      >
+        <span>{{ lang.flag || '🌐' }}</span>
+        <span class="uppercase">{{ lang.code }}</span>
+        <i class="bi bi-star-fill text-[9px] text-amber-300 ml-0.5"></i>
+      </span>
+    } @else {
+      <span
+        class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-aquamarine-100 dark:bg-aquamarine-800/80 text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-200 dark:border-aquamarine-700 cursor-default"
+        [title]="('language.translation' | translate) + ': ' + lang.name"
+      >
+        <span>{{ lang.flag || '🌐' }}</span>
+        <span class="uppercase">{{ lang.code }}</span>
+      </span>
+    }
+  }
+
+  @if (hiddenCount() > 0) {
+    <button
+      type="button"
+      (click)="togglePopover($event)"
+      class="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-xs font-bold bg-aquamarine-100 hover:bg-aquamarine-200 dark:bg-aquamarine-800 dark:hover:bg-aquamarine-700 text-aquamarine-700 dark:text-aquamarine-200 border border-aquamarine-300 dark:border-aquamarine-600 cursor-pointer transition-colors"
+      [title]="'posts.available_languages' | translate"
+    >
+      <span>+{{ hiddenCount() }}</span>
+      <i class="bi bi-chevron-down text-[10px] transition-transform" [class.rotate-180]="isOpen()"></i>
+    </button>
+
+    @if (isOpen()) {
+      <div
+        (click)="$event.stopPropagation()"
+        class="absolute left-0 top-full mt-1.5 z-50 min-w-[210px] p-2.5 rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-xl space-y-2 backdrop-blur-md text-xs"
+      >
+        <div class="px-1 py-0.5 border-b border-aquamarine-100 dark:border-aquamarine-800 font-semibold text-aquamarine-950 dark:text-aquamarine-50 flex items-center justify-between text-[11px]">
+          <span>{{ 'posts.available_languages' | translate }} ({{ languages().length }})</span>
+          <button type="button" (click)="isOpen.set(false)" class="text-aquamarine-400 hover:text-aquamarine-600 dark:hover:text-aquamarine-200 cursor-pointer">
+            <i class="bi bi-x-lg text-xs"></i>
+          </button>
+        </div>
+
+        <div class="space-y-1 max-h-48 overflow-y-auto pr-0.5">
+          @for (lang of languages(); track lang.code + '_' + $index) {
+            <div
+              class="flex items-center justify-between p-1.5 rounded-lg transition-colors gap-2"
+              [class.bg-aquamarine-50]="lang.isOriginal"
+              [class.dark:bg-aquamarine-950\/60]="lang.isOriginal"
+              [class.hover:bg-aquamarine-50\/80]="!lang.isOriginal"
+              [class.dark:hover:bg-aquamarine-800\/50]="!lang.isOriginal"
+            >
+              <div class="flex items-center gap-1.5 min-w-0">
+                <span class="text-sm shrink-0">{{ lang.flag || '🌐' }}</span>
+                <span class="font-medium text-aquamarine-950 dark:text-aquamarine-50 truncate">{{ lang.name }}</span>
+                <span class="font-mono text-[10px] text-aquamarine-500 uppercase shrink-0">({{ lang.code }})</span>
+              </div>
+
+              @if (lang.isOriginal) {
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-aquamarine-600 text-white dark:bg-aquamarine-500 shrink-0">
+                  <i class="bi bi-star-fill text-[9px] text-amber-300"></i>
+                  {{ 'language.original' | translate }}
+                </span>
+              } @else {
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-aquamarine-100 dark:bg-aquamarine-800 text-aquamarine-700 dark:text-aquamarine-300 shrink-0">
+                  {{ 'language.translation' | translate }}
+                </span>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+  }
+</div>

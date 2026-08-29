@@ -78,7 +78,7 @@
         <!-- header-dropdown-wrap (language) -->
         <div class="relative">
           <!-- header-control header-language -->
-          <button type="button" class="h-[36px] inline-grid place-items-center shrink-0 border border-transparent hover:border-[var(--border-color)] rounded-[9px] bg-transparent hover:bg-[var(--card-bg-muted)] text-[var(--text-muted)] hover:text-[var(--card-text-default)] cursor-pointer transition-colors duration-150 w-auto min-w-[38px] px-2 text-[13px] font-[800]" (click)="toggleLangDropdown()" [title]="ts.currentLang()">
+          <button type="button" class="h-[36px] inline-grid place-items-center shrink-0 border border-transparent hover:border-[var(--border-color)] rounded-[9px] bg-transparent hover:bg-[var(--card-bg-muted)] text-[var(--text-muted)] hover:text-[var(--card-text-default)] cursor-pointer transition-colors duration-150 w-auto min-w-[38px] px-2 text-[13px] font-[800]" (click)="toggleLangDropdown($event)" [title]="ts.currentLang()">
             <span>{{ ts.currentLang() }}</span>
           </button>
 
@@ -117,7 +117,7 @@
         <!-- header-dropdown-wrap (user profile) -->
         <div class="relative">
           <!-- header-profile -->
-          <button type="button" class="min-h-[38px] inline-flex items-center gap-[9px] py-[3px] pr-[7px] pl-[3px] border border-transparent hover:border-[var(--border-color)] rounded-[10px] bg-transparent hover:bg-[var(--card-bg-muted)] text-[var(--card-text-default)] cursor-pointer transition-colors duration-150" (click)="toggleUserDropdown()">
+          <button type="button" class="min-h-[38px] inline-flex items-center gap-[9px] py-[3px] pr-[7px] pl-[3px] border border-transparent hover:border-[var(--border-color)] rounded-[10px] bg-transparent hover:bg-[var(--card-bg-muted)] text-[var(--card-text-default)] cursor-pointer transition-colors duration-150" (click)="toggleUserDropdown($event)">
             @if (auth.currentUser()?.avatarUrl) {
             <img [src]="auth.currentUser()?.avatarUrl" [alt]="auth.currentUser()?.username" class="avatar-sm object-cover" />
             } @else {

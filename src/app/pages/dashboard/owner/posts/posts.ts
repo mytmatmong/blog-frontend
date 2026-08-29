@@ -6,7 +6,10 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import {
+  ActivatedRoute,
+  Router,
+} from '@angular/router';
 
 import {
   BlogOwnerPost,
@@ -37,11 +40,16 @@ import {
 import { BadgeComponent } from '../../../../shared/components/badge/badge';
 import { IconButtonComponent } from '../../../../shared/components/icon-button/icon-button';
 import { TextButtonComponent } from '../../../../shared/components/text-button/text-button';
+import { TextSearchComponent } from '../../../../shared/components/text-search/text-search';
+import { SingleDropdownComponent, DropdownOption } from '../../../../shared/components/single-dropdown/single-dropdown';
+import {
+  LanguageBadgesComponent,
+  PostLanguageItem,
+} from '../../../../shared/components/language-badges/language-badges';
 
 @Component({
   selector: 'app-posts',
   imports: [
-    RouterLink,
     DecimalPipe,
     TranslatePipe,
     OwnerPostPreviewComponent,
@@ -49,6 +57,9 @@ import { TextButtonComponent } from '../../../../shared/components/text-button/t
     BadgeComponent,
     IconButtonComponent,
     TextButtonComponent,
+    TextSearchComponent,
+    SingleDropdownComponent,
+    LanguageBadgesComponent,
   ],
   templateUrl: './posts.html',
   styleUrl: './posts.css',
@@ -56,8 +67,20 @@ import { TextButtonComponent } from '../../../../shared/components/text-button/t
 export class Posts implements OnInit {
   private readonly api = inject(BlogOwnerApiService);
   private readonly toast = inject(ToastService);
-  protected readonly ts = inject(TranslationService);
+  private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  protected readonly ts = inject(TranslationService);
+
+  readonly statusOptions = computed<DropdownOption[]>(() => {
+    this.ts.currentLang();
+    return [
+      { label: this.ts.translate('filter.status.all'), value: '' },
+      { label: this.ts.translate('filter.status.draft'), value: 'DRAFT' },
+      { label: this.ts.translate('filter.status.pending_review'), value: 'PENDING_REVIEW' },
+      { label: this.ts.translate('filter.status.published'), value: 'PUBLISH' },
+      { label: this.ts.translate('filter.status.rejected'), value: 'REJECT' },
+    ];
+  });
 
   readonly posts =
     signal<BlogOwnerPost[]>([]);
@@ -102,34 +125,102 @@ export class Posts implements OnInit {
 
   private postsRequestId = 0;
 
-  readonly pageNumbers = computed(() => {
+  readonly pageItems = computed(() => {
     const total = this.totalPages();
     const current = this.currentPage();
 
-    if (total <= 7) {
-      return Array.from(
-        { length: total },
-        (_, index) => index + 1,
-      );
+    if (total <= 5) {
+      return Array.from({ length: total }, (_, i) => ({ type: 'page' as const, value: i + 1 }));
     }
 
-    const start = Math.max(
-      1,
-      Math.min(
-        current - 2,
-        total - 4,
-      ),
-    );
+    let start = Math.max(1, current - 2);
+    let end = start + 4;
+    if (end > total) {
+      end = total;
+      start = Math.max(1, end - 4);
+    }
 
-    return Array.from(
-      { length: 5 },
-      (_, index) => start + index,
-    );
+    const items: Array<{ type: 'page' | 'ellipsis'; value: number | null }> = [];
+    if (start > 1) {
+      items.push({ type: 'ellipsis', value: null });
+    }
+    for (let p = start; p <= end; p++) {
+      items.push({ type: 'page', value: p });
+    }
+    if (end < total) {
+      items.push({ type: 'ellipsis', value: null });
+    }
+    return items;
   });
 
   ngOnInit(): void {
-    this.loadPosts();
-  }
+  /**
+   * URL là nguồn state cho:
+   * - page
+   * - search
+   * - status
+   *
+   * Nhờ vậy:
+   * F5 / Back / Forward vẫn giữ đúng trạng thái.
+   */
+  this.route.queryParamMap.subscribe(
+    (params) => {
+      // =====================
+      // PAGE
+      // =====================
+
+      const rawPage =
+        Number(params.get('page'));
+
+      const page =
+        Number.isInteger(rawPage) &&
+        rawPage > 0
+          ? rawPage
+          : 1;
+
+      this.currentPage.set(page);
+
+      // =====================
+      // SEARCH
+      // =====================
+
+      this.search.set(
+        params.get('search') ?? '',
+      );
+
+      // =====================
+      // STATUS
+      // =====================
+
+      const rawStatus =
+        params.get('status');
+
+      const validStatuses:
+        PostStatus[] = [
+          'DRAFT',
+          'PENDING_REVIEW',
+          'PUBLISH',
+          'REJECT',
+        ];
+
+      const status =
+        rawStatus &&
+        validStatuses.includes(
+          rawStatus as PostStatus,
+        )
+          ? (rawStatus as PostStatus)
+          : '';
+
+      this.statusFilter.set(status);
+
+      // =====================
+      // LOAD
+      // =====================
+
+      this.loadPosts();
+    },
+  );
+}
 
   loadPosts(): void {
     const requestId =
@@ -227,9 +318,19 @@ export class Posts implements OnInit {
   }
 
   applySearch(): void {
-    this.currentPage.set(1);
-    this.loadPosts();
-  }
+  const search =this.search().trim();
+
+  this.router.navigate([], {
+    relativeTo: this.route,
+
+    queryParams: {
+      page: 1,
+      search: search || null,
+    },
+
+    queryParamsHandling: 'merge',
+  });
+}
 
   onSearchKeydown(
     event: KeyboardEvent,
@@ -240,40 +341,59 @@ export class Posts implements OnInit {
     }
   }
 
-  onStatusChange(event: Event): void {
-    const value = (
-      event.target as
-      HTMLSelectElement
-    ).value;
+  onStatusChange(valueOrEvent: string | Event): void {
+    const value = typeof valueOrEvent === 'string'
+      ? valueOrEvent as PostStatus | ''
+      : (valueOrEvent.target as HTMLSelectElement).value as PostStatus | '';
 
-    this.statusFilter.set(
-      value as PostStatus | '',
-    );
+    this.router.navigate([], {
+      relativeTo: this.route,
 
-    this.currentPage.set(1);
-    this.loadPosts();
+      queryParams: {
+        page: 1,
+
+        status:
+          value || null,
+      },
+
+      queryParamsHandling: 'merge',
+    });
   }
 
   clearFilters(): void {
-    this.search.set('');
-    this.statusFilter.set('');
-    this.currentPage.set(1);
-    this.loadPosts();
-  }
+  this.router.navigate([], {
+    relativeTo: this.route,
+
+    queryParams: {
+      page: 1,
+      search: null,
+      status: null,
+    },
+
+    queryParamsHandling: 'merge',
+  });
+}
 
   setPage(page: number): void {
-    if (
-      page < 1 ||
-      page > this.totalPages() ||
-      page === this.currentPage() ||
-      this.isLoading()
-    ) {
-      return;
-    }
-
-    this.currentPage.set(page);
-    this.loadPosts();
+  if (
+    page < 1 ||
+    page > this.totalPages() ||
+    page === this.currentPage() ||
+    this.isLoading()
+  ) {
+    return;
   }
+
+  this.router.navigate([], {
+    relativeTo: this.route,
+
+    queryParams: {
+      page,
+    },
+
+    queryParamsHandling: 'merge',
+  });
+}
 
   setPreviewPost(
     post: BlogOwnerPost,
@@ -509,6 +629,43 @@ export class Posts implements OnInit {
       [...new Set(names)].join(', ') ||
       '—'
     );
+  }
+
+  getPostLanguages(post: BlogOwnerPost): PostLanguageItem[] {
+    const list: PostLanguageItem[] = [];
+
+    if (post.language) {
+      list.push({
+        id: post.language.id,
+        code: post.language.code,
+        name: post.language.name,
+        flag: post.language.flag,
+        isOriginal: post.parentPostId === null,
+        status: post.status,
+      });
+    }
+
+    if (post.translations && post.translations.length > 0) {
+      for (const t of post.translations) {
+        if (
+          t.language &&
+          !list.some(
+            (item) => item.code.toLowerCase() === t.language.code.toLowerCase(),
+          )
+        ) {
+          list.push({
+            id: t.language.id,
+            code: t.language.code,
+            name: t.language.name,
+            flag: t.language.flag,
+            isOriginal: false,
+            status: t.status,
+          });
+        }
+      }
+    }
+
+    return list;
   }
 
   languageLabel(
