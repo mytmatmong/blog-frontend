@@ -1279,10 +1279,21 @@ export class CreatePost implements OnInit {
     const title =
       this.titleModel.trim();
 
-    const content =
-      this.editor?.root
-        .innerHTML
-        .trim() ?? '';
+    const content =this.editor?.root.innerHTML.trim() ?? '';
+    
+        const MAX_CONTENT_LENGTH =30_000;
+
+    if (
+      content.length >
+      MAX_CONTENT_LENGTH
+    ) {
+      this.toast.error(
+        `Nội dung không được vượt quá ${MAX_CONTENT_LENGTH.toLocaleString()} ký tự.`,
+        'Nội dung quá dài',
+      );
+
+      return null;
+    }
 
     const categoryIds =
       this.selectedCategoryIds();
