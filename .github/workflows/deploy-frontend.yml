@@ -1,0 +1,91 @@
+name: Deploy frontend
+
+# Tự động deploy Angular SSR lên VPS mỗi khi có push vào develop.
+# Cùng chiến lược với backend: build image trên GitHub Actions runner,
+# chuyển qua VPS bằng scp + docker load, không dùng registry, không build
+# trên VPS.
+#
+# Lưu ý: container frontend nằm trong compose project của repo backend
+# (/opt/blog-api/backend/compose.prod.yml), vì cả hai chạy chung một VPS
+# đứng sau cùng một Nginx. Workflow này chỉ recreate service "frontend",
+# không đụng tới api/postgres/nginx.
+#
+# Yêu cầu secret cấp ở Settings > Secrets and variables > Actions:
+#   DEPLOY_SSH_KEY — cùng private key CI đã cấp cho repo backend (public key
+#                    tương ứng đã add vào ~/.ssh/authorized_keys trên VPS).
+
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-frontend
+  cancel-in-progress: false
+
+env:
+  DEPLOY_HOST: 103.72.57.142
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          tags: blog-frontend-runtime:ci
+          outputs: type=docker,dest=/tmp/blog-frontend-runtime.tar
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Compress image
+        run: gzip -f /tmp/blog-frontend-runtime.tar
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "${{ env.DEPLOY_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Ship image to server
+        run: |
+          scp -i ~/.ssh/deploy_key /tmp/blog-frontend-runtime.tar.gz "root@${{ env.DEPLOY_HOST }}:/tmp/"
+
+      - name: Deploy on server
+        run: |
+          ssh -i ~/.ssh/deploy_key "root@${{ env.DEPLOY_HOST }}" bash -s <<'REMOTE'
+          set -euo pipefail
+
+          gunzip -c /tmp/blog-frontend-runtime.tar.gz | docker load
+          rm -f /tmp/blog-frontend-runtime.tar.gz
+          docker tag blog-frontend-runtime:ci blog-frontend-runtime:local
+
+          cd /opt/blog-api/backend
+          API_IMAGE=blog-api-runtime:local MIGRATION_IMAGE=blog-api-migration:local FRONTEND_IMAGE=blog-frontend-runtime:local \
+            docker compose --env-file .env.production -f compose.prod.yml up -d --force-recreate frontend
+
+          status="starting"
+          for i in $(seq 1 20); do
+            status=$(docker inspect --format '{{.State.Health.Status}}' blog-backend-prod-frontend-1 2>/dev/null || echo starting)
+            [ "$status" = healthy ] && break
+            sleep 3
+          done
+          if [ "$status" != healthy ]; then
+            echo "frontend container không healthy sau deploy" >&2
+            docker logs blog-backend-prod-frontend-1 --tail 50
+            exit 1
+          fi
+
+          docker image prune -f
+          REMOTE
+
+      - name: Smoke test
+        run: curl --fail --max-time 10 "http://${{ env.DEPLOY_HOST }}/"
