@@ -734,10 +734,7 @@ export class Hashtag {
     }
 
     return date.toLocaleDateString(
-      this.currentLanguageCode() ===
-        'en'
-        ? 'en-US'
-        : 'vi-VN',
+      this.translationService.localeTag(),
       {
         day: '2-digit',
         month: '2-digit',

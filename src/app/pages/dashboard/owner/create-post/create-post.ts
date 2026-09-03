@@ -1288,8 +1288,8 @@ export class CreatePost implements OnInit {
       MAX_CONTENT_LENGTH
     ) {
       this.toast.error(
-        `Nội dung không được vượt quá ${MAX_CONTENT_LENGTH.toLocaleString()} ký tự.`,
-        'Nội dung quá dài',
+        `${this.translation.translate('post_form.content_too_long_prefix')} ${MAX_CONTENT_LENGTH.toLocaleString(this.translation.localeTag())} ${this.translation.translate('post_form.content_too_long_suffix')}`,
+        this.translation.translate('post_form.content_too_long_title'),
       );
 
       return null;

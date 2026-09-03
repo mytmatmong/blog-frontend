@@ -3,7 +3,7 @@
   <!-- site-header__inner -->
   <div class="site-container min-h-[var(--header-height)] flex flex-wrap items-center gap-[22px] px-4 border border-[var(--border-color)] rounded-[12px] bg-[color-mix(in_srgb,var(--card-bg)_94%,transparent)] shadow-[var(--shadow-sm)]">
     <!-- brand -->
-    <a class="inline-flex items-center gap-[9px] shrink-0 text-[19px] font-[850] tracking-[-0.035em] text-[var(--text-website)] hover:opacity-90 transition-opacity" routerLink="/" aria-label="Blogy home" (click)="closeAllMenus()">
+    <a class="inline-flex items-center gap-[9px] shrink-0 text-[19px] font-[850] tracking-[-0.035em] text-[var(--text-website)] hover:opacity-90 transition-opacity" routerLink="/" [attr.aria-label]="'a11y.brand_home' | translate" (click)="closeAllMenus()">
       <!-- brand__mark -->
       <span class="w-[30px] h-[30px] grid place-items-center rounded-[9px] text-white bg-[linear-gradient(145deg,#7657ff,#4d2fd8)] shadow-[0_7px_16px_rgba(93,61,242,0.24)] text-[13px]"><i class="bi bi-stars"></i></span>
       <!-- brand__text -->
@@ -16,7 +16,7 @@
       class="site-mobile-btn w-[36px] h-[36px] ml-auto place-items-center shrink-0 border border-transparent hover:border-[var(--border-color)] rounded-[9px] bg-transparent hover:bg-[var(--card-bg-muted)] text-[var(--text-muted)] hover:text-[var(--card-text-default)] text-[13px] cursor-pointer transition-colors duration-150"
       (click)="toggleMobileMenu()"
       [attr.aria-expanded]="isMobileMenuOpen()"
-      aria-label="Toggle navigation">
+      [attr.aria-label]="'a11y.toggle_nav' | translate">
       <i class="bi" [class.bi-list]="!isMobileMenuOpen()" [class.bi-x-lg]="isMobileMenuOpen()"></i>
     </button>
 
@@ -27,7 +27,7 @@
       
       @if (!isAuthPage()) {
       <!-- header-nav -->
-      <nav class="site-header-nav shrink-0 gap-1" aria-label="Primary navigation">
+      <nav class="site-header-nav shrink-0 gap-1" [attr.aria-label]="'a11y.primary_nav' | translate">
         <!-- nav-link -->
         <a
           class="relative inline-flex items-center min-h-[34px] px-[11px] rounded-[8px] text-[var(--text-muted)] hover:text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] text-[14px] font-[680] transition-colors duration-150"
@@ -62,10 +62,10 @@
           [value]="searchValue()"
           (input)="updateSearch($any($event.target).value)"
           [placeholder]="'search.placeholder_posts' | translate"
-          aria-label="Search posts" />
+          [attr.aria-label]="'search.placeholder_posts' | translate" />
         @if (searchValue()) {
         <!-- header-search__clear -->
-        <button type="button" class="absolute right-[8px] top-1/2 -translate-y-1/2 w-[26px] h-[26px] grid place-items-center border-0 rounded-[7px] bg-transparent text-[var(--text-faint)] hover:text-[var(--card-text-default)] cursor-pointer transition-colors duration-150" (click)="updateSearch('')" aria-label="Clear search">
+        <button type="button" class="absolute right-[8px] top-1/2 -translate-y-1/2 w-[26px] h-[26px] grid place-items-center border-0 rounded-[7px] bg-transparent text-[var(--text-faint)] hover:text-[var(--card-text-default)] cursor-pointer transition-colors duration-150" (click)="updateSearch('')" [attr.aria-label]="'common.clear_search' | translate">
           <i class="bi bi-x"></i>
         </button>
         }

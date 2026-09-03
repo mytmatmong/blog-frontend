@@ -10,6 +10,7 @@ import {
   signal,
 } from '@angular/core';
 import { TranslationService } from '../../../core/services/translation.service';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 export interface MultiDropdownOption {
   label: string;
@@ -20,6 +21,7 @@ export interface MultiDropdownOption {
 @Component({
   selector: 'app-multi-dropdown',
   standalone: true,
+  imports: [TranslatePipe],
   templateUrl: './multi-dropdown.html',
 })
 export class MultiDropdownComponent {
@@ -34,8 +36,8 @@ export class MultiDropdownComponent {
   /** Nhãn tiêu đề */
   readonly label = input<string>('');
 
-  /** Gợi ý khi chưa chọn */
-  readonly placeholder = input<string>('Chọn nhiều mục...');
+  /** Gợi ý khi chưa chọn (rỗng = dùng bản dịch mặc định 'dropdown.select_multiple') */
+  readonly placeholder = input<string>('');
 
   /** Trạng thái disabled */
   readonly disabled = input<boolean>(false);

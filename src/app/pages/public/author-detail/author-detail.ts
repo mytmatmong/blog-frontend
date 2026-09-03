@@ -446,10 +446,7 @@ export class AuthorDetailComponent {
     }
 
     return date.toLocaleDateString(
-      this.currentLanguageCode() ===
-        'en'
-        ? 'en-US'
-        : 'vi-VN',
+      this.translationService.localeTag(),
       {
         month: '2-digit',
         year: 'numeric',
@@ -668,10 +665,7 @@ export class AuthorDetailComponent {
     }
 
     return date.toLocaleDateString(
-      this.currentLanguageCode() ===
-        'en'
-        ? 'en-US'
-        : 'vi-VN',
+      this.translationService.localeTag(),
       {
         day: '2-digit',
         month: '2-digit',

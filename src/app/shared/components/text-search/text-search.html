@@ -27,7 +27,7 @@
       type="button"
       (click)="clearSearch()"
       class="absolute right-3 top-1/2 -translate-y-1/2 text-aquamarine-400 hover:text-aquamarine-600 dark:hover:text-aquamarine-200 transition-colors cursor-pointer"
-      title="Xóa tìm kiếm"
+      [title]="'common.clear_search' | translate"
     >
       <i class="bi bi-x-circle-fill text-xs"></i>
     </button>

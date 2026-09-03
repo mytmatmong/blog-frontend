@@ -119,7 +119,7 @@
                 @if (user.avatarUrl) {
                   <img
                     [src]="user.avatarUrl"
-                    alt="Avatar"
+                    [alt]="'profile.avatar' | translate"
                     class="w-8 h-8 rounded-full object-cover shrink-0 border border-aquamarine-200 dark:border-aquamarine-700"
                   />
                 } @else {
@@ -152,7 +152,7 @@
                 (click)="openRoleModal(user)"
                 class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
                 [className]="getRoleClass(user.role)"
-                title="Đổi vai trò"
+                [title]="'users.change_role_title' | translate"
               >
                 {{ ('role.' + user.role) | translate }} <i class="bi bi-chevron-down text-[10px]"></i>
               </button>
@@ -596,7 +596,7 @@
         <div>
           <label
             class="block text-xs font-semibold text-aquamarine-700 dark:text-aquamarine-300 mb-1"
-            >User ID / Username</label
+            >{{ 'users.id_username_label' | translate }}</label
           >
           <input
             type="text"

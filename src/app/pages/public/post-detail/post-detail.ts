@@ -495,7 +495,7 @@ export class PostDetail {
     const date = new Date(value);
     return Number.isNaN(date.getTime())
       ? ''
-      : date.toLocaleDateString(this.currentLanguageCode() === 'en' ? 'en-US' : 'vi-VN', {
+      : date.toLocaleDateString(this.translationService.localeTag(), {
           day: '2-digit',
           month: '2-digit',
           year: 'numeric',

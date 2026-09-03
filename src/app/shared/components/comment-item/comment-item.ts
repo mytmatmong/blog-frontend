@@ -3,6 +3,7 @@ import {
   EventEmitter,
   Input,
   Output,
+  inject,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
@@ -11,6 +12,7 @@ import {
   PublicComment,
 } from '../../../core/models/post.model';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { TranslationService } from '../../../core/services/translation.service';
 
 export interface CommentActionTarget {
   id: number;
@@ -30,6 +32,8 @@ export interface CommentActionTarget {
   styleUrl: './comment-item.css',
 })
 export class CommentItem {
+  private readonly ts = inject(TranslationService);
+
   @Input({ required: true }) comment!: PublicComment;
   @Input() currentUserId: number | null = null;
   @Input() isAuthenticated = false;
@@ -78,7 +82,7 @@ export class CommentItem {
     const date = new Date(dateString);
     return Number.isNaN(date.getTime())
       ? ''
-      : date.toLocaleDateString('vi-VN', {
+      : date.toLocaleDateString(this.ts.localeTag(), {
           day: '2-digit',
           month: '2-digit',
           year: 'numeric',

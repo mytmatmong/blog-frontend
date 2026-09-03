@@ -528,13 +528,11 @@ export class Home implements OnInit {
     const date = new Date(value);
 
     if (Number.isNaN(date.getTime())) {
-      return 'Gần đây';
+      return this.translationService.translate('common.recently');
     }
 
     return date.toLocaleDateString(
-      this.currentLanguageCode() === 'en'
-        ? 'en-US'
-        : 'vi-VN',
+      this.translationService.localeTag(),
       {
         day: '2-digit',
         month: '2-digit',
@@ -565,12 +563,12 @@ export class Home implements OnInit {
       }
 
       if (error.status === 0) {
-        return 'Không kết nối được tới backend.';
+        return this.translationService.translate('common.backend_unreachable');
       }
 
-      return `Không tải được bài viết. HTTP ${error.status}.`;
+      return `${this.translationService.translate('home.load_posts_http_error_prefix')} HTTP ${error.status}.`;
     }
 
-    return 'Có lỗi xảy ra khi tải bài viết.';
+    return this.translationService.translate('post.load_error');
   }
 }

@@ -156,27 +156,25 @@ export class ManageBlogs implements OnInit {
             this.posts.set(res.data.items);
             this.meta.set(res.data.meta);
           } else {
-            this.error.set('Không thể tải danh sách bài viết.');
+            this.error.set(this.ts.translate('moderator.load_blogs_error'));
           }
         },
         error: (err) => {
           this.loading.set(false);
           if (err?.status === 403) {
             this.isForbidden.set(true);
-            this.error.set(
-              'Tài khoản hiện tại không có quyền CONTENT_MODERATOR. Backend yêu cầu tài khoản phải có vai trò Moderator để truy cập danh sách kiểm duyệt.',
-            );
-            this.toast.show('error', '403 Forbidden', 'Yêu cầu tài khoản Content Moderator');
+            this.error.set(this.ts.translate('moderator.forbidden_error_desc'));
+            this.toast.show('error', this.ts.translate('moderator.forbidden_toast_title'), this.ts.translate('moderator.forbidden_toast_desc'));
           } else {
-            const errMsg = err?.error?.message || 'Lỗi khi lấy danh sách bài viết kiểm duyệt.';
+            const errMsg = err?.error?.message || this.ts.translate('moderator.load_blogs_api_error');
             this.error.set(
               typeof errMsg === 'string'
                 ? errMsg
                 : Array.isArray(errMsg)
                 ? errMsg.join(', ')
-                : 'Lỗi kết nối.',
+                : this.ts.translate('common.connection_error'),
             );
-            this.toast.show('error', 'Lỗi', 'Không thể tải danh sách bài viết');
+            this.toast.show('error', this.ts.translate('common.error'), this.ts.translate('moderator.cannot_load_blogs'));
           }
         },
       });
@@ -336,16 +334,16 @@ loadPreviewVersion(postId: number) {
 
         const errMsg =
           err?.error?.message ||
-          'Không thể lấy chi tiết phiên bản bài viết.';
+          this.ts.translate('moderator.load_version_detail_error');
 
         this.toast.show(
           'error',
-          'Lỗi',
+          this.ts.translate('common.error'),
           typeof errMsg === 'string'
             ? errMsg
             : Array.isArray(errMsg)
               ? errMsg.join(', ')
-              : 'Lỗi kết nối.',
+              : this.ts.translate('common.connection_error'),
         );
       },
     });
@@ -441,7 +439,7 @@ loadPreviewVersion(postId: number) {
 
   if (
     confirm(
-      `Bạn có chắc chắn muốn duyệt bài viết "${blog.title}" và tất cả bản dịch?`,
+      `${this.ts.translate('moderator.approve_confirm_prefix')} "${blog.title}" ${this.ts.translate('moderator.approve_confirm_suffix')}`,
     )
   ) {
     this.actionLoading.set(true);
@@ -452,7 +450,7 @@ loadPreviewVersion(postId: number) {
         next: (res) => {
           this.actionLoading.set(false);
           if (res.success) {
-            this.toast.show('success', 'Thành công', `Đã duyệt bài viết "${blog.title}" thành công.`);
+            this.toast.show('success', this.ts.translate('common.success'), `${this.ts.translate('moderator.approve_success_prefix')} "${blog.title}" ${this.ts.translate('moderator.approve_success_suffix')}`);
             this.closePreviewBlog();
             if (this.activePreviewBlog()?.id === blog.id) {
               this.activePreviewBlog.set(res.data);
@@ -462,9 +460,9 @@ loadPreviewVersion(postId: number) {
         },
         error: (err) => {
           this.actionLoading.set(false);
-          const errMsg = err?.error?.message || 'Không thể duyệt bài viết.';
-          const messageStr = typeof errMsg === 'string' ? errMsg : Array.isArray(errMsg) ? errMsg.join(', ') : 'Lỗi xử lý.';
-          this.toast.show('error', 'Lỗi duyệt bài viết', messageStr);
+          const errMsg = err?.error?.message || this.ts.translate('moderator.approve_error');
+          const messageStr = typeof errMsg === 'string' ? errMsg : Array.isArray(errMsg) ? errMsg.join(', ') : this.ts.translate('common.processing_error');
+          this.toast.show('error', this.ts.translate('moderator.approve_error_title'), messageStr);
         },
       });
     }
@@ -473,7 +471,7 @@ loadPreviewVersion(postId: number) {
   submitReject() {
     const reason = this.rejectReason.trim();
     if (!reason) {
-      this.toast.show('warning', 'Cảnh báo', 'Vui lòng nhập lý do từ chối bài viết');
+      this.toast.show('warning', this.ts.translate('common.warning'), this.ts.translate('moderator.reject_reason_required'));
       return;
     }
 
@@ -492,7 +490,7 @@ this.moderatorApiService.rejectPost(
         next: (res) => {
           this.actionLoading.set(false);
           if (res.success) {
-            this.toast.show('success', 'Thành công', `Đã từ chối bài viết "${blog.title}".`);
+            this.toast.show('success', this.ts.translate('common.success'), `${this.ts.translate('moderator.reject_success_prefix')} "${blog.title}".`);
             if (this.activePreviewBlog()?.id === blog.id) {
               this.activePreviewBlog.set(res.data);
             }
@@ -502,9 +500,9 @@ this.moderatorApiService.rejectPost(
         },
         error: (err) => {
           this.actionLoading.set(false);
-          const errMsg = err?.error?.message || 'Không thể từ chối bài viết.';
-          const messageStr = typeof errMsg === 'string' ? errMsg : Array.isArray(errMsg) ? errMsg.join(', ') : 'Lỗi xử lý.';
-          this.toast.show('error', 'Lỗi từ chối bài viết', messageStr);
+          const errMsg = err?.error?.message || this.ts.translate('moderator.reject_error');
+          const messageStr = typeof errMsg === 'string' ? errMsg : Array.isArray(errMsg) ? errMsg.join(', ') : this.ts.translate('common.processing_error');
+          this.toast.show('error', this.ts.translate('moderator.reject_error_title'), messageStr);
         },
       });
     }

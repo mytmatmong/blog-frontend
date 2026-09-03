@@ -5,6 +5,7 @@ import { ModeratorApiService } from '../../../../core/services/moderator-api.ser
 import { ModeratorDashboardData } from '../../../../core/models/moderator-api.model';
 import { ToastService } from '../../../../core/services/toast.service';
 import { AuthService } from '../../../../core/services/auth.service';
+import { TranslationService } from '../../../../core/services/translation.service';
 
 declare var Chart: any;
 
@@ -19,6 +20,7 @@ export class ModeratorDashboard implements OnInit, OnDestroy {
   private readonly toast = inject(ToastService);
   readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly ts = inject(TranslationService);
 
   readonly loading = signal<boolean>(true);
   readonly error = signal<string | null>(null);
@@ -58,19 +60,19 @@ export class ModeratorDashboard implements OnInit, OnDestroy {
         if (response.success && response.data) {
           this.dashboardData.set(response.data);
         } else {
-          this.error.set('Không thể lấy dữ liệu Moderator Dashboard.');
+          this.error.set(this.ts.translate('moderator.load_dashboard_error'));
         }
       },
       error: (err) => {
         this.loading.set(false);
         if (err?.status === 403) {
           this.isForbidden.set(true);
-          this.error.set('Tài khoản hiện tại không có quyền CONTENT_MODERATOR. Backend yêu cầu tài khoản phải có vai trò Moderator để truy cập API này (tài khoản SUPER_ADMIN không tự động có quyền Moderator).');
-          this.toast.show('error', '403 Forbidden', 'Yêu cầu tài khoản Content Moderator');
+          this.error.set(this.ts.translate('moderator.forbidden_dashboard_desc'));
+          this.toast.show('error', this.ts.translate('moderator.forbidden_toast_title'), this.ts.translate('moderator.forbidden_toast_desc'));
         } else {
-          const errMsg = err?.error?.message || 'Lỗi khi kết nối đến máy chủ.';
-          this.error.set(typeof errMsg === 'string' ? errMsg : Array.isArray(errMsg) ? errMsg.join(', ') : 'Lỗi kết nối.');
-          this.toast.show('error', 'Lỗi', 'Không thể tải dữ liệu Moderator Dashboard');
+          const errMsg = err?.error?.message || this.ts.translate('common.backend_unreachable');
+          this.error.set(typeof errMsg === 'string' ? errMsg : Array.isArray(errMsg) ? errMsg.join(', ') : this.ts.translate('common.connection_error'));
+          this.toast.show('error', this.ts.translate('common.error'), this.ts.translate('moderator.load_dashboard_error'));
         }
       },
     });
@@ -120,13 +122,13 @@ export class ModeratorDashboard implements OnInit, OnDestroy {
           labels,
           datasets: [
             {
-              label: 'Report bài viết',
+              label: this.ts.translate('moderator.post_reports_label'),
               data: postReportsData,
               backgroundColor: '#0ea5e9',
               borderRadius: 6,
             },
             {
-              label: 'Report bình luận',
+              label: this.ts.translate('moderator.comment_reports_label'),
               data: commentReportsData,
               backgroundColor: '#f59e0b',
               borderRadius: 6,
@@ -168,12 +170,12 @@ export class ModeratorDashboard implements OnInit, OnDestroy {
     if (canvasReasonPie && data.reportReasonCounts) {
       const reasons = data.reportReasonCounts;
       const reasonLabels = [
-        'Spam',
-        'Quấy rối',
-        'Không phù hợp',
-        'Bản quyền',
-        'Thông tin sai lệch',
-        'Khác',
+        this.ts.translate('report.reason.SPAM'),
+        this.ts.translate('report.reason.HARASSMENT'),
+        this.ts.translate('report.reason.INAPPROPRIATE'),
+        this.ts.translate('report.reason.COPYRIGHT'),
+        this.ts.translate('report.reason.MISINFORMATION'),
+        this.ts.translate('report.reason.OTHER'),
       ];
       const reasonData = [
         reasons.spam || 0,
@@ -226,7 +228,11 @@ export class ModeratorDashboard implements OnInit, OnDestroy {
       this.statusChartInstance = new Chart(canvasStatusPie, {
         type: 'pie',
         data: {
-          labels: ['Đang chờ (Pending)', 'Đã chấp nhận (Resolved)', 'Đã bác bỏ (Rejected)'],
+          labels: [
+            this.ts.translate('moderator.status_pending_label'),
+            this.ts.translate('moderator.status_resolved_label'),
+            this.ts.translate('moderator.status_rejected_label'),
+          ],
           datasets: [
             {
               data: [statuses.pending || 0, statuses.resolved || 0, statuses.rejected || 0],

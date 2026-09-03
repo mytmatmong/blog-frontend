@@ -532,7 +532,7 @@ export class PostInteractionService {
         }
 
         this.toast.warning(
-            'Vui lòng đăng nhập để thực hiện thao tác này.',
+            this.ts.translate('auth.login_required_toast'),
         );
 
         this.router.navigate(

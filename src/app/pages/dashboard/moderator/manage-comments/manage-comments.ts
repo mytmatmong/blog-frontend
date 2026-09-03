@@ -107,27 +107,25 @@ export class ManageComments implements OnInit {
           this.reports.set(res.data.items);
           this.meta.set(res.data.meta);
         } else {
-          this.error.set('Không thể tải danh sách báo cáo.');
+          this.error.set(this.ts.translate('moderator.load_reports_error'));
         }
       },
       error: (err) => {
         this.loading.set(false);
         if (err?.status === 403) {
           this.isForbidden.set(true);
-          this.error.set(
-            'Tài khoản hiện tại không có quyền CONTENT_MODERATOR. Backend yêu cầu tài khoản phải có vai trò Moderator để xem danh sách báo cáo.',
-          );
-          this.toast.show('error', '403 Forbidden', 'Yêu cầu tài khoản Content Moderator');
+          this.error.set(this.ts.translate('moderator.forbidden_reports_desc'));
+          this.toast.show('error', this.ts.translate('moderator.forbidden_toast_title'), this.ts.translate('moderator.forbidden_toast_desc'));
         } else {
-          const errMsg = err?.error?.message || 'Lỗi khi lấy danh sách báo cáo vi phạm.';
+          const errMsg = err?.error?.message || this.ts.translate('moderator.load_reports_api_error');
           this.error.set(
             typeof errMsg === 'string'
               ? errMsg
               : Array.isArray(errMsg)
               ? errMsg.join(', ')
-              : 'Lỗi kết nối.',
+              : this.ts.translate('common.connection_error'),
           );
-          this.toast.show('error', 'Lỗi', 'Không thể tải danh sách báo cáo');
+          this.toast.show('error', this.ts.translate('common.error'), this.ts.translate('moderator.cannot_load_reports'));
         }
       },
     });
@@ -200,15 +198,15 @@ export class ManageComments implements OnInit {
       },
       error: (err) => {
         this.loadingDetail.set(false);
-        const errMsg = err?.error?.message || 'Không thể lấy chi tiết báo cáo.';
+        const errMsg = err?.error?.message || this.ts.translate('moderator.load_report_detail_error');
         this.toast.show(
           'error',
-          'Lỗi',
+          this.ts.translate('common.error'),
           typeof errMsg === 'string'
             ? errMsg
             : Array.isArray(errMsg)
             ? errMsg.join(', ')
-            : 'Lỗi kết nối.',
+            : this.ts.translate('common.connection_error'),
         );
       },
     });
@@ -221,7 +219,7 @@ export class ManageComments implements OnInit {
 
   setResolveReport(report: ModeratorReportItem) {
     this.activeResolveReport.set(report);
-    this.resolutionNote = 'Nội dung vi phạm tiêu chuẩn cộng đồng và đã được ẩn.';
+    this.resolutionNote = this.ts.translate('moderator.default_resolution_note');
   }
 
   closeResolveModal() {
@@ -232,7 +230,7 @@ export class ManageComments implements OnInit {
   submitResolve() {
     const note = this.resolutionNote.trim();
     if (!note) {
-      this.toast.show('warning', 'Cảnh báo', 'Vui lòng nhập ghi chú xử lý (lý do ẩn nội dung).');
+      this.toast.show('warning', this.ts.translate('common.warning'), this.ts.translate('moderator.resolution_note_required'));
       return;
     }
 
@@ -245,8 +243,8 @@ export class ManageComments implements OnInit {
           if (res.success) {
             this.toast.show(
               'success',
-              'Thành công',
-              `Đã xác nhận vi phạm và ẩn nội dung thành công.`,
+              this.ts.translate('common.success'),
+              this.ts.translate('moderator.resolve_success'),
             );
             if (this.activePreviewReport()?.id === report.id) {
               this.activePreviewReport.set(res.data);
@@ -257,14 +255,14 @@ export class ManageComments implements OnInit {
         },
         error: (err) => {
           this.actionLoading.set(false);
-          const errMsg = err?.error?.message || 'Không thể xử lý báo cáo vi phạm.';
+          const errMsg = err?.error?.message || this.ts.translate('moderator.resolve_error');
           const messageStr =
             typeof errMsg === 'string'
               ? errMsg
               : Array.isArray(errMsg)
               ? errMsg.join(', ')
-              : 'Lỗi xử lý.';
-          this.toast.show('error', 'Lỗi xử lý báo cáo', messageStr);
+              : this.ts.translate('common.processing_error');
+          this.toast.show('error', this.ts.translate('moderator.resolve_error_title'), messageStr);
         },
       });
     }
@@ -272,7 +270,7 @@ export class ManageComments implements OnInit {
 
   setRejectReport(report: ModeratorReportItem) {
     this.activeRejectReportItem.set(report);
-    this.rejectReportNote = 'Không tìm thấy nội dung vi phạm trong ngữ cảnh hiện tại.';
+    this.rejectReportNote = this.ts.translate('moderator.default_reject_note');
   }
 
   closeRejectReportModal() {
@@ -283,7 +281,7 @@ export class ManageComments implements OnInit {
   submitRejectReport() {
     const note = this.rejectReportNote.trim();
     if (!note) {
-      this.toast.show('warning', 'Cảnh báo', 'Vui lòng nhập lý do bác bỏ báo cáo.');
+      this.toast.show('warning', this.ts.translate('common.warning'), this.ts.translate('moderator.reject_report_reason_required'));
       return;
     }
 
@@ -296,8 +294,8 @@ export class ManageComments implements OnInit {
           if (res.success) {
             this.toast.show(
               'success',
-              'Thành công',
-              `Đã bác bỏ báo cáo vi phạm #${report.id}.`,
+              this.ts.translate('common.success'),
+              `${this.ts.translate('moderator.reject_report_success_prefix')}${report.id}.`,
             );
             if (this.activePreviewReport()?.id === report.id) {
               this.activePreviewReport.set(res.data);
@@ -308,14 +306,14 @@ export class ManageComments implements OnInit {
         },
         error: (err) => {
           this.actionLoading.set(false);
-          const errMsg = err?.error?.message || 'Không thể bác bỏ báo cáo.';
+          const errMsg = err?.error?.message || this.ts.translate('moderator.reject_report_error');
           const messageStr =
             typeof errMsg === 'string'
               ? errMsg
               : Array.isArray(errMsg)
               ? errMsg.join(', ')
-              : 'Lỗi xử lý.';
-          this.toast.show('error', 'Lỗi bác bỏ báo cáo', messageStr);
+              : this.ts.translate('common.processing_error');
+          this.toast.show('error', this.ts.translate('moderator.reject_report_error_title'), messageStr);
         },
       });
     }

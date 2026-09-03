@@ -268,7 +268,7 @@ private readonly router =inject(Router);
   formatDate(value?: string | null): string {
     if (!value) return '—';
     const date = new Date(value);
-    const locale = this.ts.currentLang() === 'EN' ? 'en-US' : 'vi-VN';
+    const locale = this.ts.localeTag();
     return Number.isNaN(date.getTime()) ? '—' : date.toLocaleString(locale);
   }
 

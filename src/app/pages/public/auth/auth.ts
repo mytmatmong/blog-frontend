@@ -98,7 +98,7 @@ export class Auth implements OnInit {
       },
       error: (err: HttpErrorResponse) => {
         this.isLoading.set(false);
-        this.handleError(err, 'Đăng nhập thất bại');
+        this.handleError(err, this.ts.translate('auth.login_failed_title'));
       }
     });
   }
@@ -127,7 +127,7 @@ export class Auth implements OnInit {
       },
       error: (err: HttpErrorResponse) => {
         this.isLoading.set(false);
-        this.handleError(err, 'Đăng ký thất bại');
+        this.handleError(err, this.ts.translate('auth.register_failed_title'));
       }
     });
   }
@@ -145,13 +145,13 @@ export class Auth implements OnInit {
     this.authService.forgotPassword({ email }).subscribe({
       next: (res) => {
         this.isLoading.set(false);
-        const msg = res.data?.message || 'Nếu email hợp lệ, một liên kết khôi phục đã được gửi đi.';
+        const msg = res.data?.message || this.ts.translate('auth.forgot_success_fallback');
         this.toastService.info(msg, this.ts.translate('common.notice'));
         this.forgotStep.set('reset');
       },
       error: (err: HttpErrorResponse) => {
         this.isLoading.set(false);
-        this.handleError(err, 'Yêu cầu khôi phục thất bại');
+        this.handleError(err, this.ts.translate('auth.forgot_failed_title'));
       }
     });
   }
@@ -170,7 +170,7 @@ export class Auth implements OnInit {
     this.authService.resetPassword({ token, newPassword }).subscribe({
       next: (res) => {
         this.isLoading.set(false);
-        const msg = res.data?.message || 'Đổi mật khẩu thành công. Vui lòng đăng nhập lại.';
+        const msg = res.data?.message || this.ts.translate('auth.reset_success_fallback');
         this.toastService.success(msg, this.ts.translate('common.success'));
         this.resetToken.set('');
         this.resetPassword.set('');
@@ -178,13 +178,13 @@ export class Auth implements OnInit {
       },
       error: (err: HttpErrorResponse) => {
         this.isLoading.set(false);
-        this.handleError(err, 'Đặt lại mật khẩu thất bại');
+        this.handleError(err, this.ts.translate('auth.reset_failed_title'));
       }
     });
   }
 
   private handleError(err: HttpErrorResponse, defaultTitle: string) {
-    let msg = 'Đã có lỗi xảy ra. Vui lòng thử lại sau.';
+    let msg = this.ts.translate('common.generic_error');
     if (err.error?.message) {
       if (Array.isArray(err.error.message)) {
         msg = err.error.message.join(', ');

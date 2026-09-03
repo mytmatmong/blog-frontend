@@ -153,7 +153,7 @@ export class ManageUsers {
       error: (error: unknown) => {
         this.users.set([]);
         this.isLoading.set(false);
-        this.toast.error(getApiErrorMessage(error), 'Tải danh sách người dùng thất bại');
+        this.toast.error(getApiErrorMessage(error), this.ts.translate('users.load_error_title'));
       },
     });
   }
@@ -232,7 +232,7 @@ export class ManageUsers {
       },
       error: (error: unknown) => {
         this.isLoadingDetail.set(false);
-        this.toast.error(getApiErrorMessage(error), 'Không thể tải chi tiết người dùng');
+        this.toast.error(getApiErrorMessage(error), this.ts.translate('users.load_detail_error_title'));
       },
     });
   }
@@ -257,12 +257,12 @@ export class ManageUsers {
 
   submitCreateMod(): void {
     if (!this.modUsername.trim() || !this.modEmail.trim() || !this.modPassword.trim()) {
-      this.toast.warning('Vui lòng điền đầy đủ thông tin bắt buộc (Username, Email, Mật khẩu).');
+      this.toast.warning(this.ts.translate('users.fill_required_fields'));
       return;
     }
 
     if (this.modPassword.trim().length < 6) {
-      this.toast.warning('Mật khẩu phải có ít nhất 6 ký tự.');
+      this.toast.warning(this.ts.translate('users.min_6_chars_warning'));
       return;
     }
 
@@ -278,13 +278,13 @@ export class ManageUsers {
     this.adminApi.createModerator(payload).subscribe({
       next: () => {
         this.isSubmittingMod.set(false);
-        this.toast.success('Tạo tài khoản Content Moderator thành công!');
+        this.toast.success(this.ts.translate('users.create_mod_success'));
         this.closeCreateModModal();
         this.loadUsers();
       },
       error: (error: unknown) => {
         this.isSubmittingMod.set(false);
-        this.toast.error(getApiErrorMessage(error), 'Tạo Moderator thất bại');
+        this.toast.error(getApiErrorMessage(error), this.ts.translate('users.create_mod_error_title'));
       },
     });
   }
@@ -308,7 +308,7 @@ export class ManageUsers {
     if (!user) return;
 
     if (this.editPassword.trim() && this.editPassword.trim().length < 6) {
-      this.toast.warning('Mật khẩu mới phải có ít nhất 6 ký tự.');
+      this.toast.warning(this.ts.translate('profile.password_min_length'));
       return;
     }
 
@@ -328,13 +328,13 @@ export class ManageUsers {
     this.adminApi.updateAdminUser(user.id, body).subscribe({
       next: () => {
         this.isSubmittingEdit.set(false);
-        this.toast.success('Cập nhật thông tin người dùng thành công!');
+        this.toast.success(this.ts.translate('users.update_success'));
         this.closeEditUserModal();
         this.loadUsers();
       },
       error: (error: unknown) => {
         this.isSubmittingEdit.set(false);
-        this.toast.error(getApiErrorMessage(error), 'Cập nhật người dùng thất bại');
+        this.toast.error(getApiErrorMessage(error), this.ts.translate('users.update_error_title'));
       },
     });
   }
@@ -356,7 +356,7 @@ export class ManageUsers {
     const reason = this.lockReason().trim();
 
     if (!user || !reason) {
-      this.toast.warning('Vui lòng nhập lý do khóa tài khoản.');
+      this.toast.warning(this.ts.translate('users.enter_lock_reason'));
       return;
     }
 
@@ -365,13 +365,13 @@ export class ManageUsers {
     this.adminApi.lockUser(user.id, { reason }).subscribe({
       next: () => {
         this.isSubmittingLock.set(false);
-        this.toast.success(`Đã khóa tài khoản ${user.username || user.email}`);
+        this.toast.success(`${this.ts.translate('users.locked_success_prefix')} ${user.username || user.email}`);
         this.closeLockModal();
         this.loadUsers();
       },
       error: (error: unknown) => {
         this.isSubmittingLock.set(false);
-        this.toast.error(getApiErrorMessage(error), 'Khóa tài khoản thất bại');
+        this.toast.error(getApiErrorMessage(error), this.ts.translate('users.lock_error_title'));
       },
     });
   }
@@ -403,13 +403,13 @@ export class ManageUsers {
     this.adminApi.unlockUser(user.id).subscribe({
       next: () => {
         this.isSubmittingConfirmation.set(false);
-        this.toast.success(`Đã mở khóa tài khoản ${user.username || user.email}`);
+        this.toast.success(`${this.ts.translate('users.unlocked_success_prefix')} ${user.username || user.email}`);
         this.closeUserConfirmation();
         this.loadUsers();
       },
       error: (error: unknown) => {
         this.isSubmittingConfirmation.set(false);
-        this.toast.error(getApiErrorMessage(error), 'Mở khóa thất bại');
+        this.toast.error(getApiErrorMessage(error), this.ts.translate('users.unlock_error_title'));
       },
     });
   }
@@ -442,13 +442,15 @@ export class ManageUsers {
     this.adminApi.changeUserRole(user.id, { role: newRole }).subscribe({
       next: () => {
         this.isSubmittingRole.set(false);
-        this.toast.success(`Đã đổi vai trò của ${user.username || user.email} thành ${newRole}`);
+        this.toast.success(
+          `${this.ts.translate('users.role_changed_prefix')} ${user.username || user.email} ${this.ts.translate('users.role_changed_suffix')} ${newRole}`,
+        );
         this.closeRoleModal();
         this.loadUsers();
       },
       error: (error: unknown) => {
         this.isSubmittingRole.set(false);
-        this.toast.error(getApiErrorMessage(error), 'Đổi vai trò thất bại');
+        this.toast.error(getApiErrorMessage(error), this.ts.translate('users.change_role_error_title'));
       },
     });
   }
@@ -463,13 +465,13 @@ export class ManageUsers {
     this.adminApi.deleteAdminUser(user.id).subscribe({
       next: () => {
         this.isSubmittingConfirmation.set(false);
-        this.toast.success(`Đã xóa mềm người dùng ${user.username || user.email}`);
+        this.toast.success(`${this.ts.translate('users.soft_deleted_success_prefix')} ${user.username || user.email}`);
         this.closeUserConfirmation();
         this.loadUsers();
       },
       error: (error: unknown) => {
         this.isSubmittingConfirmation.set(false);
-        this.toast.error(getApiErrorMessage(error), 'Xóa mềm thất bại');
+        this.toast.error(getApiErrorMessage(error), this.ts.translate('users.soft_delete_error_title'));
       },
     });
   }
@@ -511,6 +513,6 @@ export class ManageUsers {
   formatDate(value?: string | null): string {
     if (!value) return '—';
     const date = new Date(value);
-    return Number.isNaN(date.getTime()) ? '—' : date.toLocaleString('vi-VN');
+    return Number.isNaN(date.getTime()) ? '—' : date.toLocaleString(this.ts.localeTag());
   }
 }

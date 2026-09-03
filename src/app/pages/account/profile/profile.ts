@@ -427,7 +427,7 @@ export class Profile {
 
     return Number.isNaN(date.getTime())
       ? ''
-      : date.toLocaleDateString('vi-VN');
+      : date.toLocaleDateString(this.ts.localeTag());
   }
 
   private createProfileFormData(): FormData {

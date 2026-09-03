@@ -90,7 +90,7 @@
         <div>
           <h2>{{ 'dashboard.interaction_chart' | translate }}</h2>
         </div>
-        <div class="chart-legend" aria-label="Chart legend">
+        <div class="chart-legend" [attr.aria-label]="'a11y.chart_legend' | translate">
           <span><i class="chart-dot chart-dot--views"></i>{{ 'table.views' | translate }}</span>
           <span><i class="chart-dot chart-dot--likes"></i>{{ 'table.likes' | translate }}</span>
         </div>

@@ -20,8 +20,8 @@
             type="button"
             class="min-w-9 min-h-9 px-2 py-1 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-black text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-900 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center"
             [disabled]="normalizedCurrentPage() === 1"
-            title="Trang đầu"
-            aria-label="First page"
+            [title]="'pagination.first_page' | translate"
+            [attr.aria-label]="'pagination.first_page' | translate"
             (click)="goToPage(1)"
           >
             <i class="bi bi-chevron-double-left" aria-hidden="true"></i>
@@ -34,8 +34,8 @@
             type="button"
             class="min-w-9 min-h-9 px-2 py-1 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-black text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-900 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center"
             [disabled]="normalizedCurrentPage() === 1"
-            title="Trang trước"
-            aria-label="Previous page"
+            [title]="'pagination.prev_page' | translate"
+            [attr.aria-label]="'pagination.prev_page' | translate"
             (click)="goToPage(normalizedCurrentPage() - 1)"
           >
             <i class="bi bi-chevron-left" aria-hidden="true"></i>
@@ -83,8 +83,8 @@
             type="button"
             class="min-w-9 min-h-9 px-2 py-1 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-black text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-900 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center"
             [disabled]="normalizedCurrentPage() === totalPages()"
-            title="Trang sau"
-            aria-label="Next page"
+            [title]="'pagination.next_page' | translate"
+            [attr.aria-label]="'pagination.next_page' | translate"
             (click)="goToPage(normalizedCurrentPage() + 1)"
           >
             <i class="bi bi-chevron-right" aria-hidden="true"></i>
@@ -97,8 +97,8 @@
             type="button"
             class="min-w-9 min-h-9 px-2 py-1 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-black text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-900 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center"
             [disabled]="normalizedCurrentPage() === totalPages()"
-            title="Trang cuối"
-            aria-label="Last page"
+            [title]="'pagination.last_page' | translate"
+            [attr.aria-label]="'pagination.last_page' | translate"
             (click)="goToPage(totalPages())"
           >
             <i class="bi bi-chevron-double-right" aria-hidden="true"></i>

@@ -51,7 +51,7 @@
       <img
         class="w-full h-full object-cover"
         [src]="avatarUrl"
-        [alt]="auth.currentUser()?.username || 'Avatar'"
+        [alt]="auth.currentUser()?.username || ('profile.avatar' | translate)"
       >
       } @else {
       {{ userInitial() }}

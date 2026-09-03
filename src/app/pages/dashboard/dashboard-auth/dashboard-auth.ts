@@ -29,7 +29,7 @@ export class DashboardAuth {
     const passVal = this.password();
 
     if (!idVal || !passVal) {
-      this.toastService.warning('Vui lòng nhập đầy đủ tên đăng nhập/email và mật khẩu.');
+      this.toastService.warning(this.ts.translate('dashboard_auth.fill_fields'));
       return;
     }
 
@@ -37,7 +37,7 @@ export class DashboardAuth {
     this.authService.login({ identifier: idVal, password: passVal }).subscribe({
       next: () => {
         this.isLoading.set(false);
-        this.toastService.success('Đăng nhập Quản trị thành công!', 'Thành công');
+        this.toastService.success(this.ts.translate('dashboard_auth.login_success'), this.ts.translate('common.success'));
         const role = this.authService.currentRole();
         if (role === 'admin') {
           this.router.navigate(['/dashboard/admin']);
@@ -51,11 +51,11 @@ export class DashboardAuth {
       },
       error: (err: HttpErrorResponse) => {
         this.isLoading.set(false);
-        let msg = 'Đăng nhập thất bại';
+        let msg = this.ts.translate('dashboard_auth.login_error');
         if (err.error?.message) {
           msg = Array.isArray(err.error.message) ? err.error.message.join(', ') : err.error.message;
         }
-        this.toastService.error(msg, 'Lỗi đăng nhập');
+        this.toastService.error(msg, this.ts.translate('dashboard_auth.login_error_title'));
       }
     });
   }

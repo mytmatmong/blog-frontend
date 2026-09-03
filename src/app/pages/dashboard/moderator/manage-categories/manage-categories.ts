@@ -221,7 +221,7 @@ export class ManageCategories implements OnInit {
           }
 
           this.error.set(
-            'Không thể tải danh sách nhóm danh mục.',
+            this.ts.translate('manage_categories.load_list_error'),
           );
         },
 
@@ -231,14 +231,14 @@ export class ManageCategories implements OnInit {
           const message =
             this.getErrorMessage(
               err,
-              'Không thể tải danh sách nhóm danh mục.',
+              this.ts.translate('manage_categories.load_list_error'),
             );
 
           this.error.set(message);
 
           this.toast.show(
             'error',
-            'Lỗi',
+            this.ts.translate('common.error'),
             message,
           );
         },
@@ -381,8 +381,8 @@ export class ManageCategories implements OnInit {
     if (!code) {
       this.toast.show(
         'warning',
-        'Thiếu thông tin',
-        'Vui lòng nhập mã nhóm danh mục.',
+        this.ts.translate('manage_categories.missing_code_title'),
+        this.ts.translate('manage_categories.missing_code_desc'),
       );
 
       return;
@@ -395,8 +395,8 @@ export class ManageCategories implements OnInit {
     ) {
       this.toast.show(
         'warning',
-        'Mã không hợp lệ',
-        'Code chỉ được chứa chữ thường không dấu, số, dấu - hoặc _.',
+        this.ts.translate('manage_categories.invalid_code_title'),
+        this.ts.translate('manage_categories.invalid_code_desc'),
       );
 
       return;
@@ -405,8 +405,8 @@ export class ManageCategories implements OnInit {
     if (!translations.length) {
       this.toast.show(
         'warning',
-        'Thiếu bản dịch',
-        'Phải có ít nhất một bản dịch.',
+        this.ts.translate('manage_categories.missing_translation_title'),
+        this.ts.translate('manage_categories.missing_translation_desc'),
       );
 
       return;
@@ -419,8 +419,8 @@ export class ManageCategories implements OnInit {
     ) {
       this.toast.show(
         'warning',
-        'Ngôn ngữ bị trùng',
-        'Mỗi ngôn ngữ chỉ được chọn một lần.',
+        this.ts.translate('manage_categories.duplicate_lang_title'),
+        this.ts.translate('manage_categories.duplicate_lang_desc'),
       );
 
       return;
@@ -443,8 +443,8 @@ export class ManageCategories implements OnInit {
 
           this.toast.show(
             'success',
-            'Thành công',
-            `Đã tạo nhóm danh mục "${code}".`,
+            this.ts.translate('common.success'),
+            `${this.ts.translate('manage_categories.create_success_prefix')} "${code}".`,
           );
 
           this.isAddModalOpen.set(false);
@@ -468,10 +468,10 @@ export class ManageCategories implements OnInit {
 
           this.toast.show(
             'error',
-            'Không thể tạo danh mục',
+            this.ts.translate('manage_categories.create_error_title'),
             this.getErrorMessage(
               err,
-              'Không thể tạo nhóm danh mục.',
+              this.ts.translate('manage_categories.create_error'),
             ),
           );
         },
@@ -531,10 +531,10 @@ export class ManageCategories implements OnInit {
 
           this.toast.show(
             'error',
-            'Lỗi',
+            this.ts.translate('common.error'),
             this.getErrorMessage(
               err,
-              'Không thể lấy chi tiết nhóm danh mục.',
+              this.ts.translate('manage_categories.load_detail_error'),
             ),
           );
         },
@@ -596,8 +596,8 @@ export class ManageCategories implements OnInit {
     ) {
       this.toast.show(
         'warning',
-        'Không thể xóa bản dịch',
-        'Backend hiện chỉ hỗ trợ cập nhật/thêm bản dịch, chưa hỗ trợ xóa riêng một bản dịch.',
+        this.ts.translate('manage_categories.remove_translation_blocked_title'),
+        this.ts.translate('manage_categories.remove_translation_blocked_desc'),
       );
 
       return;
@@ -630,8 +630,8 @@ export class ManageCategories implements OnInit {
     if (!code) {
       this.toast.show(
         'warning',
-        'Thiếu thông tin',
-        'Vui lòng nhập mã nhóm danh mục.',
+        this.ts.translate('manage_categories.missing_code_title'),
+        this.ts.translate('manage_categories.missing_code_desc'),
       );
 
       return;
@@ -644,8 +644,8 @@ export class ManageCategories implements OnInit {
     ) {
       this.toast.show(
         'warning',
-        'Mã không hợp lệ',
-        'Code chỉ được chứa chữ thường không dấu, số, dấu - hoặc _.',
+        this.ts.translate('manage_categories.invalid_code_title'),
+        this.ts.translate('manage_categories.invalid_code_desc'),
       );
 
       return;
@@ -656,8 +656,8 @@ export class ManageCategories implements OnInit {
     ) {
       this.toast.show(
         'warning',
-        'Thiếu bản dịch',
-        'Phải có ít nhất một bản dịch.',
+        this.ts.translate('manage_categories.missing_translation_title'),
+        this.ts.translate('manage_categories.missing_translation_desc'),
       );
 
       return;
@@ -670,8 +670,8 @@ export class ManageCategories implements OnInit {
     ) {
       this.toast.show(
         'warning',
-        'Ngôn ngữ bị trùng',
-        'Mỗi ngôn ngữ chỉ được chọn một lần.',
+        this.ts.translate('manage_categories.duplicate_lang_title'),
+        this.ts.translate('manage_categories.duplicate_lang_desc'),
       );
 
       return;
@@ -697,8 +697,8 @@ export class ManageCategories implements OnInit {
 
           this.toast.show(
             'success',
-            'Thành công',
-            'Đã cập nhật nhóm danh mục.',
+            this.ts.translate('common.success'),
+            this.ts.translate('manage_categories.update_success'),
           );
 
           this.activeEditCategory.set(
@@ -713,10 +713,10 @@ export class ManageCategories implements OnInit {
 
           this.toast.show(
             'error',
-            'Không thể cập nhật',
+            this.ts.translate('manage_categories.update_error_title'),
             this.getErrorMessage(
               err,
-              'Không thể cập nhật nhóm danh mục.',
+              this.ts.translate('manage_categories.update_error'),
             ),
           );
         },
@@ -731,7 +731,7 @@ export class ManageCategories implements OnInit {
     category: ModeratorCategoryGroup,
   ): void {
     const confirmed = confirm(
-      `Bạn có chắc muốn xóa nhóm danh mục "${category.code}" và tất cả bản dịch?`,
+      `${this.ts.translate('manage_categories.delete_confirm_prefix')} "${category.code}" ${this.ts.translate('manage_categories.delete_confirm_suffix')}`,
     );
 
     if (!confirmed) {
@@ -754,8 +754,8 @@ export class ManageCategories implements OnInit {
 
           this.toast.show(
             'success',
-            'Đã xóa',
-            `Đã xóa nhóm "${category.code}".`,
+            this.ts.translate('manage_categories.delete_success_title'),
+            `${this.ts.translate('manage_categories.delete_success_prefix')} "${category.code}".`,
           );
 
           /**
@@ -779,10 +779,10 @@ export class ManageCategories implements OnInit {
 
           this.toast.show(
             'error',
-            'Không thể xóa',
+            this.ts.translate('manage_categories.delete_error_title'),
             this.getErrorMessage(
               err,
-              'Không thể xóa nhóm danh mục.',
+              this.ts.translate('manage_categories.delete_error'),
             ),
           );
         },

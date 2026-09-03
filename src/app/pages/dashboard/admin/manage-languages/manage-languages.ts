@@ -101,7 +101,7 @@ export class ManageLanguages implements OnInit {
           this.errorMessage.set(
             typeof err?.error?.message === 'string'
               ? err.error.message
-              : 'Không thể tải danh sách ngôn ngữ.',
+              : this.ts.translate('languages.load_error'),
           );
         },
       });
@@ -226,12 +226,12 @@ export class ManageLanguages implements OnInit {
     if (!code || !name) return;
 
     if (code.length > 10) {
-      this.toastService.error('Mã ngôn ngữ tối đa 10 ký tự.');
+      this.toastService.error(this.ts.translate('languages.code_max_length'));
       return;
     }
 
     if (name.length > 100) {
-      this.toastService.error('Tên ngôn ngữ tối đa 100 ký tự.');
+      this.toastService.error(this.ts.translate('languages.name_max_length'));
       return;
     }
 
@@ -252,7 +252,7 @@ export class ManageLanguages implements OnInit {
         next: (res) => {
           this.isSubmittingAdd.set(false);
           if (res?.success && res.data) {
-            this.toastService.success('Tạo ngôn ngữ mới thành công!');
+            this.toastService.success(this.ts.translate('languages.create_success'));
             this.loadLanguages();
             this.ts.loadLanguages(true);
             this.resetAddForm();
@@ -266,7 +266,7 @@ export class ManageLanguages implements OnInit {
               ? err.error.message
               : Array.isArray(err?.error?.message)
                 ? err.error.message.join(', ')
-                : 'Tạo ngôn ngữ thất bại.';
+                : this.ts.translate('languages.create_error');
           this.toastService.error(errorMsg);
         },
       });
@@ -285,12 +285,12 @@ export class ManageLanguages implements OnInit {
     if (!code || !name) return;
 
     if (code.length > 10) {
-      this.toastService.error('Mã ngôn ngữ tối đa 10 ký tự.');
+      this.toastService.error(this.ts.translate('languages.code_max_length'));
       return;
     }
 
     if (name.length > 100) {
-      this.toastService.error('Tên ngôn ngữ tối đa 100 ký tự.');
+      this.toastService.error(this.ts.translate('languages.name_max_length'));
       return;
     }
 
@@ -311,7 +311,7 @@ export class ManageLanguages implements OnInit {
         next: (res) => {
           this.isSubmittingEdit.set(false);
           if (res?.success && res.data) {
-            this.toastService.success('Cập nhật ngôn ngữ thành công!');
+            this.toastService.success(this.ts.translate('languages.update_success'));
             this.loadLanguages();
             this.ts.loadLanguages(true);
             this.closeEditModal();
@@ -324,7 +324,7 @@ export class ManageLanguages implements OnInit {
               ? err.error.message
               : Array.isArray(err?.error?.message)
                 ? err.error.message.join(', ')
-                : 'Cập nhật ngôn ngữ thất bại.';
+                : this.ts.translate('languages.update_error');
           this.toastService.error(errorMsg);
         },
       });
@@ -355,7 +355,7 @@ export class ManageLanguages implements OnInit {
         next: (res) => {
           this.deletingId.set(null);
           if (res?.success) {
-            this.toastService.success('Xóa ngôn ngữ thành công!');
+            this.toastService.success(this.ts.translate('languages.delete_success'));
             this.pendingDeleteLanguage.set(null);
             this.loadLanguages();
             this.ts.loadLanguages(true);
@@ -368,7 +368,7 @@ export class ManageLanguages implements OnInit {
               ? err.error.message
               : Array.isArray(err?.error?.message)
                 ? err.error.message.join(', ')
-                : 'Xóa ngôn ngữ thất bại.';
+                : this.ts.translate('languages.delete_error');
           this.toastService.error(errorMsg);
         },
       });

@@ -18,7 +18,7 @@
         </div>
       </div>
 
-      <div class="connections-tabs" role="tablist" aria-label="Connections">
+      <div class="connections-tabs" role="tablist" [attr.aria-label]="'nav.connections' | translate">
 
         <button type="button" role="tab" class="connections-tab" [class.is-active]="activeTab() === 'followers'"
           [attr.aria-selected]="activeTab() === 'followers'" (click)="selectTab('followers')">
@@ -130,7 +130,7 @@
           }
 
           @if (isFollowing(user.id)) {
-          <span class="connection-card__status" title="Following">
+          <span class="connection-card__status" [title]="'connections.you_are_following' | translate">
             <i class="bi bi-check"></i>
           </span>
           }

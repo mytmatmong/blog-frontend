@@ -574,7 +574,7 @@ export class AccountLibrary {
         );
 
         this.toast.success(
-          'Đã thích bài viết.',
+          this.ts.translate('post.liked_success'),
         );
         break;
 
@@ -598,7 +598,7 @@ export class AccountLibrary {
         );
 
         this.toast.success(
-          'Đã bỏ thích bài viết.',
+          this.ts.translate('post.unliked_success'),
         );
         break;
 
@@ -617,7 +617,7 @@ export class AccountLibrary {
         );
 
         this.toast.success(
-          'Đã lưu bài viết.',
+          this.ts.translate('post.bookmarked_success'),
         );
         break;
 
@@ -636,7 +636,7 @@ export class AccountLibrary {
         );
 
         this.toast.success(
-          'Đã bỏ lưu bài viết.',
+          this.ts.translate('post.unbookmarked_success'),
         );
         break;
     }
@@ -900,16 +900,16 @@ export class AccountLibrary {
   ): string {
     switch (action) {
       case 'like':
-        return 'Thích bài viết thất bại';
+        return this.ts.translate('library.like_error_title');
 
       case 'unlike':
-        return 'Bỏ thích thất bại';
+        return this.ts.translate('library.unlike_error_title');
 
       case 'bookmark':
-        return 'Lưu bài viết thất bại';
+        return this.ts.translate('library.bookmark_error_title');
 
       case 'unbookmark':
-        return 'Bỏ lưu thất bại';
+        return this.ts.translate('library.unbookmark_error_title');
     }
   }
 
@@ -1177,9 +1177,7 @@ export class AccountLibrary {
     }
 
     return date.toLocaleDateString(
-      this.langCode() === 'en'
-        ? 'en-US'
-        : 'vi-VN',
+      this.ts.localeTag(),
       {
         day: '2-digit',
         month: '2-digit',

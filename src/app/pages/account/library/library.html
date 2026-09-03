@@ -18,7 +18,7 @@
         </div>
       </div>
 
-      <div class="library-tabs" role="tablist" aria-label="Library">
+      <div class="library-tabs" role="tablist" [attr.aria-label]="'library.title' | translate">
 
         <button type="button" role="tab" class="library-tab" [class.is-active]="activeTab() === 'bookmarks'"
           [attr.aria-selected]="activeTab() === 'bookmarks'" (click)="selectTab('bookmarks')">

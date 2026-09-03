@@ -15,7 +15,7 @@
   @if (isLoading()) {
     <div class="p-8 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 flex items-center justify-center gap-3">
       <div class="animate-spin rounded-full h-6 w-6 border-2 border-aquamarine-600 border-t-transparent"></div>
-      <span class="text-sm font-medium text-aquamarine-700 dark:text-aquamarine-300">Đang tải danh sách ngôn ngữ...</span>
+      <span class="text-sm font-medium text-aquamarine-700 dark:text-aquamarine-300">{{ 'languages.loading_list' | translate }}</span>
     </div>
   } @else if (errorMessage()) {
     <div class="p-5 rounded-2xl border border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800 flex items-center justify-between">

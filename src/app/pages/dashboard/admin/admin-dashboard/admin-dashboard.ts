@@ -101,7 +101,7 @@ export class AdminDashboard implements OnInit, OnDestroy {
     const textColor = styles.getPropertyValue('--text-muted').trim() || '#677085';
     const borderColor = styles.getPropertyValue('--border-color').trim() || '#e9edf4';
     const brandColor = '#0d9488';
-    const locale = this.translationService.currentLang() === 'EN' ? 'en-US' : 'vi-VN';
+    const locale = this.translationService.localeTag();
     const growthLabels =
       data.userGrowth.details.length === data.userGrowth.data.length
         ? data.userGrowth.details.map((detail) => {
@@ -221,7 +221,7 @@ export class AdminDashboard implements OnInit, OnDestroy {
 
   getLanguageDisplayName(code: string, fallback: string): string {
     try {
-      const locale = this.translationService.currentLang() === 'EN' ? 'en-US' : 'vi-VN';
+      const locale = this.translationService.localeTag();
       return new Intl.DisplayNames([locale], { type: 'language' }).of(code) || fallback;
     } catch {
       return fallback;
