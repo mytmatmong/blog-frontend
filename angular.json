@@ -31,7 +31,11 @@
             "server": "src/main.server.ts",
             "outputMode": "server",
             "security": {
-              "allowedHosts": ["103.72.57.142", "localhost"]
+              "allowedHosts": [
+                "103.72.57.142",
+                "mainbloggy.duckdns.org",
+                "localhost"
+              ]
             },
             "ssr": {
               "entry": "src/server.ts"
