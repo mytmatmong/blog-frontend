@@ -8,10 +8,11 @@ import { TranslationService } from '../../../core/services/translation.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+import { LanguageSelectorComponent } from '../../../shared/components/language-selector/language-selector';
 
 @Component({
   selector: 'app-auth',
-  imports: [FormsModule, InputComponent, TranslatePipe, NgClass, RouterLink],
+  imports: [FormsModule, InputComponent, TranslatePipe, NgClass, RouterLink, LanguageSelectorComponent],
   templateUrl: './auth.html',
   styleUrl: './auth.css',
 })

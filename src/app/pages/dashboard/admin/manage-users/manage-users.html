@@ -159,13 +159,12 @@
             </td>
             <td class="min-w-[118px] whitespace-nowrap p-4 text-center">
               @if (user.status === 'ACTIVE') {
-                <app-badge color="green" shape="pill" size="sm" dot>{{ 'status.active' | translate }}</app-badge>
+                <app-badge color="green" shape="pill" size="sm">{{ 'status.active' | translate }}</app-badge>
               } @else if (user.status === 'LOCKED') {
                 <app-badge
                   color="yellow"
                   shape="pill"
                   size="sm"
-                  dot
                   [title]="user.lockReason ? ('users.lock_reason_label' | translate) + ': ' + user.lockReason : ('status.locked' | translate)"
                 >
                   {{ 'status.locked' | translate }}
@@ -189,7 +188,7 @@
                 <!-- Lock / Unlock Action (A13 / A14) -->
                 @if (user.status === 'ACTIVE') {
                   <app-icon-button
-                    icon="bi bi-lock-fill"
+                    icon="bi bi-lock"
                     color="yellow"
                     variant="soft"
                     size="sm"
@@ -200,7 +199,7 @@
                   </app-icon-button>
                 } @else if (user.status === 'LOCKED') {
                   <app-icon-button
-                    icon="bi bi-unlock-fill"
+                    icon="bi bi-unlock"
                     color="green"
                     variant="soft"
                     size="sm"
@@ -213,7 +212,7 @@
 
                 <!-- Soft Delete Action (A16) -->
                 <app-icon-button
-                  icon="bi bi-trash3-fill"
+                  icon="bi bi-trash3"
                   color="red"
                   variant="soft"
                   size="sm"
@@ -478,9 +477,9 @@
             <div>
               <div class="mt-1">
                 @if (activeUserDetail()?.status === 'ACTIVE') {
-                  <app-badge color="green" shape="pill" size="sm" dot>{{ 'status.active' | translate }}</app-badge>
+                  <app-badge color="green" shape="pill" size="sm">{{ 'status.active' | translate }}</app-badge>
                 } @else {
-                  <app-badge color="yellow" shape="pill" size="sm" dot>{{ 'status.locked' | translate }}</app-badge>
+                  <app-badge color="yellow" shape="pill" size="sm">{{ 'status.locked' | translate }}</app-badge>
                 }
               </div>
             </div>
@@ -534,13 +533,13 @@
                       >
                         {{ post.title }}
                       </h6>
-                      @if (post.status === 'PUBLISHED') {
+                      @if (post.status === 'PUBLISHED' || post.status === 'PUBLISH') {
                         <app-badge color="green" shape="rounded" size="sm">{{ 'status.published' | translate }}</app-badge>
-                      } @else if (post.status === 'PENDING') {
-                        <app-badge color="yellow" shape="rounded" size="sm">{{ 'status.pending' | translate }}</app-badge>
+                      } @else if (post.status === 'PENDING' || post.status === 'PENDING_REVIEW') {
+                        <app-badge color="yellow" shape="rounded" size="sm">{{ 'status.pending_review' | translate }}</app-badge>
                       } @else if (post.status === 'DRAFT') {
                         <app-badge color="gray" shape="rounded" size="sm">{{ 'status.draft' | translate }}</app-badge>
-                      } @else if (post.status === 'REJECTED') {
+                      } @else if (post.status === 'REJECTED' || post.status === 'REJECT') {
                         <app-badge color="red" shape="rounded" size="sm">{{ 'status.rejected' | translate }}</app-badge>
                       } @else {
                         <app-badge color="gray" shape="rounded" size="sm">{{ post.status }}</app-badge>
@@ -729,7 +728,7 @@
             {{ 'modal.cancel' | translate }}
           </app-text-button>
           <app-icon-button
-            icon="bi bi-lock-fill"
+            icon="bi bi-lock"
             color="yellow"
             variant="solid"
             size="md"

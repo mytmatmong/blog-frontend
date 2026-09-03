@@ -8,6 +8,12 @@ export type IconButtonSize = 'sm' | 'md' | 'lg';
   selector: 'app-icon-button',
   standalone: true,
   templateUrl: './icon-button.html',
+  styles: [`
+    :host {
+      display: inline-flex;
+      vertical-align: middle;
+    }
+  `],
 })
 export class IconButtonComponent {
   /** Tên class của Bootstrap Icon (Ví dụ: 'bi bi-trash3-fill', 'bi bi-pencil-square') */

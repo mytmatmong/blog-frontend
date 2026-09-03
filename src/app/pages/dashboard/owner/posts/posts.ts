@@ -733,14 +733,19 @@ export class Posts implements OnInit {
   }
 
 
-  statusBadgeColor(status: PostStatus): 'green' | 'yellow' | 'red' | 'blue' {
+  statusBadgeColor(status: PostStatus | string): 'green' | 'yellow' | 'red' | 'blue' | 'gray' {
     switch (status) {
       case 'PUBLISH':
+      case 'PUBLISHED':
         return 'green';
+      case 'PENDING':
       case 'PENDING_REVIEW':
         return 'yellow';
       case 'REJECT':
+      case 'REJECTED':
         return 'red';
+      case 'DRAFT':
+        return 'gray';
       default:
         return 'blue';
     }

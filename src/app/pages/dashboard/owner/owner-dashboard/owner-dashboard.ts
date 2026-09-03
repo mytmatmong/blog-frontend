@@ -223,13 +223,16 @@ export class OwnerDashboard implements OnInit, AfterViewInit, OnDestroy {
     return this.ts.translate(`post_status.${status.toLowerCase()}`);
   }
 
-  statusClass(status: PostStatus): string {
+  statusClass(status: PostStatus | string): string {
     switch (status) {
       case 'PUBLISH':
+      case 'PUBLISHED':
         return 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300';
+      case 'PENDING':
       case 'PENDING_REVIEW':
         return 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300';
       case 'REJECT':
+      case 'REJECTED':
         return 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300';
       default:
         return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';

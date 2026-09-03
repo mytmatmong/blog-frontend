@@ -26,6 +26,19 @@
 
     <!-- auth-panel -->
     <section class="auth-panel">
+      <!-- auth-top-actions -->
+      <div class="auth-top-actions">
+        <app-language-selector mode="system" size="sm" [hideCode]="true" />
+        <button
+          type="button"
+          class="auth-theme-toggle"
+          (click)="authService.toggleTheme()"
+          [title]="'nav.toggle_theme' | translate"
+          aria-label="Toggle theme">
+          <i class="bi" [class.bi-sun-fill]="authService.isDarkMode()" [class.bi-moon-stars]="!authService.isDarkMode()"></i>
+        </button>
+      </div>
+
       <!-- auth-card -->
       <div class="auth-card">
         <!-- auth-tabs -->

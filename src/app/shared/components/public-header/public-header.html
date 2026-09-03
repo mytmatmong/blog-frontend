@@ -25,7 +25,6 @@
       class="site-header-menu"
       [ngClass]="isMobileMenuOpen() ? 'mobile-open' : ''">
       
-      @if (!isAuthPage()) {
       <!-- header-nav -->
       <nav class="site-header-nav shrink-0 gap-1" aria-label="Primary navigation">
         <!-- nav-link -->
@@ -70,35 +69,12 @@
         </button>
         }
       </form>
-      }
 
       <!-- header-actions -->
-      <div class="flex items-center shrink-0 gap-[6px]"
-        [ngClass]="isAuthPage() ? 'ms-auto' : ''">
+      <div class="flex items-center shrink-0 gap-[6px]">
         <!-- header-dropdown-wrap (language) -->
         <div class="relative">
-          <!-- header-control header-language -->
-          <button type="button" class="h-[36px] inline-grid place-items-center shrink-0 border border-transparent hover:border-[var(--border-color)] rounded-[9px] bg-transparent hover:bg-[var(--card-bg-muted)] text-[var(--text-muted)] hover:text-[var(--card-text-default)] cursor-pointer transition-colors duration-150 w-auto min-w-[38px] px-2 text-[13px] font-[800]" (click)="toggleLangDropdown($event)" [title]="ts.currentLang()">
-            <span>{{ ts.currentLang() }}</span>
-          </button>
-
-          @if (isLangDropdownOpen()) {
-          <!-- header-dropdown header-dropdown--language -->
-          <div class="absolute top-[calc(100%+12px)] right-0 w-[188px] overflow-hidden border border-[var(--border-color)] rounded-[12px] bg-[var(--card-bg-raised)] shadow-[var(--shadow-lg)] p-[7px] z-[90]">
-            <!-- dropdown-label -->
-            <div class="px-[10px] pt-2 pb-[6px] text-[var(--text-faint)] text-[11px] font-[700] tracking-[0.08em] uppercase">{{ 'nav.language' | translate }}</div>
-            @for (lang of ts.languages(); track lang.code) {
-            <!-- dropdown-item -->
-            <button type="button" class="w-full min-h-[40px] flex items-center gap-[10px] px-[10px] py-2 border-0 rounded-[10px] bg-transparent text-[var(--text-muted)] hover:text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] text-[13px] text-left cursor-pointer transition-colors duration-150" (click)="selectLang(lang.code)">
-              <span>{{ lang.flag }}</span>
-              <span>{{ lang.name }}</span>
-              @if (ts.currentLang() === lang.code) {
-              <i class="bi bi-check2 ms-auto text-aquamarine-600"></i>
-              }
-            </button>
-            }
-          </div>
-          }
+          <app-language-selector mode="system" size="sm" [hideCode]="true" />
         </div>
 
         <!-- header-control (theme toggle) -->
@@ -107,12 +83,10 @@
         </button>
 
         @if (auth.currentRole() === 'guest') {
-        @if (!isAuthPage()) {
         <!-- header-login -->
         <a class="btn btn-primary min-h-[36px] !rounded-[9px] px-[13px] text-[14px]" routerLink="/auth" (click)="closeMobileMenu()">
           {{ 'nav.login' | translate }}
         </a>
-        }
         } @else {
         <!-- header-dropdown-wrap (user profile) -->
         <div class="relative">

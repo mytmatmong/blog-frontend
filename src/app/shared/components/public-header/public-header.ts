@@ -1,15 +1,14 @@
 import { NgClass } from '@angular/common';
-import { Component, computed, ElementRef, HostListener, inject, OnInit, signal } from '@angular/core';
-import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { filter, map } from 'rxjs';
+import { Component, ElementRef, HostListener, inject, OnInit, signal } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { TranslationService, SupportedLang } from '../../../core/services/translation.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { LanguageSelectorComponent } from '../language-selector/language-selector';
 
 @Component({
   selector: 'app-public-header',
-  imports: [RouterLink, RouterLinkActive, TranslatePipe, NgClass],
+  imports: [RouterLink, RouterLinkActive, TranslatePipe, NgClass, LanguageSelectorComponent],
   templateUrl: './public-header.html',
   styleUrl: './public-header.css',
 })
@@ -23,19 +22,6 @@ export class PublicHeader implements OnInit {
   protected isUserDropdownOpen = signal(false);
   protected isLangDropdownOpen = signal(false);
   protected searchValue = signal('');
-
-  private readonly currentUrl = toSignal(
-    this.router.events.pipe(
-      filter((event): event is NavigationEnd => event instanceof NavigationEnd),
-      map((event) => event.urlAfterRedirects || event.url)
-    ),
-    { initialValue: this.router.url }
-  );
-
-  protected readonly isAuthPage = computed(() => {
-    const url = this.currentUrl() || '';
-    return url.startsWith('/auth') || url.includes('/auth');
-  });
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {

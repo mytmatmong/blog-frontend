@@ -72,11 +72,10 @@
                   <span class="required">*</span>
                 </label>
 
-                <app-single-dropdown
-                  [options]="sourceLanguageOptions()"
+                <app-language-selector
+                  mode="select"
                   [value]="originalLanguageId()"
                   [disabled]="sourceLanguageLocked() || formLocked()"
-                  [placeholder]="'post_form.select_language' | translate"
                   (selectionChange)="changeOriginalLanguage($event)"
                 />
               </div>

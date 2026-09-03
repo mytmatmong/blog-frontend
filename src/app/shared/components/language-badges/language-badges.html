@@ -5,7 +5,7 @@
         class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-aquamarine-600 text-white dark:bg-aquamarine-500 shadow-2xs cursor-default transition-transform hover:scale-105"
         [title]="('language.original' | translate) + ': ' + lang.name"
       >
-        <span>{{ lang.flag || '🌐' }}</span>
+        <img [src]="getFlagUrl(lang.flag || lang.code)" class="w-4 h-3 rounded-xs object-cover shrink-0" alt="Flag">
         <span class="uppercase">{{ lang.code }}</span>
         <i class="bi bi-star-fill text-[9px] text-amber-300 ml-0.5"></i>
       </span>
@@ -14,7 +14,7 @@
         class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-aquamarine-100 dark:bg-aquamarine-800/80 text-aquamarine-800 dark:text-aquamarine-200 border border-aquamarine-200 dark:border-aquamarine-700 cursor-default"
         [title]="('language.translation' | translate) + ': ' + lang.name"
       >
-        <span>{{ lang.flag || '🌐' }}</span>
+        <img [src]="getFlagUrl(lang.flag || lang.code)" class="w-4 h-3 rounded-xs object-cover shrink-0" alt="Flag">
         <span class="uppercase">{{ lang.code }}</span>
       </span>
     }
@@ -53,7 +53,7 @@
               [class.dark:hover:bg-aquamarine-800\/50]="!lang.isOriginal"
             >
               <div class="flex items-center gap-1.5 min-w-0">
-                <span class="text-sm shrink-0">{{ lang.flag || '🌐' }}</span>
+                <img [src]="getFlagUrl(lang.flag || lang.code)" class="w-4 h-3 rounded-xs object-cover shrink-0" alt="Flag">
                 <span class="font-medium text-aquamarine-950 dark:text-aquamarine-50 truncate">{{ lang.name }}</span>
                 <span class="font-mono text-[10px] text-aquamarine-500 uppercase shrink-0">({{ lang.code }})</span>
               </div>

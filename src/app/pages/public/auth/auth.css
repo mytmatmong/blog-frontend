@@ -128,10 +128,41 @@
 }
 
 .auth-panel {
+  position: relative;
   display: grid;
   place-items: center;
   background: var(--card-bg);
-  padding: 46px 54px;
+  padding: 56px 54px 46px;
+}
+
+.auth-top-actions {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.auth-theme-toggle {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid var(--border-color);
+  border-radius: 11px;
+  background: var(--card-bg);
+  color: var(--card-text-default);
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.auth-theme-toggle:hover {
+  background: var(--card-bg-muted);
+  border-color: var(--brand);
+  color: var(--brand);
 }
 
 .auth-card {
@@ -235,13 +266,23 @@
   }
 
   .auth-panel {
-    padding: 36px 26px 42px;
+    padding: 64px 26px 42px;
+  }
+
+  .auth-top-actions {
+    top: 16px;
+    right: 18px;
   }
 }
 
 @media (max-width: 480px) {
   .auth-panel {
-    padding: 28px 18px 34px;
+    padding: 60px 18px 34px;
+  }
+
+  .auth-top-actions {
+    top: 14px;
+    right: 14px;
   }
 
   .auth-tabs button {

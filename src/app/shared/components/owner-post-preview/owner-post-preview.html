@@ -11,12 +11,9 @@
                     {{ 'common.view' | translate }}
                 </span>
 
-                <span class="post-preview-status" [class]="
-              'post-preview-status ' +
-              statusClass(post.status)
-            ">
+                <app-badge [color]="badgeColor(post.status)" shape="pill" size="sm">
                     {{ statusLabel(post.status) }}
-                </span>
+                </app-badge>
             </div>
 
             <button type="button" class="post-preview-close" (click)="close()" [attr.aria-label]="
@@ -221,41 +218,49 @@
         <footer class="post-preview-footer" [class.post-preview-footer--moderation]="showModerationActions">
             @if (
             showModerationActions &&
-            post.status === 'PENDING_REVIEW'
+            isPendingModeration(post)
             ) {
-            <button type="button" class="post-preview-action post-preview-action--approve" [disabled]="moderationBusy"
-                (click)="approveRequested.emit(post)">
+            <button
+                type="button"
+                class="post-preview-action post-preview-action--approve"
+                [disabled]="moderationBusy"
+                (click)="approveRequested.emit(post)"
+            >
                 <i class="bi" [class.bi-arrow-repeat]="moderationBusy" [class.post-preview-spin]="moderationBusy"
                     [class.bi-check-circle]="!moderationBusy"></i>
                 {{ 'requests.approve' | translate }}
             </button>
 
-            <button type="button" class="post-preview-action post-preview-action--reject" [disabled]="moderationBusy"
-                (click)="rejectRequested.emit(post)">
+            <button
+                type="button"
+                class="post-preview-action post-preview-action--reject"
+                [disabled]="moderationBusy"
+                (click)="rejectRequested.emit(post)"
+            >
                 <i class="bi bi-x-circle"></i>
                 {{ 'requests.reject' | translate }}
             </button>
             }
 
-            <button type="button" class="
-            post-preview-action
-            post-preview-action--secondary
-          " (click)="close()">
+            <button
+                type="button"
+                class="post-preview-action post-preview-action--secondary"
+                (click)="close()"
+            >
                 <i class="bi bi-x-lg"></i>
                 {{ 'modal.close' | translate }}
             </button>
 
             @if (canEdit(post)) {
-            <a class="
-    post-preview-action
-    post-preview-action--primary
-  " [routerLink]="[
-    editRoute,
-    rootPostId() ?? post.id
-  ]" (click)="close()">
-                <i class="bi bi-pencil-square"></i>
+            <app-icon-button
+                icon="bi bi-pencil-square"
+                color="blue"
+                variant="soft"
+                size="sm"
+                (btnClick)="onEditPost(post)"
+            >
                 {{ 'comments.edit' | translate }}
-            </a>
+            </app-icon-button>
             }
 
         </footer>

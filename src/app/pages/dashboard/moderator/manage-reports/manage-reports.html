@@ -199,17 +199,17 @@
               <!-- Status -->
               <td class="p-4 text-center">
                 @if (report.status === 'PENDING') {
-                  <span class="inline-block px-2.5 py-1 text-xs font-semibold rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
+                  <app-badge color="yellow" shape="pill" size="sm">
                     {{ 'status.pending' | translate }}
-                  </span>
+                  </app-badge>
                 } @else if (report.status === 'RESOLVED') {
-                  <span class="inline-block px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                  <app-badge color="green" shape="pill" size="sm">
                     {{ 'status.resolved' | translate }}
-                  </span>
+                  </app-badge>
                 } @else if (report.status === 'REJECTED') {
-                  <span class="inline-block px-2.5 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300">
+                  <app-badge color="red" shape="pill" size="sm">
                     {{ 'status.rejected' | translate }}
-                  </span>
+                  </app-badge>
                 }
               </td>
 
@@ -228,7 +228,7 @@
 
                   @if (report.status === 'PENDING') {
                     <app-icon-button
-                      icon="bi bi-check-circle-fill"
+                      icon="bi bi-check-circle"
                       color="green"
                       variant="soft"
                       size="sm"
@@ -238,7 +238,7 @@
                       {{ 'action.resolve' | translate }}
                     </app-icon-button>
                     <app-icon-button
-                      icon="bi bi-x-circle-fill"
+                      icon="bi bi-x-circle"
                       color="red"
                       variant="soft"
                       size="sm"
@@ -380,13 +380,22 @@
         <div class="p-4 rounded-xl border border-amber-200 dark:border-amber-900 bg-amber-50/60 dark:bg-amber-950/30 space-y-2">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
-              <i class="bi bi-exclamation-triangle-fill text-amber-600 text-lg"></i>
+              <i class="bi bi-exclamation-triangle text-amber-600 text-lg"></i>
               <span class="font-bold text-sm text-amber-900 dark:text-amber-200">
                 {{ 'moderator.report_reason_label' | translate }} {{ getReasonLabel(report.reason) }}
               </span>
             </div>
             <span class="text-xs px-2.5 py-0.5 rounded-full font-semibold bg-amber-200 text-amber-900 dark:bg-amber-800 dark:text-amber-100">
-              {{ 'moderator.status_label' | translate }} {{ report.status }}
+              {{ 'moderator.status_label' | translate }}
+              @if (report.status === 'PENDING') {
+                {{ 'status.pending' | translate }}
+              } @else if (report.status === 'RESOLVED') {
+                {{ 'status.resolved' | translate }}
+              } @else if (report.status === 'REJECTED') {
+                {{ 'status.rejected' | translate }}
+              } @else {
+                {{ report.status }}
+              }
             </span>
           </div>
 
@@ -476,7 +485,7 @@
                       <div class="report-context-comment-head">
                         <strong>{{ reply.user.username }}</strong>
                         @if (reply.id === report.comment.id) {
-                          <span class="report-context-reported-label"><i class="bi bi-flag-fill"></i> {{ 'moderator.reported_comment_title' | translate }}</span>
+                          <span class="report-context-reported-label"><i class="bi bi-flag"></i> {{ 'moderator.reported_comment_title' | translate }}</span>
                         } @else {
                           <span>Reply</span>
                         }
@@ -488,7 +497,7 @@
                     <article class="report-context-comment report-context-comment--reply report-context-comment--reported">
                       <div class="report-context-comment-head">
                         <strong>{{ report.comment.user.username }}</strong>
-                        <span class="report-context-reported-label"><i class="bi bi-flag-fill"></i> {{ 'moderator.reported_comment_title' | translate }}</span>
+                        <span class="report-context-reported-label"><i class="bi bi-flag"></i> {{ 'moderator.reported_comment_title' | translate }}</span>
                         <time>{{ report.comment.createdAt | date: 'dd/MM/yyyy HH:mm' }}</time>
                       </div>
                       <p>{{ report.comment.content }}</p>
@@ -498,7 +507,7 @@
                   <article class="report-context-comment report-context-comment--root report-context-comment--reported">
                     <div class="report-context-comment-head">
                       <strong>{{ report.comment.user.username }}</strong>
-                      <span class="report-context-reported-label"><i class="bi bi-flag-fill"></i> {{ 'moderator.reported_comment_title' | translate }}</span>
+                      <span class="report-context-reported-label"><i class="bi bi-flag"></i> {{ 'moderator.reported_comment_title' | translate }}</span>
                       <time>{{ report.comment.createdAt | date: 'dd/MM/yyyy HH:mm' }}</time>
                     </div>
                     <p>{{ report.comment.content }}</p>
@@ -527,7 +536,7 @@
           <app-icon-button
             icon="bi bi-check-circle"
             color="green"
-            variant="solid"
+            variant="soft"
             size="sm"
             [disabled]="actionLoading()"
             (btnClick)="setResolveReport(report)"
@@ -537,7 +546,7 @@
           <app-icon-button
             icon="bi bi-x-circle"
             color="red"
-            variant="solid"
+            variant="soft"
             size="sm"
             [disabled]="actionLoading()"
             (btnClick)="setRejectReport(report)"
@@ -545,9 +554,15 @@
             {{ 'action.reject' | translate }}
           </app-icon-button>
         }
-        <app-text-button variant="secondary" size="sm" (btnClick)="closePreviewReport()">
-          <i class="bi bi-x-lg mr-1"></i>{{ 'action.close' | translate }}
-        </app-text-button>
+        <app-icon-button
+          icon="bi bi-x-lg"
+          color="primary"
+          variant="soft"
+          size="sm"
+          (btnClick)="closePreviewReport()"
+        >
+          {{ 'action.close' | translate }}
+        </app-icon-button>
       </footer>
     </aside>
   </div>

@@ -10,27 +10,7 @@
   <div class="flex items-center gap-3">
     <!-- dashboard-header-lang-dropdown -->
     <div class="relative">
-      <button type="button" (click)="toggleLangDropdown($event)" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl border border-[var(--border-color)] bg-[var(--card-bg-muted)] text-[var(--card-text-default)] hover:border-[var(--brand)] transition-colors">
-        <span class="text-sm">{{ translationService.currentLanguageOption()?.flag || '🌐' }}</span>
-        <span>{{ translationService.currentLang() }}</span>
-        <i class="bi bi-chevron-down text-xs ms-0.5"></i>
-      </button>
-
-      @if (isLangDropdownOpen()) {
-      <ul class="absolute right-0 mt-1 w-44 bg-[var(--card-bg)] rounded-xl shadow-lg border border-[var(--border-color)] py-1 z-50">
-        @for (lang of translationService.languages(); track lang.code) {
-        <li>
-          <button type="button" (click)="selectLang(lang.code)" class="w-full text-left flex items-center gap-2 px-4 py-2 text-xs text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)]" [class.font-bold]="translationService.currentLang() === lang.code">
-            <span class="text-sm">{{ lang.flag }}</span>
-            <span>{{ lang.name }}</span>
-            @if (translationService.currentLang() === lang.code) {
-            <i class="bi bi-check2 ms-auto text-[var(--brand)] font-bold text-sm"></i>
-            }
-          </button>
-        </li>
-        }
-      </ul>
-      }
+      <app-language-selector mode="system" size="sm" [hideCode]="true" />
     </div>
 
     <!-- theme-toggle -->

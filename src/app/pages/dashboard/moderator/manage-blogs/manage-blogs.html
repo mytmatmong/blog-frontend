@@ -175,15 +175,15 @@
               <!-- Status -->
               <td class="p-4 text-center moderator-status-column">
                 @if (blog.status === 'PENDING_REVIEW') {
-                  <app-badge color="yellow" shape="pill" size="sm" dot>
+                  <app-badge color="yellow" shape="pill" size="sm">
                     {{ 'status.pending_review' | translate }}
                   </app-badge>
                 } @else if (blog.status === 'PUBLISH') {
-                  <app-badge color="green" shape="pill" size="sm" dot>
+                  <app-badge color="green" shape="pill" size="sm">
                     {{ 'status.published' | translate }}
                   </app-badge>
                 } @else if (blog.status === 'REJECT') {
-                  <app-badge color="red" shape="pill" size="sm" dot>
+                  <app-badge color="red" shape="pill" size="sm">
                     {{ 'status.rejected' | translate }}
                   </app-badge>
                 }

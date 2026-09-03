@@ -8,6 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { getFlagUrl } from '../../../core/utils/flag.util';
 
 export interface PostLanguageItem {
   id?: number;
@@ -26,6 +27,7 @@ export interface PostLanguageItem {
 })
 export class LanguageBadgesComponent {
   private readonly elementRef = inject(ElementRef);
+  protected readonly getFlagUrl = getFlagUrl;
 
   readonly languages = input.required<PostLanguageItem[]>();
   readonly maxVisible = input<number>(2);

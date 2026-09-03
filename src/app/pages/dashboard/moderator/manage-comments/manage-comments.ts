@@ -18,6 +18,7 @@ import {
 
 import { IconButtonComponent } from '../../../../shared/components/icon-button/icon-button';
 import { TextButtonComponent } from '../../../../shared/components/text-button/text-button';
+import { BadgeComponent } from '../../../../shared/components/badge/badge';
 import { SingleDropdownComponent, DropdownOption } from '../../../../shared/components/single-dropdown/single-dropdown';
 
 @Component({
@@ -28,6 +29,7 @@ import { SingleDropdownComponent, DropdownOption } from '../../../../shared/comp
     TranslatePipe,
     IconButtonComponent,
     TextButtonComponent,
+    BadgeComponent,
     SingleDropdownComponent,
   ],
   templateUrl: './manage-comments.html',

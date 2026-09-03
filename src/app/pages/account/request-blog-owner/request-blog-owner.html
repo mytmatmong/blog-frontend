@@ -314,7 +314,15 @@
                 [class.request-status--approved]="request.status === 'APPROVED'"
                 [class.request-status--rejected]="request.status === 'REJECTED'">
                 <span></span>
-                {{ request.status }}
+                @if (request.status === 'PENDING') {
+                  {{ 'requests.pending' | translate }}
+                } @else if (request.status === 'APPROVED') {
+                  {{ 'requests.approved' | translate }}
+                } @else if (request.status === 'REJECTED') {
+                  {{ 'requests.rejected' | translate }}
+                } @else {
+                  {{ request.status }}
+                }
               </span>
             </header>
 

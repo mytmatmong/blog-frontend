@@ -50,14 +50,16 @@ export interface TranslationCreationResult {
   message: string;
 }
 
+import { LanguageSelectorComponent } from '../../../../shared/components/language-selector/language-selector';
+
 @Component({
   selector: 'app-create-post',
   imports: [
     FormsModule,
     TranslatePipe,
     ConfirmDialog,
-    SingleDropdownComponent,
     MultiDropdownComponent,
+    LanguageSelectorComponent,
   ],
   templateUrl: './create-post.html',
   styleUrl: './create-post.css',
@@ -1212,18 +1214,7 @@ export class CreatePost implements OnInit {
     status:
       BlogOwnerPost['status'],
   ): string {
-    const labels: Record<
-      BlogOwnerPost['status'],
-      string
-    > = {
-      DRAFT: 'DRAFT',
-      PENDING_REVIEW:
-        'PENDING_REVIEW',
-      PUBLISH: 'PUBLISH',
-      REJECT: 'REJECT',
-    };
-
-    return labels[status];
+    return this.translation.translate(`post_status.${status.toLowerCase()}`);
   }
 
   /* =======================================================

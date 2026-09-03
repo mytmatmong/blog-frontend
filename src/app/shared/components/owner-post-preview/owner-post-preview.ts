@@ -34,6 +34,10 @@ export interface OwnerPostPreviewVersion {
     >;
 }
 
+import { Router } from '@angular/router';
+import { BadgeComponent, BadgeColor } from '../badge/badge';
+import { IconButtonComponent } from '../icon-button/icon-button';
+
 @Component({
     selector: 'app-owner-post-preview',
     standalone: true,
@@ -41,6 +45,8 @@ export interface OwnerPostPreviewVersion {
         CommonModule,
         RouterLink,
         TranslatePipe,
+        BadgeComponent,
+        IconButtonComponent,
     ],
     templateUrl: './owner-post-preview.html',
     styleUrl: './owner-post-preview.css',
@@ -49,6 +55,7 @@ export class OwnerPostPreviewComponent
     implements OnChanges, OnDestroy {
     private readonly api = inject(BlogOwnerApiService);
     private readonly ts = inject(TranslationService);
+    private readonly router = inject(Router);
 
     /**
      * Có thể truyền dữ liệu tóm tắt lấy từ danh sách.
@@ -207,6 +214,37 @@ export class OwnerPostPreviewComponent
         this.externalLoadingPostId !== null
     );
     }
+    badgeColor(
+        status: BlogOwnerPost['status'],
+    ): BadgeColor {
+        const normalized = String(status).toUpperCase();
+
+        if (
+            normalized === 'PUBLISHED' ||
+            normalized === 'APPROVED' ||
+            normalized === 'PUBLISH'
+        ) {
+            return 'green';
+        }
+
+        if (
+            normalized === 'PENDING' ||
+            normalized === 'PENDING_REVIEW' ||
+            normalized === 'WAITING_APPROVAL'
+        ) {
+            return 'yellow';
+        }
+
+        if (
+            normalized === 'REJECTED' ||
+            normalized === 'REJECT'
+        ) {
+            return 'red';
+        }
+
+        return 'gray';
+    }
+
     statusClass(
         status: BlogOwnerPost['status'],
     ): string {
@@ -251,57 +289,69 @@ export class OwnerPostPreviewComponent
             string,
             {
                 key: string;
-                fallback: string;
+                fallbackKey?: string;
+                fallbackVi: string;
+                fallbackEn: string;
             }
         > = {
             DRAFT: {
                 key: 'posts.status.draft',
-                fallback: 'Bản nháp',
+                fallbackKey: 'post_status.draft',
+                fallbackVi: 'Bản nháp',
+                fallbackEn: 'Draft',
             },
-
             PENDING: {
                 key: 'posts.status.pending',
-                fallback: 'Chờ duyệt',
+                fallbackKey: 'post_status.pending_review',
+                fallbackVi: 'Chờ duyệt',
+                fallbackEn: 'Pending review',
             },
-
             PENDING_REVIEW: {
                 key: 'posts.status.pending',
-                fallback: 'Chờ duyệt',
+                fallbackKey: 'post_status.pending_review',
+                fallbackVi: 'Chờ duyệt',
+                fallbackEn: 'Pending review',
             },
-
             WAITING_APPROVAL: {
                 key: 'posts.status.pending',
-                fallback: 'Chờ duyệt',
+                fallbackKey: 'post_status.pending_review',
+                fallbackVi: 'Chờ duyệt',
+                fallbackEn: 'Pending review',
             },
-
             PUBLISHED: {
                 key: 'posts.status.published',
-                fallback: 'Đã xuất bản',
+                fallbackKey: 'post_status.publish',
+                fallbackVi: 'Đã xuất bản',
+                fallbackEn: 'Published',
             },
-
             PUBLISH: {
                 key: 'posts.status.published',
-                fallback: 'Đã xuất bản',
+                fallbackKey: 'post_status.publish',
+                fallbackVi: 'Đã xuất bản',
+                fallbackEn: 'Published',
             },
-
             APPROVED: {
                 key: 'posts.status.published',
-                fallback: 'Đã xuất bản',
+                fallbackKey: 'post_status.publish',
+                fallbackVi: 'Đã xuất bản',
+                fallbackEn: 'Published',
             },
-
             REJECTED: {
                 key: 'posts.status.rejected',
-                fallback: 'Bị từ chối',
+                fallbackKey: 'post_status.reject',
+                fallbackVi: 'Bị từ chối',
+                fallbackEn: 'Rejected',
             },
-
             REJECT: {
                 key: 'posts.status.rejected',
-                fallback: 'Bị từ chối',
+                fallbackKey: 'post_status.reject',
+                fallbackVi: 'Bị từ chối',
+                fallbackEn: 'Rejected',
             },
-
             ARCHIVED: {
                 key: 'posts.status.archived',
-                fallback: 'Đã lưu trữ',
+                fallbackVi: 'Đã lưu trữ',
+                fallbackEn: 'Archived',
             },
         };
 
@@ -311,12 +361,20 @@ export class OwnerPostPreviewComponent
             return String(status);
         }
 
-        const translated =
-            this.ts.translate(config.key);
+        const translated = this.ts.translate(config.key);
 
-        return translated === config.key
-            ? config.fallback
-            : translated;
+        if (translated !== config.key) {
+            return translated;
+        }
+
+        if (config.fallbackKey) {
+            const fallbackTranslated = this.ts.translate(config.fallbackKey);
+            if (fallbackTranslated !== config.fallbackKey) {
+                return fallbackTranslated;
+            }
+        }
+
+        return this.ts.currentLang() === 'EN' ? config.fallbackEn : config.fallbackVi;
     }
 
     categoryNames(post: BlogOwnerPost): string {
@@ -391,6 +449,26 @@ export class OwnerPostPreviewComponent
             'PENDING_REVIEW',
             'WAITING_APPROVAL',
         ].includes(normalized);
+    }
+
+    isPendingModeration(post: BlogOwnerPost | null): boolean {
+        if (!post) return false;
+        const normalized = String(post.status).toUpperCase();
+        return (
+            normalized === 'PENDING_REVIEW' ||
+            normalized === 'PENDING' ||
+            normalized === 'WAITING_APPROVAL'
+        );
+    }
+
+    onEditPost(post: BlogOwnerPost): void {
+        const targetId = this.rootPostId() ?? post.id;
+        this.close();
+        if (Array.isArray(this.editRoute)) {
+            this.router.navigate([...this.editRoute, targetId]);
+        } else {
+            this.router.navigate([this.editRoute, targetId]);
+        }
     }
 
     editQueryParams(postId: number): {

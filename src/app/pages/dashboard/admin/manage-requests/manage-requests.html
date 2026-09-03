@@ -18,7 +18,7 @@
       {{ 'requests.pending' | translate }}
     </app-icon-button>
     <app-icon-button
-      icon="bi bi-check-circle-fill"
+      icon="bi bi-check-circle"
       [color]="statusFilter() === 'APPROVED' ? 'green' : 'primary'"
       [variant]="statusFilter() === 'APPROVED' ? 'solid' : 'soft'"
       size="md"
@@ -27,7 +27,7 @@
       {{ 'requests.approved' | translate }}
     </app-icon-button>
     <app-icon-button
-      icon="bi bi-x-circle-fill"
+      icon="bi bi-x-circle"
       [color]="statusFilter() === 'REJECTED' ? 'red' : 'primary'"
       [variant]="statusFilter() === 'REJECTED' ? 'solid' : 'soft'"
       size="md"
@@ -90,11 +90,11 @@
             </td>
             <td class="p-4 text-center whitespace-nowrap">
               @if (item.status === 'APPROVED') {
-                <app-badge color="green" shape="pill" size="sm" dot>{{ 'requests.approved' | translate }}</app-badge>
+                <app-badge color="green" shape="pill" size="sm">{{ 'requests.approved' | translate }}</app-badge>
               } @else if (item.status === 'REJECTED') {
-                <app-badge color="red" shape="pill" size="sm" dot>{{ 'requests.rejected' | translate }}</app-badge>
+                <app-badge color="red" shape="pill" size="sm">{{ 'requests.rejected' | translate }}</app-badge>
               } @else {
-                <app-badge color="yellow" shape="pill" size="sm" dot>{{ 'requests.pending' | translate }}</app-badge>
+                <app-badge color="yellow" shape="pill" size="sm">{{ 'requests.pending' | translate }}</app-badge>
               }
             </td>
             <td class="min-w-[220px] whitespace-nowrap p-4 text-center">
@@ -257,7 +257,7 @@
             {{ 'modal.cancel' | translate }}
           </app-text-button>
           <app-icon-button
-            icon="bi bi-x-circle-fill"
+            icon="bi bi-x-circle"
             color="red"
             variant="solid"
             size="md"

@@ -949,56 +949,12 @@
     opacity: 0.55;
 }
 
-/* Moderator preview: keep actions identical to the compact Blog Owner table buttons. */
+/* Moderator preview: keep actions compact like table buttons, with unified color system */
 .post-preview-footer--moderation .post-preview-action {
     min-height: 32px;
     gap: 5px;
-    padding: 6px 9px;
-    border: 1px solid #bfdbfe;
+    padding: 6px 12px;
     border-radius: 8px;
-    background: #eff6ff;
-    color: #1d4ed8;
     font-size: 12px;
     font-weight: 600;
-}
-
-.post-preview-footer--moderation .post-preview-action--approve,
-.post-preview-footer--moderation .post-preview-action--secondary {
-    border-color: #bfdbfe;
-    background: #eff6ff;
-    color: #1d4ed8;
-}
-
-.post-preview-footer--moderation .post-preview-action--approve:hover:not(:disabled),
-.post-preview-footer--moderation .post-preview-action--secondary:hover:not(:disabled) {
-    background: #dbeafe;
-}
-
-.post-preview-footer--moderation .post-preview-action--reject {
-    border-color: #fecdd3;
-    background: #fff1f2;
-    color: #e11d48;
-}
-
-.post-preview-footer--moderation .post-preview-action--reject:hover:not(:disabled) {
-    background: #ffe4e6;
-}
-
-:host-context(.dark) .post-preview-footer--moderation .post-preview-action--approve,
-:host-context(html.dark) .post-preview-footer--moderation .post-preview-action--approve,
-:host-context(.dark-mode) .post-preview-footer--moderation .post-preview-action--approve,
-:host-context(.dark) .post-preview-footer--moderation .post-preview-action--secondary,
-:host-context(html.dark) .post-preview-footer--moderation .post-preview-action--secondary,
-:host-context(.dark-mode) .post-preview-footer--moderation .post-preview-action--secondary {
-    border-color: #1e40af;
-    background: rgb(30 58 138 / 28%);
-    color: #bfdbfe;
-}
-
-:host-context(.dark) .post-preview-footer--moderation .post-preview-action--reject,
-:host-context(html.dark) .post-preview-footer--moderation .post-preview-action--reject,
-:host-context(.dark-mode) .post-preview-footer--moderation .post-preview-action--reject {
-    border-color: rgb(159 18 57 / 55%);
-    background: rgb(136 19 55 / 24%);
-    color: #fda4af;
 }

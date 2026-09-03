@@ -7,7 +7,7 @@
 
   <!-- dashboard-sidebar-section-owner -->
   @if (activeSection === 'owner') {
-  <div class="text-xs text-[var(--brand)] font-bold tracking-wider uppercase mb-2 px-3">Owner</div>
+  <div class="text-xs text-[var(--brand)] font-bold tracking-wider mb-2 px-3">Owner</div>
   <div class="space-y-1">
     <a routerLink="/dashboard/owner" routerLinkActive="bg-[var(--brand-soft)] text-[var(--brand)] font-semibold" [routerLinkActiveOptions]="{exact: true}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] hover:text-[var(--brand)] transition-colors"><i class="bi bi-speedometer2"></i>{{ 'nav.owner_dashboard' | translate }}</a>
     <a routerLink="/dashboard/owner/posts" routerLinkActive="bg-[var(--brand-soft)] text-[var(--brand)] font-semibold" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] hover:text-[var(--brand)] transition-colors"><i class="bi bi-file-earmark-text"></i>{{ 'dashboard.my_posts' | translate }}</a>
@@ -17,7 +17,7 @@
 
   <!-- dashboard-sidebar-section-moderator -->
   @if (activeSection === 'moderator') {
-  <div class="text-xs text-[var(--brand)] font-bold tracking-wider uppercase my-2 px-3">Moderator</div>
+  <div class="text-xs text-[var(--brand)] font-bold tracking-wider my-2 px-3">Moderator</div>
   <div class="space-y-1">
     <a routerLink="/dashboard/moderator" routerLinkActive="bg-[var(--brand-soft)] text-[var(--brand)] font-semibold" [routerLinkActiveOptions]="{exact: true}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] hover:text-[var(--brand)] transition-colors"><i class="bi bi-shield-check"></i>{{ 'dashboard.mod_dashboard' | translate }}</a>
     <a routerLink="/dashboard/moderator/manage-blogs" routerLinkActive="bg-[var(--brand-soft)] text-[var(--brand)] font-semibold" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] hover:text-[var(--brand)] transition-colors"><i class="bi bi-journals"></i>{{ 'dashboard.approve_posts' | translate }}</a>
@@ -28,7 +28,7 @@
 
   <!-- dashboard-sidebar-section-admin -->
   @if (activeSection === 'admin') {
-  <div class="text-xs text-[var(--brand)] font-bold tracking-wider uppercase my-2 px-3">Admin</div>
+  <div class="text-xs text-[var(--brand)] font-bold tracking-wider my-2 px-3">Admin</div>
   <div class="space-y-1">
     <a routerLink="/dashboard/admin" routerLinkActive="bg-[var(--brand-soft)] text-[var(--brand)] font-semibold" [routerLinkActiveOptions]="{exact: true}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] hover:text-[var(--brand)] transition-colors"><i class="bi bi-gear"></i>{{ 'nav.admin_dashboard' | translate }}</a>
     <a routerLink="/dashboard/admin/manage-users" routerLinkActive="bg-[var(--brand-soft)] text-[var(--brand)] font-semibold" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] hover:text-[var(--brand)] transition-colors"><i class="bi bi-people"></i>{{ 'dashboard.manage_users' | translate }}</a>
