@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://mainbloggy.duckdns.org/api/v1'
+  apiUrl: 'https://blogy.id.vn/api/v1'
 };
