@@ -20,6 +20,8 @@ import {
   ModeratorCategoryGroup,
   ModeratorCategoryGroupsPaginatedResponse,
   UpdateModeratorCategoryGroupDto,
+  TranslateModeratorCategoryPreviewDto,
+  ModeratorCategoryTranslationPreview,
 } from '../models/moderator-api.model';
 
 @Injectable({ providedIn: 'root' })
@@ -194,6 +196,25 @@ createModeratorCategoryGroup(
 }
 
 /**
+ * POST /api/v1/moderator/category-groups/translate-preview
+ *
+ * Dịch thử tên danh mục.
+ * API này chỉ trả preview, không ghi database.
+ */
+translateModeratorCategoryPreview(
+  dto: TranslateModeratorCategoryPreviewDto,
+): Observable<
+  ApiResponse<ModeratorCategoryTranslationPreview>
+> {
+  return this.http.post<
+    ApiResponse<ModeratorCategoryTranslationPreview>
+  >(
+    `${this.apiUrl}/moderator/category-groups/translate-preview`,
+    dto,
+  );
+}
+
+/**
  * PATCH /api/v1/moderator/category-groups/:groupId
  */
 updateModeratorCategoryGroup(
@@ -221,6 +242,19 @@ deleteModeratorCategoryGroup(
   );
 }
 
+/**
+ * DELETE /api/v1/moderator/category-groups/:groupId/translations/:languageId
+ *
+ * Xóa mềm một bản dịch của CategoryGroup.
+ */
+deleteModeratorCategoryTranslation(
+  groupId: number,
+  languageId: number,
+): Observable<ApiResponse<ModeratorCategoryGroup>> {
+  return this.http.delete<ApiResponse<ModeratorCategoryGroup>>(
+    `${this.apiUrl}/moderator/category-groups/${groupId}/translations/${languageId}`,
+  );
+}
   /**
    * M06 — GET /api/v1/moderator/reports
    * Lấy danh sách report (báo cáo bài viết hoặc bình luận)
