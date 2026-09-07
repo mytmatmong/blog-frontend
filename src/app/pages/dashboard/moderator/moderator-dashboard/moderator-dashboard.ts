@@ -2,7 +2,11 @@ import { Component, effect, inject, OnDestroy, OnInit, signal } from '@angular/c
 import { Router, RouterLink } from '@angular/router';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { ModeratorApiService } from '../../../../core/services/moderator-api.service';
-import { ModeratorDashboardData } from '../../../../core/models/moderator-api.model';
+import {
+  ModeratorDashboardOverview,
+  ModeratorDashboardReportStats,
+  ModeratorDashboardReportTrend,
+} from '../../../../core/models/moderator-api.model';
 import { ToastService } from '../../../../core/services/toast.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { TranslationService } from '../../../../core/services/translation.service';
@@ -22,24 +26,34 @@ export class ModeratorDashboard implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly ts = inject(TranslationService);
 
-  readonly loading = signal<boolean>(true);
-  readonly error = signal<string | null>(null);
   readonly isForbidden = signal<boolean>(false);
-  readonly dashboardData = signal<ModeratorDashboardData | null>(null);
+
+  readonly overviewLoading = signal<boolean>(true);
+  readonly overviewError = signal<string | null>(null);
+  readonly overviewData = signal<ModeratorDashboardOverview | null>(null);
+
+  readonly reportStatsLoading = signal<boolean>(true);
+  readonly reportStatsError = signal<string | null>(null);
+  readonly reportStatsData = signal<ModeratorDashboardReportStats | null>(null);
+
+  readonly reportTrendLoading = signal<boolean>(true);
+  readonly reportTrendError = signal<string | null>(null);
+  readonly reportTrendData = signal<ModeratorDashboardReportTrend | null>(null);
 
   private reportsChartInstance: any = null;
   private reasonChartInstance: any = null;
   private statusChartInstance: any = null;
 
   private readonly chartThemeEffect = effect(() => {
-    // Theo dõi cả dữ liệu lẫn theme để Chart.js đổi màu ngay lập tức.
-    this.auth.isDarkMode();
-    const data = this.dashboardData();
+  this.auth.isDarkMode();
 
-    if (data) {
-      setTimeout(() => this.initCharts(data));
-    }
-  });
+  const reportStats = this.reportStatsData();
+  const reportTrend = this.reportTrendData();
+
+  if (reportStats || reportTrend) {
+    setTimeout(() => this.initCharts(reportStats, reportTrend));
+  }
+});
 
   ngOnInit() {
     this.loadDashboardData();
@@ -49,41 +63,120 @@ export class ModeratorDashboard implements OnInit, OnDestroy {
     this.destroyCharts();
   }
 
-  loadDashboardData() {
-    this.loading.set(true);
-    this.error.set(null);
-    this.isForbidden.set(false);
+loadDashboardData() {
+  this.isForbidden.set(false);
 
-    this.moderatorApiService.getModeratorDashboard().subscribe({
-      next: (response) => {
-        this.loading.set(false);
-        if (response.success && response.data) {
-          this.dashboardData.set(response.data);
-        } else {
-          this.error.set(this.ts.translate('moderator.load_dashboard_error'));
-        }
-      },
-      error: (err) => {
-        this.loading.set(false);
-        if (err?.status === 403) {
-          this.isForbidden.set(true);
-          this.error.set(this.ts.translate('moderator.forbidden_dashboard_desc'));
-          this.toast.show('error', this.ts.translate('moderator.forbidden_toast_title'), this.ts.translate('moderator.forbidden_toast_desc'));
-        } else {
-          const errMsg = err?.error?.message || this.ts.translate('common.backend_unreachable');
-          this.error.set(typeof errMsg === 'string' ? errMsg : Array.isArray(errMsg) ? errMsg.join(', ') : this.ts.translate('common.connection_error'));
-          this.toast.show('error', this.ts.translate('common.error'), this.ts.translate('moderator.load_dashboard_error'));
-        }
-      },
-    });
+  this.loadOverview();
+  this.loadReportStats();
+  this.loadReportTrend();
+}
+
+loadOverview() {
+  this.overviewLoading.set(true);
+  this.overviewError.set(null);
+
+  this.moderatorApiService.getModeratorDashboardOverview().subscribe({
+    next: (response) => {
+      this.overviewLoading.set(false);
+
+      if (response.success && response.data) {
+        this.overviewData.set(response.data);
+      } else {
+        this.overviewError.set(
+          this.ts.translate('moderator.load_dashboard_error'),
+        );
+      }
+    },
+    error: (err) => {
+      this.overviewLoading.set(false);
+      this.handleDashboardError(err, this.overviewError);
+    },
+  });
+}
+
+loadReportStats() {
+  this.reportStatsLoading.set(true);
+  this.reportStatsError.set(null);
+
+  this.moderatorApiService.getModeratorDashboardReportStats().subscribe({
+    next: (response) => {
+      this.reportStatsLoading.set(false);
+
+      if (response.success && response.data) {
+        this.reportStatsData.set(response.data);
+      } else {
+        this.reportStatsError.set(
+          this.ts.translate('moderator.load_dashboard_error'),
+        );
+      }
+    },
+    error: (err) => {
+      this.reportStatsLoading.set(false);
+      this.handleDashboardError(err, this.reportStatsError);
+    },
+  });
+}
+
+loadReportTrend() {
+  this.reportTrendLoading.set(true);
+  this.reportTrendError.set(null);
+
+  this.moderatorApiService.getModeratorDashboardReportTrend().subscribe({
+    next: (response) => {
+      this.reportTrendLoading.set(false);
+
+      if (response.success && response.data) {
+        this.reportTrendData.set(response.data);
+      } else {
+        this.reportTrendError.set(
+          this.ts.translate('moderator.load_dashboard_error'),
+        );
+      }
+    },
+    error: (err) => {
+      this.reportTrendLoading.set(false);
+      this.handleDashboardError(err, this.reportTrendError);
+    },
+  });
+}
+private handleDashboardError(
+  err: any,
+  errorSignal: {
+    set: (value: string | null) => void;
+  },
+) {
+  if (err?.status === 403) {
+    this.isForbidden.set(true);
+
+    errorSignal.set(
+      this.ts.translate('moderator.forbidden_dashboard_desc'),
+    );
+
+    return;
   }
+
+  const errMsg =
+    err?.error?.message ||
+    this.ts.translate('common.backend_unreachable');
+
+  errorSignal.set(
+    typeof errMsg === 'string'
+      ? errMsg
+      : Array.isArray(errMsg)
+        ? errMsg.join(', ')
+        : this.ts.translate('common.connection_error'),
+  );
+}
 
   logoutAndSwitchAccount() {
     this.auth.logout();
     this.router.navigate(['/auth']);
   }
 
-  initCharts(data: ModeratorDashboardData) {
+initCharts(
+  reportStats: ModeratorDashboardReportStats | null,
+  reportTrend: ModeratorDashboardReportTrend | null,
+) {
     if (typeof Chart === 'undefined') return;
 
     this.destroyCharts();
@@ -107,14 +200,18 @@ export class ModeratorDashboard implements OnInit, OnDestroy {
 
     // 1. Stacked Bar Chart - Report 7 ngày qua
     const canvasBar = document.getElementById('reportsChart') as HTMLCanvasElement;
-    if (canvasBar && data.last7Days && data.last7Days.length > 0) {
-      const labels = data.last7Days.map((item) => {
+    if (
+  canvasBar &&
+  reportTrend?.last7Days &&
+  reportTrend.last7Days.length > 0
+) {
+      const labels = reportTrend.last7Days.map((item) => {
         if (!item.date) return '';
         const parts = item.date.split('-');
         return parts.length === 3 ? `${parts[2]}/${parts[1]}` : item.date;
       });
-      const postReportsData = data.last7Days.map((item) => item.postReports);
-      const commentReportsData = data.last7Days.map((item) => item.commentReports);
+      const postReportsData = reportTrend.last7Days.map((item) => item.postReports);
+      const commentReportsData = reportTrend.last7Days.map((item) => item.commentReports);
 
       this.reportsChartInstance = new Chart(canvasBar, {
         type: 'bar',
@@ -167,8 +264,8 @@ export class ModeratorDashboard implements OnInit, OnDestroy {
 
     // 2. Doughnut Chart - Lý do báo cáo
     const canvasReasonPie = document.getElementById('moderationPieChart') as HTMLCanvasElement;
-    if (canvasReasonPie && data.reportReasonCounts) {
-      const reasons = data.reportReasonCounts;
+    if (canvasReasonPie && reportStats?.reportReasonCounts) {
+      const reasons = reportStats.reportReasonCounts;
       const reasonLabels = [
         this.ts.translate('report.reason.SPAM'),
         this.ts.translate('report.reason.HARASSMENT'),
@@ -223,8 +320,8 @@ export class ModeratorDashboard implements OnInit, OnDestroy {
 
     // 3. Status Pie Chart - Trạng thái báo cáo
     const canvasStatusPie = document.getElementById('statusPieChart') as HTMLCanvasElement;
-    if (canvasStatusPie && data.reportStatusCounts) {
-      const statuses = data.reportStatusCounts;
+    if (canvasStatusPie && reportStats?.reportStatusCounts) {
+      const statuses = reportStats.reportStatusCounts;
       this.statusChartInstance = new Chart(canvasStatusPie, {
         type: 'pie',
         data: {

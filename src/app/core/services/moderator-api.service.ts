@@ -8,6 +8,9 @@ import {
   GetModeratorPostsQuery,
   GetModeratorReportsQuery,
   ModeratorDashboardData,
+  ModeratorDashboardOverview,
+  ModeratorDashboardReportStats,
+  ModeratorDashboardReportTrend,
   ModeratorPostItem,
   ModeratorPostsPaginatedResponse,
   ModeratorReportItem,
@@ -36,7 +39,38 @@ export class ModeratorApiService {
       `${this.apiUrl}/moderator/dashboard`,
     );
   }
+  /**
+ * GET /api/v1/moderator/dashboard/overview
+ */
+getModeratorDashboardOverview(): Observable<
+  ApiResponse<ModeratorDashboardOverview>
+> {
+  return this.http.get<ApiResponse<ModeratorDashboardOverview>>(
+    `${this.apiUrl}/moderator/dashboard/overview`,
+  );
+}
 
+/**
+ * GET /api/v1/moderator/dashboard/report-stats
+ */
+  getModeratorDashboardReportStats(): Observable<
+    ApiResponse<ModeratorDashboardReportStats>
+  > {
+    return this.http.get<ApiResponse<ModeratorDashboardReportStats>>(
+      `${this.apiUrl}/moderator/dashboard/report-stats`,
+    );
+  }
+
+/**
+ * GET /api/v1/moderator/dashboard/report-trend
+ */
+  getModeratorDashboardReportTrend(): Observable<
+    ApiResponse<ModeratorDashboardReportTrend>
+  > {
+    return this.http.get<ApiResponse<ModeratorDashboardReportTrend>>(
+      `${this.apiUrl}/moderator/dashboard/report-trend`,
+    );
+  }
   /**
    * M02 — GET /api/v1/moderator/posts
    * Lấy danh sách bài Moderator được phép xem

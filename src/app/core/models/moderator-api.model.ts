@@ -31,6 +31,14 @@ export interface ModeratorLast7DaysItem {
   totalReports: number;
 }
 
+export interface ModeratorDashboardReportStats {
+  reportStatusCounts: ModeratorReportStatusCounts;
+  reportReasonCounts: ModeratorReportReasonCounts;
+}
+
+export interface ModeratorDashboardReportTrend {
+  last7Days: ModeratorLast7DaysItem[];
+}
 export interface ModeratorDashboardData {
   overview: ModeratorDashboardOverview;
   reportStatusCounts: ModeratorReportStatusCounts;
