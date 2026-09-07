@@ -342,3 +342,33 @@ export interface UpdateModeratorCategoryGroupDto {
   code?: string;
   translations?: ModeratorCategoryTranslationRequest[];
 }
+
+export interface TranslateModeratorCategoryPreviewDto {
+  sourceLanguageId: number;
+  sourceName: string;
+  targetLanguageIds: number[];
+}
+
+export interface ModeratorCategoryPreviewLanguage {
+  id: number;
+  code: string;
+  name: string;
+}
+
+export interface ModeratorCategoryPreviewTranslation {
+  languageId: number;
+  languageCode: string;
+  languageName: string;
+  name: string;
+}
+
+export interface ModeratorCategoryTranslationPreview {
+  source: {
+    languageId: number;
+    languageCode: string;
+    languageName: string;
+    name: string;
+  };
+
+  translations: ModeratorCategoryPreviewTranslation[];
+}

@@ -1,5 +1,8 @@
 <section class="space-y-6">
+  <!-- ========================= -->
   <!-- HEADER -->
+  <!-- ========================= -->
+
   <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
     <div>
       <h3 class="font-bold text-xl text-aquamarine-950 dark:text-aquamarine-50">
@@ -11,61 +14,70 @@
       </p>
     </div>
 
-    <app-icon-button
-      icon="bi bi-plus-circle"
-      color="primary"
-      variant="solid"
-      size="md"
-      (btnClick)="openAddCategoryModal()"
-    >
+    <app-icon-button icon="bi bi-plus-circle" color="primary" variant="solid" size="md"
+      (btnClick)="openAddCategoryModal()">
       {{ 'manage_categories.add_group' | translate }}
     </app-icon-button>
   </div>
 
+  <!-- ========================= -->
   <!-- SEARCH -->
+  <!-- ========================= -->
+
   <div class="max-w-md">
-    <app-text-search
-      [value]="searchQuery"
-      (searchChange)="searchQuery = $event; onSearch()"
-      [placeholder]="'manage_categories.search_placeholder' | translate"
-    />
+    <app-text-search [value]="searchQuery" (searchChange)="searchQuery = $event; onSearch()"
+      [placeholder]="'manage_categories.search_placeholder' | translate" />
   </div>
 
+  <!-- ========================= -->
   <!-- ERROR -->
+  <!-- ========================= -->
+
   @if (error()) {
-  <div
-    class="p-4 rounded-xl border border-red-200 bg-red-50 text-red-700 dark:bg-red-950/30 dark:border-red-900 dark:text-red-300">
+  <div class="p-4 rounded-xl border border-red-200 bg-red-50
+             text-red-700 dark:bg-red-950/30 dark:border-red-900
+             dark:text-red-300">
     {{ error() }}
   </div>
   }
 
+  <!-- ========================= -->
   <!-- TABLE -->
-  <div
-    class="rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 shadow-sm overflow-x-auto">
-    <table class="w-full text-left border-collapse text-sm">
+  <!-- ========================= -->
 
+  <div class="rounded-2xl border border-aquamarine-200
+           dark:border-aquamarine-800 bg-white
+           dark:bg-aquamarine-900 shadow-sm overflow-x-auto">
+    <table class="w-full text-left border-collapse text-sm">
       <thead>
-        <tr
-          class="border-b border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950/50">
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">
+        <tr class="border-b border-aquamarine-200
+                 dark:border-aquamarine-800
+                 bg-aquamarine-50/50
+                 dark:bg-aquamarine-950/50">
+          <th class="p-4 font-semibold text-aquamarine-900
+                   dark:text-aquamarine-100">
             {{ 'table.code' | translate }}
           </th>
 
-          <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">
+          <th class="p-4 font-semibold text-aquamarine-900
+                   dark:text-aquamarine-100">
             {{ 'manage_categories.translations' | translate }}
           </th>
 
-          <th class="p-4 text-center font-semibold text-aquamarine-900 dark:text-aquamarine-100">
+          <th class="p-4 text-center font-semibold
+                   text-aquamarine-900 dark:text-aquamarine-100">
             {{ 'manage_categories.translation_count' | translate }}
           </th>
 
-          <th class="p-4 text-center font-semibold text-aquamarine-900 dark:text-aquamarine-100">
+          <th class="p-4 text-center font-semibold
+                   text-aquamarine-900 dark:text-aquamarine-100">
             {{ 'table.actions' | translate }}
           </th>
         </tr>
       </thead>
 
-      <tbody class="divide-y divide-aquamarine-100 dark:divide-aquamarine-800">
+      <tbody class="divide-y divide-aquamarine-100
+               dark:divide-aquamarine-800">
         @if (loading()) {
         <tr>
           <td colspan="4" class="p-10 text-center text-aquamarine-600">
@@ -83,15 +95,13 @@
         </tr>
         }
 
-        @for (
-        category of categories();
-        track category.id
-        ) {
-        <tr class="hover:bg-aquamarine-50/30 dark:hover:bg-aquamarine-950/30">
-
+        @for (category of categories(); track category.id) {
+        <tr class="hover:bg-aquamarine-50/30
+                   dark:hover:bg-aquamarine-950/30">
           <!-- CODE -->
           <td class="p-4">
-            <div class="font-semibold text-aquamarine-950 dark:text-aquamarine-50">
+            <div class="font-semibold text-aquamarine-950
+                       dark:text-aquamarine-50">
               {{ category.code }}
             </div>
 
@@ -107,13 +117,14 @@
               translation of category.translations;
               track translation.id
               ) {
-              <span
-                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border border-aquamarine-200 dark:border-aquamarine-700 bg-aquamarine-50 dark:bg-aquamarine-950">
+              <span class="inline-flex items-center gap-1.5
+                           px-2.5 py-1 rounded-full text-xs
+                           font-medium border border-aquamarine-200
+                           dark:border-aquamarine-700
+                           bg-aquamarine-50
+                           dark:bg-aquamarine-950">
                 <span>
-                  {{
-                  translation.language?.flag
-                  || '🌐'
-                  }}
+                  {{ translation.language?.flag || '🌐' }}
                 </span>
 
                 <strong>
@@ -133,8 +144,11 @@
 
           <!-- COUNT -->
           <td class="p-4 text-center">
-            <span
-              class="inline-flex min-w-8 justify-center rounded-full bg-aquamarine-100 dark:bg-aquamarine-800 px-2.5 py-1 font-semibold text-aquamarine-800 dark:text-aquamarine-100">
+            <span class="inline-flex min-w-8 justify-center
+                       rounded-full bg-aquamarine-100
+                       dark:bg-aquamarine-800 px-2.5 py-1
+                       font-semibold text-aquamarine-800
+                       dark:text-aquamarine-100">
               {{ category.translationCount }}
             </span>
           </td>
@@ -142,311 +156,770 @@
           <!-- ACTION -->
           <td class="p-4">
             <div class="flex justify-center gap-2">
-              <app-icon-button
-                icon="bi bi-pencil-square"
-                color="blue"
-                variant="soft"
-                size="sm"
-                [title]="'action.edit' | translate"
-                (btnClick)="setEditCategory(category)"
-              >
+              <app-icon-button icon="bi bi-pencil-square" color="blue" variant="soft" size="sm"
+                [title]="'action.edit' | translate" (btnClick)="setEditCategory(category)">
                 {{ 'action.edit' | translate }}
               </app-icon-button>
-              <app-icon-button
-                icon="bi bi-trash3-fill"
-                color="red"
-                variant="soft"
-                size="sm"
-                [title]="'action.delete' | translate"
-                (btnClick)="deleteCategory(category)"
-              >
+
+              <app-icon-button icon="bi bi-trash3-fill" color="red" variant="soft" size="sm"
+                [title]="'action.delete' | translate" (btnClick)="deleteCategory(category)">
                 {{ 'action.delete' | translate }}
               </app-icon-button>
             </div>
           </td>
-
         </tr>
         }
       </tbody>
     </table>
   </div>
 
+  <!-- ========================= -->
   <!-- PAGINATION -->
-  @if (
-  !loading() &&
-  (meta()?.totalItems ?? 0) > 0
-  ) {
-  <div class="mt-6 flex justify-between items-center text-xs text-aquamarine-700 dark:text-aquamarine-300">
+  <!-- ========================= -->
+
+  @if (!loading() && (meta()?.totalItems ?? 0) > 0) {
+  <div class="mt-6 flex justify-between items-center
+             text-xs text-aquamarine-700
+             dark:text-aquamarine-300">
     <div>
-      {{ 'moderator.showing' | translate }} <strong>{{ meta()?.itemCount }}</strong> / <strong>{{ meta()?.totalItems }}</strong> {{ 'dashboard.categories' | translate }}
+      {{ 'moderator.showing' | translate }}
+
+      <strong>
+        {{ meta()?.itemCount }}
+      </strong>
+
+      /
+
+      <strong>
+        {{ meta()?.totalItems }}
+      </strong>
+
+      {{ 'dashboard.categories' | translate }}
     </div>
+
     <ul class="inline-flex items-center gap-1 text-sm">
-
-      <!-- Trang đầu << -->
+      <!-- First -->
       <li>
-        <app-icon-button
-          icon="bi bi-chevron-double-left"
-          color="primary"
-          variant="soft"
-          size="sm"
-          [disabled]="currentPage() === 1"
-          (btnClick)="setPage(1)"
-        />
+        <app-icon-button icon="bi bi-chevron-double-left" color="primary" variant="soft" size="sm"
+          [disabled]="currentPage() === 1" (btnClick)="setPage(1)" />
       </li>
 
-      <!-- Trang trước < -->
+      <!-- Previous -->
       <li>
-        <app-icon-button
-          icon="bi bi-chevron-left"
-          color="primary"
-          variant="soft"
-          size="sm"
-          [disabled]="currentPage() === 1"
-          (btnClick)="setPage(currentPage() - 1)"
-        />
+        <app-icon-button icon="bi bi-chevron-left" color="primary" variant="soft" size="sm"
+          [disabled]="currentPage() === 1" (btnClick)="setPage(currentPage() - 1)" />
       </li>
 
-      <!-- Các trang & Dấu 3 chấm -->
       @for (item of pageItems(); track $index) {
-        @if (item.type === 'page') {
-          <li>
-            <app-text-button
-              [variant]="currentPage() === item.value ? 'primary' : 'secondary'"
-              size="sm"
-              (btnClick)="setPage(item.value!)"
-            >
-              {{ item.value }}
-            </app-text-button>
-          </li>
-        } @else {
-          <li>
-            <span class="inline-flex min-w-6 h-8 items-center justify-center text-xs font-bold text-aquamarine-500 select-none">
-              ...
-            </span>
-          </li>
-        }
+      @if (item.type === 'page') {
+      <li>
+        <app-text-button [variant]="
+                  currentPage() === item.value
+                    ? 'primary'
+                    : 'secondary'
+                " size="sm" (btnClick)="setPage(item.value!)">
+          {{ item.value }}
+        </app-text-button>
+      </li>
+      } @else {
+      <li>
+        <span class="inline-flex min-w-6 h-8 items-center
+                       justify-center text-xs font-bold
+                       text-aquamarine-500 select-none">
+          ...
+        </span>
+      </li>
+      }
       }
 
-      <!-- Trang sau > -->
+      <!-- Next -->
       <li>
-        <app-icon-button
-          icon="bi bi-chevron-right"
-          color="primary"
-          variant="soft"
-          size="sm"
-          [disabled]="currentPage() === (meta()?.totalPages ?? 1)"
-          (btnClick)="setPage(currentPage() + 1)"
-        />
+        <app-icon-button icon="bi bi-chevron-right" color="primary" variant="soft" size="sm"
+          [disabled]="currentPage() === (meta()?.totalPages ?? 1)" (btnClick)="setPage(currentPage() + 1)" />
       </li>
 
-      <!-- Trang cuối >> -->
+      <!-- Last -->
       <li>
-        <app-icon-button
-          icon="bi bi-chevron-double-right"
-          color="primary"
-          variant="soft"
-          size="sm"
-          [disabled]="currentPage() === (meta()?.totalPages ?? 1)"
-          (btnClick)="setPage(meta()?.totalPages ?? 1)"
-        />
+        <app-icon-button icon="bi bi-chevron-double-right" color="primary" variant="soft" size="sm"
+          [disabled]="currentPage() === (meta()?.totalPages ?? 1)" (btnClick)="setPage(meta()?.totalPages ?? 1)" />
       </li>
-
     </ul>
   </div>
   }
-
 </section>
 
-
-<!-- ========================= -->
-<!-- CREATE MODAL -->
-<!-- ========================= -->
+<!-- ========================================================= -->
+<!-- CREATE CATEGORY MODAL -->
+<!-- ========================================================= -->
 
 @if (isAddModalOpen()) {
-<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-  <div
-    class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6">
+<div class="fixed inset-0 z-50 flex items-center justify-center
+           bg-black/50 backdrop-blur-sm p-4">
+  <div class="bg-white dark:bg-aquamarine-900 rounded-2xl
+             border border-aquamarine-200
+             dark:border-aquamarine-800 shadow-xl
+             w-full max-w-4xl max-h-[92vh]
+             overflow-y-auto">
+    <!-- HEADER -->
+    <div class="sticky top-0 z-10 flex justify-between items-center
+               px-6 py-5 border-b border-aquamarine-100
+               dark:border-aquamarine-800
+               bg-white dark:bg-aquamarine-900">
+      <div>
+        <h5 class="font-bold text-lg text-aquamarine-950
+                   dark:text-aquamarine-50">
+          {{ 'manage_categories.add_group' | translate }}
+        </h5>
 
-    <div class="flex justify-between items-center mb-5">
-      <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">
-        {{ 'manage_categories.add_group' | translate }}
-      </h5>
+        <p class="text-xs text-aquamarine-500
+                   dark:text-aquamarine-400 mt-1">
+          Tạo danh mục và dịch tự động sang nhiều ngôn ngữ.
+        </p>
+      </div>
 
-      <button type="button" (click)="closeAddCategoryModal()">
+      <button type="button" [disabled]="actionLoading() || newTranslationLoading()" (click)="closeAddCategoryModal()"
+        class="w-9 h-9 rounded-lg flex items-center justify-center
+                 hover:bg-aquamarine-100
+                 dark:hover:bg-aquamarine-800
+                 disabled:opacity-40 cursor-pointer">
         <i class="bi bi-x-lg"></i>
       </button>
     </div>
 
-    <form class="space-y-5" (submit)="$event.preventDefault(); submitAddCategory()">
-
+    <form class="p-6 space-y-6" (submit)="$event.preventDefault(); submitAddCategory()">
       <!-- CODE -->
       <div>
-        <label class="block text-sm font-semibold mb-1">
+        <label class="block text-sm font-semibold mb-1.5">
           {{ 'table.code' | translate }}
         </label>
 
-        <input type="text" name="newCode" [(ngModel)]="newCode" [placeholder]="'manage_categories.code_placeholder' | translate" maxlength="50"
-          class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5" />
+        <input type="text" name="newCode" [(ngModel)]="newCode"
+          [placeholder]="'manage_categories.code_placeholder' | translate" maxlength="50" class="w-full rounded-xl border
+                   border-aquamarine-200
+                   dark:border-aquamarine-800
+                   bg-aquamarine-50/50
+                   dark:bg-aquamarine-950
+                   px-4 py-2.5 outline-none
+                   focus:ring-2 focus:ring-aquamarine-500/30" />
 
         <p class="text-xs text-aquamarine-500 mt-1">
           {{ 'manage_categories.code_hint' | translate }}
         </p>
       </div>
 
-      <!-- TRANSLATIONS -->
-      <div class="space-y-3">
+      <!-- ===================================================== -->
+      <!-- AUTO TRANSLATE -->
+      <!-- ===================================================== -->
 
-        <div class="flex justify-between items-center">
-          <label class="font-semibold">
-            {{ 'manage_categories.translations' | translate }}
-          </label>
+      <div class="rounded-2xl border border-violet-200
+                 dark:border-violet-900/60
+                 bg-violet-50/40
+                 dark:bg-violet-950/10 p-5 space-y-5">
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-10 rounded-xl bg-violet-100
+                     dark:bg-violet-900/40
+                     flex items-center justify-center
+                     text-violet-600 dark:text-violet-300">
+            <i class="bi bi-stars text-lg"></i>
+          </div>
 
-          <button type="button" class="text-sm font-semibold text-aquamarine-600" (click)="addNewTranslationRow()">
+          <div>
+            <h6 class="font-bold text-aquamarine-950
+                       dark:text-aquamarine-50">
+              Dịch tự động
+            </h6>
+
+            <p class="text-xs text-aquamarine-500
+                       dark:text-aquamarine-400 mt-1">
+              Chọn ngôn ngữ nguồn và các ngôn ngữ đích.
+              Hệ thống chỉ tạo bản dịch xem trước,
+              chưa lưu vào cơ sở dữ liệu.
+            </p>
+          </div>
+        </div>
+
+        <!-- SOURCE -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold mb-1.5">
+              Ngôn ngữ nguồn
+            </label>
+
+            <select name="newSourceLanguageId" [(ngModel)]="newSourceLanguageId"
+              (ngModelChange)="onNewSourceLanguageChange()" class="w-full rounded-xl border
+                       border-aquamarine-200
+                       dark:border-aquamarine-800
+                       bg-white dark:bg-aquamarine-950
+                       px-3 py-2.5 outline-none">
+              <option [ngValue]="null">
+                Chọn ngôn ngữ nguồn
+              </option>
+
+              @for (language of languages; track language.id) {
+              <option [ngValue]="language.id">
+                {{ language.flag }}
+                {{ language.name }}
+              </option>
+              }
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold mb-1.5">
+              Tên danh mục nguồn
+            </label>
+
+            <input type="text" name="newSourceName" [(ngModel)]="newSourceName" maxlength="100"
+              placeholder="Ví dụ: Công nghệ" class="w-full rounded-xl border
+                       border-aquamarine-200
+                       dark:border-aquamarine-800
+                       bg-white dark:bg-aquamarine-950
+                       px-3 py-2.5 outline-none
+                       focus:ring-2 focus:ring-violet-500/30" />
+          </div>
+        </div>
+
+        <!-- TARGET LANGUAGES -->
+        <div>
+          <div class="flex items-center justify-between gap-3 mb-2">
+            <label class="text-sm font-semibold">
+              Ngôn ngữ đích
+            </label>
+
+            <span class="text-xs text-aquamarine-500">
+              Đã chọn:
+              {{ newTargetLanguageIds.length }}
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2
+                     lg:grid-cols-3 gap-2">
+            @for (
+            language of newTargetLanguages;
+            track language.id
+            ) {
+            <label class="flex items-center gap-3 px-3 py-2.5
+                         rounded-xl border cursor-pointer
+                         transition-colors
+                         border-aquamarine-200
+                         dark:border-aquamarine-800
+                         bg-white dark:bg-aquamarine-950
+                         hover:border-violet-400">
+              <input type="checkbox" [name]="'newTargetLanguage' + language.id"
+                [checked]="isNewTargetSelected(language.id)" (change)="
+                      toggleNewTargetLanguage(
+                        language.id,
+                        $any($event.target).checked
+                      )
+                    " class="accent-violet-600" />
+
+              <span class="text-lg">
+                {{ language.flag }}
+              </span>
+
+              <span class="text-sm font-medium
+                           text-aquamarine-900
+                           dark:text-aquamarine-100">
+                {{ language.name }}
+              </span>
+            </label>
+            }
+          </div>
+        </div>
+
+        <!-- TRANSLATE ERROR -->
+        @if (newTranslationError()) {
+        <div class="rounded-xl border border-red-200
+                     dark:border-red-900
+                     bg-red-50 dark:bg-red-950/30
+                     px-4 py-3 text-sm
+                     text-red-700 dark:text-red-300">
+          <i class="bi bi-exclamation-circle me-1"></i>
+          {{ newTranslationError() }}
+        </div>
+        }
+
+        <!-- TRANSLATE BUTTON -->
+        <div>
+          <button type="button" [disabled]="
+                newTranslationLoading()
+                || actionLoading()
+              " (click)="translateNewCategoryPreview()" class="inline-flex items-center justify-center
+                     gap-2 rounded-xl bg-violet-600
+                     hover:bg-violet-700 text-white
+                     px-4 py-2.5 text-sm font-semibold
+                     transition-colors cursor-pointer
+                     disabled:opacity-50
+                     disabled:cursor-not-allowed">
+            @if (newTranslationLoading()) {
+            <span class="inline-block w-4 h-4 rounded-full
+                         border-2 border-white/40
+                         border-r-white animate-spin"></span>
+
+            Đang dịch...
+            } @else {
+            <i class="bi bi-stars"></i>
+            Dịch tự động
+            }
+          </button>
+        </div>
+      </div>
+
+      <!-- ===================================================== -->
+      <!-- EDITABLE TRANSLATIONS -->
+      <!-- ===================================================== -->
+
+      <div class="rounded-2xl border border-aquamarine-200
+                 dark:border-aquamarine-800 p-5">
+        <div class="flex flex-col sm:flex-row sm:items-center
+                   sm:justify-between gap-3 mb-4">
+          <div>
+            <h6 class="font-semibold text-aquamarine-950
+                       dark:text-aquamarine-50">
+              {{ 'manage_categories.translations' | translate }}
+            </h6>
+
+            <p class="text-xs text-aquamarine-500
+                       dark:text-aquamarine-400 mt-1">
+              Kết quả dịch có thể chỉnh sửa lại trước khi lưu.
+            </p>
+          </div>
+
+          <button type="button" class="text-sm font-semibold text-aquamarine-600
+                     dark:text-aquamarine-400
+                     hover:text-aquamarine-700 cursor-pointer" (click)="addNewTranslationRow()">
             <i class="bi bi-plus-lg"></i>
             {{ 'manage_categories.add_language' | translate }}
           </button>
         </div>
 
-        @for (
-        row of newTranslations;
-        track $index;
-        let index = $index
-        ) {
-        <div class="grid grid-cols-[160px_1fr_auto] gap-2 items-center">
+        <div class="space-y-3">
+          @for (
+          row of newTranslations;
+          track $index;
+          let index = $index
+          ) {
+          <div class="grid grid-cols-1
+                       md:grid-cols-[180px_1fr_auto]
+                       gap-2 items-center">
+            <div class="relative">
+              <select [name]="'newLanguage' + index" [(ngModel)]="row.languageId" class="w-full rounded-xl border
+                           border-aquamarine-200
+                           dark:border-aquamarine-800
+                           bg-white dark:bg-aquamarine-950
+                           px-3 py-2.5">
+                <option [ngValue]="null">
+                  {{
+                  'manage_categories.select_language'
+                  | translate
+                  }}
+                </option>
 
-          <select [name]="'newLanguage' + index" [(ngModel)]="row.languageId"
-            class="rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 px-3 py-2.5">
-            <option [ngValue]="null">
-              {{ 'manage_categories.select_language' | translate }}
-            </option>
+                @for (
+                language of languages;
+                track language.id
+                ) {
+                <option [ngValue]="language.id" [disabled]="
+                          isLanguageUsed(
+                            language.id,
+                            newTranslations,
+                            index
+                          )
+                        ">
+                  {{ language.flag }}
+                  {{ language.name }}
+                </option>
+                }
+              </select>
 
-            @for (
-            language of languages;
-            track language.id
-            ) {
-            <option [ngValue]="language.id" [disabled]="isLanguageUsed(language.id, newTranslations, index)">
-              {{ language.flag }} {{ language.name }}
-            </option>
-            }
-          </select>
+              @if (
+              row.languageId === newSourceLanguageId
+              ) {
+              <span class="absolute -top-2 right-2
+                             rounded-full bg-violet-600
+                             text-white text-[10px]
+                             font-semibold px-2 py-0.5">
+                Nguồn
+              </span>
+              }
+            </div>
 
-          <input type="text" [name]="'newTranslationName' + index" [(ngModel)]="row.name" maxlength="100"
-            [placeholder]="'manage_categories.name_placeholder' | translate"
-            class="rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 px-3 py-2.5" />
+            <input type="text" [name]="'newTranslationName' + index" [(ngModel)]="row.name" maxlength="100"
+              [placeholder]="
+                    'manage_categories.name_placeholder'
+                      | translate
+                  " class="w-full rounded-xl border
+                         border-aquamarine-200
+                         dark:border-aquamarine-800
+                         bg-white dark:bg-aquamarine-950
+                         px-3 py-2.5" />
 
-          <button type="button" class="p-2 text-red-600 disabled:opacity-30" [disabled]="newTranslations.length === 1"
-            (click)="removeNewTranslationRow(index)">
-            <i class="bi bi-trash"></i>
-          </button>
-
+            <button type="button" class="w-10 h-10 flex items-center
+                         justify-center rounded-xl
+                         text-red-600 hover:bg-red-50
+                         dark:hover:bg-red-950/30
+                         disabled:opacity-30 cursor-pointer" [disabled]="
+                    newTranslations.length === 1
+                    || row.languageId === newSourceLanguageId
+                  " (click)="removeNewTranslationRow(index)">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+          }
         </div>
-        }
       </div>
 
-      <div class="flex justify-end gap-3 pt-3">
-        <app-text-button variant="secondary" size="md" [disabled]="actionLoading()" (btnClick)="closeAddCategoryModal()">
+      <!-- ACTION -->
+      <div class="flex justify-end gap-3 pt-3
+                 border-t border-aquamarine-100
+                 dark:border-aquamarine-800">
+        <app-text-button variant="secondary" size="md" [disabled]="
+              actionLoading()
+              || newTranslationLoading()
+            " (btnClick)="closeAddCategoryModal()">
           {{ 'modal.cancel' | translate }}
         </app-text-button>
 
-        <app-text-button variant="primary" size="md" type="submit" [disabled]="actionLoading()" [loading]="actionLoading()">
+        <app-text-button variant="primary" size="md" type="submit" [disabled]="
+              actionLoading()
+              || newTranslationLoading()
+            " [loading]="actionLoading()">
           {{ 'manage_categories.create_btn' | translate }}
         </app-text-button>
       </div>
-
     </form>
   </div>
 </div>
 }
 
-
-<!-- ========================= -->
-<!-- EDIT MODAL -->
-<!-- ========================= -->
+<!-- ========================================================= -->
+<!-- EDIT CATEGORY MODAL -->
+<!-- ========================================================= -->
 
 @if (activeEditCategory()) {
-<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-  <div
-    class="bg-white dark:bg-aquamarine-900 rounded-2xl border border-aquamarine-200 dark:border-aquamarine-800 shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6">
+<div class="fixed inset-0 z-50 flex items-center justify-center
+           bg-black/50 backdrop-blur-sm p-4">
+  <div class="bg-white dark:bg-aquamarine-900 rounded-2xl
+             border border-aquamarine-200
+             dark:border-aquamarine-800 shadow-xl
+             w-full max-w-4xl max-h-[92vh]
+             overflow-y-auto">
+    <!-- HEADER -->
+    <div class="sticky top-0 z-10 flex justify-between items-center
+               px-6 py-5 border-b border-aquamarine-100
+               dark:border-aquamarine-800
+               bg-white dark:bg-aquamarine-900">
+      <div>
+        <h5 class="font-bold text-lg text-aquamarine-950
+                   dark:text-aquamarine-50">
+          {{ 'manage_categories.edit_group' | translate }}
+        </h5>
 
-    <div class="flex justify-between items-center mb-5">
-      <h5 class="font-bold text-lg text-aquamarine-950 dark:text-aquamarine-50">
-        {{ 'manage_categories.edit_group' | translate }}
-      </h5>
+        <p class="text-xs text-aquamarine-500
+                   dark:text-aquamarine-400 mt-1">
+          Có thể dịch thêm hoặc cập nhật bản dịch
+          hiện có trước khi lưu.
+        </p>
+      </div>
 
-      <button type="button" (click)="closeEditCategoryModal()">
+      <button type="button" [disabled]="actionLoading() || editTranslationLoading()" (click)="closeEditCategoryModal()"
+        class="w-9 h-9 rounded-lg flex items-center justify-center
+                 hover:bg-aquamarine-100
+                 dark:hover:bg-aquamarine-800
+                 disabled:opacity-40 cursor-pointer">
         <i class="bi bi-x-lg"></i>
       </button>
     </div>
 
-    <form class="space-y-5" (submit)="$event.preventDefault(); submitEditCategory()">
-
+    <form class="p-6 space-y-6" (submit)="$event.preventDefault(); submitEditCategory()">
+      <!-- CODE -->
       <div>
-        <label class="block text-sm font-semibold mb-1">
+        <label class="block text-sm font-semibold mb-1.5">
           {{ 'table.code' | translate }}
         </label>
 
-        <input type="text" name="editCode" [(ngModel)]="editCode" maxlength="50"
-          class="w-full rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-aquamarine-50/50 dark:bg-aquamarine-950 px-4 py-2.5" />
+        <input type="text" name="editCode" [(ngModel)]="editCode" maxlength="50" class="w-full rounded-xl border
+                   border-aquamarine-200
+                   dark:border-aquamarine-800
+                   bg-aquamarine-50/50
+                   dark:bg-aquamarine-950
+                   px-4 py-2.5" />
       </div>
 
-      <div class="space-y-3">
+      <!-- ===================================================== -->
+      <!-- AUTO TRANSLATE -->
+      <!-- ===================================================== -->
 
-        <div class="flex justify-between items-center">
-          <label class="font-semibold">
-            {{ 'manage_categories.translations' | translate }}
-          </label>
+      <div class="rounded-2xl border border-violet-200
+                 dark:border-violet-900/60
+                 bg-violet-50/40
+                 dark:bg-violet-950/10 p-5 space-y-5">
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-10 rounded-xl bg-violet-100
+                     dark:bg-violet-900/40
+                     flex items-center justify-center
+                     text-violet-600 dark:text-violet-300">
+            <i class="bi bi-stars text-lg"></i>
+          </div>
 
-          <button type="button" class="text-sm font-semibold text-aquamarine-600" (click)="addEditTranslationRow()">
+          <div>
+            <h6 class="font-bold text-aquamarine-950
+                       dark:text-aquamarine-50">
+              Dịch tự động
+            </h6>
+
+            <p class="text-xs text-aquamarine-500
+                       dark:text-aquamarine-400 mt-1">
+              Chọn một bản dịch hiện có làm nguồn
+              rồi dịch sang các ngôn ngữ đích.
+            </p>
+          </div>
+        </div>
+
+        <!-- SOURCE -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold mb-1.5">
+              Ngôn ngữ nguồn
+            </label>
+
+            <select name="editSourceLanguageId" [(ngModel)]="editSourceLanguageId"
+              (ngModelChange)="onEditSourceLanguageChange()" class="w-full rounded-xl border
+                       border-aquamarine-200
+                       dark:border-aquamarine-800
+                       bg-white dark:bg-aquamarine-950
+                       px-3 py-2.5">
+              <option [ngValue]="null">
+                Chọn ngôn ngữ nguồn
+              </option>
+
+              @for (language of languages; track language.id) {
+              <option [ngValue]="language.id">
+                {{ language.flag }}
+                {{ language.name }}
+              </option>
+              }
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold mb-1.5">
+              Tên danh mục nguồn
+            </label>
+
+            <input type="text" name="editSourceName" [(ngModel)]="editSourceName" maxlength="100" class="w-full rounded-xl border
+                       border-aquamarine-200
+                       dark:border-aquamarine-800
+                       bg-white dark:bg-aquamarine-950
+                       px-3 py-2.5" />
+          </div>
+        </div>
+
+        <!-- TARGET LANGUAGES -->
+        <div>
+          <div class="flex items-center justify-between gap-3 mb-2">
+            <label class="text-sm font-semibold">
+              Ngôn ngữ đích
+            </label>
+
+            <span class="text-xs text-aquamarine-500">
+              Đã chọn:
+              {{ editTargetLanguageIds.length }}
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2
+                     lg:grid-cols-3 gap-2">
+            @for (
+            language of editTargetLanguages;
+            track language.id
+            ) {
+            <label class="flex items-center gap-3
+                         px-3 py-2.5 rounded-xl
+                         border cursor-pointer
+                         border-aquamarine-200
+                         dark:border-aquamarine-800
+                         bg-white dark:bg-aquamarine-950
+                         hover:border-violet-400">
+              <input type="checkbox" [name]="'editTargetLanguage' + language.id"
+                [checked]="isEditTargetSelected(language.id)" (change)="
+                      toggleEditTargetLanguage(
+                        language.id,
+                        $any($event.target).checked
+                      )
+                    " class="accent-violet-600" />
+
+              <span class="text-lg">
+                {{ language.flag }}
+              </span>
+
+              <span class="text-sm font-medium
+                           text-aquamarine-900
+                           dark:text-aquamarine-100">
+                {{ language.name }}
+              </span>
+            </label>
+            }
+          </div>
+        </div>
+
+        @if (editTranslationError()) {
+        <div class="rounded-xl border border-red-200
+                     dark:border-red-900
+                     bg-red-50 dark:bg-red-950/30
+                     px-4 py-3 text-sm
+                     text-red-700 dark:text-red-300">
+          <i class="bi bi-exclamation-circle me-1"></i>
+          {{ editTranslationError() }}
+        </div>
+        }
+
+        <button type="button" [disabled]="
+              editTranslationLoading()
+              || actionLoading()
+            " (click)="translateEditCategoryPreview()" class="inline-flex items-center justify-center
+                   gap-2 rounded-xl bg-violet-600
+                   hover:bg-violet-700 text-white
+                   px-4 py-2.5 text-sm font-semibold
+                   cursor-pointer disabled:opacity-50
+                   disabled:cursor-not-allowed">
+          @if (editTranslationLoading()) {
+          <span class="inline-block w-4 h-4 rounded-full
+                       border-2 border-white/40
+                       border-r-white animate-spin"></span>
+
+          Đang dịch...
+          } @else {
+          <i class="bi bi-stars"></i>
+          Dịch tự động
+          }
+        </button>
+      </div>
+
+      <!-- ===================================================== -->
+      <!-- EXISTING / PREVIEW TRANSLATIONS -->
+      <!-- ===================================================== -->
+
+      <div class="rounded-2xl border border-aquamarine-200
+                 dark:border-aquamarine-800 p-5">
+        <div class="flex flex-col sm:flex-row sm:items-center
+                   sm:justify-between gap-3 mb-4">
+          <div>
+            <h6 class="font-semibold text-aquamarine-950
+                       dark:text-aquamarine-50">
+              {{ 'manage_categories.translations' | translate }}
+            </h6>
+
+            <p class="text-xs text-aquamarine-500
+                       dark:text-aquamarine-400 mt-1">
+              Bản dịch tự động sẽ được ghép vào danh sách này.
+              Bạn có thể chỉnh sửa trước khi lưu.
+            </p>
+          </div>
+
+          <button type="button" class="text-sm font-semibold
+                     text-aquamarine-600
+                     dark:text-aquamarine-400
+                     cursor-pointer" (click)="addEditTranslationRow()">
             <i class="bi bi-plus-lg"></i>
             {{ 'manage_categories.add_language' | translate }}
           </button>
         </div>
 
-        @for (
-        row of editTranslations;
-        track $index;
-        let index = $index
-        ) {
-        <div class="grid grid-cols-[160px_1fr_auto] gap-2 items-center">
+        <div class="space-y-3">
+          @for (
+          row of editTranslations;
+          track $index;
+          let index = $index
+          ) {
+          <div class="grid grid-cols-1
+                       md:grid-cols-[180px_1fr_auto]
+                       gap-2 items-center">
+            <div class="relative">
+              <select [name]="'editLanguage' + index" [(ngModel)]="row.languageId" class="w-full rounded-xl border
+                           border-aquamarine-200
+                           dark:border-aquamarine-800
+                           bg-white dark:bg-aquamarine-950
+                           px-3 py-2.5">
+                <option [ngValue]="null">
+                  {{
+                  'manage_categories.select_language'
+                  | translate
+                  }}
+                </option>
 
-          <select [name]="'editLanguage' + index" [(ngModel)]="row.languageId"
-            class="rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 px-3 py-2.5">
-            <option [ngValue]="null">
-              {{ 'manage_categories.select_language' | translate }}
-            </option>
+                @for (
+                language of languages;
+                track language.id
+                ) {
+                <option [ngValue]="language.id" [disabled]="
+                          isLanguageUsed(
+                            language.id,
+                            editTranslations,
+                            index
+                          )
+                        ">
+                  {{ language.flag }}
+                  {{ language.name }}
+                </option>
+                }
+              </select>
 
-            @for (
-            language of languages;
-            track language.id
-            ) {
-            <option [ngValue]="language.id" [disabled]="isLanguageUsed(language.id, editTranslations, index)">
-              {{ language.flag }} {{ language.name }}
-            </option>
-            }
-          </select>
+              @if (
+              row.languageId === editSourceLanguageId
+              ) {
+              <span class="absolute -top-2 right-2
+                             rounded-full bg-violet-600
+                             text-white text-[10px]
+                             font-semibold px-2 py-0.5">
+                Nguồn
+              </span>
+              }
+            </div>
 
-          <input type="text" [name]="'editTranslationName' + index" [(ngModel)]="row.name" maxlength="100"
-            [placeholder]="'manage_categories.name_placeholder' | translate"
-            class="rounded-xl border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-950 px-3 py-2.5" />
+            <input type="text" [name]="'editTranslationName' + index" [(ngModel)]="row.name" maxlength="100"
+              [placeholder]="
+                    'manage_categories.name_placeholder'
+                      | translate
+                  " class="w-full rounded-xl border
+                         border-aquamarine-200
+                         dark:border-aquamarine-800
+                         bg-white dark:bg-aquamarine-950
+                         px-3 py-2.5" />
 
-          <button type="button" class="p-2 text-red-600" [title]="'manage_categories.remove_row' | translate" (click)="removeEditTranslationRow(index)">
-            <i class="bi bi-trash"></i>
-          </button>
-
+            <button type="button" class="w-10 h-10 flex items-center
+                         justify-center rounded-xl
+                         text-red-600 hover:bg-red-50
+                         dark:hover:bg-red-950/30
+                         cursor-pointer" [title]="
+                    'manage_categories.remove_row'
+                      | translate
+                  " (click)="removeEditTranslationRow(index)">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+          }
         </div>
-        }
       </div>
 
-      <div class="flex justify-end gap-3 pt-3">
-        <app-text-button variant="secondary" size="md" [disabled]="actionLoading()" (btnClick)="closeEditCategoryModal()">
+      <!-- ACTIONS -->
+      <div class="flex justify-end gap-3 pt-3
+                 border-t border-aquamarine-100
+                 dark:border-aquamarine-800">
+        <app-text-button variant="secondary" size="md" [disabled]="
+              actionLoading()
+              || editTranslationLoading()
+            " (btnClick)="closeEditCategoryModal()">
           {{ 'modal.cancel' | translate }}
         </app-text-button>
 
-        <app-text-button variant="primary" size="md" type="submit" [disabled]="actionLoading()" [loading]="actionLoading()">
+        <app-text-button variant="primary" size="md" type="submit" [disabled]="
+              actionLoading()
+              || editTranslationLoading()
+            " [loading]="actionLoading()">
           {{ 'common.save' | translate }}
         </app-text-button>
       </div>
-
     </form>
   </div>
 </div>
