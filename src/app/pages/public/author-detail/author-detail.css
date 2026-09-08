@@ -370,6 +370,7 @@
 
 .author-connection-user {
     min-width: 0;
+    width: 100%;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -378,6 +379,9 @@
     border-radius: 11px;
     background: var(--card-bg);
     color: inherit;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
     transition:
         border-color 150ms ease,
         background 150ms ease,
@@ -737,3 +741,5 @@
         min-height: 190px;
     }
 }
+
+

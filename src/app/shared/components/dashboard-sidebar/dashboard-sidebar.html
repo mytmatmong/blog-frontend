@@ -42,8 +42,29 @@
 
   <!-- dashboard-sidebar-footer -->
   <div class="space-y-1 mt-auto">
-    <a routerLink="/" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] hover:text-[var(--brand)] transition-colors"><i class="bi bi-house"></i>{{ 'dashboard.back_public' | translate }}</a>
-    <a routerLink="/auth" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--danger,#dc2626)] hover:bg-[color-mix(in_srgb,var(--danger,#dc2626)_8%,transparent)] transition-colors" (click)="auth.setRole('guest')">
+    <!-- Quick Switch Dashboards -->
+    @if (canAccessOwner && activeSection !== 'owner') {
+    <a routerLink="/dashboard/owner" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] hover:text-[var(--brand)] transition-colors">
+      <i class="bi bi-pencil-square"></i>{{ 'nav.owner_dashboard' | translate }}
+    </a>
+    }
+
+    @if (canAccessModerator && activeSection !== 'moderator') {
+    <a routerLink="/dashboard/moderator" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] hover:text-[var(--brand)] transition-colors">
+      <i class="bi bi-shield-check"></i>{{ 'nav.moderator_dashboard' | translate }}
+    </a>
+    }
+
+    @if (canAccessAdmin && activeSection !== 'admin') {
+    <a routerLink="/dashboard/admin" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] hover:text-[var(--brand)] transition-colors">
+      <i class="bi bi-gear"></i>{{ 'nav.admin_dashboard' | translate }}
+    </a>
+    }
+
+    <a routerLink="/" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--card-text-default)] hover:bg-[var(--card-bg-muted)] hover:text-[var(--brand)] transition-colors">
+      <i class="bi bi-house"></i>{{ 'dashboard.back_public' | translate }}
+    </a>
+    <a routerLink="/auth" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[var(--danger,#dc2626)] hover:bg-[color-mix(in_srgb,var(--danger,#dc2626)_8%,transparent)] transition-colors" (click)="onLogout()">
       <i class="bi bi-box-arrow-right"></i>{{ 'dashboard.logout' | translate }}
     </a>
   </div>

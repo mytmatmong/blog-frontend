@@ -84,25 +84,25 @@
 .moderator-quick-actions {
   display: grid;
   gap: 10px;
-  margin-top: 20px;
+  margin-top: 16px;
 }
 
 .moderator-quick-action {
   display: flex;
   min-width: 0;
-  min-height: 46px;
+  min-height: 44px;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
   border: 1px solid transparent;
-  border-radius: 11px;
-  padding: 10px 13px;
-  font-size: 13px;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 14px;
   font-weight: 600;
   line-height: 1.25;
   text-decoration: none;
-  transition: background-color 150ms ease, border-color 150ms ease,
-    color 150ms ease, transform 150ms ease;
+  transition: all 150ms ease;
+  cursor: pointer;
 }
 
 .moderator-quick-action:hover {
@@ -110,41 +110,64 @@
 }
 
 .moderator-quick-action--primary {
-  border-color: var(--brand);
-  background: var(--brand);
+  border-color: #5b5bd6;
+  background: #5b5bd6;
   color: #ffffff;
 }
 
 .moderator-quick-action--primary:hover {
-  border-color: var(--brand-hover);
-  background: var(--brand-hover);
+  border-color: #4848bd;
+  background: #4848bd;
 }
 
 .moderator-quick-action--secondary {
-  border-color: var(--border-strong);
-  background: var(--card-bg-muted);
-  color: var(--card-text-default);
+  border-color: #dbe3ef;
+  background: #ffffff;
+  color: #334155;
+}
+
+:host-context(.dark) .moderator-quick-action--secondary {
+  border-color: #292a43;
+  background: #171a28;
+  color: #f1f5f9;
 }
 
 .moderator-quick-action--secondary:hover {
-  border-color: var(--brand);
-  background: var(--brand-soft);
-  color: var(--brand-hover);
+  border-color: #5b5bd6;
+  background: #f8fafc;
+  color: #5b5bd6;
+}
+
+:host-context(.dark) .moderator-quick-action--secondary:hover {
+  border-color: #8b8cf8;
+  background: #24283a;
+  color: #8b8cf8;
+}
+
+.moderator-quick-action--secondary .bi-chevron-right {
+  font-size: 12px;
+  color: #94a3b8;
+  transition: color 150ms ease;
+}
+
+.moderator-quick-action--secondary:hover .bi-chevron-right {
+  color: currentColor;
 }
 
 .moderator-action-count {
-  min-width: 28px;
+  min-width: 26px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex: 0 0 auto;
   border-radius: 999px;
-  background: color-mix(in srgb, currentColor 14%, transparent);
-  padding: 3px 8px;
+  background: rgba(255, 255, 255, 0.22);
+  padding: 0 8px;
   text-align: center;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
-}
-
-.moderator-quick-action--primary .moderator-action-count {
-  background: rgb(255 255 255 / 20%);
+  color: #ffffff;
 }
 
 @media (max-width: 1050px) {

@@ -2,6 +2,51 @@
 <main class="auth-page">
   <!-- auth-layout -->
   <div class="auth-layout">
+    <!-- Top-Right Actions on Card: Language & Theme -->
+    <div class="auth-actions">
+      <!-- Language Dropdown -->
+      <div class="auth-dropdown-wrap">
+        <button
+          type="button"
+          class="auth-action-btn"
+          (click)="toggleLangDropdown($event)"
+          [title]="ts.currentLang()"
+          aria-label="Language selector">
+          <span>{{ ts.currentLang() }}</span>
+          <i class="bi bi-chevron-down text-[10px] opacity-70"></i>
+        </button>
+
+        @if (isLangDropdownOpen()) {
+        <div class="auth-dropdown-menu">
+          <div class="auth-dropdown-label">{{ 'nav.language' | translate }}</div>
+          @for (lang of ts.languages(); track lang.code) {
+          <button
+            type="button"
+            class="auth-dropdown-item"
+            [class.is-selected]="ts.currentLang() === lang.code"
+            (click)="selectLang(lang.code)">
+            <span>{{ lang.flag }}</span>
+            <span>{{ lang.name }}</span>
+            @if (ts.currentLang() === lang.code) {
+            <i class="bi bi-check2 ms-auto text-aquamarine-600"></i>
+            }
+          </button>
+          }
+        </div>
+        }
+      </div>
+
+      <!-- Theme Switcher -->
+      <button
+        type="button"
+        class="auth-action-btn auth-theme-btn"
+        (click)="authService.toggleTheme()"
+        [title]="'nav.toggle_theme' | translate"
+        aria-label="Toggle theme">
+        <i class="bi" [class.bi-sun-fill]="authService.isDarkMode()" [class.bi-moon-stars]="!authService.isDarkMode()"></i>
+      </button>
+    </div>
+
     <!-- auth-showcase -->
     <section class="auth-showcase">
       <a routerLink="/" class="auth-brand">

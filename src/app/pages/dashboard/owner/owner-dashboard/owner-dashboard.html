@@ -144,19 +144,17 @@
 
       <div class="quick-links">
         <a routerLink="/dashboard/owner/create-post" class="quick-link">
-          <span><i class="bi bi-pencil-square"></i></span>
-          <div>
-            <strong>{{ 'dashboard.create_new_post' | translate }}</strong>
-            <small>{{ 'dashboard.create_post' | translate }}</small>
-          </div>
+          <span class="quick-link__content">
+            <i class="bi bi-pencil-square"></i>
+            <span>{{ 'dashboard.create_new_post' | translate }}</span>
+          </span>
           <i class="bi bi-chevron-right"></i>
         </a>
         <button type="button" class="quick-link" (click)="openShareModal()">
-          <span><i class="bi bi-share"></i></span>
-          <div>
-            <strong>{{ 'dashboard.share_blog' | translate }}</strong>
-            <small>{{ 'modal.share_desc' | translate }}</small>
-          </div>
+          <span class="quick-link__content">
+            <i class="bi bi-share"></i>
+            <span>{{ 'dashboard.share_blog' | translate }}</span>
+          </span>
           <i class="bi bi-chevron-right"></i>
         </button>
       </div>

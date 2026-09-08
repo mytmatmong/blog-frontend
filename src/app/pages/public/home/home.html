@@ -166,45 +166,7 @@
         }
       </div>
       } @else {
-      @if (featuredPost(); as featured) {
-      <!-- featured-post -->
-      <article class="group relative min-h-[255px] grid grid-cols-[minmax(0,1.03fr)_minmax(260px,0.97fr)] overflow-hidden border border-[color-mix(in_srgb,var(--brand)_12%,var(--border-color))] rounded-[14px] bg-[radial-gradient(circle_at_82%_12%,rgba(255,255,255,0.72),transparent_15rem),linear-gradient(115deg,#f1efff_0%,#f7f6ff_44%,#e4e6ff_100%)] dark:bg-[radial-gradient(circle_at_78%_8%,rgba(126,100,255,0.12),transparent_16rem),linear-gradient(118deg,#171d2b_0%,#181d2b_52%,#20223c_100%)] shadow-[var(--shadow-sm)] max-[820px]:grid-cols-1">
-        <!-- featured-post__content -->
-        <div class="relative z-[2] flex flex-col justify-center p-[28px_14px_27px_28px] max-[820px]:p-[25px]">
-          <span class="w-fit inline-flex items-center gap-[6px] px-2 py-[5px] rounded-[6px] bg-[color-mix(in_srgb,var(--brand)_12%,transparent)] text-[var(--brand)] text-[9px] font-[820] tracking-[0.05em] uppercase"><i class="bi bi-stars"></i>{{ 'dashboard.featured_posts' | translate }}</span>
-          <h1 class="max-w-[560px] mt-[12px] mb-[8px] text-[#131624] dark:text-[var(--card-text-default)] text-[clamp(25px,2.35vw,34px)] leading-[1.12] tracking-[-0.05em]"><a [routerLink]="['/post', featured.id]" class="hover:text-[var(--brand)]">{{ featured.title }}</a></h1>
-          <p class="max-w-[520px] m-0 overflow-hidden text-[#626b80] dark:text-[var(--text-muted)] text-[12px] leading-[1.6] line-clamp-2">{{ featured.excerpt }}</p>
-          <!-- featured-post__author -->
-          <div class="flex items-center justify-between gap-[14px] mt-5 max-[600px]:items-start max-[600px]:flex-col">
-            <a [routerLink]="['/author', featured.authorId]" class="min-w-0 flex items-center gap-[9px]">
-              @if (featured.authorAvatarUrl) {
-              <img [src]="featured.authorAvatarUrl" [alt]="featured.authorName" class="avatar-sm object-cover" />
-              } @else {
-              <span class="avatar-sm">{{ featured.authorAvatar }}</span>
-              }
-              <span class="min-w-0"><strong class="overflow-hidden text-[var(--card-text-default)] text-[10px] font-[730] truncate block">{{ featured.authorName }}</strong><small class="mt-[1px] text-[var(--text-faint)] text-[9px] block">{{ featured.timeAgo }} · {{ featured.readTime
-                  }}</small></span>
-            </a>
-            <a [routerLink]="['/post', featured.id]" class="btn btn-primary min-h-[34px] px-3 rounded-[8px] text-[10px]">{{ 'hashtag.related_posts' | translate }}
-              <i class="bi bi-arrow-up-right"></i></a>
-          </div>
-        </div>
 
-        <!-- featured-post__media -->
-        <a [routerLink]="['/post', featured.id]" class="relative min-w-0 min-h-[255px] overflow-hidden max-[820px]:min-h-[220px] after:content-[''] after:absolute after:inset-y-0 after:left-0 after:w-[28%] after:bg-[linear-gradient(90deg,color-mix(in_srgb,#f5f3ff_96%,transparent),transparent)] dark:after:bg-[linear-gradient(90deg,color-mix(in_srgb,#181d2b_96%,transparent),transparent)] after:pointer-events-none max-[820px]:after:inset-x-0 max-[820px]:after:top-0 max-[820px]:after:w-full max-[820px]:after:h-[22%] max-[820px]:after:bg-[linear-gradient(180deg,color-mix(in_srgb,#f7f6ff_96%,transparent),transparent)] dark:max-[820px]:after:bg-[linear-gradient(180deg,color-mix(in_srgb,#181d2b_96%,transparent),transparent)]" [attr.aria-label]="featured.title">
-          @if (featured.thumbnailUrl) {
-          <img [src]="featured.thumbnailUrl" [alt]="featured.title" class="w-full h-full min-h-[255px] block object-cover transition-transform duration-400 max-[820px]:min-h-[220px] group-hover:scale-[1.035]" />
-          } @else {
-          <!-- featured-post__illustration -->
-          <span class="absolute inset-[32px_30px_24px_22px] grid place-items-center rounded-[24px_24px_14px_14px] bg-[linear-gradient(#8f85e8,#8f85e8)_50%_68%_/_76%_7%_no-repeat,linear-gradient(#b7b2ef,#b7b2ef)_50%_75%_/_67%_5%_no-repeat,radial-gradient(circle_at_50%_44%,#ffffff_0_7%,#d9d6ff_8%_31%,transparent_32%)] text-[#5d3df2]" aria-hidden="true">
-            <span class="absolute grid place-items-center rounded-[14px] bg-white/80 shadow-[0_14px_30px_rgba(72,54,154,0.14)] left-[10%] bottom-[23%] w-[54px] h-[74px] text-[27px]"><i class="bi bi-flower1"></i></span>
-            <span class="absolute grid place-items-center rounded-[14px] bg-white/80 shadow-[0_14px_30px_rgba(72,54,154,0.14)] w-[104px] h-[72px] text-[33px]"><i class="bi bi-code-slash"></i></span>
-            <span class="absolute grid place-items-center rounded-[14px] bg-white/80 shadow-[0_14px_30px_rgba(72,54,154,0.14)] right-[9%] top-[24%] w-[46px] h-[46px] text-[20px]"><i class="bi bi-lightbulb"></i></span>
-          </span>
-          }
-        </a>
-      </article>
-      }
 
       <!-- mobile-home-tools -->
       <div class="hidden max-[600px]:block max-[600px]:mt-3">

@@ -135,7 +135,7 @@ export interface AuthorDetail {
   username: string;
   bio: string | null;
   avatarUrl: string | null;
-  createdAt: string;
+  createdAt: string | null;
   postCount: number;
 }
 

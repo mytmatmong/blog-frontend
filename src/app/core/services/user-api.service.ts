@@ -1,9 +1,9 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { ApiResponse, User } from '../models/auth.model';
+import { ApiResponse, User, UserSummary } from '../models/auth.model';
 import {
   BlogOwnerRequestQuery,
   CreateBlogOwnerRequest,
@@ -97,6 +97,32 @@ export class UserApiService {
     );
   }
 
+  private readonly userCache = new Map<number, UserSummary>();
+
+  cacheUser(user: UserSummary): void {
+    if (user && user.id) {
+      this.userCache.set(user.id, user);
+      try {
+        sessionStorage.setItem(`user_cache_${user.id}`, JSON.stringify(user));
+      } catch {}
+    }
+  }
+
+  getCachedUser(id: number): UserSummary | null {
+    if (this.userCache.has(id)) {
+      return this.userCache.get(id)!;
+    }
+    try {
+      const raw = sessionStorage.getItem(`user_cache_${id}`);
+      if (raw) {
+        const parsed = JSON.parse(raw) as UserSummary;
+        this.userCache.set(id, parsed);
+        return parsed;
+      }
+    } catch {}
+    return null;
+  }
+
   // U11
   getMyFollowers(
     query: PaginationQuery = {},
@@ -104,6 +130,10 @@ export class UserApiService {
     return this.http.get<ApiResponse<PaginatedFollowUsers>>(
       `${this.apiUrl}/user/follow/followers`,
       { params: this.toParams(query) },
+    ).pipe(
+      tap(({ data }) => {
+        data?.items?.forEach((u) => this.cacheUser(u));
+      }),
     );
   }
 
@@ -114,6 +144,10 @@ export class UserApiService {
     return this.http.get<ApiResponse<PaginatedFollowUsers>>(
       `${this.apiUrl}/user/follow/following`,
       { params: this.toParams(query) },
+    ).pipe(
+      tap(({ data }) => {
+        data?.items?.forEach((u) => this.cacheUser(u));
+      }),
     );
   }
 
@@ -125,6 +159,10 @@ export class UserApiService {
     return this.http.get<ApiResponse<PaginatedFollowUsers>>(
       `${this.apiUrl}/user/follow/${userId}/followers`,
       { params: this.toParams(query) },
+    ).pipe(
+      tap(({ data }) => {
+        data?.items?.forEach((u) => this.cacheUser(u));
+      }),
     );
   }
 
@@ -136,6 +174,10 @@ export class UserApiService {
     return this.http.get<ApiResponse<PaginatedFollowUsers>>(
       `${this.apiUrl}/user/follow/${userId}/following`,
       { params: this.toParams(query) },
+    ).pipe(
+      tap(({ data }) => {
+        data?.items?.forEach((u) => this.cacheUser(u));
+      }),
     );
   }
 

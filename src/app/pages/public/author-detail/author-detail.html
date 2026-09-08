@@ -100,6 +100,7 @@
             </div>
 
             <div class="author-profile__meta">
+              @if (currentAuthor.postCount !== undefined && !isNormalUser()) {
               <div class="author-meta-item">
                 <span class="author-meta-item__icon">
                   <i class="bi bi-journal-text"></i>
@@ -115,7 +116,9 @@
                   </small>
                 </span>
               </div>
+              }
 
+              @if (currentAuthor.createdAt) {
               <div class="author-meta-item author-meta-item--wide">
                 <span class="author-meta-item__icon">
                   <i class="bi bi-calendar-check"></i>
@@ -135,6 +138,7 @@
                   </small>
                 </span>
               </div>
+              }
             </div>
 
             <div class="author-profile__actions">
@@ -204,7 +208,7 @@
             user of connectionUsers();
             track user.id
             ) {
-            <a [routerLink]="['/author', user.id]" class="author-connection-user">
+            <a [routerLink]="['/author', user.id]" [state]="{ userSummary: user }" (click)="closeConnections()" class="author-connection-user text-left">
 
               @if (user.avatarUrl) {
               <img [src]="user.avatarUrl" [alt]="user.username" class="author-connection-user__avatar" />
@@ -258,7 +262,8 @@
         }
       </section>
 
-      <!-- Bài viết -->
+      <!-- Bài viết: Chỉ hiển thị khi là Tác giả có bài viết, ẩn khi là người dùng thông thường -->
+      @if (!isNormalUser()) {
       <section class="author-post-section">
         <header class="author-post-header">
           <div>
@@ -335,6 +340,7 @@
         </div>
         }
       </section>
+      }
       }
 
       @else {

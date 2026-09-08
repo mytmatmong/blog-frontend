@@ -11,7 +11,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 })
 export class DashboardSidebar {
   private readonly router = inject(Router);
-  auth = inject(AuthService);
+  readonly auth = inject(AuthService);
 
   get activeSection(): 'owner' | 'moderator' | 'admin' | null {
     const url = this.router.url;
@@ -19,5 +19,27 @@ export class DashboardSidebar {
     if (url.includes('/dashboard/moderator')) return 'moderator';
     if (url.includes('/dashboard/admin')) return 'admin';
     return null;
+  }
+
+  get canAccessOwner(): boolean {
+    const role = this.auth.currentRole();
+    return role === 'owner' || role === 'moderator' || role === 'admin';
+  }
+
+  get canAccessModerator(): boolean {
+    const role = this.auth.currentRole();
+    return role === 'moderator' || role === 'admin';
+  }
+
+  get canAccessAdmin(): boolean {
+    const role = this.auth.currentRole();
+    return role === 'admin';
+  }
+
+  onLogout(): void {
+    this.auth.logoutApi().subscribe({
+      next: () => this.router.navigate(['/auth']),
+      error: () => this.router.navigate(['/auth']),
+    });
   }
 }
