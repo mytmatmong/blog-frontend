@@ -6,9 +6,23 @@ name: Deploy frontend
 # trên VPS.
 #
 # Lưu ý: container frontend nằm trong compose project của repo backend
-# (/opt/blog-api/backend/compose.prod.yml), vì cả hai chạy chung một VPS
-# đứng sau cùng một Nginx. Workflow này chỉ recreate service "frontend",
-# không đụng tới api/postgres/nginx.
+# (/opt/blog-api/backend/compose.shared.yml — layer "sống lâu dài": nginx,
+# postgres, frontend..., xem DEPLOYMENT.md mục 1 ở repo backend), vì cả
+# hai chạy chung một VPS đứng sau cùng một Nginx. Workflow này chỉ
+# recreate service "frontend", không đụng tới api/postgres/nginx.
+#
+# QUAN TRỌNG: PHẢI dùng đúng file compose.shared.yml (không phải file
+# compose.prod.yml cũ, đã xoá khỏi repo backend ngày 2026-09-04 khi tách
+# blue-green — xem backend commit 4d3124e). compose.shared.yml đặt tên
+# tường minh cho network ("blog-edge") và container ("blog-frontend");
+# compose.prod.yml cũ thì không, nên network "edge" của nó tự suy ra tên
+# theo project ("blog-backend-prod_edge") — KHÁC với "blog-edge" mà nginx
+# thật đang dùng. Từng dùng nhầm compose.prod.yml ở đây: mỗi lần deploy
+# lại recreate frontend vào đúng network sai đó, cắt đứt kết nối tới
+# nginx — container tự nó vẫn "healthy" (healthcheck gọi thẳng
+# localhost:4000) nên cả job này lẫn job backend đều báo xanh, chỉ có
+# nginx không proxy tới được frontend nữa (502 Bad Gateway cho mọi request
+# "/", API vẫn bình thường vì api sống ở project blue-green riêng).
 #
 # Yêu cầu secret cấp ở Settings > Secrets and variables > Actions:
 #   DEPLOY_SSH_KEY — cùng private key CI đã cấp cho repo backend (public key
@@ -71,18 +85,18 @@ jobs:
           docker tag blog-frontend-runtime:ci blog-frontend-runtime:local
 
           cd /opt/blog-api/backend
-          API_IMAGE=blog-api-runtime:local MIGRATION_IMAGE=blog-api-migration:local FRONTEND_IMAGE=blog-frontend-runtime:local \
-            docker compose --env-file .env.production -f compose.prod.yml up -d --force-recreate frontend
+          FRONTEND_IMAGE=blog-frontend-runtime:local \
+            docker compose --env-file .env.production -f compose.shared.yml up -d --force-recreate frontend
 
           status="starting"
           for i in $(seq 1 20); do
-            status=$(docker inspect --format '{{.State.Health.Status}}' blog-backend-prod-frontend-1 2>/dev/null || echo starting)
+            status=$(docker inspect --format '{{.State.Health.Status}}' blog-frontend 2>/dev/null || echo starting)
             [ "$status" = healthy ] && break
             sleep 3
           done
           if [ "$status" != healthy ]; then
             echo "frontend container không healthy sau deploy" >&2
-            docker logs blog-backend-prod-frontend-1 --tail 50
+            docker logs blog-frontend --tail 50
             exit 1
           fi
 
@@ -90,4 +104,10 @@ jobs:
           REMOTE
 
       - name: Smoke test
-        run: curl --fail --max-time 10 "http://${{ env.DEPLOY_HOST }}/"
+        # Phải đi qua domain thật + theo redirect (-L), không gọi thẳng IP:80 —
+        # gọi thẳng IP:80 chỉ trúng khối redirect 301 sang HTTPS của nginx,
+        # "--fail" không coi 3xx là lỗi nên smoke test kiểu đó luôn pass dù
+        # frontend phía sau có kết nối được tới nginx hay không (đây chính là
+        # lý do lần deploy frontend bị đứt kết nối network với nginx vẫn báo
+        # thành công — xem ghi chú ở bước "Deploy on server").
+        run: curl --fail --silent --show-error --max-time 10 -L "https://blogy.id.vn/" -o /dev/null
