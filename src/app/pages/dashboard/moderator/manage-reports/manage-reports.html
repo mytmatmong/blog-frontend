@@ -14,7 +14,7 @@
         {{ 'filter.status.pending' | translate }}
       </app-icon-button>
       <app-icon-button
-        icon="bi bi-check2-circle"
+        icon="bi bi-check-circle"
         [color]="statusFilter() === 'RESOLVED' ? 'green' : 'primary'"
         [variant]="statusFilter() === 'RESOLVED' ? 'solid' : 'soft'"
         size="sm"
@@ -130,7 +130,7 @@
             <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'moderator.reporter' | translate }}</th>
             <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'moderator.reported_content' | translate }}</th>
             <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100">{{ 'moderator.violation_reason' | translate }}</th>
-            <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.status' | translate }}</th>
+            <th class="min-w-[118px] whitespace-nowrap p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.status' | translate }}</th>
             <th class="p-4 font-semibold text-aquamarine-900 dark:text-aquamarine-100 text-center">{{ 'table.actions' | translate }}</th>
           </tr>
         </thead>
@@ -197,20 +197,10 @@
               </td>
 
               <!-- Status -->
-              <td class="p-4 text-center">
-                @if (report.status === 'PENDING') {
-                  <span class="inline-block px-2.5 py-1 text-xs font-semibold rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
-                    {{ 'status.pending' | translate }}
-                  </span>
-                } @else if (report.status === 'RESOLVED') {
-                  <span class="inline-block px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-                    {{ 'status.resolved' | translate }}
-                  </span>
-                } @else if (report.status === 'REJECTED') {
-                  <span class="inline-block px-2.5 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300">
-                    {{ 'status.rejected' | translate }}
-                  </span>
-                }
+              <td class="min-w-[118px] whitespace-nowrap p-4 text-center">
+                <app-badge [color]="getReportBadgeColor(report.status)" shape="pill" size="sm">
+                  {{ ('status.' + report.status.toLowerCase()) | translate }}
+                </app-badge>
               </td>
 
               <!-- Actions -->
@@ -228,7 +218,7 @@
 
                   @if (report.status === 'PENDING') {
                     <app-icon-button
-                      icon="bi bi-check-circle-fill"
+                      icon="bi bi-check-circle"
                       color="green"
                       variant="soft"
                       size="sm"
@@ -238,7 +228,7 @@
                       {{ 'action.resolve' | translate }}
                     </app-icon-button>
                     <app-icon-button
-                      icon="bi bi-x-circle-fill"
+                      icon="bi bi-x-circle"
                       color="red"
                       variant="soft"
                       size="sm"
@@ -265,48 +255,38 @@
         <ul class="inline-flex items-center space-x-1 text-sm">
           <!-- Trang đầu << -->
           <li>
-            <button
+            <app-icon-button
+              icon="bi bi-chevron-double-left"
+              color="primary"
+              variant="soft"
+              size="sm"
               [disabled]="currentPage() === 1"
-              [class.opacity-40]="currentPage() === 1"
-              class="min-w-8 h-8 px-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer disabled:cursor-not-allowed flex items-center justify-center text-xs"
-              [title]="'pagination.first_page' | translate"
-              (click)="setPage(1)"
-            >
-              <i class="bi bi-chevron-double-left"></i>
-            </button>
+              (btnClick)="setPage(1)"
+            />
           </li>
           <!-- Trang trước < -->
           <li>
-            <button
+            <app-icon-button
+              icon="bi bi-chevron-left"
+              color="primary"
+              variant="soft"
+              size="sm"
               [disabled]="currentPage() === 1"
-              [class.opacity-40]="currentPage() === 1"
-              class="min-w-8 h-8 px-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer disabled:cursor-not-allowed flex items-center justify-center text-xs"
-              [title]="'pagination.prev_page' | translate"
-              (click)="setPage(currentPage() - 1)"
-            >
-              <i class="bi bi-chevron-left"></i>
-            </button>
+              (btnClick)="setPage(currentPage() - 1)"
+            />
           </li>
 
           <!-- Các trang & Dấu 3 chấm -->
           @for (item of pageItems(); track $index) {
             @if (item.type === 'page') {
               <li>
-                <button
-                  class="min-w-8 h-8 px-2.5 rounded-lg font-semibold transition-colors cursor-pointer text-xs flex items-center justify-center"
-                  [class.bg-aquamarine-600]="currentPage() === item.value"
-                  [class.text-white]="currentPage() === item.value"
-                  [class.border]="currentPage() !== item.value"
-                  [class.border-aquamarine-200]="currentPage() !== item.value"
-                  [class.dark:border-aquamarine-800]="currentPage() !== item.value"
-                  [class.bg-white]="currentPage() !== item.value"
-                  [class.dark:bg-aquamarine-900]="currentPage() !== item.value"
-                  [class.text-aquamarine-800]="currentPage() !== item.value"
-                  [class.dark:text-aquamarine-200]="currentPage() !== item.value"
-                  (click)="setPage(item.value!)"
+                <app-text-button
+                  [variant]="currentPage() === item.value ? 'primary' : 'secondary'"
+                  size="sm"
+                  (btnClick)="setPage(item.value!)"
                 >
                   {{ item.value }}
-                </button>
+                </app-text-button>
               </li>
             } @else {
               <li>
@@ -319,27 +299,25 @@
 
           <!-- Trang sau > -->
           <li>
-            <button
+            <app-icon-button
+              icon="bi bi-chevron-right"
+              color="primary"
+              variant="soft"
+              size="sm"
               [disabled]="currentPage() === (meta()?.totalPages || 1)"
-              [class.opacity-40]="currentPage() === (meta()?.totalPages || 1)"
-              class="min-w-8 h-8 px-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer disabled:cursor-not-allowed flex items-center justify-center text-xs"
-              [title]="'pagination.next_page' | translate"
-              (click)="setPage(currentPage() + 1)"
-            >
-              <i class="bi bi-chevron-right"></i>
-            </button>
+              (btnClick)="setPage(currentPage() + 1)"
+            />
           </li>
           <!-- Trang cuối >> -->
           <li>
-            <button
+            <app-icon-button
+              icon="bi bi-chevron-double-right"
+              color="primary"
+              variant="soft"
+              size="sm"
               [disabled]="currentPage() === (meta()?.totalPages || 1)"
-              [class.opacity-40]="currentPage() === (meta()?.totalPages || 1)"
-              class="min-w-8 h-8 px-2 rounded-lg border border-aquamarine-200 dark:border-aquamarine-800 bg-white dark:bg-aquamarine-900 text-aquamarine-800 dark:text-aquamarine-200 hover:bg-aquamarine-50 dark:hover:bg-aquamarine-800 transition-colors cursor-pointer disabled:cursor-not-allowed flex items-center justify-center text-xs"
-              [title]="'pagination.last_page' | translate"
-              (click)="setPage(meta()?.totalPages || 1)"
-            >
-              <i class="bi bi-chevron-double-right"></i>
-            </button>
+              (btnClick)="setPage(meta()?.totalPages || 1)"
+            />
           </li>
         </ul>
       </div>
@@ -385,9 +363,12 @@
                 {{ 'moderator.report_reason_label' | translate }} {{ getReasonLabel(report.reason) }}
               </span>
             </div>
-            <span class="text-xs px-2.5 py-0.5 rounded-full font-semibold bg-amber-200 text-amber-900 dark:bg-amber-800 dark:text-amber-100">
-              {{ 'moderator.status_label' | translate }} {{ report.status }}
-            </span>
+            <div class="flex items-center gap-1.5 whitespace-nowrap">
+              <span class="text-xs font-medium text-amber-900 dark:text-amber-200">{{ 'moderator.status_label' | translate }}</span>
+              <app-badge [color]="getReportBadgeColor(report.status)" shape="pill" size="sm">
+                {{ ('status.' + report.status.toLowerCase()) | translate }}
+              </app-badge>
+            </div>
           </div>
 
           @if (report.description) {
@@ -527,7 +508,7 @@
           <app-icon-button
             icon="bi bi-check-circle"
             color="green"
-            variant="solid"
+            variant="soft"
             size="sm"
             [disabled]="actionLoading()"
             (btnClick)="setResolveReport(report)"
@@ -537,7 +518,7 @@
           <app-icon-button
             icon="bi bi-x-circle"
             color="red"
-            variant="solid"
+            variant="soft"
             size="sm"
             [disabled]="actionLoading()"
             (btnClick)="setRejectReport(report)"
@@ -545,8 +526,12 @@
             {{ 'action.reject' | translate }}
           </app-icon-button>
         }
-        <app-text-button variant="secondary" size="sm" (btnClick)="closePreviewReport()">
-          <i class="bi bi-x-lg mr-1"></i>{{ 'action.close' | translate }}
+        <app-text-button
+          variant="secondary"
+          size="sm"
+          (btnClick)="closePreviewReport()"
+        >
+          <i class="bi bi-x-lg mr-1"></i>{{ 'modal.close' | translate }}
         </app-text-button>
       </footer>
     </aside>
@@ -561,7 +546,11 @@
         <h5 class="font-bold text-lg text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
           <i class="bi bi-shield-check"></i> {{ 'moderator.confirm_violation_modal_title' | translate }}
         </h5>
-        <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer" (click)="closeResolveModal()">
+        <button
+          type="button"
+          class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer p-1 rounded-lg"
+          (click)="closeResolveModal()"
+        >
           <i class="bi bi-x-lg text-lg"></i>
         </button>
       </div>
@@ -609,7 +598,11 @@
         <h5 class="font-bold text-lg text-red-600 dark:text-red-400 flex items-center gap-2">
           <i class="bi bi-x-circle"></i> {{ 'moderator.reject_report_modal_title' | translate }}
         </h5>
-        <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer" (click)="closeRejectReportModal()">
+        <button
+          type="button"
+          class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer p-1 rounded-lg"
+          (click)="closeRejectReportModal()"
+        >
           <i class="bi bi-x-lg text-lg"></i>
         </button>
       </div>

@@ -11,7 +11,7 @@ import {
   signal,
 } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import {
   BlogOwnerDashboardData,
   BlogOwnerDashboardPost,
@@ -27,6 +27,8 @@ import { TranslationService } from '../../../../core/services/translation.servic
 import { getApiErrorMessage } from '../../../../core/utils/api-error.util';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { ConfirmDialog } from '../../../../shared/components/confirm-dialog/confirm-dialog';
+import { BadgeComponent, BadgeColor } from '../../../../shared/components/badge/badge';
+import { IconButtonComponent } from '../../../../shared/components/icon-button/icon-button';
 
 type ChartInstance = {
   destroy(): void;
@@ -46,6 +48,8 @@ type ChartConstructor = new (
     TranslatePipe,
     OwnerPostPreviewComponent,
     ConfirmDialog,
+    BadgeComponent,
+    IconButtonComponent,
   ],
 
   templateUrl: './owner-dashboard.html',
@@ -56,6 +60,7 @@ export class OwnerDashboard implements OnInit, AfterViewInit, OnDestroy {
   private readonly api = inject(BlogOwnerApiService);
   private readonly auth = inject(AuthService);
   private readonly toast = inject(ToastService);
+  private readonly router = inject(Router);
   protected readonly ts = inject(TranslationService);
 
   @ViewChild('interactionChart')
@@ -221,6 +226,23 @@ export class OwnerDashboard implements OnInit, AfterViewInit, OnDestroy {
 
   statusLabel(status: PostStatus): string {
     return this.ts.translate(`post_status.${status.toLowerCase()}`);
+  }
+
+  statusBadgeColor(status: PostStatus): BadgeColor {
+    switch (status) {
+      case 'PUBLISH':
+        return 'green';
+      case 'PENDING_REVIEW':
+        return 'yellow';
+      case 'REJECT':
+        return 'red';
+      default:
+        return 'gray';
+    }
+  }
+
+  navigateToEdit(postId: number): void {
+    this.router.navigate(['/dashboard/owner/edit-post', postId]);
   }
 
   statusClass(status: PostStatus): string {

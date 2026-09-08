@@ -90,27 +90,37 @@
   position: fixed;
   z-index: 5000;
   inset: 0;
+  display: flex;
+  width: 100%;
   height: 100dvh;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
   overflow: hidden;
-  background: rgb(15 18 28 / 42%);
-  backdrop-filter: blur(1.5px);
+  background: rgb(15 18 28 / 48%);
+  backdrop-filter: blur(2px);
+  animation: post-preview-backdrop-in 160ms ease-out;
 }
 
 .report-preview-sheet {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
+  position: relative;
   display: flex;
-  width: min(720px, 100vw);
-  max-width: 100vw;
-  height: 100dvh;
   flex-direction: column;
+  width: min(880px, calc(100vw - 48px));
+  height: min(840px, calc(100dvh - 48px));
+  max-width: 880px;
+  max-height: calc(100dvh - 48px);
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
   overflow: hidden;
-  border-left: 1px solid var(--report-preview-border);
+  border: 1px solid var(--report-preview-border);
+  border-radius: 18px;
   background: var(--report-preview-surface);
-  box-shadow: -18px 0 48px rgb(15 23 42 / 22%);
-  animation: report-preview-in 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow:
+    0 24px 70px rgb(15 23 42 / 30%),
+    0 8px 24px rgb(15 23 42 / 16%);
+  animation: post-preview-modal-in 220ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .report-preview-header {
@@ -130,7 +140,7 @@
   flex: 1 1 auto;
   overflow-x: hidden;
   overflow-y: auto;
-  padding: 22px 24px 88px;
+  padding: 22px 24px;
   overscroll-behavior: contain;
   scrollbar-width: thin;
 }
@@ -322,13 +332,11 @@
 }
 
 .report-preview-footer {
-  position: absolute;
+  position: relative;
   z-index: 10;
-  right: 0;
-  bottom: 0;
-  left: 0;
   display: flex;
   min-height: 59px;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: flex-end;
   gap: 9px;
@@ -422,21 +430,39 @@
   background: rgb(136 19 55 / 36%);
 }
 
-@keyframes report-preview-in {
+@keyframes post-preview-backdrop-in {
   from {
-    transform: translateX(100%);
-    opacity: 0.65;
+    background: rgb(15 18 28 / 0%);
+    backdrop-filter: blur(0);
   }
   to {
-    transform: translateX(0);
+    background: rgb(15 18 28 / 48%);
+    backdrop-filter: blur(2px);
+  }
+}
+
+@keyframes post-preview-modal-in {
+  from {
+    transform: translateY(12px) scale(0.975);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
     opacity: 1;
   }
 }
 
 @media (max-width: 640px) {
+  .report-preview-backdrop {
+    padding: 12px;
+  }
+
   .report-preview-sheet {
     width: 100vw;
-    border-left: 0;
+    height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
+    border: 0;
   }
 
   .report-preview-header {
@@ -445,7 +471,7 @@
   }
 
   .report-preview-body {
-    padding: 18px 14px 142px;
+    padding: 18px 14px 24px;
   }
 
   .report-preview-footer {

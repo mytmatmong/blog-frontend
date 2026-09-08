@@ -131,6 +131,12 @@
   text-align: center;
 }
 
+.posts-table th:nth-child(5),
+.posts-table td:nth-child(5) {
+  white-space: nowrap;
+  min-width: 118px;
+}
+
 .posts-table tbody tr:last-child td {
   border-bottom: 0;
 }

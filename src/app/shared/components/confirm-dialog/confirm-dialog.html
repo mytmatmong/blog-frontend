@@ -33,7 +33,7 @@
     <div class="mt-6 flex justify-end gap-3">
       <button
         type="button"
-        class="rounded-xl border border-aquamarine-300 px-4 py-2 text-sm font-medium text-aquamarine-800 transition-colors hover:bg-aquamarine-50 disabled:opacity-50 dark:border-aquamarine-700 dark:text-aquamarine-200 dark:hover:bg-aquamarine-800"
+        class="rounded-xl border border-aquamarine-300 px-4 py-2 text-sm font-medium text-aquamarine-800 transition-colors hover:bg-aquamarine-50 disabled:opacity-50 dark:border-aquamarine-700 dark:text-aquamarine-200 dark:hover:bg-aquamarine-800 whitespace-nowrap shrink-0"
         [disabled]="busy()"
         (click)="cancelled.emit()"
       >
@@ -41,7 +41,7 @@
       </button>
       <button
         type="button"
-        class="flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white transition-colors disabled:opacity-50"
+        class="flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white transition-colors disabled:opacity-50 whitespace-nowrap shrink-0"
         [class]="buttonClass()"
         [disabled]="busy()"
         (click)="confirmed.emit()"

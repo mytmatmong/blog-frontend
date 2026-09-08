@@ -175,15 +175,15 @@
               <!-- Status -->
               <td class="p-4 text-center moderator-status-column">
                 @if (blog.status === 'PENDING_REVIEW') {
-                  <app-badge color="yellow" shape="pill" size="sm" dot>
-                    {{ 'status.pending_review' | translate }}
+                  <app-badge color="yellow" shape="pill" size="sm">
+                    {{ 'status.pending' | translate }}
                   </app-badge>
                 } @else if (blog.status === 'PUBLISH') {
-                  <app-badge color="green" shape="pill" size="sm" dot>
+                  <app-badge color="green" shape="pill" size="sm">
                     {{ 'status.published' | translate }}
                   </app-badge>
                 } @else if (blog.status === 'REJECT') {
-                  <app-badge color="red" shape="pill" size="sm" dot>
+                  <app-badge color="red" shape="pill" size="sm">
                     {{ 'status.rejected' | translate }}
                   </app-badge>
                 }
@@ -316,7 +316,7 @@
 
 <app-owner-post-preview [post]="activePreviewPost()" [showEdit]="false" [loadDetails]="false" [externalLoadingPostId]="
     loadingPreviewPostId()
-  " [showModerationActions]="true" [moderationBusy]="actionLoading()" (languageRequested)="
+  " [showModerationActions]="statusFilter() === 'PENDING_REVIEW' || activePreviewBlog()?.status === 'PENDING_REVIEW'" [moderationBusy]="actionLoading()" (languageRequested)="
     loadPreviewVersion($event)
   " (closed)="closePreviewBlog()" (approveRequested)="
     approveBlog(activePreviewBlog()!)

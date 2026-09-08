@@ -12,10 +12,11 @@ import { UserApiService } from '../../../core/services/user-api.service';
 import { getApiErrorMessage } from '../../../core/utils/api-error.util';
 import { Pagination } from '../../../shared/components/pagination/pagination';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+import { BadgeComponent, BadgeColor } from '../../../shared/components/badge/badge';
 
 @Component({
   selector: 'app-request-blog-owner',
-  imports: [FormsModule, Pagination, TranslatePipe],
+  imports: [FormsModule, Pagination, TranslatePipe, BadgeComponent],
   templateUrl: './request-blog-owner.html',
   styleUrl: './request-blog-owner.css',
 })
@@ -140,6 +141,18 @@ export class RequestBlogOwner {
     if (!value) return '—';
     const date = new Date(value);
     return Number.isNaN(date.getTime()) ? '—' : date.toLocaleString(this.ts.localeTag());
+  }
+
+  getRequestBadgeColor(status: BlogOwnerRequestStatus): BadgeColor {
+    switch (status) {
+      case 'APPROVED':
+        return 'green';
+      case 'REJECTED':
+        return 'red';
+      case 'PENDING':
+      default:
+        return 'yellow';
+    }
   }
 
   statusClass(status: BlogOwnerRequestStatus): string {

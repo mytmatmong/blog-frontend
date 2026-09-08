@@ -21,6 +21,7 @@ import { BlogOwnerApiService } from '../../../core/services/blog-owner-api.servi
 import { TranslationService } from '../../../core/services/translation.service';
 import { getApiErrorMessage } from '../../../core/utils/api-error.util';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { BadgeComponent, BadgeColor } from '../badge/badge';
 
 export interface OwnerPostPreviewVersion {
     id: number;
@@ -41,6 +42,7 @@ export interface OwnerPostPreviewVersion {
         CommonModule,
         RouterLink,
         TranslatePipe,
+        BadgeComponent,
     ],
     templateUrl: './owner-post-preview.html',
     styleUrl: './owner-post-preview.css',
@@ -126,8 +128,8 @@ export class OwnerPostPreviewComponent
                 this.post.id,
             );
 
-            this.languageVersions.set(
-                this.mergeLanguageVersions([], this.post),
+            this.languageVersions.update((currentVersions) =>
+                this.mergeLanguageVersions(currentVersions, this.post!),
             );
 
             if (this.loadDetails) {
@@ -207,6 +209,37 @@ export class OwnerPostPreviewComponent
         this.externalLoadingPostId !== null
     );
     }
+    statusBadgeColor(
+        status: BlogOwnerPost['status'],
+    ): BadgeColor {
+        const normalized = String(status).toUpperCase();
+
+        if (
+            normalized === 'PUBLISHED' ||
+            normalized === 'APPROVED' ||
+            normalized === 'PUBLISH'
+        ) {
+            return 'green';
+        }
+
+        if (
+            normalized === 'PENDING' ||
+            normalized === 'PENDING_REVIEW' ||
+            normalized === 'WAITING_APPROVAL'
+        ) {
+            return 'yellow';
+        }
+
+        if (
+            normalized === 'REJECTED' ||
+            normalized === 'REJECT'
+        ) {
+            return 'red';
+        }
+
+        return 'gray';
+    }
+
     statusClass(
         status: BlogOwnerPost['status'],
     ): string {
@@ -291,12 +324,12 @@ export class OwnerPostPreviewComponent
 
             REJECTED: {
                 key: 'posts.status.rejected',
-                fallback: 'Bị từ chối',
+                fallback: 'Từ chối',
             },
 
             REJECT: {
                 key: 'posts.status.rejected',
-                fallback: 'Bị từ chối',
+                fallback: 'Từ chối',
             },
 
             ARCHIVED: {
@@ -466,6 +499,13 @@ export class OwnerPostPreviewComponent
         });
     }
 
+    canModerate(post: BlogOwnerPost | null): boolean {
+        if (!this.showModerationActions || !post) {
+            return false;
+        }
+        return true;
+    }
+
     private mergeLanguageVersions(
         currentVersions: OwnerPostPreviewVersion[],
         post: BlogOwnerPost,
@@ -499,17 +539,12 @@ export class OwnerPostPreviewComponent
 
         return Array.from(versionMap.values()).sort(
             (first, second) => {
-                if (first.id === post.id) {
-                    return -1;
+                const codeA = this.languageCode(first);
+                const codeB = this.languageCode(second);
+                if (codeA !== codeB) {
+                    return codeA.localeCompare(codeB);
                 }
-
-                if (second.id === post.id) {
-                    return 1;
-                }
-
-                return this.languageCode(first).localeCompare(
-                    this.languageCode(second),
-                );
+                return first.id - second.id;
             },
         );
     }

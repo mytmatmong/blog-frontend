@@ -332,6 +332,7 @@
 .modern-table tbody tr:last-child td { border-bottom: 0; }
 .modern-table tbody tr:hover { background: var(--owner-bg-soft); }
 .modern-table td:not(:first-child) { text-align: center; }
+.modern-table th:nth-child(4), .modern-table td:nth-child(4) { white-space: nowrap; min-width: 118px; }
 
 .post-identity { display: flex; min-width: 260px; align-items: center; gap: 11px; }
 .post-identity img, .post-identity__placeholder { width: 48px; height: 36px; flex: 0 0 48px; border-radius: 8px; object-fit: cover; }
@@ -446,7 +447,7 @@
 
 .share-field { display: flex; overflow: hidden; border: 1px solid var(--owner-border); border-radius: 10px; }
 .share-field input { min-width: 0; flex: 1; border: 0; background: var(--owner-bg-soft); padding: 10px 12px; color: var(--owner-text); outline: none; }
-.share-field button { border: 0; background: var(--owner-primary); padding: 0 14px; color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; }
+.share-field button { border: 0; background: var(--owner-primary); padding: 0 14px; color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; }
 .share-field button.is-success { background: #059669; }
 
 @keyframes pulse { 50% { opacity: .5; } }

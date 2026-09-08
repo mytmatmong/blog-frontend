@@ -19,6 +19,7 @@ import {
 import { IconButtonComponent } from '../../../../shared/components/icon-button/icon-button';
 import { TextButtonComponent } from '../../../../shared/components/text-button/text-button';
 import { SingleDropdownComponent, DropdownOption } from '../../../../shared/components/single-dropdown/single-dropdown';
+import { BadgeComponent, BadgeColor } from '../../../../shared/components/badge/badge';
 
 @Component({
   selector: 'app-manage-comments',
@@ -29,6 +30,7 @@ import { SingleDropdownComponent, DropdownOption } from '../../../../shared/comp
     IconButtonComponent,
     TextButtonComponent,
     SingleDropdownComponent,
+    BadgeComponent,
   ],
   templateUrl: './manage-comments.html',
   styleUrl: './manage-comments.css',
@@ -321,6 +323,18 @@ export class ManageComments implements OnInit {
 
   getReasonLabel(reason: ModeratorReportReason): string {
     return this.ts.translate('report.reason.' + reason);
+  }
+
+  getReportBadgeColor(status: ModeratorReportStatus): BadgeColor {
+    switch (status) {
+      case 'RESOLVED':
+        return 'green';
+      case 'REJECTED':
+        return 'red';
+      case 'PENDING':
+      default:
+        return 'yellow';
+    }
   }
 
   logoutAndSwitchAccount() {

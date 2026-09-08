@@ -221,28 +221,54 @@
                 </div>
               </div>
             </td>
-            <td><span class="status-pill {{ statusClass(post.status) }}">{{ statusLabel(post.status) }}</span></td>
+            <td>
+              <app-badge
+                [color]="statusBadgeColor(post.status)"
+                shape="pill"
+                size="sm"
+              >
+                {{ statusLabel(post.status) }}
+              </app-badge>
+            </td>
             <td><span class="table-metric"><i class="bi bi-eye"></i>{{ post.views | number }}</span></td>
             <td><span class="table-metric table-metric--likes"><i class="bi bi-heart"></i>{{ post.likes | number
                 }}</span></td>
             <td class="owner-actions-column">
-              <div class="owner-action-group">
-                <button type="button" class="owner-action-button" (click)="openPreview(post.id)"
-                  [title]="'common.view' | translate">
-                  <i class="bi bi-eye"></i><span>{{ 'common.view' | translate }}</span>
-                </button>
-                <a class="owner-action-button" [routerLink]="[
-    '/dashboard/owner/edit-post',
-    post.id
-  ]" [title]="'comments.edit' | translate">
-                  <i class="bi bi-pencil-square"></i><span>{{ 'comments.edit' | translate }}</span>
-                </a>
-                <button type="button" class="owner-action-button owner-action-button--danger" (click)="deletePost(post)"
-                  [disabled]="deletingPostId() === post.id" [title]="'comments.delete' | translate">
-                  <i class="bi" [class.bi-arrow-repeat]="deletingPostId() === post.id"
-                    [class.spin]="deletingPostId() === post.id" [class.bi-trash3]="deletingPostId() !== post.id"></i>
-                  <span>{{ 'comments.delete' | translate }}</span>
-                </button>
+              <div class="flex items-center justify-center gap-2">
+                <app-icon-button
+                  icon="bi bi-eye"
+                  color="primary"
+                  variant="soft"
+                  size="sm"
+                  [title]="'action.view' | translate"
+                  (btnClick)="openPreview(post.id)"
+                >
+                  {{ 'action.view' | translate }}
+                </app-icon-button>
+
+                <app-icon-button
+                  icon="bi bi-pencil-square"
+                  color="blue"
+                  variant="soft"
+                  size="sm"
+                  [title]="'action.edit' | translate"
+                  (btnClick)="navigateToEdit(post.id)"
+                >
+                  {{ 'action.edit' | translate }}
+                </app-icon-button>
+
+                <app-icon-button
+                  icon="bi bi-trash3"
+                  color="red"
+                  variant="soft"
+                  size="sm"
+                  [disabled]="deletingPostId() !== null"
+                  [loading]="deletingPostId() === post.id"
+                  [title]="'action.delete' | translate"
+                  (btnClick)="deletePost(post)"
+                >
+                  {{ 'action.delete' | translate }}
+                </app-icon-button>
               </div>
             </td>
           </tr>
@@ -258,7 +284,7 @@
 <div class="dashboard-modal-backdrop" (click)="closeShareModal()">
   <div class="dashboard-modal dashboard-modal--small" (click)="$event.stopPropagation()">
     <div class="dashboard-modal__heading">
-      <span class="dashboard-modal__icon"><i class="bi bi-share-fill"></i></span>
+      <span class="dashboard-modal__icon"><i class="bi bi-share"></i></span>
       <div>
         <h3>{{ 'modal.share_title' | translate }}</h3>
         <p>{{ 'modal.share_desc' | translate }}</p>

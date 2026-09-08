@@ -27,6 +27,7 @@ import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { ConfirmDialog } from '../../../../shared/components/confirm-dialog/confirm-dialog';
 import { SingleDropdownComponent, DropdownOption } from '../../../../shared/components/single-dropdown/single-dropdown';
 import { MultiDropdownComponent, MultiDropdownOption } from '../../../../shared/components/multi-dropdown/multi-dropdown';
+import { BadgeComponent, BadgeColor } from '../../../../shared/components/badge/badge';
 
 interface QuillConstructor {
   new(
@@ -58,6 +59,7 @@ export interface TranslationCreationResult {
     ConfirmDialog,
     SingleDropdownComponent,
     MultiDropdownComponent,
+    BadgeComponent,
   ],
   templateUrl: './create-post.html',
   styleUrl: './create-post.css',
@@ -1212,18 +1214,23 @@ export class CreatePost implements OnInit {
     status:
       BlogOwnerPost['status'],
   ): string {
-    const labels: Record<
-      BlogOwnerPost['status'],
-      string
-    > = {
-      DRAFT: 'DRAFT',
-      PENDING_REVIEW:
-        'PENDING_REVIEW',
-      PUBLISH: 'PUBLISH',
-      REJECT: 'REJECT',
-    };
+    return this.translation.translate(`post_status.${status.toLowerCase()}`);
+  }
 
-    return labels[status];
+  statusBadgeColor(
+    status:
+      BlogOwnerPost['status'],
+  ): BadgeColor {
+    switch (status) {
+      case 'PUBLISH':
+        return 'green';
+      case 'PENDING_REVIEW':
+        return 'yellow';
+      case 'REJECT':
+        return 'red';
+      default:
+        return 'gray';
+    }
   }
 
   /* =======================================================

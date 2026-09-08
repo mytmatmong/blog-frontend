@@ -138,12 +138,13 @@
             </h2>
           </div>
 
-          <span class="request-status" [class.request-status--pending]="detail.status === 'PENDING'"
-            [class.request-status--approved]="detail.status === 'APPROVED'"
-            [class.request-status--rejected]="detail.status === 'REJECTED'">
-            <span></span>
-            {{ detail.status }}
-          </span>
+          <app-badge
+            [color]="getRequestBadgeColor(detail.status)"
+            shape="pill"
+            size="sm"
+          >
+            {{ ('requests.' + detail.status.toLowerCase()) | translate }}
+          </app-badge>
         </header>
 
         <div class="request-detail-list">
@@ -310,12 +311,13 @@
                 </div>
               </div>
 
-              <span class="request-status" [class.request-status--pending]="request.status === 'PENDING'"
-                [class.request-status--approved]="request.status === 'APPROVED'"
-                [class.request-status--rejected]="request.status === 'REJECTED'">
-                <span></span>
-                {{ request.status }}
-              </span>
+              <app-badge
+                [color]="getRequestBadgeColor(request.status)"
+                shape="pill"
+                size="sm"
+              >
+                {{ ('requests.' + request.status.toLowerCase()) | translate }}
+              </app-badge>
             </header>
 
             <p class="request-history-item__reason">
