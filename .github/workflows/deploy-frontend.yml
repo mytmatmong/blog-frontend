@@ -100,6 +100,17 @@ jobs:
             exit 1
           fi
 
+          # QUAN TRỌNG: nginx resolve hostname "frontend" trong upstream
+          # block MỘT LẦN lúc start/reload, không tự re-resolve theo mỗi
+          # request — recreate container "frontend" ở trên cho nó IP mới
+          # trên network Docker, nhưng nginx vẫn giữ IP CŨ (đã chết) cho
+          # tới khi được reload. Thiếu bước này là lý do site 502 dù
+          # container frontend mới đã "healthy" thật. Cùng lý do backend
+          # luôn "nginx -s reload" sau mỗi lần switch blue-green
+          # (scripts/lib/blue-green-common.sh, repo backend).
+          docker exec blog-nginx nginx -t
+          docker exec blog-nginx nginx -s reload
+
           docker image prune -f
           REMOTE
 
