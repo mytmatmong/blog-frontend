@@ -20,6 +20,7 @@ import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { ConfirmDialog } from '../../../../shared/components/confirm-dialog/confirm-dialog';
 import { SingleDropdownComponent } from '../../../../shared/components/single-dropdown/single-dropdown';
 import { MultiDropdownComponent } from '../../../../shared/components/multi-dropdown/multi-dropdown';
+import { BadgeComponent } from '../../../../shared/components/badge/badge';
 import { CreatePost } from '../create-post/create-post';
 
 @Component({
@@ -30,6 +31,7 @@ import { CreatePost } from '../create-post/create-post';
     ConfirmDialog,
     SingleDropdownComponent,
     MultiDropdownComponent,
+    BadgeComponent,
   ],
 
   /*

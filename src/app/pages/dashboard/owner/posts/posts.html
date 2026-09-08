@@ -170,7 +170,6 @@
                   [color]="statusBadgeColor(post.status)"
                   shape="pill"
                   size="sm"
-                  dot
                 >
                   {{ statusLabel(post.status) }}
                 </app-badge>
@@ -222,10 +221,10 @@
                   variant="soft"
                   size="sm"
                   [disabled]="!canEdit(post)"
-                  [title]="canEdit(post) ? ('comments.edit' | translate) : ('posts.edit_disabled' | translate)"
+                  [title]="canEdit(post) ? ('action.edit' | translate) : ('posts.edit_disabled' | translate)"
                   (btnClick)="navigateToEdit(post.id)"
                 >
-                  {{ 'comments.edit' | translate }}
+                  {{ 'action.edit' | translate }}
                 </app-icon-button>
 
                 <app-icon-button
@@ -235,10 +234,10 @@
                   size="sm"
                   [disabled]="deletingPostId() !== null"
                   [loading]="deletingPostId() === post.id"
-                  [title]="'comments.delete' | translate"
+                  [title]="'action.delete' | translate"
                   (btnClick)="deletePost(post)"
                 >
-                  {{ 'comments.delete' | translate }}
+                  {{ 'action.delete' | translate }}
                 </app-icon-button>
               </div>
             </td>

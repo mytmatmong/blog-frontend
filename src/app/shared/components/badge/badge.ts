@@ -15,6 +15,9 @@ export type BadgeSize = 'sm' | 'md' | 'lg';
   selector: 'app-badge',
   standalone: true,
   templateUrl: './badge.html',
+  host: {
+    class: 'inline-flex shrink-0 whitespace-nowrap',
+  },
 })
 export class BadgeComponent {
   /** Màu sắc nhãn trạng thái: green (lục), yellow (vàng), red (đỏ), blue (lam), purple (tím), gray (xám) */
@@ -35,7 +38,7 @@ export class BadgeComponent {
   /** Computed class áp dụng Tailwind dựa trên color, shape, size */
   readonly badgeClasses = computed(() => {
     const base =
-      'inline-flex items-center justify-center font-bold tracking-wide select-none pointer-events-none whitespace-nowrap leading-none';
+      'inline-flex items-center justify-center font-bold tracking-wide select-none pointer-events-none whitespace-nowrap leading-none shrink-0';
 
     // Shapes
     const shapeClass = this.shape() === 'pill' ? 'rounded-full' : 'rounded-lg';

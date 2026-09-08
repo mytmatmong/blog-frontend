@@ -655,7 +655,7 @@
   "posts.search_placeholder": "投稿タイトルから探す.",
   "posts.status.archived": "アーカイブ",
   "posts.status.draft": "ドラフト",
-  "posts.status.pending": "ペンディングレビュー",
+  "posts.status.pending": "審査待ち",
   "posts.status.published": "公開済み",
   "posts.status.rejected": "却下",
   "posts.submit": "送信する",

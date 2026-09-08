@@ -37,7 +37,7 @@ import { ConfirmDialog } from '../../../../shared/components/confirm-dialog/conf
 import {
   TranslatePipe,
 } from '../../../../shared/pipes/translate.pipe';
-import { BadgeComponent } from '../../../../shared/components/badge/badge';
+import { BadgeComponent, BadgeColor } from '../../../../shared/components/badge/badge';
 import { IconButtonComponent } from '../../../../shared/components/icon-button/icon-button';
 import { TextButtonComponent } from '../../../../shared/components/text-button/text-button';
 import { TextSearchComponent } from '../../../../shared/components/text-search/text-search';
@@ -733,7 +733,7 @@ export class Posts implements OnInit {
   }
 
 
-  statusBadgeColor(status: PostStatus): 'green' | 'yellow' | 'red' | 'blue' {
+  statusBadgeColor(status: PostStatus): BadgeColor {
     switch (status) {
       case 'PUBLISH':
         return 'green';
@@ -741,8 +741,9 @@ export class Posts implements OnInit {
         return 'yellow';
       case 'REJECT':
         return 'red';
+      case 'DRAFT':
       default:
-        return 'blue';
+        return 'gray';
     }
   }
 

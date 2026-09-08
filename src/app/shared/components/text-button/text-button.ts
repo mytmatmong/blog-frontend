@@ -7,6 +7,9 @@ export type TextButtonSize = 'sm' | 'md' | 'lg';
   selector: 'app-text-button',
   standalone: true,
   templateUrl: './text-button.html',
+  host: {
+    class: 'inline-flex shrink-0 whitespace-nowrap',
+  },
 })
 export class TextButtonComponent {
   /** Loại nút: primary (chính), secondary (phụ), tertiary (nhẹ/link) */
@@ -32,7 +35,7 @@ export class TextButtonComponent {
 
   /** Computed class áp dụng Tailwind dựa trên variant và size */
   readonly buttonClasses = computed(() => {
-    const base = 'inline-flex items-center justify-center font-semibold transition-all duration-150 select-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2';
+    const base = 'inline-flex items-center justify-center font-semibold transition-all duration-150 select-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 whitespace-nowrap shrink-0';
     
     // Width
     const widthClass = this.fullWidth() ? 'w-full' : '';

@@ -11,12 +11,13 @@
                     {{ 'common.view' | translate }}
                 </span>
 
-                <span class="post-preview-status" [class]="
-              'post-preview-status ' +
-              statusClass(post.status)
-            ">
+                <app-badge
+                    [color]="statusBadgeColor(post.status)"
+                    shape="pill"
+                    size="sm"
+                >
                     {{ statusLabel(post.status) }}
-                </span>
+                </app-badge>
             </div>
 
             <button type="button" class="post-preview-close" (click)="close()" [attr.aria-label]="
@@ -101,7 +102,7 @@
 
                     @if (version.id === post.id) {
                     <i class="
-                      bi bi-check-circle-fill
+                      bi bi-check-circle
                       post-preview-language__check
                     "></i>
                     }
@@ -185,7 +186,7 @@
 
                 @if (post.rejectionReason) {
                 <div class="post-preview-rejection">
-                    <i class="bi bi-exclamation-circle-fill"></i>
+                    <i class="bi bi-exclamation-circle"></i>
                     <div>
                         <strong>{{ 'table.reason' | translate }}</strong>
                         <span>{{ post.rejectionReason }}</span>
@@ -219,10 +220,7 @@
 
         <!-- FOOTER -->
         <footer class="post-preview-footer" [class.post-preview-footer--moderation]="showModerationActions">
-            @if (
-            showModerationActions &&
-            post.status === 'PENDING_REVIEW'
-            ) {
+            @if (canModerate(post)) {
             <button type="button" class="post-preview-action post-preview-action--approve" [disabled]="moderationBusy"
                 (click)="approveRequested.emit(post)">
                 <i class="bi" [class.bi-arrow-repeat]="moderationBusy" [class.post-preview-spin]="moderationBusy"
@@ -254,7 +252,7 @@
     rootPostId() ?? post.id
   ]" (click)="close()">
                 <i class="bi bi-pencil-square"></i>
-                {{ 'comments.edit' | translate }}
+                {{ 'action.edit' | translate }}
             </a>
             }
 

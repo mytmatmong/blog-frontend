@@ -19,9 +19,13 @@
         #{{ post.id }}
       </span>
 
-      <strong [class.pending]="post.status === 'PENDING_REVIEW'">
+      <app-badge
+        [color]="statusBadgeColor(post.status)"
+        shape="pill"
+        size="sm"
+      >
         {{ statusLabel(post.status) }}
-      </strong>
+      </app-badge>
     </div>
     }
   </header>
@@ -470,10 +474,16 @@
             {{ resultHeadingKey() | translate }} #{{ post.id }}
           </strong>
 
-          <span>
-            {{ 'post_form.status' | translate }}:
-            {{ statusLabel(post.status) }}
-          </span>
+          <div class="flex items-center gap-2 mt-1">
+            <span>{{ 'post_form.status' | translate }}:</span>
+            <app-badge
+              [color]="statusBadgeColor(post.status)"
+              shape="pill"
+              size="sm"
+            >
+              {{ statusLabel(post.status) }}
+            </app-badge>
+          </div>
         </div>
       </div>
 

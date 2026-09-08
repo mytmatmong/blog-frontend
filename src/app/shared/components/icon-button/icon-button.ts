@@ -8,6 +8,9 @@ export type IconButtonSize = 'sm' | 'md' | 'lg';
   selector: 'app-icon-button',
   standalone: true,
   templateUrl: './icon-button.html',
+  host: {
+    class: 'inline-flex shrink-0 whitespace-nowrap',
+  },
 })
 export class IconButtonComponent {
   /** Tên class của Bootstrap Icon (Ví dụ: 'bi bi-trash3-fill', 'bi bi-pencil-square') */
@@ -40,7 +43,7 @@ export class IconButtonComponent {
   /** Computed class áp dụng Tailwind dựa trên color, variant, size */
   readonly buttonClasses = computed(() => {
     const base =
-      'inline-flex items-center justify-center font-semibold transition-all duration-150 select-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none';
+      'inline-flex items-center justify-center font-semibold transition-all duration-150 select-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none whitespace-nowrap shrink-0';
 
     // Sizes
     const sizeMap: Record<IconButtonSize, string> = {
