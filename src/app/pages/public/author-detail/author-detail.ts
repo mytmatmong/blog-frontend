@@ -21,6 +21,7 @@ import {
 
 import {
   distinctUntilChanged,
+  forkJoin,
   Observable,
   of,
   skip,
@@ -131,6 +132,8 @@ export class AuthorDetailComponent {
   readonly connectionsTotalPages = signal(1);
   readonly connectionsPerPage = 10;
 
+  readonly isNormalUser = signal(false);
+
   constructor() {
     this.route.paramMap
       .pipe(takeUntilDestroyed())
@@ -198,6 +201,15 @@ export class AuthorDetailComponent {
 
     this.isLoading.set(true);
     this.errorMessage.set(null);
+    this.isNormalUser.set(false);
+
+    const historyStateUser =
+      typeof history !== 'undefined' &&
+      history.state?.userSummary?.id === authorId
+        ? (history.state.userSummary as UserSummary)
+        : null;
+    const cachedUser =
+      historyStateUser || this.userApi.getCachedUser(authorId);
 
     this.publicApiService
       .getAuthorById(authorId, {
@@ -224,9 +236,19 @@ export class AuthorDetailComponent {
 
           const data = response.data;
 
+          this.isNormalUser.set(false);
           this.author.set(
             data.author,
           );
+
+          if (data.author) {
+            this.userApi.cacheUser({
+              id: data.author.id,
+              username: data.author.username,
+              avatarUrl: data.author.avatarUrl,
+              bio: data.author.bio,
+            });
+          }
 
           this.posts.set(
             data.posts.items.map(
@@ -261,6 +283,25 @@ export class AuthorDetailComponent {
             requestVersion !==
             this.requestVersion
           ) {
+            return;
+          }
+
+          if (cachedUser) {
+            this.isNormalUser.set(true);
+            this.author.set({
+              id: cachedUser.id,
+              username: cachedUser.username,
+              avatarUrl: cachedUser.avatarUrl,
+              bio: cachedUser.bio,
+              createdAt: null,
+              postCount: 0,
+            });
+            this.posts.set([]);
+            this.totalItems.set(0);
+            this.totalPages.set(1);
+            this.errorMessage.set(null);
+            this.isLoading.set(false);
+            this.refreshFollowingState(authorId);
             return;
           }
 
@@ -375,6 +416,7 @@ export class AuthorDetailComponent {
 
     request.subscribe({
       next: ({ data }) => {
+        data?.items?.forEach((user) => this.userApi.cacheUser(user));
         this.connectionUsers.set(data.items);
         this.connectionsTotalItems.set(data.meta.totalItems);
         this.connectionsTotalPages.set(Math.max(1, data.meta.totalPages));

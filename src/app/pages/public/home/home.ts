@@ -82,7 +82,7 @@ export class Home implements OnInit {
   );
 
   readonly latestPosts = computed(() =>
-    this.posts().slice(1),
+    this.posts(),
   );
 
   readonly totalItems = signal(0);

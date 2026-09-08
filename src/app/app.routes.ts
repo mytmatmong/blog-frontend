@@ -36,13 +36,16 @@ import { ManageRequests } from './pages/dashboard/admin/manage-requests/manage-r
 import { roleGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
+  // Standalone Auth for Public User & Dashboard
+  { path: 'auth', component: Auth },
+  { path: 'dashboard/auth', component: DashboardAuth },
+
   // Public Routes (Dùng PublicLayout)
   {
     path: '',
     component: PublicLayout,
     children: [
       { path: '', component: Home },
-      { path: 'auth', component: Auth },
       { path: 'post/:id', component: PostDetail },
       { path: 'author/:id', component: AuthorDetailComponent },
       { path: 'category', component: Category },
@@ -53,8 +56,6 @@ export const routes: Routes = [
       { path: 'account/connections', component: AccountConnections, canActivate: [roleGuard('user')] },
     ],
   },
-  // Standalone Auth for Dashboard
-  { path: 'dashboard/auth', component: DashboardAuth },
 
   // Dashboard Routes (Dùng DashboardLayout)
   {

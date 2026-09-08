@@ -1,10 +1,10 @@
-import { Component, signal, inject, OnInit } from '@angular/core';
+import { Component, signal, inject, OnInit, ElementRef, HostListener } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { InputComponent } from '../../../shared/components/input/input';
-import { TranslationService } from '../../../core/services/translation.service';
+import { TranslationService, SupportedLang } from '../../../core/services/translation.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
@@ -21,10 +21,12 @@ export class Auth implements OnInit {
   protected readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly elementRef = inject(ElementRef);
 
   protected activeTab = signal<'login' | 'register' | 'forgot'>('login');
   protected forgotStep = signal<'request' | 'reset'>('request');
   protected isLoading = signal<boolean>(false);
+  protected isLangDropdownOpen = signal<boolean>(false);
 
   // Login form fields
   loginIdentifier = signal<string>('');
@@ -42,7 +44,15 @@ export class Auth implements OnInit {
   resetToken = signal<string>('');
   resetPassword = signal<string>('');
 
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.elementRef.nativeElement.contains(event.target as Node)) {
+      this.isLangDropdownOpen.set(false);
+    }
+  }
+
   ngOnInit() {
+    this.ts.loadLanguages();
     this.route.queryParams.subscribe((params) => {
       if (params['token']) {
         this.resetToken.set(params['token']);
@@ -52,6 +62,16 @@ export class Auth implements OnInit {
         this.activeTab.set(params['tab'] as 'login' | 'register' | 'forgot');
       }
     });
+  }
+
+  toggleLangDropdown(event?: MouseEvent): void {
+    event?.stopPropagation();
+    this.isLangDropdownOpen.update((v) => !v);
+  }
+
+  selectLang(lang: SupportedLang): void {
+    this.ts.setLanguage(lang);
+    this.isLangDropdownOpen.set(false);
   }
 
   setTab(tab: 'login' | 'register' | 'forgot') {
