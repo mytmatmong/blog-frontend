@@ -15,6 +15,10 @@ import {
   TranslationPreviewRequest,
   TranslationPreviewResponse,
   UpdateBlogOwnerPostRequest,
+  BlogOwnerDashboardActivity,
+  BlogOwnerDashboardFeatured,
+  BlogOwnerDashboardFeaturedSort,
+  BlogOwnerDashboardSummary,
 } from '../models/blog-owner.model';
 
 @Injectable({ providedIn: 'root' })
@@ -28,7 +32,39 @@ export class BlogOwnerApiService {
       `${this.apiUrl}/dashboard`,
     );
   }
+  /** Dashboard summary: post counts + total interactions. */
+  getDashboardSummary(): Observable<ApiResponse<BlogOwnerDashboardSummary>> {
+    return this.http.get<ApiResponse<BlogOwnerDashboardSummary>>(
+      `${this.apiUrl}/dashboard/summary`,
+    );
+  }
 
+  /** Dashboard activity theo ngày. */
+  getDashboardActivity(
+    days = 7,
+  ): Observable<ApiResponse<BlogOwnerDashboardActivity>> {
+    const params = new HttpParams().set('days', String(days));
+
+    return this.http.get<ApiResponse<BlogOwnerDashboardActivity>>(
+      `${this.apiUrl}/dashboard/activity`,
+      { params },
+    );
+  }
+
+  /** Bài nổi bật theo exact post version. */
+  getDashboardFeatured(
+    sort: BlogOwnerDashboardFeaturedSort = 'views',
+    limit = 5,
+  ): Observable<ApiResponse<BlogOwnerDashboardFeatured>> {
+    const params = new HttpParams()
+      .set('sort', sort)
+      .set('limit', String(limit));
+
+    return this.http.get<ApiResponse<BlogOwnerDashboardFeatured>>(
+      `${this.apiUrl}/dashboard/featured`,
+      { params },
+    );
+  }
   /** B02 - Dữ liệu động cho form: ngôn ngữ, category và tag. */
   getOptions(): Observable<ApiResponse<BlogOwnerOptions>> {
     return this.http.get<ApiResponse<BlogOwnerOptions>>(`${this.apiUrl}/options`);

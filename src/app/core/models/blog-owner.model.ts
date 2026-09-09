@@ -125,7 +125,36 @@ export interface BlogOwnerDashboardPost {
   likes: number;
   language: Pick<BlogOwnerLanguage, 'id' | 'code' | 'name' | 'flag'>;
 }
+export type BlogOwnerDashboardFeaturedSort = 'views' | 'likes';
 
+export interface BlogOwnerDashboardSummary {
+  postCounts: {
+    total: number;
+    draft: number;
+    pendingReview: number;
+    published: number;
+    rejected: number;
+  };
+  totals: {
+    views: number;
+    likes: number;
+    comments: number;
+  };
+}
+
+export interface BlogOwnerDashboardActivity {
+  days: number;
+  last7Days: Array<{
+    date: string;
+    views: number;
+    likes: number;
+  }>;
+}
+
+export interface BlogOwnerDashboardFeatured {
+  sort: BlogOwnerDashboardFeaturedSort;
+  posts: BlogOwnerDashboardPost[];
+}
 export interface BlogOwnerDashboardData {
   postCounts: {
     total: number;
