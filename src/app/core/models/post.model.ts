@@ -214,6 +214,10 @@ export interface PublicPost {
   likeCount: number;
   media: PostMediaSummary[];
 }
+export interface RecordPostViewResponse {
+  counted: boolean;
+  viewCount: number;
+}
 
 export interface GetPostsQueryParams
   extends SortQueryParams<PostSortBy> {
