@@ -13,8 +13,11 @@ import {
 import { DecimalPipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import {
-  BlogOwnerDashboardData,
+  BlogOwnerDashboardActivity,
+  BlogOwnerDashboardFeatured,
+  BlogOwnerDashboardFeaturedSort,
   BlogOwnerDashboardPost,
+  BlogOwnerDashboardSummary,
 } from '../../../../core/models/blog-owner.model';
 import {
   OwnerPostPreviewComponent,
@@ -66,10 +69,20 @@ export class OwnerDashboard implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('interactionChart')
   private chartCanvas?: ElementRef<HTMLCanvasElement>;
 
-  readonly dashboard = signal<BlogOwnerDashboardData | null>(null);
-  readonly isLoading = signal(true);
-  readonly loadError = signal<string | null>(null);
-  readonly sortCriteria = signal<'views' | 'likes'>('views');
+  readonly summary = signal<BlogOwnerDashboardSummary | null>(null);
+  readonly activity = signal<BlogOwnerDashboardActivity | null>(null);
+  readonly featured = signal<BlogOwnerDashboardFeatured | null>(null);
+
+  readonly summaryLoading = signal(true);
+  readonly activityLoading = signal(true);
+  readonly featuredLoading = signal(true);
+
+  readonly summaryError = signal<string | null>(null);
+  readonly activityError = signal<string | null>(null);
+  readonly featuredError = signal<string | null>(null);
+
+  readonly sortCriteria =
+    signal<BlogOwnerDashboardFeaturedSort>('views');
   readonly copySuccess = signal(false);
   readonly activePreviewPostId =
     signal<number | null>(null);
@@ -79,17 +92,10 @@ export class OwnerDashboard implements OnInit, AfterViewInit, OnDestroy {
   readonly publicBlogUrl =
     typeof window !== 'undefined' ? window.location.origin : '';
 
-  readonly featuredPosts = computed<BlogOwnerDashboardPost[]>(() => {
-    const data = this.dashboard();
-    if (!data) {
-      return [];
-    }
-
-    return this.sortCriteria() === 'views'
-      ? data.featuredPosts.byViews
-      : data.featuredPosts.byLikes;
-  });
-
+readonly featuredPosts = computed<BlogOwnerDashboardPost[]>(
+  () => this.featured()?.posts ?? [],
+);
+  private featuredRequestVersion = 0;
   private chartInstance: ChartInstance | null = null;
   private viewReady = false;
 
@@ -97,7 +103,8 @@ export class OwnerDashboard implements OnInit, AfterViewInit, OnDestroy {
     effect(() => {
       this.ts.currentLang();
       this.auth.isDarkMode();
-      this.dashboard();
+      this.activity();
+
       if (this.viewReady) {
         queueMicrotask(() => this.renderChart());
       }
@@ -118,32 +125,106 @@ export class OwnerDashboard implements OnInit, AfterViewInit, OnDestroy {
     this.chartInstance = null;
   }
 
-  loadDashboard(): void {
-    this.isLoading.set(true);
-    this.loadError.set(null);
+loadDashboard(): void {
+  this.loadSummary();
+  this.loadActivity();
+  this.loadFeatured(this.sortCriteria());
+}
 
-    this.api.getDashboard().subscribe({
-      next: (response) => {
-        this.dashboard.set(response.data);
-        this.isLoading.set(false);
-        queueMicrotask(() => this.renderChart());
-      },
-      error: (error: unknown) => {
-        const message = getApiErrorMessage(
+loadSummary(): void {
+  this.summaryLoading.set(true);
+  this.summaryError.set(null);
+
+  this.api.getDashboardSummary().subscribe({
+    next: ({ data }) => {
+      this.summary.set(data);
+      this.summaryLoading.set(false);
+    },
+    error: (error: unknown) => {
+      this.summaryError.set(
+        getApiErrorMessage(
           error,
           this.ts.translate('owner_dashboard.load_error'),
-        );
-        this.loadError.set(message);
-        this.isLoading.set(false);
-      },
-    });
-  }
+        ),
+      );
+      this.summaryLoading.set(false);
+    },
+  });
+}
+
+loadActivity(days = 7): void {
+  this.activityLoading.set(true);
+  this.activityError.set(null);
+
+  this.api.getDashboardActivity(days).subscribe({
+    next: ({ data }) => {
+      this.activity.set(data);
+      this.activityLoading.set(false);
+
+      queueMicrotask(() => this.renderChart());
+    },
+    error: (error: unknown) => {
+      this.activityError.set(
+        getApiErrorMessage(
+          error,
+          this.ts.translate('owner_dashboard.load_error'),
+        ),
+      );
+      this.activityLoading.set(false);
+    },
+  });
+}
+
+loadFeatured(
+  sort: BlogOwnerDashboardFeaturedSort = this.sortCriteria(),
+): void {
+  const requestVersion = ++this.featuredRequestVersion;
+
+  this.featuredLoading.set(true);
+  this.featuredError.set(null);
+
+  this.api.getDashboardFeatured(sort, 5).subscribe({
+    next: ({ data }) => {
+      /**
+       * Nếu user đổi views -> likes quá nhanh,
+       * response request cũ không được ghi đè request mới.
+       */
+      if (requestVersion !== this.featuredRequestVersion) {
+        return;
+      }
+
+      this.featured.set(data);
+      this.featuredLoading.set(false);
+    },
+    error: (error: unknown) => {
+      if (requestVersion !== this.featuredRequestVersion) {
+        return;
+      }
+
+      this.featuredError.set(
+        getApiErrorMessage(
+          error,
+          this.ts.translate('owner_dashboard.load_error'),
+        ),
+      );
+      this.featuredLoading.set(false);
+    },
+  });
+}
 
   onSortChange(event: Event): void {
     const value = (event.target as HTMLSelectElement).value;
-    if (value === 'views' || value === 'likes') {
-      this.sortCriteria.set(value);
+
+    if (value !== 'views' && value !== 'likes') {
+      return;
     }
+
+    if (value === this.sortCriteria()) {
+      return;
+    }
+
+    this.sortCriteria.set(value);
+    this.loadFeatured(value);
   }
 
   openPreview(postId: number): void {
@@ -259,7 +340,7 @@ export class OwnerDashboard implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private renderChart(): void {
-    const data = this.dashboard();
+    const data = this.activity();
     const canvas = this.chartCanvas?.nativeElement;
     const ChartClass = (
       globalThis as typeof globalThis & { Chart?: ChartConstructor }
@@ -279,7 +360,13 @@ export class OwnerDashboard implements OnInit, AfterViewInit, OnDestroy {
       rootStyles?.getPropertyValue('--border-color').trim() || '#e5e8ef';
 
     this.chartInstance?.destroy();
+      const chartValues = data.last7Days.flatMap((item) => [
+        item.views,
+        item.likes,
+    ]);
 
+  const minChartValue = Math.min(0, ...chartValues);
+  const maxChartValue = Math.max(0, ...chartValues);
     this.chartInstance = new ChartClass(canvas, {
       type: 'line',
       data: {
@@ -351,7 +438,12 @@ export class OwnerDashboard implements OnInit, AfterViewInit, OnDestroy {
             },
           },
           y: {
-            beginAtZero: true,
+            beginAtZero: false,
+            suggestedMin: minChartValue,
+            suggestedMax:
+              minChartValue === maxChartValue
+                ? maxChartValue + 1
+                : maxChartValue,
             border: {
               display: false,
             },

@@ -1,7 +1,6 @@
 <section class="owner-dashboard">
   <header class="owner-page-header">
     <div class="owner-page-header__copy">
-
       <h1>{{ 'dashboard.owner_title' | translate }}</h1>
       <p>{{ 'dashboard.owner_desc' | translate }}</p>
     </div>
@@ -19,96 +18,161 @@
     </div>
   </header>
 
-  @if (loadError()) {
+  <!-- =========================================================
+       SUMMARY ERROR
+       Chỉ ảnh hưởng phần summary, không chặn chart/featured
+       ========================================================= -->
+  @if (summaryError()) {
   <div class="dashboard-alert dashboard-alert--danger">
     <i class="bi bi-exclamation-triangle-fill"></i>
-    <span>{{ loadError() }}</span>
-    <button type="button" (click)="loadDashboard()">{{ 'common.retry' | translate }}</button>
+
+    <span>{{ summaryError() }}</span>
+
+    <button type="button" (click)="loadSummary()">
+      {{ 'common.retry' | translate }}
+    </button>
   </div>
   }
 
+  <!-- =========================================================
+       SUMMARY METRICS
+       GET /blog-owner/dashboard/summary
+       ========================================================= -->
   <div class="metric-grid">
+    <!-- TOTAL POSTS -->
     <article class="metric-card metric-card--brand">
       <div class="metric-card__value">
-        @if (isLoading()) {
+        @if (summaryLoading()) {
         <span class="metric-skeleton"></span>
         } @else {
-        {{ (dashboard()?.postCounts?.total ?? 0) | number }}
+        {{ (summary()?.postCounts?.total ?? 0) | number }}
         }
       </div>
+
       <div class="metric-card__meta">
-        <div class="metric-card__label">{{ 'dashboard.total_posts' | translate }}</div>
+        <div class="metric-card__label">
+          {{ 'dashboard.total_posts' | translate }}
+        </div>
+
         <div class="metric-card__detail">
-          {{ (dashboard()?.postCounts?.published ?? 0) | number }} {{ 'post_status.publish' | translate }}
+          {{ (summary()?.postCounts?.published ?? 0) | number }}
+          {{ 'post_status.publish' | translate }}
         </div>
       </div>
     </article>
 
+    <!-- TOTAL VIEWS -->
     <article class="metric-card metric-card--sky">
       <div class="metric-card__value">
-        @if (isLoading()) {
+        @if (summaryLoading()) {
         <span class="metric-skeleton"></span>
         } @else {
-        {{ (dashboard()?.totals?.views ?? 0) | number }}
+        {{ (summary()?.totals?.views ?? 0) | number }}
         }
       </div>
+
       <div class="metric-card__meta">
-        <div class="metric-card__label">{{ 'dashboard.total_views' | translate }}</div>
+        <div class="metric-card__label">
+          {{ 'dashboard.total_views' | translate }}
+        </div>
       </div>
     </article>
 
+    <!-- TOTAL LIKES -->
     <article class="metric-card metric-card--rose">
       <div class="metric-card__value">
-        @if (isLoading()) {
+        @if (summaryLoading()) {
         <span class="metric-skeleton"></span>
         } @else {
-        {{ (dashboard()?.totals?.likes ?? 0) | number }}
+        {{ (summary()?.totals?.likes ?? 0) | number }}
         }
       </div>
+
       <div class="metric-card__meta">
-        <div class="metric-card__label">{{ 'dashboard.total_likes' | translate }}</div>
+        <div class="metric-card__label">
+          {{ 'dashboard.total_likes' | translate }}
+        </div>
       </div>
     </article>
 
+    <!-- TOTAL COMMENTS -->
     <article class="metric-card metric-card--amber">
       <div class="metric-card__value">
-        @if (isLoading()) {
+        @if (summaryLoading()) {
         <span class="metric-skeleton"></span>
         } @else {
-        {{ (dashboard()?.totals?.comments ?? 0) | number }}
+        {{ (summary()?.totals?.comments ?? 0) | number }}
         }
       </div>
+
       <div class="metric-card__meta">
-        <div class="metric-card__label">{{ 'dashboard.total_comments' | translate }}</div>
+        <div class="metric-card__label">
+          {{ 'dashboard.total_comments' | translate }}
+        </div>
       </div>
     </article>
   </div>
 
+  <!-- =========================================================
+       OVERVIEW
+       ========================================================= -->
   <div class="dashboard-overview-grid">
+
+    <!-- =======================================================
+         ACTIVITY CHART
+         GET /blog-owner/dashboard/activity?days=7
+         ======================================================= -->
     <article class="dashboard-panel dashboard-panel--chart">
       <div class="panel-heading">
         <div>
           <h2>{{ 'dashboard.interaction_chart' | translate }}</h2>
         </div>
+
         <div class="chart-legend" [attr.aria-label]="'a11y.chart_legend' | translate">
-          <span><i class="chart-dot chart-dot--views"></i>{{ 'table.views' | translate }}</span>
-          <span><i class="chart-dot chart-dot--likes"></i>{{ 'table.likes' | translate }}</span>
+          <span>
+            <i class="chart-dot chart-dot--views"></i>
+            {{ 'table.views' | translate }}
+          </span>
+
+          <span>
+            <i class="chart-dot chart-dot--likes"></i>
+            {{ 'table.likes' | translate }}
+          </span>
         </div>
       </div>
 
       <div class="chart-stage">
-        @if (isLoading()) {
-        <div class="panel-loading"><i class="bi bi-arrow-repeat"></i>{{ 'common.loading' | translate }}</div>
+        @if (activityLoading()) {
+        <div class="panel-loading">
+          <i class="bi bi-arrow-repeat"></i>
+          {{ 'common.loading' | translate }}
+        </div>
+        } @else if (activityError()) {
+        <div class="panel-loading">
+          <i class="bi bi-exclamation-triangle"></i>
+
+          <span>{{ activityError() }}</span>
+
+          <button type="button" (click)="loadActivity()">
+            {{ 'common.retry' | translate }}
+          </button>
+        </div>
         }
+
         <canvas #interactionChart></canvas>
       </div>
     </article>
 
+    <!-- =======================================================
+         POST STATUS SUMMARY
+         Cũng lấy từ /summary
+         ======================================================= -->
     <aside class="dashboard-panel status-panel">
       <div class="panel-heading panel-heading--status">
         <div>
           <h2>{{ 'dashboard.my_posts' | translate }}</h2>
         </div>
+
         <a routerLink="/dashboard/owner/posts" class="panel-link" [title]="'dashboard.view_all' | translate">
           <i class="bi bi-arrow-up-right"></i>
         </a>
@@ -116,29 +180,67 @@
 
       <div class="status-total">
         <span>{{ 'dashboard.total_posts' | translate }}</span>
-        <strong>{{ (dashboard()?.postCounts?.total ?? 0) | number }}</strong>
+
+        @if (summaryLoading()) {
+        <span class="metric-skeleton"></span>
+        } @else {
+        <strong>
+          {{ (summary()?.postCounts?.total ?? 0) | number }}
+        </strong>
+        }
       </div>
 
       <div class="status-list">
+        <!-- PUBLISHED -->
         <div class="status-row status-row--published">
           <span class="status-row__dot"></span>
-          <span>{{ 'post_status.publish' | translate }}</span>
-          <strong>{{ (dashboard()?.postCounts?.published ?? 0) | number }}</strong>
+
+          <span>
+            {{ 'post_status.publish' | translate }}
+          </span>
+
+          <strong>
+            {{ (summary()?.postCounts?.published ?? 0) | number }}
+          </strong>
         </div>
+
+        <!-- PENDING -->
         <div class="status-row status-row--pending">
           <span class="status-row__dot"></span>
-          <span>{{ 'post_status.pending_review' | translate }}</span>
-          <strong>{{ (dashboard()?.postCounts?.pendingReview ?? 0) | number }}</strong>
+
+          <span>
+            {{ 'post_status.pending_review' | translate }}
+          </span>
+
+          <strong>
+            {{ (summary()?.postCounts?.pendingReview ?? 0) | number }}
+          </strong>
         </div>
+
+        <!-- DRAFT -->
         <div class="status-row status-row--draft">
           <span class="status-row__dot"></span>
-          <span>{{ 'post_status.draft' | translate }}</span>
-          <strong>{{ (dashboard()?.postCounts?.draft ?? 0) | number }}</strong>
+
+          <span>
+            {{ 'post_status.draft' | translate }}
+          </span>
+
+          <strong>
+            {{ (summary()?.postCounts?.draft ?? 0) | number }}
+          </strong>
         </div>
+
+        <!-- REJECTED -->
         <div class="status-row status-row--rejected">
           <span class="status-row__dot"></span>
-          <span>{{ 'post_status.reject' | translate }}</span>
-          <strong>{{ (dashboard()?.postCounts?.rejected ?? 0) | number }}</strong>
+
+          <span>
+            {{ 'post_status.reject' | translate }}
+          </span>
+
+          <strong>
+            {{ (summary()?.postCounts?.rejected ?? 0) | number }}
+          </strong>
         </div>
       </div>
 
@@ -146,34 +248,55 @@
         <a routerLink="/dashboard/owner/create-post" class="quick-link">
           <span class="quick-link__content">
             <i class="bi bi-pencil-square"></i>
-            <span>{{ 'dashboard.create_new_post' | translate }}</span>
+
+            <span>
+              {{ 'dashboard.create_new_post' | translate }}
+            </span>
           </span>
+
           <i class="bi bi-chevron-right"></i>
         </a>
+
         <button type="button" class="quick-link" (click)="openShareModal()">
           <span class="quick-link__content">
             <i class="bi bi-share"></i>
-            <span>{{ 'dashboard.share_blog' | translate }}</span>
+
+            <span>
+              {{ 'dashboard.share_blog' | translate }}
+            </span>
           </span>
+
           <i class="bi bi-chevron-right"></i>
         </button>
       </div>
     </aside>
   </div>
 
+  <!-- =========================================================
+       FEATURED POSTS
+       GET /blog-owner/dashboard/featured
+       ========================================================= -->
   <article class="dashboard-panel posts-panel">
     <div class="panel-heading posts-panel__heading">
       <div>
         <h2>{{ 'dashboard.featured_posts' | translate }}</h2>
       </div>
+
       <div class="posts-panel__controls">
         <label class="sort-control">
           <i class="bi bi-sliders"></i>
+
           <select [value]="sortCriteria()" (change)="onSortChange($event)">
-            <option value="views">{{ 'filter.most_viewed' | translate }}</option>
-            <option value="likes">{{ 'filter.most_liked' | translate }}</option>
+            <option value="views">
+              {{ 'filter.most_viewed' | translate }}
+            </option>
+
+            <option value="likes">
+              {{ 'filter.most_liked' | translate }}
+            </option>
           </select>
         </label>
+
         <a routerLink="/dashboard/owner/posts" class="view-all-link">
           {{ 'dashboard.view_all' | translate }}
           <i class="bi bi-arrow-right"></i>
@@ -185,88 +308,139 @@
       <table class="modern-table">
         <thead>
           <tr>
-            <th>{{ 'table.post_title' | translate }}</th>
-            <th>{{ 'table.status' | translate }}</th>
-            <th>{{ 'table.views' | translate }}</th>
-            <th>{{ 'table.likes' | translate }}</th>
-            <th class="owner-actions-column">{{ 'table.actions' | translate }}</th>
+            <th>
+              {{ 'table.post_title' | translate }}
+            </th>
+
+            <th>
+              {{ 'table.status' | translate }}
+            </th>
+
+            <th>
+              {{ 'table.views' | translate }}
+            </th>
+
+            <th>
+              {{ 'table.likes' | translate }}
+            </th>
+
+            <th class="owner-actions-column">
+              {{ 'table.actions' | translate }}
+            </th>
           </tr>
         </thead>
+
         <tbody>
-          @if (isLoading()) {
+          <!-- FEATURED LOADING -->
+          @if (featuredLoading()) {
           <tr>
             <td colspan="5">
-              <div class="table-empty"><i class="bi bi-arrow-repeat"></i>{{ 'common.loading' | translate }}</div>
+              <div class="table-empty">
+                <i class="bi bi-arrow-repeat"></i>
+                {{ 'common.loading' | translate }}
+              </div>
             </td>
           </tr>
-          } @else if (featuredPosts().length === 0) {
+          }
+
+          <!-- FEATURED ERROR -->
+          @else if (featuredError()) {
           <tr>
             <td colspan="5">
-              <div class="table-empty"><i class="bi bi-journal-x"></i>{{ 'posts.empty' | translate }}</div>
+              <div class="table-empty">
+                <i class="bi bi-exclamation-triangle"></i>
+
+                <span>
+                  {{ featuredError() }}
+                </span>
+
+                <button type="button" (click)="loadFeatured(sortCriteria())">
+                  {{ 'common.retry' | translate }}
+                </button>
+              </div>
             </td>
           </tr>
-          } @else {
+          }
+
+          <!-- EMPTY -->
+          @else if (featuredPosts().length === 0) {
+          <tr>
+            <td colspan="5">
+              <div class="table-empty">
+                <i class="bi bi-journal-x"></i>
+                {{ 'posts.empty' | translate }}
+              </div>
+            </td>
+          </tr>
+          }
+
+          <!-- DATA -->
+          @else {
           @for (post of featuredPosts(); track post.id) {
           <tr>
+            <!-- POST IDENTITY -->
             <td>
               <div class="post-identity">
                 @if (post.thumbnailUrl) {
                 <img [src]="post.thumbnailUrl" [alt]="post.title">
                 } @else {
-                <span class="post-identity__placeholder"><i class="bi bi-image"></i></span>
+                <span class="post-identity__placeholder">
+                  <i class="bi bi-image"></i>
+                </span>
                 }
+
                 <div>
-                  <strong>{{ post.title }}</strong>
-                  <span>{{ post.language.flag }} {{ post.language.name }}</span>
+                  <strong>
+                    {{ post.title }}
+                  </strong>
+
+                  <span>
+                    {{ post.language.flag }}
+                    {{ post.language.name }}
+                  </span>
                 </div>
               </div>
             </td>
+
+            <!-- STATUS -->
             <td>
-              <app-badge
-                [color]="statusBadgeColor(post.status)"
-                shape="pill"
-                size="sm"
-              >
+              <app-badge [color]="statusBadgeColor(post.status)" shape="pill" size="sm">
                 {{ statusLabel(post.status) }}
               </app-badge>
             </td>
-            <td><span class="table-metric"><i class="bi bi-eye"></i>{{ post.views | number }}</span></td>
-            <td><span class="table-metric table-metric--likes"><i class="bi bi-heart"></i>{{ post.likes | number
-                }}</span></td>
+
+            <!-- VIEWS -->
+            <td>
+              <span class="table-metric">
+                <i class="bi bi-eye"></i>
+                {{ post.views | number }}
+              </span>
+            </td>
+
+            <!-- LIKES -->
+            <td>
+              <span class="table-metric table-metric--likes">
+                <i class="bi bi-heart"></i>
+                {{ post.likes | number }}
+              </span>
+            </td>
+
+            <!-- ACTIONS -->
             <td class="owner-actions-column">
               <div class="flex items-center justify-center gap-2">
-                <app-icon-button
-                  icon="bi bi-eye"
-                  color="primary"
-                  variant="soft"
-                  size="sm"
-                  [title]="'action.view' | translate"
-                  (btnClick)="openPreview(post.id)"
-                >
+                <app-icon-button icon="bi bi-eye" color="primary" variant="soft" size="sm"
+                  [title]="'action.view' | translate" (btnClick)="openPreview(post.id)">
                   {{ 'action.view' | translate }}
                 </app-icon-button>
 
-                <app-icon-button
-                  icon="bi bi-pencil-square"
-                  color="blue"
-                  variant="soft"
-                  size="sm"
-                  [title]="'action.edit' | translate"
-                  (btnClick)="navigateToEdit(post.id)"
-                >
+                <app-icon-button icon="bi bi-pencil-square" color="blue" variant="soft" size="sm"
+                  [title]="'action.edit' | translate" (btnClick)="navigateToEdit(post.id)">
                   {{ 'action.edit' | translate }}
                 </app-icon-button>
 
-                <app-icon-button
-                  icon="bi bi-trash3"
-                  color="red"
-                  variant="soft"
-                  size="sm"
-                  [disabled]="deletingPostId() !== null"
-                  [loading]="deletingPostId() === post.id"
-                  [title]="'action.delete' | translate"
-                  (btnClick)="deletePost(post)"
-                >
+                <app-icon-button icon="bi bi-trash3" color="red" variant="soft" size="sm"
+                  [disabled]="deletingPostId() !== null" [loading]="deletingPostId() === post.id"
+                  [title]="'action.delete' | translate" (btnClick)="deletePost(post)">
                   {{ 'action.delete' | translate }}
                 </app-icon-button>
               </div>
@@ -280,41 +454,61 @@
   </article>
 </section>
 
+<!-- ===========================================================
+     SHARE MODAL
+     =========================================================== -->
 @if (isShareModalOpen()) {
 <div class="dashboard-modal-backdrop" (click)="closeShareModal()">
   <div class="dashboard-modal dashboard-modal--small" (click)="$event.stopPropagation()">
     <div class="dashboard-modal__heading">
-      <span class="dashboard-modal__icon"><i class="bi bi-share"></i></span>
+      <span class="dashboard-modal__icon">
+        <i class="bi bi-share"></i>
+      </span>
+
       <div>
-        <h3>{{ 'modal.share_title' | translate }}</h3>
-        <p>{{ 'modal.share_desc' | translate }}</p>
+        <h3>
+          {{ 'modal.share_title' | translate }}
+        </h3>
+
+        <p>
+          {{ 'modal.share_desc' | translate }}
+        </p>
       </div>
-      <button type="button" (click)="closeShareModal()"><i class="bi bi-x-lg"></i></button>
+
+      <button type="button" (click)="closeShareModal()">
+        <i class="bi bi-x-lg"></i>
+      </button>
     </div>
+
     <div class="share-field">
       <input type="text" id="blogLinkInput" [value]="publicBlogUrl" readonly>
+
       <button type="button" (click)="copyBlogLink()" [class.is-success]="copySuccess()">
         <i class="bi" [class.bi-clipboard]="!copySuccess()" [class.bi-check2]="copySuccess()"></i>
-        {{ copySuccess() ? ('modal.copied' | translate) : ('modal.copy' | translate) }}
+
+        {{
+        copySuccess()
+        ? ('modal.copied' | translate)
+        : ('modal.copy' | translate)
+        }}
       </button>
     </div>
   </div>
 </div>
 }
 
-<!-- SHARED POST PREVIEW -->
+<!-- ===========================================================
+     SHARED POST PREVIEW
+     =========================================================== -->
 <app-owner-post-preview [postId]="activePreviewPostId()" editRoute="/dashboard/owner/edit-post" [showEdit]="true"
   (closed)="closePreviewModal()" />
 
+<!-- ===========================================================
+     DELETE CONFIRMATION
+     =========================================================== -->
 @if (pendingDeletePost()) {
-<app-confirm-dialog
-  [title]="'comments.delete' | translate"
-  [message]="'post.delete_confirm' | translate"
-  [confirmLabel]="'action.delete' | translate"
-  [cancelLabel]="'modal.cancel' | translate"
-  [busy]="deletingPostId() !== null"
-  tone="danger"
-  (cancelled)="closeDeleteConfirmation()"
-  (confirmed)="confirmDeletePost()"
-/>
+<app-confirm-dialog [title]="'comments.delete' | translate" [message]="'post.delete_confirm' | translate"
+  [confirmLabel]="'action.delete' | translate" [cancelLabel]="'modal.cancel' | translate"
+  [busy]="deletingPostId() !== null" tone="danger" (cancelled)="closeDeleteConfirmation()"
+  (confirmed)="confirmDeletePost()" />
 }
