@@ -23,6 +23,7 @@ import {
   PublicPost,
   TopAuthor,
   TopTagItem,
+  RecordPostViewResponse,
 } from '../models/post.model';
 
 @Injectable({
@@ -111,6 +112,30 @@ export class PublicApiService {
     );
   }
 
+    /**
+   * POST /posts/:id/view
+   *
+   * FE chỉ gọi khi:
+   * - người đọc đã ở bài >= 10 giây
+   * - đã đọc tới >= 75% nội dung
+   *
+   * visitorId được dùng cho guest.
+   * Nếu đang đăng nhập, AuthInterceptor tự gắn Bearer token
+   * và backend sẽ ưu tiên userId từ token.
+   */
+  recordPostView(
+    postId: number,
+    visitorId: string,
+  ): Observable<ApiResponse<RecordPostViewResponse>> {
+    return this.http.post<
+      ApiResponse<RecordPostViewResponse>
+    >(
+      `${this.apiUrl}/posts/${postId}/view`,
+      {
+        visitorId,
+      },
+    );
+  }
   /**
    * P08 — GET /authors/top
    */

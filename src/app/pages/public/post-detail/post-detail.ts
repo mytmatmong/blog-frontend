@@ -2,7 +2,9 @@ import {
   Component,
   computed,
   ElementRef,
+  HostListener,
   inject,
+  OnDestroy,
   signal,
   ViewChild,
 } from '@angular/core';
@@ -86,9 +88,21 @@ interface ReportTarget {
   templateUrl: './post-detail.html',
   styleUrl: './post-detail.css',
 })
-export class PostDetail {
+export class PostDetail implements OnDestroy {
   @ViewChild('commentTextarea')
   private commentTextarea?: ElementRef<HTMLTextAreaElement>;
+  @ViewChild('articleProse')
+  private articleProse?: ElementRef<HTMLElement>;
+
+  private static readonly VISITOR_ID_STORAGE_KEY = 'blog_visitor_id';
+  private static readonly MIN_READ_TIME_MS = 10_000;
+  private static readonly READ_THRESHOLD = 0.75;
+
+  private viewTimer: ReturnType<typeof setTimeout> | null = null;
+  private viewTrackingPostId: number | null = null;
+  private hasReadLongEnough = false;
+  private hasReachedReadThreshold = false;
+  private viewRecordRequested = false;
 
   private readonly route = inject(ActivatedRoute);
   protected readonly router = inject(Router);
@@ -160,6 +174,7 @@ export class PostDetail {
         const id = Number(params.get('id'));
 
         if (!Number.isInteger(id) || id <= 0) {
+          this.resetViewTracking();
           this.postRequestVersion++;
           this.commentsRequestVersion++;
           this.routePostId = null;
@@ -186,10 +201,19 @@ export class PostDetail {
       });
   }
 
+  @HostListener('window:scroll')
+  onWindowScroll(): void {
+    this.evaluateReadingProgress();
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    this.evaluateReadingProgress();
+  }
   loadPost(options: LoadPostOptions = {}): void {
     const routePostId = this.routePostId;
     if (routePostId === null) return;
-
+    this.resetViewTracking();
     const preserveContent = options.preserveContent === true && this.post() !== null;
     const requestVersion = ++this.postRequestVersion;
     this.commentsRequestVersion++;
@@ -216,6 +240,7 @@ export class PostDetail {
 
           this.post.set(data);
           this.commentsPostId = data.id;
+          this.startViewTracking(data.id);
           this.isLoading.set(false);
           this.isRefreshingLanguage.set(false);
 
@@ -558,6 +583,204 @@ export class PostDetail {
     return false;
   }
 
+    private startViewTracking(postId: number): void {
+    if (typeof window === 'undefined') return;
+
+    this.viewTrackingPostId = postId;
+    this.hasReadLongEnough = false;
+    this.hasReachedReadThreshold = false;
+    this.viewRecordRequested = false;
+
+    /**
+     * Điều kiện thời gian:
+     * phải ở trang bài ít nhất 10 giây.
+     */
+    this.viewTimer = setTimeout(() => {
+      if (this.viewTrackingPostId !== postId) return;
+
+      this.hasReadLongEnough = true;
+      this.tryRecordView();
+    }, PostDetail.MIN_READ_TIME_MS);
+
+    /**
+     * Chờ Angular render article-prose xong
+     * rồi mới đo chiều cao nội dung.
+     */
+    if (typeof requestAnimationFrame !== 'undefined') {
+      requestAnimationFrame(() => {
+        if (this.viewTrackingPostId !== postId) return;
+        this.evaluateReadingProgress();
+      });
+    }
+  }
+
+  private resetViewTracking(): void {
+    if (this.viewTimer !== null) {
+      clearTimeout(this.viewTimer);
+      this.viewTimer = null;
+    }
+
+    this.viewTrackingPostId = null;
+    this.hasReadLongEnough = false;
+    this.hasReachedReadThreshold = false;
+    this.viewRecordRequested = false;
+  }
+
+  /**
+   * Người đọc được coi là đã đạt 75%
+   * khi đáy viewport đã đi qua điểm 75%
+   * chiều cao của article-prose.
+   */
+  private evaluateReadingProgress(): void {
+    if (
+      typeof window === 'undefined' ||
+      this.hasReachedReadThreshold ||
+      this.viewTrackingPostId === null
+    ) {
+      return;
+    }
+
+    const article = this.articleProse?.nativeElement;
+    if (!article) return;
+
+    const rect = article.getBoundingClientRect();
+
+    if (rect.height <= 0) return;
+
+    const articleTop = rect.top + window.scrollY;
+    const thresholdPosition =
+      articleTop + rect.height * PostDetail.READ_THRESHOLD;
+
+    const viewportBottom =
+      window.scrollY + window.innerHeight;
+
+    if (viewportBottom >= thresholdPosition) {
+      this.hasReachedReadThreshold = true;
+      this.tryRecordView();
+    }
+  }
+
+  private tryRecordView(): void {
+    if (
+      !this.hasReadLongEnough ||
+      !this.hasReachedReadThreshold ||
+      this.viewRecordRequested
+    ) {
+      return;
+    }
+
+    const postId = this.viewTrackingPostId;
+    if (postId === null) return;
+
+    const visitorId = this.getOrCreateVisitorId();
+    if (!visitorId) return;
+
+    /**
+     * Chặn chính tab này gửi nhiều lần.
+     *
+     * Backend vẫn là lớp bảo vệ cuối cùng:
+     * cùng viewer + exact post trong 10 phút
+     * chỉ được tính 1 view.
+     */
+    this.viewRecordRequested = true;
+
+    this.publicApi.recordPostView(postId, visitorId).subscribe({
+      next: ({ data }) => {
+        /**
+         * Update số view đang hiển thị bằng giá trị thật từ BE.
+         *
+         * counted=false cũng update vì có thể tab khác
+         * đã ghi view trước tab này.
+         */
+        this.post.update((currentPost) => {
+          if (!currentPost || currentPost.id !== postId) {
+            return currentPost;
+          }
+
+          return {
+            ...currentPost,
+            viewCount: data.viewCount,
+          };
+        });
+      },
+      error: () => {
+        /**
+         * Tracking lỗi không làm lỗi trang đọc bài.
+         *
+         * Cho phép thử lại nếu sau đó có scroll/resize.
+         */
+        if (this.viewTrackingPostId === postId) {
+          this.viewRecordRequested = false;
+        }
+      },
+    });
+  }
+
+  private getOrCreateVisitorId(): string | null {
+    if (typeof window === 'undefined') return null;
+
+    try {
+      const existing = localStorage.getItem(
+        PostDetail.VISITOR_ID_STORAGE_KEY,
+      );
+
+      if (existing && this.isUuidV4(existing)) {
+        return existing;
+      }
+
+      const visitorId = this.generateVisitorId();
+
+      localStorage.setItem(
+        PostDetail.VISITOR_ID_STORAGE_KEY,
+        visitorId,
+      );
+
+      return visitorId;
+    } catch {
+      /**
+       * Browser chặn storage thì không cố fingerprint
+       * bằng IP/User-Agent ở phía FE.
+       */
+      return null;
+    }
+  }
+
+  private generateVisitorId(): string {
+    if (
+      typeof crypto !== 'undefined' &&
+      typeof crypto.randomUUID === 'function'
+    ) {
+      return crypto.randomUUID();
+    }
+
+    /**
+     * Fallback UUID v4 cho browser không có randomUUID().
+     */
+    const bytes = new Uint8Array(16);
+    crypto.getRandomValues(bytes);
+
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+
+    const hex = Array.from(
+      bytes,
+      (byte) => byte.toString(16).padStart(2, '0'),
+    );
+
+    return [
+      hex.slice(0, 4).join(''),
+      hex.slice(4, 6).join(''),
+      hex.slice(6, 8).join(''),
+      hex.slice(8, 10).join(''),
+      hex.slice(10, 16).join(''),
+    ].join('-');
+  }
+
+  private isUuidV4(value: string): boolean {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+      value,
+    );
+  }
   private clearComments(): void {
     this.comments.set([]);
     this.commentsTotalItems.set(0);
@@ -579,5 +802,8 @@ export class PostDetail {
   private resolveCommentsErrorKey(error: unknown): CommentsErrorKey {
     if (error instanceof HttpErrorResponse && error.status === 0) return 'common.backend_unreachable';
     return 'comments.load_error';
+  }
+  ngOnDestroy(): void {
+    this.resetViewTracking();
   }
 }
