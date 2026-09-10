@@ -1284,14 +1284,22 @@ export class CreatePost implements OnInit {
   /**
    * Poll progress API cho tới khi batch kết thúc.
    *
-   * Poll 1 giây/lần, tối đa 5 phút.
+   * Poll 3 giây/lần, tối đa 25 phút.
+   *
+   * Trước là 1s/5 phút — quá ngắn: dịch một bài dài ra nhiều ngôn ngữ có
+   * thể hợp lệ chạy 10-20 phút trên CPU-only, single-threaded worker
+   * (xem DEPLOYMENT.md repo backend mục 10/10b). Với ngưỡng cũ, batch còn
+   * đang chạy bình thường ở backend vẫn bị FE báo lỗi ở phút thứ 5 — job
+   * không hề mất, chỉ là FE bỏ cuộc sớm và báo sai. 25 phút khớp với dung
+   * sai autoheal (~20 phút) + `stop_grace_period: 15m` phía backend, có
+   * thêm buffer.
    */
   protected async waitForTranslationBatch(
     batchId: string,
   ): Promise<BlogOwnerTranslationBatchProgress> {
-    const pollIntervalMs = 1000;
+    const pollIntervalMs = 3000;
     const timeoutMs =
-      5 * 60 * 1000;
+      25 * 60 * 1000;
 
     const startedAt =
       Date.now();
