@@ -64,6 +64,31 @@ export interface BlogOwnerTranslationSummary {
   language: Pick<BlogOwnerLanguage, 'id' | 'code' | 'name' | 'flag'>;
 }
 
+export type BlogOwnerTranslationBatchStatus =
+  | 'QUEUED'
+  | 'PROCESSING'
+  | 'COMPLETED'
+  | 'FAILED';
+
+export interface BlogOwnerTranslationBatchInfo {
+  batchId: string;
+  status: BlogOwnerTranslationBatchStatus;
+}
+
+export interface BlogOwnerTranslationLanguageProgress {
+  languageId: number;
+  status: BlogOwnerTranslationBatchStatus;
+  progress: number;
+}
+
+export interface BlogOwnerTranslationBatchProgress {
+  batchId: string;
+  rootPostId: number;
+  status: BlogOwnerTranslationBatchStatus;
+  progress: number;
+  translations: BlogOwnerTranslationLanguageProgress[];
+}
+
 export interface BlogOwnerPost {
   id: number;
   title: string;
@@ -86,6 +111,12 @@ export interface BlogOwnerPost {
   tags: BlogOwnerTag[];
   media: BlogOwnerMedia[];
   translations?: BlogOwnerTranslationSummary[];
+
+  /**
+   * Chỉ có trên response create/update khi backend vừa enqueue
+   * một translation batch.
+   */
+  translationBatch?: BlogOwnerTranslationBatchInfo;
 }
 
 /**
@@ -125,6 +156,7 @@ export interface BlogOwnerDashboardPost {
   likes: number;
   language: Pick<BlogOwnerLanguage, 'id' | 'code' | 'name' | 'flag'>;
 }
+
 export type BlogOwnerDashboardFeaturedSort = 'views' | 'likes';
 
 export interface BlogOwnerDashboardSummary {
@@ -155,6 +187,7 @@ export interface BlogOwnerDashboardFeatured {
   sort: BlogOwnerDashboardFeaturedSort;
   posts: BlogOwnerDashboardPost[];
 }
+
 export interface BlogOwnerDashboardData {
   postCounts: {
     total: number;
