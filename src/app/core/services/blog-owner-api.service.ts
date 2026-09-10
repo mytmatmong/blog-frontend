@@ -5,20 +5,21 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/auth.model';
 import {
+  BlogOwnerDashboardActivity,
   BlogOwnerDashboardData,
+  BlogOwnerDashboardFeatured,
+  BlogOwnerDashboardFeaturedSort,
+  BlogOwnerDashboardSummary,
   BlogOwnerOptions,
   BlogOwnerPost,
   BlogOwnerPostsPage,
   BlogOwnerPostsQuery,
+  BlogOwnerTranslationBatchProgress,
   CreateBlogOwnerPostRequest,
   CreateTranslationRequest,
   TranslationPreviewRequest,
   TranslationPreviewResponse,
   UpdateBlogOwnerPostRequest,
-  BlogOwnerDashboardActivity,
-  BlogOwnerDashboardFeatured,
-  BlogOwnerDashboardFeaturedSort,
-  BlogOwnerDashboardSummary,
 } from '../models/blog-owner.model';
 
 @Injectable({ providedIn: 'root' })
@@ -32,6 +33,7 @@ export class BlogOwnerApiService {
       `${this.apiUrl}/dashboard`,
     );
   }
+
   /** Dashboard summary: post counts + total interactions. */
   getDashboardSummary(): Observable<ApiResponse<BlogOwnerDashboardSummary>> {
     return this.http.get<ApiResponse<BlogOwnerDashboardSummary>>(
@@ -65,6 +67,7 @@ export class BlogOwnerApiService {
       { params },
     );
   }
+
   /** B02 - Dữ liệu động cho form: ngôn ngữ, category và tag. */
   getOptions(): Observable<ApiResponse<BlogOwnerOptions>> {
     return this.http.get<ApiResponse<BlogOwnerOptions>>(`${this.apiUrl}/options`);
@@ -80,6 +83,7 @@ export class BlogOwnerApiService {
       if (value === undefined || value === null || value === '') {
         continue;
       }
+
       params = params.set(key, String(value));
     }
 
@@ -100,7 +104,10 @@ export class BlogOwnerApiService {
   createPost(
     body: CreateBlogOwnerPostRequest | FormData,
   ): Observable<ApiResponse<BlogOwnerPost>> {
-    return this.http.post<ApiResponse<BlogOwnerPost>>(`${this.apiUrl}/posts`, body);
+    return this.http.post<ApiResponse<BlogOwnerPost>>(
+      `${this.apiUrl}/posts`,
+      body,
+    );
   }
 
   /** B06 - Cập nhật bài của chính Blog Owner. */
@@ -148,6 +155,19 @@ export class BlogOwnerApiService {
     return this.http.post<ApiResponse<BlogOwnerPost>>(
       `${this.apiUrl}/posts/${postId}/translations`,
       body,
+    );
+  }
+
+  /**
+   * Theo dõi trạng thái một batch dịch nền BullMQ.
+   *
+   * FE poll endpoint này sau create/update khi response có translationBatch.
+   */
+  getTranslationBatchStatus(
+    batchId: string,
+  ): Observable<ApiResponse<BlogOwnerTranslationBatchProgress>> {
+    return this.http.get<ApiResponse<BlogOwnerTranslationBatchProgress>>(
+      `${this.apiUrl}/translation-batches/${encodeURIComponent(batchId)}`,
     );
   }
 }

@@ -19,11 +19,7 @@
         #{{ post.id }}
       </span>
 
-      <app-badge
-        [color]="statusBadgeColor(post.status)"
-        shape="pill"
-        size="sm"
-      >
+      <app-badge [color]="statusBadgeColor(post.status)" shape="pill" size="sm">
         {{ statusLabel(post.status) }}
       </app-badge>
     </div>
@@ -76,13 +72,10 @@
                   <span class="required">*</span>
                 </label>
 
-                <app-single-dropdown
-                  [options]="sourceLanguageOptions()"
-                  [value]="originalLanguageId()"
+                <app-single-dropdown [options]="sourceLanguageOptions()" [value]="originalLanguageId()"
                   [disabled]="sourceLanguageLocked() || formLocked()"
                   [placeholder]="'post_form.select_language' | translate"
-                  (selectionChange)="changeOriginalLanguage($event)"
-                />
+                  (selectionChange)="changeOriginalLanguage($event)" />
               </div>
 
               <!-- NGÔN NGỮ DỊCH -->
@@ -95,13 +88,9 @@
                   </span>
                 </label>
 
-                <app-multi-dropdown
-                  [options]="translationLanguageOptions()"
-                  [values]="selectedTranslationLanguageIds()"
-                  [placeholder]="'post_form.no_translation' | translate"
-                  [disabled]="formLocked()"
-                  (selectionChange)="onTranslationLanguageSelectionChange($event)"
-                />
+                <app-multi-dropdown [options]="translationLanguageOptions()" [values]="selectedTranslationLanguageIds()"
+                  [placeholder]="'post_form.no_translation' | translate" [disabled]="formLocked()"
+                  (selectionChange)="onTranslationLanguageSelectionChange($event)" />
               </div>
             </div>
           </article>
@@ -183,13 +172,9 @@
                   <span class="required">*</span>
                 </label>
 
-                <app-multi-dropdown
-                  [options]="categoryOptions()"
-                  [values]="selectedCategoryIds()"
-                  [placeholder]="'post_form.select_category' | translate"
-                  [disabled]="formLocked()"
-                  (selectionChange)="selectedCategoryIds.set($event)"
-                />
+                <app-multi-dropdown [options]="categoryOptions()" [values]="selectedCategoryIds()"
+                  [placeholder]="'post_form.select_category' | translate" [disabled]="formLocked()"
+                  (selectionChange)="selectedCategoryIds.set($event)" />
 
                 <small>
                   {{ 'post_form.only_source_categories' | translate }}
@@ -270,11 +255,13 @@
             " (click)="toggleHashtag(tag.name)">
                       <!-- Checkbox Box bên trái -->
                       @if (isHashtagSelected(tag.name)) {
-                        <span class="w-4 h-4 rounded bg-aquamarine-600 dark:bg-aquamarine-500 text-white flex items-center justify-center shrink-0 shadow-2xs">
-                          <i class="bi bi-check-lg text-xs font-bold"></i>
-                        </span>
+                      <span
+                        class="w-4 h-4 rounded bg-aquamarine-600 dark:bg-aquamarine-500 text-white flex items-center justify-center shrink-0 shadow-2xs">
+                        <i class="bi bi-check-lg text-xs font-bold"></i>
+                      </span>
                       } @else {
-                        <span class="w-4 h-4 rounded border border-aquamarine-300 dark:border-aquamarine-600 bg-white dark:bg-aquamarine-950 shrink-0"></span>
+                      <span
+                        class="w-4 h-4 rounded border border-aquamarine-300 dark:border-aquamarine-600 bg-white dark:bg-aquamarine-950 shrink-0"></span>
                       }
 
                       <span class="hashtag-v3__option-name">
@@ -321,12 +308,14 @@
                   <img [src]="previewUrl" [alt]="thumbnailFile()?.name || titleModel">
 
                   <div class="thumbnail-bar flex items-center justify-between px-3 py-2">
-                    <span class="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                    <span
+                      class="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
                       <i class="bi bi-check-circle"></i>
                       {{ 'post_form.thumbnail_new_preview' | translate }}
                     </span>
 
-                    <button type="button" (click)="removeThumbnail($event)" class="text-xs font-semibold text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 flex items-center gap-1 hover:underline cursor-pointer">
+                    <button type="button" (click)="removeThumbnail($event)"
+                      class="text-xs font-semibold text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 flex items-center gap-1 hover:underline cursor-pointer">
                       <i class="bi bi-trash"></i>
                       {{ 'post_form.remove_thumbnail' | translate }}
                     </button>
@@ -345,7 +334,8 @@
                       {{ 'post_form.thumbnail_current' | translate }}
                     </span>
 
-                    <button type="button" (click)="removeThumbnail($event)" class="text-xs font-semibold text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 flex items-center gap-1 hover:underline cursor-pointer">
+                    <button type="button" (click)="removeThumbnail($event)"
+                      class="text-xs font-semibold text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 flex items-center gap-1 hover:underline cursor-pointer">
                       <i class="bi bi-trash"></i>
                       {{ 'post_form.remove_thumbnail' | translate }}
                     </button>
@@ -362,7 +352,8 @@
                   <span class="file-name">
                     {{
                     thumbnailFile()?.name ||
-                    (hasThumbnail() ? ('post_form.file_prefix' | translate) + ': Image' : ('post_form.no_file_selected' | translate))
+                    (hasThumbnail() ? ('post_form.file_prefix' | translate) + ': Image' : ('post_form.no_file_selected'
+                    | translate))
                     }}
                   </span>
                 </label>
@@ -461,6 +452,134 @@
       </div>
     </fieldset>
 
+    <!-- TRANSLATION BATCH PROGRESS -->
+    @if (translationBatchStatus(); as batch) {
+    <article class="translation-progress-panel" [class.is-completed]="batch.status === 'COMPLETED'"
+      [class.is-failed]="batch.status === 'FAILED'">
+      <div class="translation-progress__header">
+        <div class="translation-progress__heading">
+          <span class="translation-progress__icon">
+            @switch (batch.status) {
+            @case ('COMPLETED') {
+            <i class="bi bi-check-lg"></i>
+            }
+            @case ('FAILED') {
+            <i class="bi bi-exclamation-triangle"></i>
+            }
+            @default {
+            <i class="bi bi-translate"></i>
+            }
+            }
+          </span>
+
+          <div class="translation-progress__title">
+            <strong>
+              @switch (batch.status) {
+              @case ('QUEUED') {
+              Đang chờ xử lý bản dịch
+              }
+              @case ('PROCESSING') {
+              Đang dịch bài viết
+              }
+              @case ('COMPLETED') {
+              Dịch bài viết hoàn tất
+              }
+              @case ('FAILED') {
+              Dịch bài viết thất bại
+              }
+              }
+            </strong>
+
+            <span>
+              Bài #{{ batch.rootPostId }}
+              · {{ batch.translations.length }} ngôn ngữ
+            </span>
+          </div>
+        </div>
+
+        <span class="translation-progress__percent">
+          {{ batch.progress }}%
+        </span>
+      </div>
+
+      <div class="translation-progress__track" role="progressbar" [attr.aria-valuemin]="0" [attr.aria-valuemax]="100"
+        [attr.aria-valuenow]="batch.progress">
+        <span class="translation-progress__bar" [style.width.%]="batch.progress"></span>
+      </div>
+
+      @if (batch.translations.length > 0) {
+      <div class="translation-progress__languages">
+        @for (
+        item of batch.translations;
+        track item.languageId
+        ) {
+        <div class="translation-progress__language" [class.is-completed]="item.status === 'COMPLETED'"
+          [class.is-failed]="item.status === 'FAILED'">
+          <div class="translation-progress__language-main">
+            <span class="translation-progress__flag">
+              {{
+              translationLanguage(item.languageId)?.flag ||
+              '🌐'
+              }}
+            </span>
+
+            <div class="translation-progress__language-name">
+              <strong>
+                {{
+                languageDisplayName(
+                translationLanguage(item.languageId)
+                )
+                }}
+              </strong>
+
+              <span>
+                @switch (item.status) {
+                @case ('QUEUED') {
+                Đang chờ
+                }
+                @case ('PROCESSING') {
+                Đang dịch
+                }
+                @case ('COMPLETED') {
+                Hoàn tất
+                }
+                @case ('FAILED') {
+                Thất bại
+                }
+                }
+              </span>
+            </div>
+          </div>
+
+          <div class="translation-progress__language-end">
+            <span>{{ item.progress }}%</span>
+
+            @switch (item.status) {
+            @case ('COMPLETED') {
+            <i class="bi bi-check-circle-fill"></i>
+            }
+            @case ('FAILED') {
+            <i class="bi bi-exclamation-circle-fill"></i>
+            }
+            @default {
+            <i class="bi bi-arrow-repeat spin"></i>
+            }
+            }
+          </div>
+        </div>
+        }
+      </div>
+      }
+
+      @if (batch.status === 'FAILED') {
+      <p class="translation-progress__error">
+        <i class="bi bi-info-circle"></i>
+        Một hoặc nhiều bản dịch chưa hoàn tất. Bài gốc vẫn được giữ lại để bạn có thể kiểm tra và thử cập nhật lại.
+      </p>
+      }
+    </article>
+    }
+
     <!-- RESULT -->
     @if (createdPost(); as post) {
     <article class="result-panel">
@@ -476,11 +595,7 @@
 
           <div class="flex items-center gap-2 mt-1">
             <span>{{ 'post_form.status' | translate }}:</span>
-            <app-badge
-              [color]="statusBadgeColor(post.status)"
-              shape="pill"
-              size="sm"
-            >
+            <app-badge [color]="statusBadgeColor(post.status)" shape="pill" size="sm">
               {{ statusLabel(post.status) }}
             </app-badge>
           </div>
@@ -531,14 +646,8 @@
 </section>
 
 @if (cancelConfirmationOpen()) {
-<app-confirm-dialog
-  [title]="'post_form.cancel_changes_btn' | translate"
-  [message]="'post_form.cancel_confirm' | translate"
-  [confirmLabel]="'modal.confirm' | translate"
-  [cancelLabel]="'modal.cancel' | translate"
-  [busy]="isSubmitting()"
-  tone="warning"
-  (cancelled)="closeCancelConfirmation()"
-  (confirmed)="confirmCancelChanges()"
-/>
+<app-confirm-dialog [title]="'post_form.cancel_changes_btn' | translate"
+  [message]="'post_form.cancel_confirm' | translate" [confirmLabel]="'modal.confirm' | translate"
+  [cancelLabel]="'modal.cancel' | translate" [busy]="isSubmitting()" tone="warning"
+  (cancelled)="closeCancelConfirmation()" (confirmed)="confirmCancelChanges()" />
 }

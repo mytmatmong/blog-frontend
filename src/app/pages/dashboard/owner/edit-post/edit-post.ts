@@ -182,7 +182,9 @@ export class EditPost
     ) {
       return;
     }
+
     this.addManualHashtags();
+
     const updateRequest =
       this.buildUpdateRequest(
         submitForReview,
@@ -194,12 +196,15 @@ export class EditPost
 
     this.isSubmitting.set(true);
     this.translationResults.set([]);
+    this.translationBatchStatus.set(null);
 
     try {
       /**
-       * Flow mới: chỉ MỘT request update.
-       * Backend cập nhật root, tự dịch lại translations,
-       * tạo translation mới (nếu có) và set status cả group.
+       * FE gửi một request update.
+       *
+       * Backend update root về DRAFT và enqueue toàn bộ
+       * translations cũ + mới. Nếu response có batchId,
+       * FE poll progress API cho tới khi hoàn tất.
        */
       const updateResponse =
         await firstValueFrom(
@@ -209,23 +214,36 @@ export class EditPost
           ),
         );
 
-      const updatedPost =
+      const initialUpdatedPost =
         updateResponse.data;
 
       this.editingPost.set(
-        updatedPost,
+        initialUpdatedPost,
       );
+
       this.createdPost.set(
-        updatedPost,
+        initialUpdatedPost,
+      );
+
+      const finalUpdatedPost =
+        await this.resolvePostAfterTranslation(
+          initialUpdatedPost,
+        );
+
+      this.editingPost.set(
+        finalUpdatedPost,
+      );
+
+      this.createdPost.set(
+        finalUpdatedPost,
       );
 
       /**
-       * Đồng bộ lại danh sách translation đã tồn tại từ
-       * response backend để các checkbox tiếp tục bị khóa
-       * không cho bỏ ở những lần sửa tiếp theo.
+       * Sau khi batch COMPLETED, GET lại post đã có đầy đủ
+       * translations nên có thể đồng bộ chính xác checkbox.
        */
       const translationLanguageIds =
-        (updatedPost.translations ?? [])
+        (finalUpdatedPost.translations ?? [])
           .map(
             (translation) =>
               Number(
@@ -234,10 +252,12 @@ export class EditPost
           )
           .filter(
             (languageId) =>
-              Number.isInteger(languageId) &&
+              Number.isInteger(
+                languageId,
+              ) &&
               languageId > 0 &&
               languageId !==
-                updatedPost.languageId,
+                finalUpdatedPost.languageId,
           );
 
       this.existingTranslationLanguageIds.set(
@@ -253,51 +273,26 @@ export class EditPost
       );
 
       this.existingThumbnailUrl.set(
-        updatedPost.thumbnailUrl,
+        finalUpdatedPost.thumbnailUrl,
       );
+
       this.thumbnailFile.set(null);
       this.thumbnailPreviewUrl.set(null);
 
-      const translationPostIdByLanguageId =
-        new Map<number, number>(
-          (updatedPost.translations ?? []).map(
-            (translation): [number, number] => [
-              translation.languageId,
-              translation.id,
-            ],
-          ),
-        );
-
-      this.translationResults.set(
-        this
-          .existingTranslationLanguageIds()
-          .map(
-            (languageId) => ({
-              languageId,
-              postId:
-                translationPostIdByLanguageId.get(
-                  languageId,
-                ),
-              success: true,
-              message: submitForReview
-                ? this.tr(
-                  'post_form.translation_submitted',
-                )
-                : this.tr(
-                  'post_form.translation_draft_created',
-                ),
-            }),
-          ),
+      this.setCompletedTranslationResults(
+        finalUpdatedPost,
+        this.existingTranslationLanguageIds(),
+        submitForReview,
       );
 
       this.toast.success(
         submitForReview
           ? this.tr(
-            'post_form.update_submit_success',
-          )
+              'post_form.update_submit_success',
+            )
           : this.tr(
-            'post_form.update_success',
-          ),
+              'post_form.update_success',
+            ),
         this.tr('common.success'),
         5000,
       );

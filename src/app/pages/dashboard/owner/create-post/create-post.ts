@@ -17,6 +17,7 @@ import {
   BlogOwnerLanguage,
   BlogOwnerOptions,
   BlogOwnerPost,
+  BlogOwnerTranslationBatchProgress,
   CreateBlogOwnerPostRequest,
 } from '../../../../core/models/blog-owner.model';
 import { BlogOwnerApiService } from '../../../../core/services/blog-owner-api.service';
@@ -125,6 +126,32 @@ export class CreatePost implements OnInit {
 
   readonly translationResults =
     signal<TranslationCreationResult[]>([]);
+
+  /**
+   * Trạng thái batch dịch nền hiện tại.
+   *
+   * null khi request không có ngôn ngữ cần dịch.
+   */
+  readonly translationBatchStatus =
+    signal<BlogOwnerTranslationBatchProgress | null>(null);
+
+  readonly translationBatchProgress =
+    computed(
+      () =>
+        this.translationBatchStatus()?.progress ??
+        0,
+    );
+
+  readonly isTranslationProcessing =
+    computed(() => {
+      const status =
+        this.translationBatchStatus()?.status;
+
+      return (
+        status === 'QUEUED' ||
+        status === 'PROCESSING'
+      );
+    });
 
   titleModel = '';
 
@@ -1100,7 +1127,7 @@ export class CreatePost implements OnInit {
       return;
     }
 
-     this.addManualHashtags();
+    this.addManualHashtags();
 
     const request =
       this.buildCreateRequest(
@@ -1113,12 +1140,14 @@ export class CreatePost implements OnInit {
 
     this.isSubmitting.set(true);
     this.translationResults.set([]);
+    this.translationBatchStatus.set(null);
 
     try {
       /**
-       * Flow mới: FE chỉ gọi MỘT request.
-       * Backend tự tạo root + tự dịch + tạo translations
-       * rồi đồng bộ cùng trạng thái.
+       * FE chỉ gửi một request create.
+       *
+       * Nếu backend trả translationBatch thì bản dịch đang
+       * được xử lý nền bởi BullMQ/Redis.
        */
       const createResponse =
         await firstValueFrom(
@@ -1127,77 +1156,61 @@ export class CreatePost implements OnInit {
           ),
         );
 
-      const post =
+      const initialPost =
         createResponse.data;
 
-      this.createdPost.set(post);
+      this.createdPost.set(
+        initialPost,
+      );
+
       this.editor?.enable(false);
 
-      /**
-       * Chỉ dùng kết quả backend để hiển thị trạng thái
-       * các ngôn ngữ; KHÔNG gọi translate-preview /
-       * createTranslation ở frontend nữa.
-       */
       const targetLanguageIds =
-        Array.from(
-          new Set(
-            this
-              .selectedTranslationLanguageIds()
-              .map(Number)
-              .filter(
-                (languageId) =>
-                  Number.isInteger(languageId) &&
-                  languageId > 0 &&
-                  languageId !==
-                    post.languageId,
-              ),
-          ),
+        this.getSelectedTargetLanguageIds(
+          initialPost.languageId,
         );
 
-      const translationPostIdByLanguageId =
-        new Map<number, number>(
-          (post.translations ?? []).map(
-            (translation): [number, number] => [
-              translation.languageId,
-              translation.id,
-            ],
-          ),
+      /**
+       * Không có translationBatch:
+       * - không chọn ngôn ngữ dịch;
+       * - hoặc backend không cần chạy queue.
+       *
+       * Có translationBatch:
+       * poll tới COMPLETED/FAILED rồi tải lại post để lấy
+       * translations và status cuối cùng.
+       */
+      const finalPost =
+        await this.resolvePostAfterTranslation(
+          initialPost,
         );
 
-      this.translationResults.set(
-        targetLanguageIds.map(
-          (languageId) => ({
-            languageId,
-            postId:
-              translationPostIdByLanguageId.get(
-                languageId,
-              ),
-            success: true,
-            message: submitForReview
-              ? this.tr(
-                'post_form.translation_submitted',
-              )
-              : this.tr(
-                'post_form.translation_draft_created',
-              ),
-          }),
-        ),
+      this.createdPost.set(
+        finalPost,
+      );
+
+      this.setCompletedTranslationResults(
+        finalPost,
+        targetLanguageIds,
+        submitForReview,
       );
 
       this.toast.success(
         submitForReview
           ? this.tr(
-            'post_form.group_submitted',
-          )
+              'post_form.group_submitted',
+            )
           : this.tr(
-            'post_form.group_saved',
-          ),
+              'post_form.group_saved',
+            ),
         this.tr(
           'post_form.create_success',
         ),
         5000,
       );
-      await this.router.navigate(['/dashboard/owner/posts']);
+
+      await this.router.navigate([
+        '/dashboard/owner/posts',
+      ]);
     } catch (error: unknown) {
       this.toast.error(
         getApiErrorMessage(error),
@@ -1208,6 +1221,193 @@ export class CreatePost implements OnInit {
     } finally {
       this.isSubmitting.set(false);
     }
+  }
+
+  /**
+   * Nếu response create/update có translationBatch thì chờ
+   * BullMQ xử lý xong rồi GET lại post.
+   *
+   * EditPost kế thừa và dùng chung method này.
+   */
+  protected async resolvePostAfterTranslation(
+    post: BlogOwnerPost,
+  ): Promise<BlogOwnerPost> {
+    const batch =
+      post.translationBatch;
+
+    if (!batch) {
+      this.translationBatchStatus.set(null);
+      return post;
+    }
+
+    this.translationBatchStatus.set({
+      batchId: batch.batchId,
+      rootPostId: post.id,
+      status: batch.status,
+      progress: 0,
+      translations:
+        this.getSelectedTargetLanguageIds(
+          post.languageId,
+        ).map(
+          (languageId) => ({
+            languageId,
+            status: 'QUEUED',
+            progress: 0,
+          }),
+        ),
+    });
+
+    const batchResult =
+      await this.waitForTranslationBatch(
+        batch.batchId,
+      );
+
+    if (
+      batchResult.status !==
+      'COMPLETED'
+    ) {
+      throw new Error(
+        'Dịch bài viết thất bại. Vui lòng thử lại.',
+      );
+    }
+
+    const refreshedPostResponse =
+      await firstValueFrom(
+        this.api.getPost(
+          post.id,
+        ),
+      );
+
+    return refreshedPostResponse.data;
+  }
+
+  /**
+   * Poll progress API cho tới khi batch kết thúc.
+   *
+   * Poll 1 giây/lần, tối đa 5 phút.
+   */
+  protected async waitForTranslationBatch(
+    batchId: string,
+  ): Promise<BlogOwnerTranslationBatchProgress> {
+    const pollIntervalMs = 1000;
+    const timeoutMs =
+      5 * 60 * 1000;
+
+    const startedAt =
+      Date.now();
+
+    while (true) {
+      const response =
+        await firstValueFrom(
+          this.api.getTranslationBatchStatus(
+            batchId,
+          ),
+        );
+
+      const batch =
+        response.data;
+
+      this.translationBatchStatus.set(
+        batch,
+      );
+
+      if (
+        batch.status ===
+          'COMPLETED' ||
+        batch.status ===
+          'FAILED'
+      ) {
+        return batch;
+      }
+
+      if (
+        Date.now() - startedAt >=
+        timeoutMs
+      ) {
+        throw new Error(
+          'Quá thời gian chờ xử lý bản dịch. Vui lòng kiểm tra lại sau.',
+        );
+      }
+
+      await new Promise<void>(
+        (resolve) => {
+          setTimeout(
+            resolve,
+            pollIntervalMs,
+          );
+        },
+      );
+    }
+  }
+
+  /**
+   * Danh sách target language đang được chọn trên form.
+   */
+  protected getSelectedTargetLanguageIds(
+    sourceLanguageId: number,
+  ): number[] {
+    return Array.from(
+      new Set(
+        this
+          .selectedTranslationLanguageIds()
+          .map(Number)
+          .filter(
+            (languageId) =>
+              Number.isInteger(
+                languageId,
+              ) &&
+              languageId > 0 &&
+              languageId !==
+                sourceLanguageId,
+          ),
+      ),
+    );
+  }
+
+  /**
+   * Chỉ đánh dấu translation thành công sau khi batch
+   * đã COMPLETED và post đã được tải lại từ backend.
+   */
+  protected setCompletedTranslationResults(
+    post: BlogOwnerPost,
+    targetLanguageIds: number[],
+    submitForReview: boolean,
+  ): void {
+    const translationPostIdByLanguageId =
+      new Map<number, number>(
+        (post.translations ?? []).map(
+          (translation): [number, number] => [
+            translation.languageId,
+            translation.id,
+          ],
+        ),
+      );
+
+    this.translationResults.set(
+      targetLanguageIds.map(
+        (languageId) => ({
+          languageId,
+
+          postId:
+            translationPostIdByLanguageId.get(
+              languageId,
+            ),
+
+          success:
+            translationPostIdByLanguageId.has(
+              languageId,
+            ),
+
+          message: submitForReview
+            ? this.tr(
+                'post_form.translation_submitted',
+              )
+            : this.tr(
+                'post_form.translation_draft_created',
+              ),
+        }),
+      ),
+    );
   }
 
   statusLabel(
