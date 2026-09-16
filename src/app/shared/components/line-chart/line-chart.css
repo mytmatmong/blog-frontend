@@ -1,0 +1,77 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.line-chart-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 12px;
+}
+
+.line-chart-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.line-chart-period-selector {
+  display: inline-flex;
+  align-items: center;
+  background: var(--card-bg-muted, #f1f5f9);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 9999px;
+  padding: 3px;
+  gap: 2px;
+}
+
+:host-context(.dark) .line-chart-period-selector {
+  background: #171a28;
+  border-color: #292a43;
+}
+
+.period-btn {
+  border: none;
+  background: transparent;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted, #64748b);
+  cursor: pointer;
+  transition: all 150ms ease;
+  line-height: 1.25;
+  outline: none;
+}
+
+.period-btn:hover {
+  color: var(--card-text-default, #1e293b);
+}
+
+:host-context(.dark) .period-btn:hover {
+  color: #f1f5f9;
+}
+
+.period-btn.active {
+  background: #ffffff;
+  color: #5b5bd6;
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+:host-context(.dark) .period-btn.active {
+  background: #24283a;
+  color: #8b8cf8;
+}
+
+.line-chart-stage {
+  position: relative;
+  width: 100%;
+  min-height: 200px;
+}
+
+.line-chart-stage canvas {
+  width: 100% !important;
+  height: 100% !important;
+}

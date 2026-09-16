@@ -1,12 +1,7 @@
 import {
-  AfterViewInit,
   Component,
-  ElementRef,
-  OnDestroy,
   OnInit,
-  ViewChild,
   computed,
-  effect,
   inject,
   signal,
 } from '@angular/core';
@@ -32,15 +27,8 @@ import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { ConfirmDialog } from '../../../../shared/components/confirm-dialog/confirm-dialog';
 import { BadgeComponent, BadgeColor } from '../../../../shared/components/badge/badge';
 import { IconButtonComponent } from '../../../../shared/components/icon-button/icon-button';
-
-type ChartInstance = {
-  destroy(): void;
-};
-
-type ChartConstructor = new (
-  canvas: HTMLCanvasElement,
-  config: Record<string, unknown>,
-) => ChartInstance;
+import { LineChartComponent, LineChartDataset, ChartPeriod } from '../../../../shared/components/line-chart/line-chart';
+import { StatCardComponent } from '../../../../shared/components/stat-card/stat-card';
 
 @Component({
   selector: 'app-owner-dashboard',
@@ -53,25 +41,25 @@ type ChartConstructor = new (
     ConfirmDialog,
     BadgeComponent,
     IconButtonComponent,
+    LineChartComponent,
+    StatCardComponent,
   ],
 
   templateUrl: './owner-dashboard.html',
   styleUrl: './owner-dashboard.css',
 })
 
-export class OwnerDashboard implements OnInit, AfterViewInit, OnDestroy {
+export class OwnerDashboard implements OnInit {
   private readonly api = inject(BlogOwnerApiService);
   private readonly auth = inject(AuthService);
   private readonly toast = inject(ToastService);
   private readonly router = inject(Router);
   protected readonly ts = inject(TranslationService);
 
-  @ViewChild('interactionChart')
-  private chartCanvas?: ElementRef<HTMLCanvasElement>;
-
   readonly summary = signal<BlogOwnerDashboardSummary | null>(null);
   readonly activity = signal<BlogOwnerDashboardActivity | null>(null);
   readonly featured = signal<BlogOwnerDashboardFeatured | null>(null);
+  readonly selectedActivityPeriod = signal<ChartPeriod>('7d');
 
   readonly summaryLoading = signal(true);
   readonly activityLoading = signal(true);
@@ -96,33 +84,37 @@ readonly featuredPosts = computed<BlogOwnerDashboardPost[]>(
   () => this.featured()?.posts ?? [],
 );
   private featuredRequestVersion = 0;
-  private chartInstance: ChartInstance | null = null;
-  private viewReady = false;
 
-  constructor() {
-    effect(() => {
-      this.ts.currentLang();
-      this.auth.isDarkMode();
-      this.activity();
+  readonly activityLabels = computed(() => {
+    const list = this.activity()?.last7Days;
+    if (!list) return [];
+    return list.map((item) => this.formatChartDate(item.date));
+  });
 
-      if (this.viewReady) {
-        queueMicrotask(() => this.renderChart());
-      }
-    });
-  }
+  readonly activityDatasets = computed<LineChartDataset[]>(() => {
+    this.ts.currentLang();
+    const list = this.activity()?.last7Days;
+    if (!list) return [];
+    return [
+      {
+        label: this.ts.translate('table.views'),
+        data: list.map((item) => item.views),
+      },
+      {
+        label: this.ts.translate('table.likes'),
+        data: list.map((item) => item.likes),
+      },
+    ];
+  });
 
   ngOnInit(): void {
     this.loadDashboard();
   }
 
-  ngAfterViewInit(): void {
-    this.viewReady = true;
-    this.renderChart();
-  }
-
-  ngOnDestroy(): void {
-    this.chartInstance?.destroy();
-    this.chartInstance = null;
+  onActivityPeriodChange(period: ChartPeriod): void {
+    this.selectedActivityPeriod.set(period);
+    const days = period === '30d' ? 30 : period === '1y' ? 30 : 7;
+    this.loadActivity(days);
   }
 
 loadDashboard(): void {
@@ -160,8 +152,6 @@ loadActivity(days = 7): void {
     next: ({ data }) => {
       this.activity.set(data);
       this.activityLoading.set(false);
-
-      queueMicrotask(() => this.renderChart());
     },
     error: (error: unknown) => {
       this.activityError.set(
@@ -337,129 +327,6 @@ loadFeatured(
       default:
         return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
     }
-  }
-
-  private renderChart(): void {
-    const data = this.activity();
-    const canvas = this.chartCanvas?.nativeElement;
-    const ChartClass = (
-      globalThis as typeof globalThis & { Chart?: ChartConstructor }
-    ).Chart;
-
-    if (!this.viewReady || !data || !canvas || !ChartClass) {
-      return;
-    }
-
-    const rootStyles =
-      typeof document !== 'undefined'
-        ? getComputedStyle(document.documentElement)
-        : null;
-    const textColor =
-      rootStyles?.getPropertyValue('--text-muted').trim() || '#667085';
-    const gridColor =
-      rootStyles?.getPropertyValue('--border-color').trim() || '#e5e8ef';
-
-    this.chartInstance?.destroy();
-      const chartValues = data.last7Days.flatMap((item) => [
-        item.views,
-        item.likes,
-    ]);
-
-  const minChartValue = Math.min(0, ...chartValues);
-  const maxChartValue = Math.max(0, ...chartValues);
-    this.chartInstance = new ChartClass(canvas, {
-      type: 'line',
-      data: {
-        labels: data.last7Days.map((item) => this.formatChartDate(item.date)),
-        datasets: [
-          {
-            label: this.ts.translate('table.views'),
-            data: data.last7Days.map((item) => item.views),
-            borderColor: '#5b5bd6',
-            backgroundColor: 'rgba(91, 91, 214, 0.10)',
-            pointBackgroundColor: '#5b5bd6',
-            pointBorderColor: '#ffffff',
-            pointBorderWidth: 2,
-            pointRadius: 3,
-            pointHoverRadius: 5,
-            borderWidth: 2.5,
-            fill: true,
-            tension: 0.42,
-          },
-          {
-            label: this.ts.translate('table.likes'),
-            data: data.last7Days.map((item) => item.likes),
-            borderColor: '#f43f5e',
-            backgroundColor: 'rgba(244, 63, 94, 0.06)',
-            pointBackgroundColor: '#f43f5e',
-            pointBorderColor: '#ffffff',
-            pointBorderWidth: 2,
-            pointRadius: 3,
-            pointHoverRadius: 5,
-            borderWidth: 2.5,
-            fill: true,
-            tension: 0.42,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: {
-          intersect: false,
-          mode: 'index',
-        },
-        plugins: {
-          legend: {
-            display: false,
-          },
-          tooltip: {
-            backgroundColor: this.auth.isDarkMode() ? '#1b1f2c' : '#ffffff',
-            titleColor: this.auth.isDarkMode() ? '#f3f4f7' : '#171923',
-            bodyColor: textColor,
-            borderColor: gridColor,
-            borderWidth: 1,
-            padding: 12,
-            cornerRadius: 10,
-            displayColors: true,
-          },
-        },
-        scales: {
-          x: {
-            grid: {
-              display: false,
-            },
-            border: {
-              display: false,
-            },
-            ticks: {
-              color: textColor,
-              font: { size: 10 },
-            },
-          },
-          y: {
-            beginAtZero: false,
-            suggestedMin: minChartValue,
-            suggestedMax:
-              minChartValue === maxChartValue
-                ? maxChartValue + 1
-                : maxChartValue,
-            border: {
-              display: false,
-            },
-            grid: {
-              color: gridColor,
-              drawTicks: false,
-            },
-            ticks: {
-              color: textColor,
-              padding: 10,
-              font: { size: 10 },
-            },
-          },
-        },
-      },
-    });
   }
 
   private formatChartDate(date: string): string {

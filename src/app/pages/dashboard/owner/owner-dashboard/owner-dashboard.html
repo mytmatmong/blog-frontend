@@ -1,9 +1,6 @@
 <section class="owner-dashboard">
   <header class="owner-page-header">
-    <div class="owner-page-header__copy">
-      <h1>{{ 'dashboard.owner_title' | translate }}</h1>
-      <p>{{ 'dashboard.owner_desc' | translate }}</p>
-    </div>
+    <div></div>
 
     <div class="owner-page-header__actions">
       <button type="button" class="dashboard-button dashboard-button--secondary" (click)="openShareModal()">
@@ -38,79 +35,42 @@
        SUMMARY METRICS
        GET /blog-owner/dashboard/summary
        ========================================================= -->
-  <div class="metric-grid">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
     <!-- TOTAL POSTS -->
-    <article class="metric-card metric-card--brand">
-      <div class="metric-card__value">
-        @if (summaryLoading()) {
-        <span class="metric-skeleton"></span>
-        } @else {
-        {{ (summary()?.postCounts?.total ?? 0) | number }}
-        }
-      </div>
-
-      <div class="metric-card__meta">
-        <div class="metric-card__label">
-          {{ 'dashboard.total_posts' | translate }}
-        </div>
-
-        <div class="metric-card__detail">
-          {{ (summary()?.postCounts?.published ?? 0) | number }}
-          {{ 'post_status.publish' | translate }}
-        </div>
-      </div>
-    </article>
+    <app-stat-card
+      icon="bi bi-file-earmark-richtext"
+      [label]="'dashboard.total_posts' | translate"
+      [value]="summary()?.postCounts?.total ?? 0"
+      [loading]="summaryLoading()"
+      [colorIndex]="0"
+    ></app-stat-card>
 
     <!-- TOTAL VIEWS -->
-    <article class="metric-card metric-card--sky">
-      <div class="metric-card__value">
-        @if (summaryLoading()) {
-        <span class="metric-skeleton"></span>
-        } @else {
-        {{ (summary()?.totals?.views ?? 0) | number }}
-        }
-      </div>
-
-      <div class="metric-card__meta">
-        <div class="metric-card__label">
-          {{ 'dashboard.total_views' | translate }}
-        </div>
-      </div>
-    </article>
+    <app-stat-card
+      icon="bi bi-eye"
+      [label]="'dashboard.total_views' | translate"
+      [value]="summary()?.totals?.views ?? 0"
+      [loading]="summaryLoading()"
+      [colorIndex]="1"
+    ></app-stat-card>
 
     <!-- TOTAL LIKES -->
-    <article class="metric-card metric-card--rose">
-      <div class="metric-card__value">
-        @if (summaryLoading()) {
-        <span class="metric-skeleton"></span>
-        } @else {
-        {{ (summary()?.totals?.likes ?? 0) | number }}
-        }
-      </div>
-
-      <div class="metric-card__meta">
-        <div class="metric-card__label">
-          {{ 'dashboard.total_likes' | translate }}
-        </div>
-      </div>
-    </article>
+    <app-stat-card
+      icon="bi bi-heart"
+      [label]="'dashboard.total_likes' | translate"
+      [value]="summary()?.totals?.likes ?? 0"
+      [loading]="summaryLoading()"
+      [colorIndex]="2"
+    ></app-stat-card>
 
     <!-- TOTAL COMMENTS -->
-    <article class="metric-card metric-card--amber">
-      <div class="metric-card__value">
-        @if (summaryLoading()) {
-        <span class="metric-skeleton"></span>
-        } @else {
-        {{ (summary()?.totals?.comments ?? 0) | number }}
-        }
-      </div>
-
-      <div class="metric-card__meta">
-        <div class="metric-card__label">
-          {{ 'dashboard.total_comments' | translate }}
-        </div>
-      </div>
-    </article>
+    <app-stat-card
+      icon="bi bi-chat-dots"
+      [label]="'dashboard.total_comments' | translate"
+      [value]="summary()?.totals?.comments ?? 0"
+      [loading]="summaryLoading()"
+      [colorIndex]="3"
+    ></app-stat-card>
   </div>
 
   <!-- =========================================================
@@ -126,18 +86,6 @@
       <div class="panel-heading">
         <div>
           <h2>{{ 'dashboard.interaction_chart' | translate }}</h2>
-        </div>
-
-        <div class="chart-legend" [attr.aria-label]="'a11y.chart_legend' | translate">
-          <span>
-            <i class="chart-dot chart-dot--views"></i>
-            {{ 'table.views' | translate }}
-          </span>
-
-          <span>
-            <i class="chart-dot chart-dot--likes"></i>
-            {{ 'table.likes' | translate }}
-          </span>
         </div>
       </div>
 
@@ -157,9 +105,18 @@
             {{ 'common.retry' | translate }}
           </button>
         </div>
+        } @else {
+          <app-line-chart
+            [labels]="activityLabels()"
+            [datasets]="activityDatasets()"
+            colorScheme="interaction"
+            [showPeriodSelector]="true"
+            [selectedPeriod]="selectedActivityPeriod()"
+            (periodChange)="onActivityPeriodChange($event)"
+            [showLegend]="true"
+            [height]="250"
+          ></app-line-chart>
         }
-
-        <canvas #interactionChart></canvas>
       </div>
     </article>
 

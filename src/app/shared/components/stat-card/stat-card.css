@@ -1,0 +1,229 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-radius: 16px;
+  border: 1px solid var(--border-color, #e2e8f0);
+  background: var(--card-bg, #ffffff);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-sm, 0 1px 2px 0 rgba(0, 0, 0, 0.05));
+  user-select: none;
+  cursor: default;
+  transition: border-color 150ms ease;
+  min-height: 98px;
+}
+
+:host-context(.dark) .stat-card {
+  background: var(--card-bg, #171a28);
+  border-color: var(--border-color, #292a43);
+}
+
+.stat-card__icon-box {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.stat-card__body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.stat-card__label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 4px;
+}
+
+.stat-card__value-container {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.stat-card__value {
+  font-size: 1.625rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+/* Skeleton Loading */
+.stat-card__skeleton {
+  display: inline-block;
+  width: 60px;
+  height: 28px;
+  border-radius: 6px;
+  background: #e2e8f0;
+  animation: statPulse 1.5s ease-in-out infinite;
+}
+
+:host-context(.dark) .stat-card__skeleton {
+  background: #334155;
+}
+
+@keyframes statPulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 0.3; }
+}
+
+/* ========================================================
+   THEME COLOR VARIANTS (Màu icon trùng với màu chữ)
+   ======================================================== */
+
+/* Indigo / Purple */
+.stat-card[data-color='indigo'] .stat-card__icon-box {
+  background: rgba(91, 91, 214, 0.12);
+  color: #5b5bd6;
+}
+.stat-card[data-color='indigo'] .stat-card__label {
+  color: #5b5bd6;
+}
+.stat-card[data-color='indigo'] .stat-card__value {
+  color: #5b5bd6;
+}
+:host-context(.dark) .stat-card[data-color='indigo'] .stat-card__icon-box {
+  background: rgba(129, 140, 248, 0.16);
+  color: #818cf8;
+}
+:host-context(.dark) .stat-card[data-color='indigo'] .stat-card__label,
+:host-context(.dark) .stat-card[data-color='indigo'] .stat-card__value {
+  color: #818cf8;
+}
+
+/* Cyan / Sky */
+.stat-card[data-color='cyan'] .stat-card__icon-box {
+  background: rgba(8, 145, 178, 0.12);
+  color: #0891b2;
+}
+.stat-card[data-color='cyan'] .stat-card__label {
+  color: #0891b2;
+}
+.stat-card[data-color='cyan'] .stat-card__value {
+  color: #0891b2;
+}
+:host-context(.dark) .stat-card[data-color='cyan'] .stat-card__icon-box {
+  background: rgba(34, 211, 238, 0.16);
+  color: #22d3ee;
+}
+:host-context(.dark) .stat-card[data-color='cyan'] .stat-card__label,
+:host-context(.dark) .stat-card[data-color='cyan'] .stat-card__value {
+  color: #22d3ee;
+}
+
+/* Emerald / Green */
+.stat-card[data-color='emerald'] .stat-card__icon-box {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+.stat-card[data-color='emerald'] .stat-card__label {
+  color: #059669;
+}
+.stat-card[data-color='emerald'] .stat-card__value {
+  color: #059669;
+}
+:host-context(.dark) .stat-card[data-color='emerald'] .stat-card__icon-box {
+  background: rgba(52, 211, 153, 0.16);
+  color: #34d399;
+}
+:host-context(.dark) .stat-card[data-color='emerald'] .stat-card__label,
+:host-context(.dark) .stat-card[data-color='emerald'] .stat-card__value {
+  color: #34d399;
+}
+
+/* Amber / Orange */
+.stat-card[data-color='amber'] .stat-card__icon-box {
+  background: rgba(217, 119, 6, 0.12);
+  color: #d97706;
+}
+.stat-card[data-color='amber'] .stat-card__label {
+  color: #d97706;
+}
+.stat-card[data-color='amber'] .stat-card__value {
+  color: #d97706;
+}
+:host-context(.dark) .stat-card[data-color='amber'] .stat-card__icon-box {
+  background: rgba(251, 191, 36, 0.16);
+  color: #fbbf24;
+}
+:host-context(.dark) .stat-card[data-color='amber'] .stat-card__label,
+:host-context(.dark) .stat-card[data-color='amber'] .stat-card__value {
+  color: #fbbf24;
+}
+
+/* Rose / Red */
+.stat-card[data-color='rose'] .stat-card__icon-box {
+  background: rgba(225, 29, 72, 0.12);
+  color: #e11d48;
+}
+.stat-card[data-color='rose'] .stat-card__label {
+  color: #e11d48;
+}
+.stat-card[data-color='rose'] .stat-card__value {
+  color: #e11d48;
+}
+:host-context(.dark) .stat-card[data-color='rose'] .stat-card__icon-box {
+  background: rgba(251, 113, 133, 0.16);
+  color: #fb7185;
+}
+:host-context(.dark) .stat-card[data-color='rose'] .stat-card__label,
+:host-context(.dark) .stat-card[data-color='rose'] .stat-card__value {
+  color: #fb7185;
+}
+
+/* Purple */
+.stat-card[data-color='purple'] .stat-card__icon-box {
+  background: rgba(147, 51, 234, 0.12);
+  color: #9333ea;
+}
+.stat-card[data-color='purple'] .stat-card__label {
+  color: #9333ea;
+}
+.stat-card[data-color='purple'] .stat-card__value {
+  color: #9333ea;
+}
+:host-context(.dark) .stat-card[data-color='purple'] .stat-card__icon-box {
+  background: rgba(192, 132, 252, 0.16);
+  color: #c084fc;
+}
+:host-context(.dark) .stat-card[data-color='purple'] .stat-card__label,
+:host-context(.dark) .stat-card[data-color='purple'] .stat-card__value {
+  color: #c084fc;
+}
+
+/* Blue */
+.stat-card[data-color='blue'] .stat-card__icon-box {
+  background: rgba(37, 99, 235, 0.12);
+  color: #2563eb;
+}
+.stat-card[data-color='blue'] .stat-card__label {
+  color: #2563eb;
+}
+.stat-card[data-color='blue'] .stat-card__value {
+  color: #2563eb;
+}
+:host-context(.dark) .stat-card[data-color='blue'] .stat-card__icon-box {
+  background: rgba(96, 165, 250, 0.16);
+  color: #60a5fa;
+}
+:host-context(.dark) .stat-card[data-color='blue'] .stat-card__label,
+:host-context(.dark) .stat-card[data-color='blue'] .stat-card__value {
+  color: #60a5fa;
+}

@@ -1,0 +1,29 @@
+<div class="stat-card" [attr.data-color]="activeColor()">
+  <!-- Icon bên trái -->
+  <div class="stat-card__icon-box">
+    @if (icon()) {
+      <i [class]="icon()" aria-hidden="true"></i>
+    }
+  </div>
+
+  <!-- Thông tin bên phải -->
+  <div class="stat-card__body">
+    <!-- Chữ bên phải trên -->
+    <span class="stat-card__label">{{ label() }}</span>
+
+    <!-- Số bên phải dưới -->
+    <div class="stat-card__value-container">
+      @if (loading()) {
+        <span class="stat-card__skeleton"></span>
+      } @else {
+        <strong class="stat-card__value">
+          @if (isNumericValue()) {
+            {{ value() | number }}
+          } @else {
+            {{ value() }}
+          }
+        </strong>
+      }
+    </div>
+  </div>
+</div>
