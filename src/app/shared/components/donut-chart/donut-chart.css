@@ -1,0 +1,55 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.donut-chart-container {
+  position: relative;
+  width: 100%;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.donut-chart-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.donut-center-info {
+  position: absolute;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  line-height: 1.2;
+  user-select: none;
+  transition: opacity 200ms ease;
+}
+
+.donut-center-value {
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: var(--card-text-default, #1e293b);
+}
+
+:host-context(.dark) .donut-center-value {
+  color: var(--card-text-default, #f1f5f9);
+}
+
+.donut-center-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted, #64748b);
+  margin-top: 2px;
+  text-transform: lowercase;
+}
+
+:host-context(.dark) .donut-center-label {
+  color: var(--text-muted, #94a3b8);
+}

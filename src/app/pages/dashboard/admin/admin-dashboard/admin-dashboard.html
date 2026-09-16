@@ -1,23 +1,4 @@
 <section class="space-y-6">
-  <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-    <div>
-      <h1 class="text-2xl font-bold text-aquamarine-950 dark:text-aquamarine-50">
-        {{ 'dashboard.admin_title' | translate }}
-      </h1>
-      <p class="mt-1 text-sm text-aquamarine-600 dark:text-aquamarine-400">
-        {{ 'dashboard.admin_desc' | translate }}
-      </p>
-    </div>
-    <button
-      type="button"
-      (click)="loadDashboardData()"
-      [disabled]="isLoading()"
-      class="inline-flex items-center justify-center gap-2 self-start rounded-xl border border-aquamarine-200 bg-white px-3.5 py-2 text-xs font-semibold text-aquamarine-700 shadow-sm transition-colors hover:bg-aquamarine-50 disabled:cursor-wait disabled:opacity-60 dark:border-aquamarine-800 dark:bg-aquamarine-900 dark:text-aquamarine-300 dark:hover:bg-aquamarine-800"
-    >
-      <i class="bi bi-arrow-clockwise" [class.animate-spin]="isLoading()"></i>
-      {{ 'admin_dashboard.refresh' | translate }}
-    </button>
-  </div>
 
   @if (isLoading()) {
     <div
@@ -50,93 +31,33 @@
     </div>
   } @else {
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      <a
-        routerLink="/dashboard/admin/manage-users"
-        class="flex items-center gap-4 rounded-2xl border border-aquamarine-200 bg-white p-5 shadow-sm transition-colors hover:border-aquamarine-400 dark:border-aquamarine-800 dark:bg-aquamarine-900 dark:hover:border-aquamarine-600"
-      >
-        <span
-          class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-aquamarine-50 text-aquamarine-600 dark:bg-aquamarine-800 dark:text-aquamarine-300"
-          ><i class="bi bi-people text-lg"></i
-        ></span>
-        <span class="min-w-0">
-          <span
-            class="block truncate text-xs font-medium text-aquamarine-600 dark:text-aquamarine-400"
-            >{{ 'dashboard.manage_users' | translate }}</span
-          >
-          <strong class="mt-1 block text-2xl text-aquamarine-800 dark:text-aquamarine-200">{{
-            dashboardData()?.stats?.totalUsers ?? 0
-          }}</strong>
-          <small class="mt-1 block text-xs text-aquamarine-500"
-            >+{{ totalNewUsers() }} {{ 'admin_dashboard.in_7_days' | translate }}</small
-          >
-        </span>
-      </a>
+      <app-stat-card
+        icon="bi bi-people"
+        [label]="'dashboard.manage_users' | translate"
+        [value]="dashboardData()?.stats?.totalUsers ?? 0"
+        [colorIndex]="0"
+      ></app-stat-card>
 
-      <a
-        routerLink="/dashboard/admin/manage-users"
-        class="flex items-center gap-4 rounded-2xl border border-aquamarine-200 bg-white p-5 shadow-sm transition-colors hover:border-aquamarine-400 dark:border-aquamarine-800 dark:bg-aquamarine-900 dark:hover:border-aquamarine-600"
-      >
-        <span
-          class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-cyan-50 text-cyan-600 dark:bg-cyan-900/30 dark:text-cyan-400"
-          ><i class="bi bi-pen text-lg"></i
-        ></span>
-        <span class="min-w-0">
-          <span
-            class="block truncate text-xs font-medium text-aquamarine-600 dark:text-aquamarine-400"
-            >{{ 'dashboard.blog_owners' | translate }}</span
-          >
-          <strong class="mt-1 block text-2xl text-cyan-600 dark:text-cyan-400">{{
-            dashboardData()?.stats?.totalBlogOwners ?? 0
-          }}</strong>
-          <small class="mt-1 block text-xs text-aquamarine-500">{{
-            'admin_dashboard.creator_accounts' | translate
-          }}</small>
-        </span>
-      </a>
+      <app-stat-card
+        icon="bi bi-pencil-square"
+        [label]="'dashboard.blog_owners' | translate"
+        [value]="dashboardData()?.stats?.totalBlogOwners ?? 0"
+        [colorIndex]="1"
+      ></app-stat-card>
 
-      <a
-        routerLink="/dashboard/admin/manage-languages"
-        class="flex items-center gap-4 rounded-2xl border border-aquamarine-200 bg-white p-5 shadow-sm transition-colors hover:border-aquamarine-400 dark:border-aquamarine-800 dark:bg-aquamarine-900 dark:hover:border-aquamarine-600"
-      >
-        <span
-          class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400"
-          ><i class="bi bi-translate text-lg"></i
-        ></span>
-        <span class="min-w-0">
-          <span
-            class="block truncate text-xs font-medium text-aquamarine-600 dark:text-aquamarine-400"
-            >{{ 'dashboard.manage_languages' | translate }}</span
-          >
-          <strong class="mt-1 block text-2xl text-emerald-600 dark:text-emerald-400">{{
-            dashboardData()?.stats?.totalLanguages ?? 0
-          }}</strong>
-          <small class="mt-1 block text-xs text-aquamarine-500"
-            >{{ totalPosts() }} {{ 'admin_dashboard.posts' | translate }}</small
-          >
-        </span>
-      </a>
+      <app-stat-card
+        icon="bi bi-translate"
+        [label]="'dashboard.manage_languages' | translate"
+        [value]="dashboardData()?.stats?.totalLanguages ?? 0"
+        [colorIndex]="2"
+      ></app-stat-card>
 
-      <a
-        routerLink="/dashboard/admin/manage-requests"
-        class="flex items-center gap-4 rounded-2xl border border-aquamarine-200 bg-white p-5 shadow-sm transition-colors hover:border-amber-400 dark:border-aquamarine-800 dark:bg-aquamarine-900 dark:hover:border-amber-600"
-      >
-        <span
-          class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400"
-          ><i class="bi bi-person-check text-lg"></i
-        ></span>
-        <span class="min-w-0">
-          <span
-            class="block truncate text-xs font-medium text-aquamarine-600 dark:text-aquamarine-400"
-            >{{ 'admin_dashboard.owner_requests' | translate }}</span
-          >
-          <strong class="mt-1 block text-2xl text-amber-600 dark:text-amber-400">{{
-            dashboardData()?.stats?.pendingRequests ?? 0
-          }}</strong>
-          <small class="mt-1 block text-xs text-aquamarine-500">{{
-            'admin_dashboard.awaiting_review' | translate
-          }}</small>
-        </span>
-      </a>
+      <app-stat-card
+        icon="bi bi-person-check"
+        [label]="'admin_dashboard.owner_requests' | translate"
+        [value]="dashboardData()?.stats?.pendingRequests ?? 0"
+        [colorIndex]="3"
+      ></app-stat-card>
     </div>
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-12">
@@ -144,29 +65,21 @@
         <div
           class="flex h-full flex-col rounded-2xl border border-aquamarine-200 bg-white p-5 shadow-sm dark:border-aquamarine-800 dark:bg-aquamarine-900"
         >
-          <div class="mb-4 flex items-start justify-between gap-4">
-            <div>
-              <h2 class="text-base font-bold text-aquamarine-950 dark:text-aquamarine-50">
-                {{ 'dashboard.user_growth_chart' | translate }}
-              </h2>
-              <p class="mt-1 text-xs text-aquamarine-500">
-                {{ 'admin_dashboard.daily_growth_desc' | translate }}
-              </p>
-            </div>
-            <div class="text-right">
-              <strong class="block text-xl text-aquamarine-700 dark:text-aquamarine-300"
-                >+{{ totalNewUsers() }}</strong
-              >
-              <span class="text-xs text-aquamarine-500">{{
-                'admin_dashboard.seven_day_total' | translate
-              }}</span>
-            </div>
+          <div class="mb-4">
+            <h2 class="text-base font-bold text-aquamarine-950 dark:text-aquamarine-50">
+              {{ 'dashboard.user_growth_chart' | translate }}
+            </h2>
           </div>
-          <div class="relative min-h-64 flex-1">
-            <canvas
-              id="userGrowthChart"
-              [attr.aria-label]="'admin_dashboard.growth_chart_label' | translate"
-            ></canvas>
+          <div class="relative flex-1">
+            <app-line-chart
+              [labels]="userGrowthLabels()"
+              [data]="userGrowthData()"
+              [label]="'admin_dashboard.new_users' | translate"
+              colorScheme="growth"
+              [showPeriodSelector]="true"
+              [(selectedPeriod)]="selectedGrowthPeriod"
+              [height]="250"
+            ></app-line-chart>
           </div>
         </div>
       </div>
@@ -219,25 +132,19 @@
         <h2 class="text-base font-bold text-aquamarine-950 dark:text-aquamarine-50">
           {{ 'dashboard.blog_lang_dist_chart' | translate }}
         </h2>
-        <p class="mt-1 text-xs text-aquamarine-500">
-          {{ 'admin_dashboard.language_distribution_desc' | translate }}
-        </p>
 
-        <div class="relative mx-auto mt-4 h-56 w-full max-w-64">
-          <canvas
-            id="langPieChart"
-            [attr.aria-label]="'admin_dashboard.language_chart_label' | translate"
-          ></canvas>
-          <div
-            class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center"
-          >
-            <strong class="text-2xl text-aquamarine-800 dark:text-aquamarine-200">{{
-              totalPosts()
-            }}</strong>
-            <span class="text-xs text-aquamarine-500">{{
-              'admin_dashboard.posts' | translate
-            }}</span>
-          </div>
+        <div class="mt-4">
+          <app-donut-chart
+            [data]="langChartData()"
+            [labels]="langChartLabels()"
+            colorScheme="languages"
+            [centerValue]="totalPosts()"
+            [centerLabel]="'admin_dashboard.posts' | translate"
+            [unit]="'admin_dashboard.posts' | translate"
+            [ariaLabel]="'admin_dashboard.language_chart_label' | translate"
+            [height]="260"
+            [showLegend]="true"
+          ></app-donut-chart>
         </div>
       </div>
 

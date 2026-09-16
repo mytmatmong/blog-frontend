@@ -1,6 +1,9 @@
-import { Component, effect, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+import { DonutChartComponent } from '../../../../shared/components/donut-chart/donut-chart';
+import { LineChartComponent, LineChartDataset, ChartPeriod } from '../../../../shared/components/line-chart/line-chart';
+import { StatCardComponent } from '../../../../shared/components/stat-card/stat-card';
 import { ModeratorApiService } from '../../../../core/services/moderator-api.service';
 import {
   ModeratorDashboardOverview,
@@ -11,15 +14,13 @@ import { ToastService } from '../../../../core/services/toast.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { TranslationService } from '../../../../core/services/translation.service';
 
-declare var Chart: any;
-
 @Component({
   selector: 'app-moderator-dashboard',
-  imports: [RouterLink, TranslatePipe],
+  imports: [RouterLink, TranslatePipe, DonutChartComponent, LineChartComponent, StatCardComponent],
   templateUrl: './moderator-dashboard.html',
   styleUrl: './moderator-dashboard.css',
 })
-export class ModeratorDashboard implements OnInit, OnDestroy {
+export class ModeratorDashboard implements OnInit {
   private readonly moderatorApiService = inject(ModeratorApiService);
   private readonly toast = inject(ToastService);
   readonly auth = inject(AuthService);
@@ -39,32 +40,84 @@ export class ModeratorDashboard implements OnInit, OnDestroy {
   readonly reportTrendLoading = signal<boolean>(true);
   readonly reportTrendError = signal<string | null>(null);
   readonly reportTrendData = signal<ModeratorDashboardReportTrend | null>(null);
+  readonly selectedTrendPeriod = signal<ChartPeriod>('7d');
 
-  private reportsChartInstance: any = null;
-  private reasonChartInstance: any = null;
-  private statusChartInstance: any = null;
+  readonly reasonChartLabels = computed(() => {
+    this.ts.currentLang();
+    return [
+      this.ts.translate('report.reason.SPAM'),
+      this.ts.translate('report.reason.HARASSMENT'),
+      this.ts.translate('report.reason.INAPPROPRIATE'),
+      this.ts.translate('report.reason.COPYRIGHT'),
+      this.ts.translate('report.reason.MISINFORMATION'),
+      this.ts.translate('report.reason.OTHER'),
+    ];
+  });
 
-  private readonly chartThemeEffect = effect(() => {
-  this.auth.isDarkMode();
+  readonly reasonChartData = computed(() => {
+    const reasons = this.reportStatsData()?.reportReasonCounts;
+    if (!reasons) return [];
+    return [
+      reasons.spam || 0,
+      reasons.harassment || 0,
+      reasons.inappropriate || 0,
+      reasons.copyright || 0,
+      reasons.misinformation || 0,
+      reasons.other || 0,
+    ];
+  });
 
-  const reportStats = this.reportStatsData();
-  const reportTrend = this.reportTrendData();
+  readonly statusChartLabels = computed(() => {
+    this.ts.currentLang();
+    return [
+      this.ts.translate('moderator.status_pending_label'),
+      this.ts.translate('moderator.status_resolved_label'),
+      this.ts.translate('moderator.status_rejected_label'),
+    ];
+  });
 
-  if (reportStats || reportTrend) {
-    setTimeout(() => this.initCharts(reportStats, reportTrend));
-  }
-});
+  readonly statusChartData = computed(() => {
+    const statuses = this.reportStatsData()?.reportStatusCounts;
+    if (!statuses) return [];
+    return [
+      statuses.pending || 0,
+      statuses.resolved || 0,
+      statuses.rejected || 0,
+    ];
+  });
+
+  readonly reportTrendLabels = computed(() => {
+    const trend = this.reportTrendData()?.last7Days;
+    if (!trend) return [];
+    return trend.map((item) => {
+      if (!item.date) return '';
+      const parts = item.date.split('-');
+      return parts.length === 3 ? `${parts[2]}/${parts[1]}` : item.date;
+    });
+  });
+
+  readonly reportTrendDatasets = computed<LineChartDataset[]>(() => {
+    this.ts.currentLang();
+    const trend = this.reportTrendData()?.last7Days;
+    if (!trend) return [];
+    return [
+      {
+        label: this.ts.translate('moderator.post_reports_label'),
+        data: trend.map((item) => item.postReports),
+      },
+      {
+        label: this.ts.translate('moderator.comment_reports_label'),
+        data: trend.map((item) => item.commentReports),
+      },
+    ];
+  });
 
   ngOnInit() {
     this.loadDashboardData();
   }
 
-  ngOnDestroy() {
-    this.destroyCharts();
-  }
-
-loadDashboardData() {
-  this.isForbidden.set(false);
+  loadDashboardData() {
+    this.isForbidden.set(false);
 
   this.loadOverview();
   this.loadReportStats();
@@ -171,201 +224,5 @@ private handleDashboardError(
   logoutAndSwitchAccount() {
     this.auth.logout();
     this.router.navigate(['/auth']);
-  }
-
-initCharts(
-  reportStats: ModeratorDashboardReportStats | null,
-  reportTrend: ModeratorDashboardReportTrend | null,
-) {
-    if (typeof Chart === 'undefined') return;
-
-    this.destroyCharts();
-
-    const isDark = this.auth.isDarkMode();
-    const chartText = isDark ? '#cbd5e1' : '#64748b';
-    const chartGrid = isDark
-      ? 'rgba(148, 163, 184, 0.16)'
-      : 'rgba(100, 116, 139, 0.18)';
-    const chartBorder = isDark ? '#171a28' : '#ffffff';
-    const tooltipBackground = isDark ? '#0f172a' : '#111827';
-    const legendOptions = {
-      labels: {
-        color: chartText,
-        usePointStyle: true,
-        pointStyle: 'circle',
-        boxWidth: 8,
-        padding: 16,
-      },
-    };
-
-    // 1. Stacked Bar Chart - Report 7 ngày qua
-    const canvasBar = document.getElementById('reportsChart') as HTMLCanvasElement;
-    if (
-  canvasBar &&
-  reportTrend?.last7Days &&
-  reportTrend.last7Days.length > 0
-) {
-      const labels = reportTrend.last7Days.map((item) => {
-        if (!item.date) return '';
-        const parts = item.date.split('-');
-        return parts.length === 3 ? `${parts[2]}/${parts[1]}` : item.date;
-      });
-      const postReportsData = reportTrend.last7Days.map((item) => item.postReports);
-      const commentReportsData = reportTrend.last7Days.map((item) => item.commentReports);
-
-      this.reportsChartInstance = new Chart(canvasBar, {
-        type: 'bar',
-        data: {
-          labels,
-          datasets: [
-            {
-              label: this.ts.translate('moderator.post_reports_label'),
-              data: postReportsData,
-              backgroundColor: '#0ea5e9',
-              borderRadius: 6,
-            },
-            {
-              label: this.ts.translate('moderator.comment_reports_label'),
-              data: commentReportsData,
-              backgroundColor: '#f59e0b',
-              borderRadius: 6,
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: {
-              beginAtZero: true,
-              stacked: true,
-              ticks: { color: chartText, stepSize: 1 },
-              grid: { color: chartGrid },
-              border: { color: chartGrid },
-            },
-            x: {
-              stacked: true,
-              ticks: { color: chartText },
-              grid: { color: chartGrid },
-              border: { color: chartGrid },
-            },
-          },
-          plugins: {
-            legend: { position: 'bottom', ...legendOptions },
-            tooltip: {
-              backgroundColor: tooltipBackground,
-              titleColor: '#f8fafc',
-              bodyColor: '#e2e8f0',
-            },
-          },
-        },
-      });
-    }
-
-    // 2. Doughnut Chart - Lý do báo cáo
-    const canvasReasonPie = document.getElementById('moderationPieChart') as HTMLCanvasElement;
-    if (canvasReasonPie && reportStats?.reportReasonCounts) {
-      const reasons = reportStats.reportReasonCounts;
-      const reasonLabels = [
-        this.ts.translate('report.reason.SPAM'),
-        this.ts.translate('report.reason.HARASSMENT'),
-        this.ts.translate('report.reason.INAPPROPRIATE'),
-        this.ts.translate('report.reason.COPYRIGHT'),
-        this.ts.translate('report.reason.MISINFORMATION'),
-        this.ts.translate('report.reason.OTHER'),
-      ];
-      const reasonData = [
-        reasons.spam || 0,
-        reasons.harassment || 0,
-        reasons.inappropriate || 0,
-        reasons.copyright || 0,
-        reasons.misinformation || 0,
-        reasons.other || 0,
-      ];
-
-      this.reasonChartInstance = new Chart(canvasReasonPie, {
-        type: 'doughnut',
-        data: {
-          labels: reasonLabels,
-          datasets: [
-            {
-              data: reasonData,
-              backgroundColor: [
-                '#ef4444',
-                '#f59e0b',
-                '#8b5cf6',
-                '#3b82f6',
-                '#ec4899',
-                '#6b7280',
-              ],
-              borderColor: chartBorder,
-              borderWidth: 2,
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { position: 'bottom', ...legendOptions },
-            tooltip: {
-              backgroundColor: tooltipBackground,
-              titleColor: '#f8fafc',
-              bodyColor: '#e2e8f0',
-            },
-          },
-        },
-      });
-    }
-
-    // 3. Status Pie Chart - Trạng thái báo cáo
-    const canvasStatusPie = document.getElementById('statusPieChart') as HTMLCanvasElement;
-    if (canvasStatusPie && reportStats?.reportStatusCounts) {
-      const statuses = reportStats.reportStatusCounts;
-      this.statusChartInstance = new Chart(canvasStatusPie, {
-        type: 'pie',
-        data: {
-          labels: [
-            this.ts.translate('moderator.status_pending_label'),
-            this.ts.translate('moderator.status_resolved_label'),
-            this.ts.translate('moderator.status_rejected_label'),
-          ],
-          datasets: [
-            {
-              data: [statuses.pending || 0, statuses.resolved || 0, statuses.rejected || 0],
-              backgroundColor: ['#f59e0b', '#10b981', '#ef4444'],
-              borderColor: chartBorder,
-              borderWidth: 2,
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { position: 'bottom', ...legendOptions },
-            tooltip: {
-              backgroundColor: tooltipBackground,
-              titleColor: '#f8fafc',
-              bodyColor: '#e2e8f0',
-            },
-          },
-        },
-      });
-    }
-  }
-
-  private destroyCharts(): void {
-    for (const chart of [
-      this.reportsChartInstance,
-      this.reasonChartInstance,
-      this.statusChartInstance,
-    ]) {
-      chart?.destroy();
-    }
-
-    this.reportsChartInstance = null;
-    this.reasonChartInstance = null;
-    this.statusChartInstance = null;
   }
 }

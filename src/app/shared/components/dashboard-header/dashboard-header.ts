@@ -1,5 +1,6 @@
 import { Component, computed, ElementRef, HostListener, inject, OnInit, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { AuthService } from '../../../core/services/auth.service';
 import { TranslationService, SupportedLang } from '../../../core/services/translation.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
@@ -17,6 +18,7 @@ export class DashboardHeader implements OnInit {
   private elementRef = inject(ElementRef);
 
   isLangDropdownOpen = signal<boolean>(false);
+  readonly currentUrl = signal<string>(this.router.url);
 
   readonly userInitial = computed(() => {
     const user = this.auth.currentUser();
@@ -28,6 +30,31 @@ export class DashboardHeader implements OnInit {
     return Array.from(label)[0]?.toLocaleUpperCase() ?? '?';
   });
 
+  readonly dashboardTitleKey = computed(() => {
+    const url = this.currentUrl();
+    if (url.includes('/dashboard/admin')) {
+      return 'dashboard.admin_title';
+    }
+    if (url.includes('/dashboard/moderator')) {
+      return 'dashboard.mod_title';
+    }
+    if (url.includes('/dashboard/owner')) {
+      return 'dashboard.owner_title';
+    }
+
+    const role = this.auth.currentRole();
+    switch (role) {
+      case 'admin':
+        return 'dashboard.admin_title';
+      case 'moderator':
+        return 'dashboard.mod_title';
+      case 'owner':
+        return 'dashboard.owner_title';
+      default:
+        return 'dashboard.title';
+    }
+  });
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     if (!this.elementRef.nativeElement.contains(event.target as Node)) {
@@ -37,6 +64,12 @@ export class DashboardHeader implements OnInit {
 
   ngOnInit(): void {
     this.translationService.loadLanguages();
+
+    this.router.events
+      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+      .subscribe((event) => {
+        this.currentUrl.set(event.urlAfterRedirects || event.url);
+      });
   }
 
   toggleLangDropdown(event?: MouseEvent) {

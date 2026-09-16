@@ -1,0 +1,20 @@
+<div class="donut-chart-container" [style.height]="containerHeight()">
+  <canvas
+    #chartCanvas
+    [attr.aria-label]="ariaLabel()"
+    role="img"
+  ></canvas>
+
+  @if (showCenter() && (hasData() || displayCenterValue() !== 0 || centerLabel())) {
+    <div
+      class="donut-center-info"
+      [style.top.px]="centerPos().top"
+      [style.left.px]="centerPos().left"
+    >
+      <span class="donut-center-value">{{ displayCenterValue() }}</span>
+      @if (centerLabel()) {
+        <span class="donut-center-label">{{ centerLabel() }}</span>
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,40 @@
+<div class="line-chart-wrapper">
+  @if (showPeriodSelector()) {
+    <div class="line-chart-toolbar">
+      <div class="line-chart-period-selector" role="group" [attr.aria-label]="'Chọn khoảng thời gian'">
+        <button
+          type="button"
+          class="period-btn"
+          [class.active]="selectedPeriod() === '7d'"
+          (click)="selectPeriod('7d')"
+        >
+          {{ getPeriodLabel('7d') }}
+        </button>
+        <button
+          type="button"
+          class="period-btn"
+          [class.active]="selectedPeriod() === '30d'"
+          (click)="selectPeriod('30d')"
+        >
+          {{ getPeriodLabel('30d') }}
+        </button>
+        <button
+          type="button"
+          class="period-btn"
+          [class.active]="selectedPeriod() === '1y'"
+          (click)="selectPeriod('1y')"
+        >
+          {{ getPeriodLabel('1y') }}
+        </button>
+      </div>
+    </div>
+  }
+
+  <div class="line-chart-stage" [style.height]="containerHeight()">
+    <canvas
+      #chartCanvas
+      [attr.aria-label]="ariaLabel()"
+      role="img"
+    ></canvas>
+  </div>
+</div>
