@@ -39,12 +39,6 @@ export interface ModeratorDashboardReportStats {
 export interface ModeratorDashboardReportTrend {
   last7Days: ModeratorLast7DaysItem[];
 }
-export interface ModeratorDashboardData {
-  overview: ModeratorDashboardOverview;
-  reportStatusCounts: ModeratorReportStatusCounts;
-  reportReasonCounts: ModeratorReportReasonCounts;
-  last7Days: ModeratorLast7DaysItem[];
-}
 
 export type ModeratorPostStatus = 'PENDING_REVIEW' | 'PUBLISH' | 'REJECT';
 

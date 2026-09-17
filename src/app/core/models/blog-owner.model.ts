@@ -188,30 +188,6 @@ export interface BlogOwnerDashboardFeatured {
   posts: BlogOwnerDashboardPost[];
 }
 
-export interface BlogOwnerDashboardData {
-  postCounts: {
-    total: number;
-    draft: number;
-    pendingReview: number;
-    published: number;
-    rejected: number;
-  };
-  totals: {
-    views: number;
-    likes: number;
-    comments: number;
-  };
-  last7Days: Array<{
-    date: string;
-    views: number;
-    likes: number;
-  }>;
-  featuredPosts: {
-    byViews: BlogOwnerDashboardPost[];
-    byLikes: BlogOwnerDashboardPost[];
-  };
-}
-
 export interface CreateBlogOwnerPostRequest {
   title: string;
   content: string;
@@ -254,11 +230,4 @@ export interface TranslationPreviewResponse {
     title: string;
     content: string;
   };
-}
-
-export interface CreateTranslationRequest {
-  targetLanguageId: number;
-  title: string;
-  content: string;
-  thumbnailUrl?: string;
 }

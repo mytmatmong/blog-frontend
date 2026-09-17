@@ -6,7 +6,6 @@ import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/auth.model';
 import {
   BlogOwnerDashboardActivity,
-  BlogOwnerDashboardData,
   BlogOwnerDashboardFeatured,
   BlogOwnerDashboardFeaturedSort,
   BlogOwnerDashboardSummary,
@@ -16,7 +15,6 @@ import {
   BlogOwnerPostsQuery,
   BlogOwnerTranslationBatchProgress,
   CreateBlogOwnerPostRequest,
-  CreateTranslationRequest,
   TranslationPreviewRequest,
   TranslationPreviewResponse,
   UpdateBlogOwnerPostRequest,
@@ -27,12 +25,6 @@ export class BlogOwnerApiService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/blog-owner`;
 
-  /** B01 - Dashboard của Blog Owner đang đăng nhập. */
-  getDashboard(): Observable<ApiResponse<BlogOwnerDashboardData>> {
-    return this.http.get<ApiResponse<BlogOwnerDashboardData>>(
-      `${this.apiUrl}/dashboard`,
-    );
-  }
 
   /** Dashboard summary: post counts + total interactions. */
   getDashboardSummary(): Observable<ApiResponse<BlogOwnerDashboardSummary>> {
@@ -147,16 +139,6 @@ export class BlogOwnerApiService {
     );
   }
 
-  /** B10 - Lưu bản dịch thành một Post DRAFT. Category/tag do backend map/copy. */
-  createTranslation(
-    postId: number,
-    body: CreateTranslationRequest,
-  ): Observable<ApiResponse<BlogOwnerPost>> {
-    return this.http.post<ApiResponse<BlogOwnerPost>>(
-      `${this.apiUrl}/posts/${postId}/translations`,
-      body,
-    );
-  }
 
   /**
    * Theo dõi trạng thái một batch dịch nền BullMQ.
