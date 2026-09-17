@@ -7,7 +7,6 @@ import { ApiResponse } from '../models/auth.model';
 import {
   GetModeratorPostsQuery,
   GetModeratorReportsQuery,
-  ModeratorDashboardData,
   ModeratorDashboardOverview,
   ModeratorDashboardReportStats,
   ModeratorDashboardReportTrend,
@@ -32,29 +31,16 @@ export class ModeratorApiService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = environment.apiUrl;
 
-  /**
-   * M01 — GET /api/v1/moderator/dashboard
-   * Lấy thống kê tổng quan phục vụ màn hình Moderator
-   */
-  getModeratorDashboard(): Observable<ApiResponse<ModeratorDashboardData>> {
-    return this.http.get<ApiResponse<ModeratorDashboardData>>(
-      `${this.apiUrl}/moderator/dashboard`,
+  /** GET /api/v1/moderator/dashboard/overview */
+  getModeratorDashboardOverview(): Observable<
+    ApiResponse<ModeratorDashboardOverview>
+  > {
+    return this.http.get<ApiResponse<ModeratorDashboardOverview>>(
+      `${this.apiUrl}/moderator/dashboard/overview`,
     );
   }
-  /**
- * GET /api/v1/moderator/dashboard/overview
- */
-getModeratorDashboardOverview(): Observable<
-  ApiResponse<ModeratorDashboardOverview>
-> {
-  return this.http.get<ApiResponse<ModeratorDashboardOverview>>(
-    `${this.apiUrl}/moderator/dashboard/overview`,
-  );
-}
 
-/**
- * GET /api/v1/moderator/dashboard/report-stats
- */
+  /** GET /api/v1/moderator/dashboard/report-stats */
   getModeratorDashboardReportStats(): Observable<
     ApiResponse<ModeratorDashboardReportStats>
   > {
@@ -63,9 +49,7 @@ getModeratorDashboardOverview(): Observable<
     );
   }
 
-/**
- * GET /api/v1/moderator/dashboard/report-trend
- */
+  /** GET /api/v1/moderator/dashboard/report-trend */
   getModeratorDashboardReportTrend(): Observable<
     ApiResponse<ModeratorDashboardReportTrend>
   > {
@@ -73,6 +57,7 @@ getModeratorDashboardOverview(): Observable<
       `${this.apiUrl}/moderator/dashboard/report-trend`,
     );
   }
+
   /**
    * M02 — GET /api/v1/moderator/posts
    * Lấy danh sách bài Moderator được phép xem

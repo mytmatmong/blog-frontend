@@ -25,7 +25,6 @@ import { EditPost } from './pages/dashboard/owner/edit-post/edit-post';
 import { ModeratorDashboard } from './pages/dashboard/moderator/moderator-dashboard/moderator-dashboard';
 import { ManageBlogs } from './pages/dashboard/moderator/manage-blogs/manage-blogs';
 import { ManageCategories } from './pages/dashboard/moderator/manage-categories/manage-categories';
-import { ManageComments } from './pages/dashboard/moderator/manage-comments/manage-comments';
 import { ManageReports } from './pages/dashboard/moderator/manage-reports/manage-reports';
 
 import { AdminDashboard } from './pages/dashboard/admin/admin-dashboard/admin-dashboard';
@@ -84,7 +83,6 @@ export const routes: Routes = [
           { path: 'manage-blogs', component: ManageBlogs },
           { path: 'manage-reports', component: ManageReports },
           { path: 'manage-categories', component: ManageCategories },
-          { path: 'manage-comments', component: ManageReports },
         ]
       },
 
