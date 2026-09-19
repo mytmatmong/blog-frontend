@@ -1,9 +1,10 @@
 <!-- dashboard-sidebar -->
 <aside class="w-full lg:w-64 bg-[var(--card-bg)] text-[var(--card-text-default)] lg:fixed lg:top-0 lg:bottom-0 lg:left-0 p-5 overflow-y-auto flex flex-col border-r border-[var(--border-color)]">
   <!-- dashboard-sidebar-logo -->
-  <h4 class="text-[var(--card-text-default)] font-extrabold text-xl mb-6 flex items-center gap-2">
-    <i class="bi bi-stars text-[var(--brand)]"></i>Blogy.
-  </h4>
+  <a routerLink="/" class="inline-flex items-center gap-[9px] mb-6 text-[19px] font-[850] tracking-[-0.035em] text-[var(--text-website)] hover:opacity-90 transition-opacity">
+    <span class="w-[30px] h-[30px] grid place-items-center rounded-[9px] text-white bg-[linear-gradient(145deg,#7657ff,#4d2fd8)] shadow-[0_7px_16px_rgba(93,61,242,0.24)] text-[13px]"><i class="bi bi-stars"></i></span>
+    <span>Blogy<span class="text-[var(--brand)]">.</span></span>
+  </a>
 
   <!-- dashboard-sidebar-section-owner -->
   @if (activeSection === 'owner') {
