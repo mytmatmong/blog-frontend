@@ -528,6 +528,7 @@
   "post_form.category_label": "Categories",
   "post_form.change_file": "Change file",
   "post_form.choose_file": "Choose file",
+  "post_form.content_image_upload_error": "Couldn't upload the image. Please try again.",
   "post_form.content_images_hint": "Insert images in the article directly with the image button in the editor.",
   "post_form.content_label": "Article Content",
   "post_form.content_too_long_prefix": "Content must not exceed",

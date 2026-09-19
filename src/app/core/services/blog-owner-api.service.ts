@@ -141,6 +141,24 @@ export class BlogOwnerApiService {
 
 
   /**
+   * Upload ảnh chèn vào nội dung bài viết (nút "image" trên Quill).
+   *
+   * Không cần postId — dùng được cả lúc đang soạn bài MỚI. Trả về
+   * { url } để tự insertEmbed vào editor, không tạo bản ghi Media.
+   */
+  uploadContentImage(
+    file: File,
+  ): Observable<ApiResponse<{ url: string }>> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return this.http.post<ApiResponse<{ url: string }>>(
+      `${this.apiUrl}/posts/content-image`,
+      formData,
+    );
+  }
+
+  /**
    * Theo dõi trạng thái một batch dịch nền BullMQ.
    *
    * FE poll endpoint này sau create/update khi response có translationBatch.

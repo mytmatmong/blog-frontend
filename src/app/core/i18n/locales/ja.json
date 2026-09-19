@@ -528,6 +528,7 @@
   "post_form.category_label": "カテゴリー",
   "post_form.change_file": "ファイルの変更",
   "post_form.choose_file": "ファイルの選択",
+  "post_form.content_image_upload_error": "画像のアップロードに失敗しました。もう一度お試しください。",
   "post_form.content_images_hint": "エディタのイメージボタンで直接記事に画像をインサートします.",
   "post_form.content_label": "記事コンテンツ",
   "post_form.content_too_long_prefix": "コンテンツが上回らない",
