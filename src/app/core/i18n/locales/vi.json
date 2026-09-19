@@ -528,6 +528,7 @@
   "post_form.category_label": "Danh mục",
   "post_form.change_file": "Thay đổi tệp",
   "post_form.choose_file": "Chọn tệp",
+  "post_form.content_image_upload_error": "Không tải được ảnh lên. Vui lòng thử lại.",
   "post_form.content_images_hint": "Ảnh trong nội dung được chèn trực tiếp bằng nút hình ảnh trên trình soạn thảo.",
   "post_form.content_label": "Nội dung bài viết",
   "post_form.content_too_long_prefix": "Nội dung không được vượt quá",

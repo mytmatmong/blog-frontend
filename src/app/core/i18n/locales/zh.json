@@ -528,6 +528,7 @@
   "post_form.category_label": "类别",
   "post_form.change_file": "更改文件",
   "post_form.choose_file": "选择文件",
+  "post_form.content_image_upload_error": "图片上传失败,请重试.",
   "post_form.content_images_hint": "在文章中直接用编辑器中的图像按钮插入图像.",
   "post_form.content_label": "条款内容",
   "post_form.content_too_long_prefix": "内容不得超过",

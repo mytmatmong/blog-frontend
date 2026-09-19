@@ -37,12 +37,27 @@ interface QuillConstructor {
   ): QuillEditor;
 }
 
+interface QuillRange {
+  index: number;
+  length: number;
+}
+
 interface QuillEditor {
   root: HTMLElement;
 
   enable(enabled?: boolean): void;
 
   getText(): string;
+
+  getSelection(focus?: boolean): QuillRange | null;
+
+  setSelection(index: number, length?: number): void;
+
+  insertEmbed(
+    index: number,
+    type: string,
+    value: unknown,
+  ): void;
 }
 
 export interface TranslationCreationResult {
@@ -226,58 +241,74 @@ export class CreatePost implements OnInit {
         ),
 
         modules: {
-          toolbar: [
-            [
-              {
-                header: [
-                  1,
-                  2,
-                  3,
-                  false,
-                ],
-              },
+          toolbar: {
+            container: [
+              [
+                {
+                  header: [
+                    1,
+                    2,
+                    3,
+                    false,
+                  ],
+                },
+              ],
+
+              [
+                'bold',
+                'italic',
+                'underline',
+                'strike',
+              ],
+
+              [
+                'blockquote',
+                'code-block',
+              ],
+
+              [
+                {
+                  list: 'ordered',
+                },
+                {
+                  list: 'bullet',
+                },
+              ],
+
+              [
+                {
+                  color: [],
+                },
+                {
+                  background: [],
+                },
+              ],
+
+              [
+                'link',
+                'image',
+                'video',
+              ],
+
+              [
+                'clean',
+              ],
             ],
 
-            [
-              'bold',
-              'italic',
-              'underline',
-              'strike',
-            ],
-
-            [
-              'blockquote',
-              'code-block',
-            ],
-
-            [
-              {
-                list: 'ordered',
-              },
-              {
-                list: 'bullet',
-              },
-            ],
-
-            [
-              {
-                color: [],
-              },
-              {
-                background: [],
-              },
-            ],
-
-            [
-              'link',
-              'image',
-              'video',
-            ],
-
-            [
-              'clean',
-            ],
-          ],
+            /**
+             * Ghi đè handler mặc định của Quill cho nút "image".
+             *
+             * Mặc định Quill nhét ảnh vào content dưới dạng base64
+             * Data URI (không upload đi đâu cả) — rất nặng cho
+             * database và không qua Cloudinary/CDN. Handler này thay
+             * bằng: chọn file → upload lên Cloudinary qua backend →
+             * chèn đúng URL Cloudinary vào editor.
+             */
+            handlers: {
+              image: () =>
+                this.handleEditorImageInsert(),
+            },
+          },
         },
       },
     );
@@ -286,6 +317,128 @@ export class CreatePost implements OnInit {
       this.editor.root.innerHTML =
         this.pendingEditorContent;
     }
+  }
+
+  /**
+   * Xử lý nút "image" trên toolbar Quill.
+   *
+   * Không dùng hành vi mặc định của Quill (nhét base64 thẳng vào
+   * content) — mở file picker, upload file lên Cloudinary qua
+   * backend (`POST /blog-owner/posts/content-image`, không cần
+   * postId nên dùng được cả lúc đang soạn bài mới), rồi chèn đúng
+   * URL Cloudinary trả về vào đúng vị trí con trỏ đang đứng.
+   */
+  private handleEditorImageInsert(): void {
+    if (
+      typeof document ===
+      'undefined'
+    ) {
+      return;
+    }
+
+    const editor = this.editor;
+    if (!editor) {
+      return;
+    }
+
+    const range =
+      editor.getSelection(true);
+
+    const input =
+      document.createElement(
+        'input',
+      );
+
+    input.setAttribute(
+      'type',
+      'file',
+    );
+
+    input.setAttribute(
+      'accept',
+      'image/png, image/jpeg, image/webp',
+    );
+
+    input.addEventListener(
+      'change',
+      () => {
+        const file =
+          input.files?.[0];
+
+        if (!file) {
+          return;
+        }
+
+        if (
+          !file.type.startsWith(
+            'image/',
+          )
+        ) {
+          this.toast.error(
+            this.tr(
+              'post_form.thumbnail_must_image',
+            ),
+            this.tr(
+              'post_form.invalid_file',
+            ),
+          );
+
+          return;
+        }
+
+        if (
+          !this.validateFileSize(
+            file,
+          )
+        ) {
+          return;
+        }
+
+        this.api
+          .uploadContentImage(
+            file,
+          )
+          .subscribe({
+            next: ({ data }) => {
+              const insertAt =
+                range?.index ??
+                editor.getSelection(
+                  true,
+                )?.index ??
+                0;
+
+              editor.insertEmbed(
+                insertAt,
+                'image',
+                data.url,
+              );
+
+              editor.setSelection(
+                insertAt + 1,
+                0,
+              );
+            },
+
+            error: (
+              error: unknown,
+            ) => {
+              this.toast.error(
+                getApiErrorMessage(
+                  error,
+                  this.tr(
+                    'post_form.content_image_upload_error',
+                  ),
+                ),
+                this.tr(
+                  'post_form.content_image_upload_error',
+                ),
+              );
+            },
+          });
+      },
+    );
+
+    input.click();
   }
 
   /* =======================================================
