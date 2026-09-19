@@ -29,6 +29,13 @@ export interface PostItemTag {
 
 export interface PostItem {
   id: number;
+  /**
+   * null nếu đây là bài gốc, khác null nếu là bản dịch.
+   * Like/bookmark luôn lưu vào bài gốc (backend), nên PostCard
+   * phải dùng parentPostId ?? id khi check/gọi tương tác — nếu
+   * dùng thẳng id của bản dịch, trạng thái "đã thích" sẽ luôn sai.
+   */
+  parentPostId: number | null;
   authorId: number;
 
   title: string;
@@ -117,6 +124,15 @@ export class PostCard
   readonly displayedLikes =
     signal(0);
 
+  /**
+   * Like/bookmark luôn được backend lưu vào bài GỐC của nhóm ngôn
+   * ngữ, nên mọi thao tác đọc/ghi trạng thái "đã thích/đã lưu" phải
+   * dùng đúng id này, không phải id của bản dịch đang hiển thị.
+   */
+  private get rootId(): number {
+    return this.post.parentPostId ?? this.post.id;
+  }
+
   ngOnInit(): void {
     this.interactions.ensureLoaded();
 
@@ -141,13 +157,13 @@ export class PostCard
   isLiked(): boolean {
     return this.liked
       ?? this.interactions
-        .isLiked(this.post.id);
+        .isLiked(this.rootId);
   }
 
   isBookmarked(): boolean {
     return this.bookmarked
       ?? this.interactions
-        .isBookmarked(this.post.id);
+        .isBookmarked(this.rootId);
   }
 
   isLikeBusy(): boolean {
@@ -160,7 +176,7 @@ export class PostCard
         .isLoadingState()
       || this.interactions
         .isBusy(
-          this.post.id,
+          this.rootId,
           'like',
         )
     );
@@ -178,7 +194,7 @@ export class PostCard
         .isLoadingState()
       || this.interactions
         .isBusy(
-          this.post.id,
+          this.rootId,
           'bookmark',
         )
     );
@@ -210,9 +226,14 @@ export class PostCard
     /*
      * Home, Category, Hashtag, Author:
      * PostCard tự gọi API thông qua service dùng chung.
+     *
+     * Dùng rootId chứ không phải post.id: like luôn được backend
+     * lưu vào bài gốc, service dùng chung cũng theo dõi trạng thái
+     * theo rootId (xem PostInteractionService.collectAllPostIds –
+     * chỉ nhận id bài gốc từ GET /user/posts/likes).
      */
     this.interactions
-      .toggleLike(this.post.id)
+      .toggleLike(this.rootId)
       .subscribe((change) => {
         this.displayedLikes.update(
           (current) =>
@@ -252,7 +273,7 @@ export class PostCard
     }
 
     this.interactions
-      .toggleBookmark(this.post.id)
+      .toggleBookmark(this.rootId)
       .subscribe();
   }
 }

@@ -974,6 +974,9 @@ export class AccountLibrary {
       id:
         post.id,
 
+      parentPostId:
+        post.parentPostId,
+
       authorId:
         post.authorId,
 

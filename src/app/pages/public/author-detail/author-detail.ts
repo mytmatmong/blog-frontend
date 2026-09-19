@@ -501,6 +501,7 @@ export class AuthorDetailComponent {
   ): PostItem {
     return {
       id: post.id,
+      parentPostId: post.parentPostId,
       authorId: post.authorId,
       title: post.title,
 
