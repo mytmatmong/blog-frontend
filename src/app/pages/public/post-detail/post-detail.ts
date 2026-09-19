@@ -247,7 +247,14 @@ export class PostDetail implements OnDestroy {
           if (previousCommentsPostId !== data.id) this.clearComments();
 
           this.loadComments();
-          this.loadInteractionState(data.id);
+          /**
+           * Like/bookmark giờ luôn được backend lưu vào bài GỐC của
+           * nhóm ngôn ngữ (không phải riêng bản dịch đang đọc), nên
+           * phải kiểm tra "đã thích/lưu chưa" bằng đúng root id — nếu
+           * dùng data.id (có thể là id bản dịch) sẽ luôn ra false dù
+           * người dùng đã thích bài này ở ngôn ngữ khác.
+           */
+          this.loadInteractionState(data.parentPostId ?? data.id);
         },
         error: (error: unknown) => {
           if (requestVersion !== this.postRequestVersion) return;
